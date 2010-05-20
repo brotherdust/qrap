@@ -1,0 +1,19 @@
+
+// QGSCONFIG.H
+
+#ifndef QGSCONFIG_H
+#define QGSCONFIG_H
+
+#define VERSION "1.4.02"
+
+#define PREFIX "${CMAKE_INSTALL_PREFIX}"
+
+#define QGIS_PLUGIN_SUBDIR "${QGIS_PLUGIN_SUBDIR}"
+#define QGIS_DATA_SUBDIR "${QGIS_DATA_SUBDIR}"
+
+#cmakedefine HAVE_POSTGRESQL
+
+#cmakedefine HAVE_PYTHON
+
+#endif
+

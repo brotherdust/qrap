@@ -1,0 +1,162 @@
+<ui version="4.0" >
+ <class>LoadRasterFiles</class>
+ <widget class="QDialog" name="LoadRasterFiles" >
+  <property name="windowModality" >
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1051</width>
+    <height>489</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Load Raster Files</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="../../DataBase/application.qrc" >:/images/logo_icon.png</iconset>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox" >
+   <property name="geometry" >
+    <rect>
+     <x>700</x>
+     <y>450</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons" >
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelFeedback" >
+   <property name="geometry" >
+    <rect>
+     <x>250</x>
+     <y>410</y>
+     <width>471</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string/>
+   </property>
+  </widget>
+  <widget class="QProgressBar" name="progressBar" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>460</y>
+     <width>231</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="value" >
+    <number>0</number>
+   </property>
+  </widget>
+  <widget class="QTreeWidget" name="treeWidget" >
+   <property name="geometry" >
+    <rect>
+     <x>15</x>
+     <y>5</y>
+     <width>216</width>
+     <height>441</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text" >
+     <string>Raster File Operations</string>
+    </property>
+   </column>
+   <item>
+    <property name="text" >
+     <string>Load Files into the Database</string>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../DataBase/application.qrc" >:/images/add.png</iconset>
+    </property>
+   </item>
+   <item>
+    <property name="text" >
+     <string>Cut a File Set</string>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../DataBase/application.qrc" >:/images/cut.png</iconset>
+    </property>
+   </item>
+   <item>
+    <property name="text" >
+     <string>Set File Set Usage Order</string>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../DataBase/application.qrc" >:/images/dbgrun.png</iconset>
+    </property>
+   </item>
+   <item>
+    <property name="text" >
+     <string>Create a new File Set</string>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../DataBase/application.qrc" >:/images/new.png</iconset>
+    </property>
+   </item>
+  </widget>
+  <widget class="QGroupBox" name="widgetContainer" >
+   <property name="geometry" >
+    <rect>
+     <x>235</x>
+     <y>5</y>
+     <width>811</width>
+     <height>441</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string/>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../../../../qrap/DataBase/application.qrc" />
+  <include location="../../DataBase/application.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>LoadRasterFiles</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>LoadRasterFiles</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -1,0 +1,31 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+	<file>images/copy.png</file>
+	<file>images/cut.png</file>
+	<file>images/new.png</file>
+	<file>images/open.png</file>
+	<file>images/paste.png</file>
+	<file>images/save.png</file>
+	<file>images/connect.png</file>
+	<file>images/forward.png</file>
+	<file>images/back.png</file>
+	<file>images/add.png</file>
+	<file>images/remove.png</file>
+	<file>images/next.png</file>
+	<file>images/previous.png</file>
+	<file>images/reload.png</file>
+	<file>images/down.png</file>
+	<file>images/dbgrun.png</file>
+	<file>images/rap_logo.png</file>
+	<file>images/logo_icon.png</file>
+	<file>images/configure.png</file>
+	<file>images/up.png</file>
+	<file>images/interface.png</file>
+	<file>images/dropdowns.png</file>
+	<file>images/units.png</file>
+	<file>images/defaults.png</file>
+	<file>images/plot.png</file>
+	<file>images/find.png</file>
+	<file>images/Colour.png</file>
+</qresource>
+</RCC>

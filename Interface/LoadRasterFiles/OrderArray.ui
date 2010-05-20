@@ -1,0 +1,246 @@
+<ui version="4.0" >
+ <class>OrderArray</class>
+ <widget class="QWidget" name="OrderArray" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>708</width>
+    <height>375</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <widget class="QComboBox" name="comboBoxFileType4" >
+   <property name="geometry" >
+    <rect>
+     <x>70</x>
+     <y>10</y>
+     <width>121</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text" >
+     <string>DEM</string>
+    </property>
+   </item>
+   <item>
+    <property name="text" >
+     <string>Clutter</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label" >
+   <property name="geometry" >
+    <rect>
+     <x>15</x>
+     <y>15</y>
+     <width>54</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Filetype:</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonAdd" >
+   <property name="geometry" >
+    <rect>
+     <x>255</x>
+     <y>185</y>
+     <width>80</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Add </string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonRemove" >
+   <property name="geometry" >
+    <rect>
+     <x>340</x>
+     <y>185</y>
+     <width>80</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Remove</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonUp" >
+   <property name="geometry" >
+    <rect>
+     <x>620</x>
+     <y>250</y>
+     <width>80</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Up</string>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../DataBase/application.qrc" >:/images/add.png</iconset>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonDown" >
+   <property name="geometry" >
+    <rect>
+     <x>620</x>
+     <y>320</y>
+     <width>80</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Down</string>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../DataBase/application.qrc" >:/images/remove.png</iconset>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="tableWidgetFileSets4" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>220</y>
+     <width>616</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground" >
+    <bool>true</bool>
+   </property>
+   <property name="selectionBehavior" >
+    <enum>QAbstractItemView::SelectRows</enum>
+   </property>
+   <property name="wordWrap" >
+    <bool>false</bool>
+   </property>
+   <column>
+    <property name="text" >
+     <string>ID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Description</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Projection</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Resolution</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>File Format</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Use</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Cutted Set</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Classification</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QTableWidget" name="tableWidgetFileSets3" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>45</y>
+     <width>616</width>
+     <height>136</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground" >
+    <bool>true</bool>
+   </property>
+   <property name="selectionBehavior" >
+    <enum>QAbstractItemView::SelectRows</enum>
+   </property>
+   <property name="wordWrap" >
+    <bool>false</bool>
+   </property>
+   <column>
+    <property name="text" >
+     <string>ID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Description</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Projection</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Resolution</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>File Format</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Use</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Cutted Set</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Classification</string>
+    </property>
+   </column>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../../DataBase/application.qrc" />
+ </resources>
+ <connections/>
+ <designerdata>
+  <property name="gridDeltaX" >
+   <number>5</number>
+  </property>
+  <property name="gridDeltaY" >
+   <number>5</number>
+  </property>
+  <property name="gridSnapX" >
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY" >
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible" >
+   <bool>true</bool>
+  </property>
+ </designerdata>
+</ui>

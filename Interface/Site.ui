@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Site</class>
+ <widget class="QDialog" name="Site">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>319</width>
+    <height>241</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Place a Site</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>:/QRap/DataBase/images/logo_icon.png</normaloff>:/QRap/DataBase/images/logo_icon.png</iconset>
+  </property>
+  <widget class="QWidget" name="gridLayout_2">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>306</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="EditLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="lblSiteName">
+      <property name="text">
+       <string>Site Name:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="txtSite"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="lblLatitude">
+      <property name="text">
+       <string>Latitude:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="txtLatitude"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="lblLongitude">
+      <property name="text">
+       <string>Longitude:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="txtLongitude"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="lblGroundHeight">
+      <property name="text">
+       <string>Groud Height:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="txtGroundHeight"/>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="lblStatus">
+      <property name="text">
+       <string>Status:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QComboBox" name="comboBoxStatus"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QPushButton" name="btnPlaceSite">
+   <property name="geometry">
+    <rect>
+     <x>5</x>
+     <y>175</y>
+     <width>85</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Just a Site</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnDefaultInst">
+   <property name="geometry">
+    <rect>
+     <x>145</x>
+     <y>210</y>
+     <width>172</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Add Default Installation</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnCancel">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>175</y>
+     <width>85</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnEditInstallation">
+   <property name="geometry">
+    <rect>
+     <x>5</x>
+     <y>210</y>
+     <width>137</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Edit Installation(s)</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnMove">
+   <property name="geometry">
+    <rect>
+     <x>95</x>
+     <y>175</y>
+     <width>111</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>To move the site to specific point on the map, click here, than click on the position. The values of the new position will appear combo boxes, but will only change after updating or committing the site.</string>
+   </property>
+   <property name="text">
+    <string>Move Site to ...</string>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../qrap.qrc"/>
+  <include location="../qrap.qrc"/>
+ </resources>
+ <connections/>
+</ui>

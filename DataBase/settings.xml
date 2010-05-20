@@ -1,0 +1,18 @@
+<settings>
+<!-- QRap is licensed under the GNU General Public License version 3
+www.QRap.org.za -->
+	<!-- The location of the QRAP log file -->
+	<logfile location="./qrap.log" />
+	
+	<!-- Local (client) database settings -->
+	<database host="127.0.0.1" name="qrap" port="5432" />
+	
+	<!-- PostGIS settings -->
+	<postgis srid="4326" />
+	
+	<!-- Synchronisation server settings -->
+	<syncserver host="192.168.1.1" port="6234" />
+	
+	<!-- The location of the database structure XML file -->
+	<structure location="/usr/lib/qgis/structure.xml" />
+</settings>

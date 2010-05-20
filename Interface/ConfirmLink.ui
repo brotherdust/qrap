@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ConfirmLink</class>
+ <widget class="QDialog" name="ConfirmLink">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>579</width>
+    <height>390</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Confirm Link Analysis</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../DataBase/application.qrc">
+    <normaloff>:/images/logo_icon.png</normaloff>:/images/logo_icon.png</iconset>
+  </property>
+  <widget class="QWidget" name="horizontalLayout">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>350</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="Out">
+    <item>
+     <widget class="QPushButton" name="btnOk">
+      <property name="text">
+       <string>Ok</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="btnCancel">
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QLineEdit" name="nameEdit">
+   <property name="geometry">
+    <rect>
+     <x>375</x>
+     <y>145</y>
+     <width>196</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Link</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>15</y>
+     <width>203</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Transmitting Radio Installation:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>125</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Link Name:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>185</y>
+     <width>185</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Receiving Radio Installation:</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="plotResolutionSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>305</y>
+     <width>91</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <double>3000.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="kFactorIntSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>270</y>
+     <width>91</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <double>-10000.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>3000.000000000000000</double>
+   </property>
+   <property name="value">
+    <double>1.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>375</x>
+     <y>275</y>
+     <width>56</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>k-Factor:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="displayUnitsCombo">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>200</y>
+     <width>91</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>dBm</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>dB</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>dBuV</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>dBW</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>dBuVm</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>dBWm2Hz</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>dBWm2</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>375</x>
+     <y>205</y>
+     <width>86</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Output Units:</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="frequencySpinBox">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>235</y>
+     <width>91</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <double>30000.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>10.000000000000000</double>
+   </property>
+   <property name="value">
+    <double>2400.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>375</x>
+     <y>240</y>
+     <width>69</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Frequency:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_21">
+   <property name="geometry">
+    <rect>
+     <x>375</x>
+     <y>310</y>
+     <width>101</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Plot Resolution:</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>354</y>
+     <width>292</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="UpDown">
+    <item>
+     <widget class="QCheckBox" name="useClutterCheckBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Use Clutter </string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="downLinkRadio">
+      <property name="text">
+       <string>Down Link</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="upLinkRadio">
+      <property name="text">
+       <string>Up Link</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QTableWidget" name="TxIDTable">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>40</y>
+     <width>346</width>
+     <height>136</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text">
+     <string>Tx Site</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Technology</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Rad Inst</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QTableWidget" name="RxIDTable">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>210</y>
+     <width>346</width>
+     <height>131</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text">
+     <string>Rx Site</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Technology</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Rad Inst</string>
+    </property>
+   </column>
+  </widget>
+  <zorder>nameEdit</zorder>
+  <zorder>label</zorder>
+  <zorder>label_4</zorder>
+  <zorder>label_2</zorder>
+  <zorder>plotResolutionSpinBox</zorder>
+  <zorder>kFactorIntSpinBox</zorder>
+  <zorder>label_3</zorder>
+  <zorder>displayUnitsCombo</zorder>
+  <zorder>label_5</zorder>
+  <zorder>frequencySpinBox</zorder>
+  <zorder>label_6</zorder>
+  <zorder>label_21</zorder>
+  <zorder>layoutWidget</zorder>
+  <zorder>TxIDTable</zorder>
+  <zorder>RxIDTable</zorder>
+  <zorder>horizontalLayout</zorder>
+ </widget>
+ <resources>
+  <include location="../DataBase/application.qrc"/>
+ </resources>
+ <connections/>
+</ui>

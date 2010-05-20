@@ -1,0 +1,141 @@
+<ui version="4.0" >
+ <class>CreateUpdateFileDialog</class>
+ <widget class="QDialog" name="CreateUpdateFileDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>520</width>
+    <height>136</height>
+   </rect>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>520</width>
+    <height>136</height>
+   </size>
+  </property>
+  <property name="maximumSize" >
+   <size>
+    <width>520</width>
+    <height>136</height>
+   </size>
+  </property>
+  <property name="windowTitle" >
+   <string>Create Updqate File</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox" >
+   <property name="geometry" >
+    <rect>
+     <x>170</x>
+     <y>90</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons" >
+    <set>QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="updateFileLineEdit" >
+   <property name="geometry" >
+    <rect>
+     <x>70</x>
+     <y>10</y>
+     <width>341</width>
+     <height>27</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="selectFileNamePushButton" >
+   <property name="geometry" >
+    <rect>
+     <x>420</x>
+     <y>10</y>
+     <width>80</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>15</y>
+     <width>81</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>File Name:</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="createUpdateFilePushButton" >
+   <property name="geometry" >
+    <rect>
+     <x>160</x>
+     <y>50</y>
+     <width>161</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Create Update File</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="fullUpdateFileCheckBox" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>50</y>
+     <width>181</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Full update file</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>CreateUpdateFileDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>CreateUpdateFileDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -1,0 +1,2298 @@
+<!--
+    
+    structure.xml
+    version 0.2
+    
+    Contains the database structure for QRAP.
+
+QRap is licensed under the GNU General Public License version 3
+www.QRap.org.za
+    
+    
+    NOTES:
+    - Do NOT remove the "id", "lastmodified" or "qrapinst" fields from the tables below.
+    - Tables with "smallint" primary keys must have the customsequence="true" attribute set
+      in order to inform the database creation engine to create a smallint sequence. PostgreSQL
+      does not include a smallserial data type.
+    - The primary keys for all tables *MUST* be called "id".
+-->
+
+<structure>  
+<!-- *************************************************************************************************************************** -->
+	<table name="serverupdates" label="Server Updates"
+	description="This table provides a log for the last time a machine has been synchronised with the server. It is logged at both the main-server and the independant machine.">
+
+	       <field name="id"
+		      type="serial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"/>
+
+	       <field name="update"
+		      type="timestamp without time zone"
+		      label="Last Update"/>
+
+		<view name = "serverupdates_view" as = 'select * from serverupdates'>
+		</view>
+
+	</table> <!---serverupdates-->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="machine" label="machine" fulldownload="true" customsequence="true"
+	description="The Machine Table gives a list of all the QRap installation that share the same data(base). Its information is used in synchronisation of the different machines">
+	       <field name="id"
+		      type="smallint primary key unique not null default nextval('machine_id_seq')"
+		      label="ID"
+		      description="Primary key"
+		     readonly="true" />
+
+	       <field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last Modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="qrapinst"
+			type="varchar(12)"
+			label="Machine Name"
+			description="QRap Installation name, HOSTNAME or some unique identifier of machine. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="true"/>
+
+		<field name="mainuserid"
+			type="integer"
+			label="Main User ID"
+			description="foreign key to main user on the machine"/>
+
+		<view name = "machine_view" as = 'select * from machine'>
+		</view>
+
+	</table> <!-- machine -->
+  
+<!-- *************************************************************************************************************************** -->
+	<table name="site" label="Site"  fulldownload="true"
+	description="The site table merely identifies a location for (potential) radio installations. It does not imply any installation" >
+	
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		 <field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name="sitename"
+		       type="text"
+		       label="Name"
+		       description="A descriptive name for this site. Try to make this unique" />
+		
+		<field name="status"
+		       type="varchar(15)"
+		       label="Status"
+		       description="This site status in the planning process. Options can be altered in structure.xml"
+		       ui="dropdown(fixed, {'Experimental', 'Draft', 'Planned', 'Active','Default', 'School', 'Office'})" />
+		
+		<field name="location"
+		       type="POINT"
+		       label="Co-ordinates"
+		       description="The geographical coordinates of this site in Latitude and Longitude degrees"
+		       postgis="true" />
+		
+		<field name="groundheight"
+		       type="integer"
+		       label="Ground height"
+		       description="Ground height at the point typical populated from the Digital Elevation Model" 
+			unittype="height"/>
+
+		<view name = "site_view" as = 'select * from site'>
+		</view>
+		<view name = "site_view_only" as = 'select * from site'>
+		</view>
+		<view name = "site_view_list" as = 'select * from site'>
+		</view>
+
+	</table> <!-- site -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="sitedescription" label="Site description" 
+	description="This table gives information about the site, particularly regarding the feasibility of the site. It needs to be completed for all planned and active sites.">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+ 		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name="siteid"
+		       type="integer references site(id) on delete cascade"
+		       label="Site ID"
+		       description="The site to which this description applies"
+		       ui="dropdown(fromtable,site_view_list,sitename)" />
+
+		<field name="physicaladdress"
+		       type="text"
+		       label="Physical address"
+		       description="The physical street address of the site" />
+		
+		<field name="structuretype"
+		       type="varchar(20)"
+		       label="Structure type"
+		       description="The type of structure forming this site. Options can be altered in structure.xml"
+		       ui="dropdown(fixed, { 'Guyed lattice', 'Stayed lattice', 'Free standing', 'Pipe', 'Pipe on beacon', 'Windmill', 'Taper mast', 'Telkom tower', 'Water tower', 'Pole', 'Mono-pole', 'Wall mount', 'Cabinet', 'Flag pole', 'Pneumatic', 'Mast', 'Concrete tower', 'Silo', 'Not certain'})" />
+		
+		<field name="structureheight"
+		       type="real"
+		       label="Structure height" 
+			description="The height of the structure, e.g building or highest point on mast where antenna can be installed."
+			unittype="height"/>
+		
+		<field name="structurecapacity"
+		       type="varchar(100)"
+			description="The wind load capacity of the mast or the space available for antennas."
+		       label="Structure capacity" />
+		
+		<field name="availablecapacity"
+		       type="varchar(100)"
+			description="The capacity that is still available e.g. the wind load capacity of the mast or the space available for antennas."
+		       label="Available capacity" />
+		
+		<field name="powersupply"
+		       type="varchar(12)"
+		       label="Power supply"
+			description="The primary method electricity supply. Options can be altered in structure.xml"
+		       ui="dropdown(fixed,{'Our Generator','Solar', 'AC', 'Generator', 'Wind', 'Wind/solar', 'Not certain'})" />
+
+		<field name="containertype"
+		       type="varchar(15)"
+		       label="Container type"
+			description="The container in which equipment is stored. Options can be altered in structure.xml"
+		       ui="dropdown(fixed,{'Brick', 'In-site police station', 'Prefab', 'Brick building', 'Fibreglass'})" />
+
+		<field name="fencing"
+		       type="varchar(50)"
+		       label="Fencing"
+			description="The form of fencing around the installations. Options can be altered in structure.xml"
+		       ui="dropdown(fixed,{'No fence', 'Wired mesh', 'Palisade', 'Electric palisade', 'Roof top',  'Wire fence', 'Razor wire fence', 'Concrete', 'Complete', 'Welded mesh', 'Not certain', 'None'})" />
+		
+		<field name="access"
+		       type="text"
+			description="How does one obtain access to the site. Route description. Type of road. Type of vehicle required. Does it require a helicopter? "
+		       label="Access" />
+
+		<field name="comments"
+		       type="text"
+		       label="Comments"
+		       description="Any relevant comments. In the case of a draft site the area it should cover. Reason for existence"/>
+
+		<field name="sitedocumentation"
+		       type="text"
+			description="Complete file reference to site documentation"
+		       label="Site documentation" 
+			filelink="true" />
+		
+		<view name = "sitedescription_view" as = 'select * from sitedescription'>
+		</view>
+
+	</table> <!-- sitedescription -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="sitecontacts" label="Site contacts"
+	description="This table gives information about the site owner and contact details for site sharing, rental deals and site access. It needs to be completed for all planned and active sites." >
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+ 		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="qrapinst"
+			type="varchar(12)"
+			label="MachineName"
+			description="QRap Installation name, HOSTNAME or some unique identifier of machine. This is used to identify from which machine this entry originated when the system is synchronised"/>
+
+		<field name="siteid"
+		       type="integer references site(id) on delete cascade"
+		       label="Site ID"
+			description="Foreign key to site table for which this is the contact details"
+		       ui="dropdown(fromtable,site_view_list,sitename)" />
+		
+		<field name="ownername"
+		       type="varchar(100)"
+			description="The name of the owner of the property. I.e. Company name or individuals name."
+		       label="Owner name" />
+		
+		<field name="naturalperson"
+		       type="boolean"
+		       label="Natural person"
+		       description="Whether or not the contact is a natural person (TRUE) or company (FALSE)"
+		       ui="dropdown(fixed,{'FALSE', 'TRUE'})" />
+		
+		<field name="contactname"
+		       type="varchar(100)"
+			description="Who is the person or department to contact regarding this property. "
+		       label="Contact name" />
+
+		<field name="postaladdress"
+		       type="text"
+		       label="Postal address" />
+		
+		<field name="tel"
+		       type="varchar(20)"
+		       label="Telephone number" />
+
+		<field name="email"
+		       type="varchar(200)"
+		       label="E-mail address" />
+		
+		<field name="idnumber"
+		       type="char(13)"
+			description="ID number of natural person, or company registration number"
+		       label="ID number" />
+		
+		<field name="contract"
+		       type="varchar(50)"
+			description="Contract reference"
+		       label="Contract" />
+		
+		<field name="contractstartdate"
+		       type="date"
+		       label="Contract start date" />
+		
+		<field name="contractenddate"
+		       type="date"
+		       label="Contract end date" />
+		
+		<field name="monthlyrental"
+		       type="numeric(15,2)"
+		       label="Monthly rental (R)" />
+		
+		<field name="electricitysupplier"
+		       type="varchar(30)"
+		       label="Electricity supplier" />
+		
+		<field name="electricityaccno"
+		       type="varchar(20)"
+		       label="Electricity account number" />
+
+		<field name="electricitypoleno"
+		       type="varchar(15)"
+		       label="Electricity pole number" />
+
+		<field name="electricityemergency"
+		       type="varchar(20)"
+			description="Telephone number to call the case of an power outage."
+		       label="Outage Tel" />	
+		
+		<view name = "sitecontacts_view" as = 'select * from sitecontacts'>
+		</view>
+	</table> <!-- sitecontacts -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="btl" label="BTL"
+		description="This table stores a reference to the file which stores the Basic Transmission Loss. This is the loss before any antenna information (gain and pattern) or any transmitted power and system losses are taken into account. It is re-used to speed up subsequent prediction with the same parameters">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+ 		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name="siteid"
+		       type="integer references site(id) on delete cascade"
+		       label="Site ID"
+			description="Foreign Key to the site table. Reference the site for which the Basic Transmission Loss calculations are valid"
+		       ui="dropdown(fromtable,site,sitename)" />
+		
+		<field name="dtmsource"
+		       type="smallint references filesets(id)"
+		       label="DTM source file"
+			description="Foreign Key to the file-set table. Reference the Digital Elevation Model file set used during the Basic Transmission Loss calculations"
+		       ui="dropdown(fromtable,filesets,description)" />
+		
+		<field name="cluttersource"
+		       type="smallint references filesets(id)"
+		       label="Clutter source file"
+			description="Foreign Key to the file-set table. Reference the Clutter file set used during the Basic Transmission Loss calculations"
+		       ui="dropdown(fromtable,filesets,description)" />
+		
+		<field name="antennaheight"
+		       type="real"
+		       label="Antenna height"
+			description="The height of the antenna during the Basic Transmission Loss calculations" 
+			unittype="height"/>
+		
+		<field name="mobileheight"
+		       type="real"
+		       label="Mobile height" 
+			description="The height of the roaming/mobile antenna during the Basic Transmission Loss calculations" 
+			unittype="height"/>
+		
+		<field name="frequency"
+		       type="real constraint btl_freq check (frequency > 0)"
+			description="The frequency for which the during the Basic Transmission Loss calculations was done. " 
+		       label="Frequency" 
+			unittype="megahertz"/>
+		
+		<field name="kfactor"
+		       type="real"
+			description="The k-Factor for which the during the Basic Transmission Loss calculations was done. Indication of the refractivity of the lower air. The k-Factor is used to determine the effective earth radius. Effective Earth Radius is the Real Earth Radius multiplied by the k-factor" 
+		       label="k-Factor" />
+		
+		<field name="radius"
+		       type="real constraint btl_radius check (radius > 0)"
+		       label="Radius" 
+			description="The furthest distance to which the calculations were done."
+			unittype="distance"/>
+		
+		<field name="numangles"
+		       type="integer constraint numangles check (numangles > 2)"
+			description="The number of radii for which the calculations were done. Angular Resolution = 360 / numangles."
+		       label="Number of intervals in 360 degrees" />
+		
+		<field name="distanceres"
+		       type="real"
+		       label="Distance resolution" 
+			description="The interval at which calculations are done in meters."
+			unittype="height"/>
+		
+		<field name="btlplot"
+		       type="text"
+		       label="BTL plot file-name"
+			description="The name of the file where the Basic Transmission Loss calculations are stored."
+		       filelink="true" />
+	
+		<field name="maxr"
+		       type="boolean"
+		       label="MaxR" 
+			description="The distance for which the calculation was requested. It will be bigger or equal to the Radius."
+			unittype="distance"/>
+
+	</table> <!-- btl -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="technology" label="Technology" footer="check (stopfreq >= startfreq)" fulldownload="true" customsequence="true"
+	description="This table stores information regarding the Technology implemented on a site. Each Radio installation should reference a technology">
+		<field name="id"
+		       type="smallint primary key unique not null default nextval('technology_id_seq')"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+ 		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name="technologytype"
+			description="A short descriptive identifier for the technology"
+		       type="varchar(20)"
+		       label="Type" />
+		
+		<field name="startfreq"
+		       type="real constraint tech_start_freq check (startfreq > 0)"
+			description="The lowest frequency in which the technology operate"
+		       label="Start of frequency band" 
+			unittype="megahertz"/>
+		
+		<field name="stopfreq"
+		       type="real constraint tech_stop_freq check (stopfreq > 0)"
+			description="The highest frequency in which the technology operate"
+		       label="End of frequency band" 
+			unittype="megahertz"/>
+		
+		<field name="btlfreq"
+		       type="real constraint tech_btl_freq check (btlfreq > 0)"
+			description="If no carrier is specified for an installation this frequency will be used in the predictions"
+		       label="Prediction frequency"
+			unittype="megahertz" />
+		
+		<field name="spacing"
+		       type="real"
+		       label="Channel spacing" 
+			description="The separation between the centre frequency of two consequential channels"
+			unittype="kilohertz"/>
+
+		<field name="bandwidth"
+		       type="real"
+		       label="Band Width" 
+			description="The bandwidth of one channel"
+			unittype="kilohertz"/>
+		
+		<field name="uplink"
+		       type="real"
+		       label="Uplink offset" 
+			description="This is used to calculate the absolute centre frequency for the uplink channel. Frequency = Uplink Offset + channel X Channel spacing"
+			unittype="megahertz"/>
+		
+		<field name="downlink"
+		       type="real"
+		       label="Downlink offset"
+			description="This is used to calculate the absolute centre frequency for the downlink channel. Frequency = Downlink Offset + channel X Channel spacing"
+			unittype="megahertz" />
+		
+		<field name="maxpathloss"
+		       type="real"
+			description="The maximum path loss that could be tolerated by the technology ... used to limit prediction radii"
+		       label="Maximum Path Loss" 
+			unittype="dbell"/>
+		
+		<field name="maxrange"
+		       type="real"
+		       label="Maximum Range"
+			description="The maximum range for which a prediction needs to be done. Used as default prediction range"
+			unittype="distance"/>
+		
+		<field name="rxmin"
+		       type="real"
+		       label="Minimum receiver level" 
+			description="The minimum level that will be considered coverage. Used as default."
+			unittype="sensitivity"/>
+		
+		<field name="cico"
+		       type="real"
+		       label="Co-channel carrier interference ratio"
+			description="The minimum carrier to interference ratio that could be tolerated on co-channels"
+			unittype="dbell"/>
+		
+		<field name="ciad"
+		       type="real"
+		       label="Adjacent carrier to interference ratio"
+			description="The minimum carrier to interference ratio that could be tolerated on adjacent-channels"
+			unittype="dbell"/>
+		
+		<field name="fademargin"
+		       type="real"
+		       label="Fade margin" 
+			description="The default fade margin to be used."
+			unittype="dbell"/>
+		
+		<field name="ebno"
+		       type="real"
+		       label="EbNo" 
+			description="The Energy per Bit to Noise level required for the technology to work acceptably."
+			unittype="dbell"/>
+
+		<field name="description"
+		       type="text"
+		       label="Description" />
+		
+		<field name="defaultsite"
+		       type="integer references site(id) on delete cascade"
+		       label="Default Site"
+			description="The Radio installation(s) on this site will be duplicated when a default installation is added to a site. The site needs to be marked with the Default status-flag"
+		       ui="dropdown(fromtable,site,sitename)" />
+		
+		<view name = "technology_view" as = 'select * from technology'>
+		</view>
+		
+	</table> <!-- technology -->
+	
+<!-- *************************************************************************************************************************** -->
+	<table name="envelopes" label="Spectral Envelopes" fulldownload="true" customsequence="true"
+	description="This table describes Spectral Envelope of the transmitted signal for a given technology. This is used in the Spectral Analysis Tool. Each entry needs to reference a Technology table entry. ">
+		<field name="id"
+		       type="smallint primary key unique not null default nextval('envelopes_id_seq')"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+ 		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name="envelopetype"
+		       type="varchar(30)"
+		       label="Name"
+			description="A descriptive name for the spectral envelope"
+		       visible="true" />
+
+		<field name="techkey"
+		       type="smallint references technology(id)"
+		       label="Technology"
+			description="Foreign Key that reference the technology table for which this envelop is relevant"
+		       ui="dropdown(fromtable,technology,technologytype)" />
+		
+		<field name="offsets"
+		       type="real[]"
+		       label="Frequency Offsets"
+			description="The offset from the centre frequency where the related relative attenuation occurs in kHz"
+			unittype="kilohertz"/>
+		
+		<field name="values"
+		       type="real[]"
+		       label="Envelope values"
+			description="The relative attenuation of the signal envelope in dB"
+			unittype="dbell"/>
+		
+		<field name="numpoints"
+		       type="integer"
+		       label="Number of envelope points"
+		       visible="true" />
+		
+		<view name = "envelopes_view" as = 'select * from envelopes'>
+		</view>
+	</table> <!-- envelopes -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="equipmenttype" label="Equipment type" fulldownload="true"
+	description="This table describes different equipment types e.g. base station versions">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+ 		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name="devicename"
+		       type="varchar(150)"
+			description="A descriptive name for the equipment"
+		       label="Device name" />
+		
+		<field name="manufacturer"
+		       type="varchar(30)"
+		       label="Manufacturer" 
+			description="The manufacturer of the equipment. The options can be edited in structure.xml"
+		       ui="dropdown(fixed,{'Grintek', 'Motorola', 'Alcom', 'Ericsson', 'Huawei',  'Alcatel-Lucent', 'Cisco', 'NEC', 'Nokia-Siemens', 'Nokia', 'Siemens', 'Qualcomm', 'Sony Ericsson', 'Tektronic', 'Teltronic', 'Other'})" />
+		
+		<field name="faccode"
+		       type="varchar(50)"
+		       label="Manufacturing Code" />
+		
+		<field name="description"
+		       type="text"
+		       label="Description" />
+		
+		<field name="cost"
+		       type="numeric(12,2)"
+		       label="Cost (R)" />
+
+		<view name = "equipmenttype_view" as = 'select * from equipment;'>
+			<field name="devicename" label="Device Name" />
+		</view>
+
+	</table> <!-- equipmenttype -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="antennadevice" label="Antenna devices" fulldownload="true"
+	description="This table describes different antenna types. Note that there can be many antenna patterns assigned to antenna device. The antenna could have different patterns at different frequency and at different electrical tilt settings">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name="devicename"
+		       type="varchar(50)"
+			description="A descriptive identifying name for the antenna device"
+		       label="Device name" />
+		
+		<field name="manufacturer"
+		       type="varchar(100)"
+			description="The manufacturer of the antenna. The options can be edited in structure.xml"
+		       label="Manufacturer" 
+			 ui="dropdown(fixed,{'Grintek', 'Poynting', 'Katrein', 'Andrew', 'Alcom', 'Webb', 'Thales',  'Alcatel', 'Ericsson', 'Other'})" />
+		
+		<field name="faccode"
+		       type="varchar(50)"
+		       label="Manufacturing Code" />
+		
+		<field name="electilt"
+		       type="boolean"
+			description="Does this antenna support electrical tilting?"
+		       label="Electrical tilt"
+		       ui="dropdown(fixed,{'FALSE', 'TRUE'})" />
+		
+		<field name="description"
+		       type="text"
+		       label="Description" />
+		
+		<field name="cost"
+		       type="numeric(12,2)"
+		       label="Cost (R)" />
+		
+		<view name = "antennadevice_view" as = 'select * from antennadevice;'>
+		</view>
+
+	</table> <!-- antennadevice -->
+	
+<!-- *************************************************************************************************************************** -->
+	<table name="antennapattern" label="Antenna patterns">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name="antdevicekey"
+		       type="integer references antennadevice(id)"
+		       label="Antenna device"
+			description="Foreign key referencing the antenna device to which the pattern belong. Compulsary"
+		       ui="dropdown(fromtable,antennadevice,devicename)" />
+
+		<field name="patternfile"
+		       type="varchar(100)"
+		       label="Pattern file" 
+			description="The file name from which antenna pattern originated."
+			filelink="true"/>
+		
+		<field name="techkey"
+		       type="smallint references technology(id)"
+		       label="Technology"
+			description="Foreign key referencing the technology table. This could be part of which frequency band of the antenna pattern is valid for"
+		       ui="dropdown(fromtable,technology,technologytype)" />
+		
+		<field name="description"
+		       type="text"
+		       label="Description" />
+		
+		<field name="frequency"
+		       type="real"
+		       label="Frequency" 
+			description="The specific frequency for which this antenna pattern was measured / calculated for. "
+			unittype="megahertz" />
+		
+		<field name="gain"
+		       type="real"
+		       label="Gain" 
+			description="The gain of the antenna at this frequency in dBi. "
+			unittype="dbell" />
+		
+		<field name="azibeamwidth"
+		       type="real"
+		       label="Azimuth beam width" 
+			description="The beamwidth of the antenna in the horizontal / azimuth plane."
+			unittype="degrees" />
+		
+		<field name="elevbeamwidth"
+		       type="real"
+		       label="Elevation beam width" 
+			description="The beamwidth of the antenna in the vertical / elevation plane."
+			unittype="degrees" />
+		
+		<field name="fronttoback"
+		       type="real"
+		       label="Front to Back Ratio" 
+			description="The ratio of the field strength transmitted towards front over that transmitted backwards. In dB"
+			unittype="dbell"/>
+		
+		<field name="polarization"
+		       type="varchar(12)"	
+			description="The polarisation of the electrical field transmited from the antenna. Options can be edited in structure.xml"
+		       label="Polarization" 
+			ui="dropdown(fixed,{'Vertical', 'Horizontal', 'Cross Polarised', 'Circular-clockwise', 'Circular-anticlock', 'Other'})" />
+			
+		<field name="numazipoints"
+		       type="smallint"
+			description="Number of points for which the antenna is defined in the horizontal plane (in 360 degrees)."
+		       label="Number of azimuth points" />
+		
+		<field name="numelevpoints"
+		       type="smallint"
+			description="Number of points for which the antenna is defined in the vertical plane. (in 180 degrees)"
+		       label="Number of elevation points" />
+		
+		<field name="azimuthangles"
+		       type="real[]"
+			description="The angles in the horizontal plane for which the relative attenuation is defined. North is 0 degrees, East 90 degrees."
+		       label="Azimuth angles" />
+		
+		<field name="azimuthpattern"
+		       type="real[]"
+			description="The attenuation values relative to the value and 0 degrees of the antenna pattern. The received signal strength = Transmitted EIRP - This Value for the transmit antenna - Basic Transmission Loss + Receive Antenna Gain - This Value for the receive antenna."
+		       label="Azimuth pattern" />
+		
+		<field name="elevationangles"
+		       type="real[]"
+			description="The angles in the vertical plane for which the relative attenuation is defined. Horizontal is 0 degrees, Straight down is 90 degrees. Straight uo is -90 degrees"
+		       label="Elevation angles" />
+		
+		<field name="elevationpattern"
+		       type="real[]"
+			description="The attenuation values relative to the value and 0 degrees of the antenna pattern. The received signal strength = Transmitted EIRP - This Value for the transmit antenna - Basic Transmission Loss + Receive Antenna Gain - This Value for the receive antenna."
+		       label="Elevation pattern" />
+
+		<view name = "antennapattern_view" as = 'select * from antennapattern;'>
+		</view>
+
+	</table> <!-- antennapattern -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="radioinstallation" label="Radio Installation"
+	description = "A Radio Installation represents everything that is essential for the effective transmission and/or reception of radiowaves. A site could have many Radio Installations. Each Radio Installation must below to a site.">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>		
+
+		<field name="siteid"
+		       type="integer references site(id) on delete cascade"
+		       label="Site ID"
+			description="Foreign Key reference to the site table pointing to the site where this installation exist / is to be made"
+		       ui="dropdown(fromtable,site_view_list,sitename)" />
+		
+		<field name="sector"
+		       type="integer"
+			description="This can be used to number the different installations on the site. "
+		       label="Sector" />
+		
+		<field name="permanent"
+		       type="boolean"
+		       label="Permanent"
+			description="Is this a permanent installation? Yes (TRUE) "
+		       ui="dropdown(fixed,{'FALSE','TRUE'})" 
+			visible = "false"/>
+		
+		<field name="techkey"
+		       type="smallint references technology(id)"
+		       label="Technology"
+			description="The technology that this installation will serve. The technology that was installed. "
+		       ui="dropdown(fromtable,technology,technologytype)" />
+		
+		<field name="eirp"
+		       type="real"
+		       label="EIRP"
+			description="Effective Isotropic Radiated Power. EIRP(dBm) = Transmitted Power(dBm) - Transmitter Losses (dB) + Transmitter Antenna Gain (dBi)"
+		       unittype="eirp" />
+		
+		<field name="diversity"
+		       type="boolean"
+		       label="Diversity"
+			description="Is diversity antenna installed? A 3dB diversity gain will be assumed."
+		       ui="dropdown(fixed,{'FALSE','TRUE'})" />
+		
+		<field name="txpower"
+		       type="real"
+		       label="Transmitter power"
+			description="The transmitted power."
+		       unittype="power" />
+		
+		<field name="txlosses"
+		       type="real"
+		       label="Transmitter losses" 
+			description="The total of all losses (e.g. combiner and cable losses) incurred by the signal between the point where the transmitted power was measured and the input to the transmit antenna."
+			unittype="dbell"/>
+		
+		<field name="txantennaheight"
+		       type="real"
+		       label="Transmitter antenna height" 
+			description="The height of the centre of the transmit antenna."
+			unittype="height" />
+		
+		<field name="txantpatternkey"
+		       type="integer references antennapattern(id)"
+		       label="Antenna pattern"
+			description="Foreign Key referencing the antenna pattern that would apply to this installation."
+		       ui="dropdown (fromtable, antennapattern_view, patternfile)" />
+		
+		<field name="txbearing"
+		       type="real"
+		       label="Transmitter bearing" 
+			description="Direction of main beam of antenna relative to true north ... positive clockwise"
+			unittype="degrees"/>
+		
+		<field name="txmechtilt"
+		       type="real"
+		       label="Transmitter tilt"
+			description="Direction of main beam of antenna relative to horizon ... positive down"
+			unittype="degrees"/>
+		
+		<field name="rxsensitivity"
+		       type="real"
+		       label="Receiver sensitivity"
+			description="The minimum signal power that will result in acceptable reception in the presence of thermal noise at room temperature."
+		       unittype="sensitivity" />
+		
+		<field name="rxlosses"
+		       type="real"
+		       label="Receiver losses"
+			description="The total of all losses (e.g. cable and splitter losses) incurred by the signal between the receive antenna and the point where the receiver sensitivity was determined"
+			unittype="dbell" />
+		
+		<field name="rxantennaheight"
+		       type="real"
+		       label="Receiver antenna height" 
+			description="The height of the centre of the receive antenna."
+			unittype="height"/>
+		
+		<field name="rxantpatternkey"
+		       type="integer references antennapattern(id)"
+		       label="Receiver antenna pattern"
+			description="Direction of main beam of antenna relative to horizon ... positive down."
+		       ui="dropdown(fromtable,antennapattern_view,patternfile)" />
+		
+		<field name="rxbearing"
+		       type="real"
+			description="Direction of main beam of antenna relative to true north ... positive clockwise."
+			unittype="degrees"
+		       label="Receiver bearing" />
+		
+		<field name="rxmechtilt"
+		       type="real"
+			description="Direction of main beam of antenna relative to horizon ... positive down."
+			unittype="degrees"
+		       label="Receiver tilt" />
+		
+		<field name="btlplot"
+		       type="integer"
+		       label="BTL plot"
+			description="A loose reference to the Basic Transmission Loss calculation reference to enable easy recovery."
+		       visible="false"/>
+		
+		<field name="project"
+		       type="smallint references projects(id)"
+		       label="Project"
+			description="The project to which this Radio Installation belong. The project flag can be used in the database filter to display only sites and installations belonging to a specific project"
+			ui="dropdown(fromtable,projects,projectname)" />
+		
+		<field name="flagx"
+		      type="smallint references flagx(id)"
+		       label="FlagX"
+			description="This flag can be used for what you please to. This flag can be used in the database filter to display only Radio Installations and the sites they belong to that has a given flag."
+			ui="dropdown(fromtable,flagx,shortname)" />
+		
+		<field name="flagz"
+		      type="smallint references flagz(id)"
+		       label="FlagZ"
+			description="This flag can be used for what you please to. This flag can be used in the database filter to display only Radio Installations and the sites they belong to that has a given flag."
+			ui="dropdown(fromtable,flagz,shortname)" />
+
+		<view name = "radioinstallation_view" as = 'select distinct sitename, sitename||sector as sectorname, 
+							radioinstallation.* from radioinstallation cross join site where siteid=site.id;'>
+		</view>
+	</table> <!-- radioinstallation -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="projects" label="Projects" customsequence="true" fulldownload="true"
+	description="The project field allow one to distinguish between installations for different project. The project flag can be used in the database filter to display only sites and installations belonging to a specific project">
+
+	       <field name="id"
+		      type="smallint primary key unique not null default nextval('projects_id_seq')"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>	
+
+		<field name="projectname"
+			type="varchar(20)"
+			label="Project Name"
+			description="Short descriptive name for project"/>
+		
+		<field name="description"
+			type="text"
+			label="Description"/>
+		
+		<view name = "projects_view" as = 'select * from projects;'>
+		</view>
+
+	</table> <!-- Projects -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="flagx" label="FlagX" customsequence="true" fulldownload="true"
+	description="This flag can be used for what you please to. This flag can be used in the database filter to display only Radio Installations and the sites they belong to that has a given flag.">
+
+	       <field name="id"
+		      type="smallint primary key unique not null default nextval('flagx_id_seq')"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name="shortname"
+			type="varchar(20)"
+			label="Short Name"
+			description="Short descriptive name for to indicate what the flag identifies"/>
+		
+		<field name="description"
+			type="text"
+			label="Description"/>
+		
+	<view name = "flagx_view" as = 'select * from flagx;'>
+		</view>
+
+	</table> <!-- FlagX -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="flagz" label="FlagZ" customsequence="true" fulldownload="true"
+	description="This flag can be used for what you please to. This flag can be used in the database filter to display only Radio Installations and the sites they belong to that has a given flag.">
+
+	       <field name="id"
+		      type="smallint primary key unique not null default nextval('flagz_id_seq')"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+
+		<field name="shortname"
+			type="varchar(20)"
+			label="Short Name"
+			description="Short descriptive name for to indicate what the flag identifies"/>
+		
+		<field name="description"
+			type="text"
+			label="Description"/>
+			
+		
+		<view name = "flagz_view" as = 'select * from flagz;'>
+		</view>
+	</table> <!-- FlagZ -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="mobile" label="Mobile installation"
+	description="The mobile table represents mobile or roaming transmit and receive units used in area predictions">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name="mobileheight"
+		       type="real"
+		       label="Antenna height"
+			description="The average expected height of the mobile units."
+			unittype="height"/>
+		       
+		 <field name="description"
+		       type="text"
+		       label="Description" />
+		
+		<field name="techkey"
+		       type="smallint references technology(id)"
+		       label="Technology"
+			description="The technology that this mobile unit is designed for."
+		       ui="dropdown(fromtable,technology,technologytype)" />
+		
+		<field name="txpower"
+		       type="real"
+		       label="Transmitter power"
+			description="A representative value for the transmit power of mobiles to be provided with service. Mostly equal to the EIRP"
+		       unittype="power"/>
+		
+		<field name="txlosses"
+		       type="real"
+		       label="Transmitter losses" 
+			description="A representative value for the total losses incurred by a typical mobile between the point where the transmitter power is measured and the transmit antenna. Mostly zero"
+			unittype="dbell"/>
+		
+		<field name="eirp"
+		       type="real"
+		       label="EIRP"
+			description="Effective Isotropic Radiated Power (dBm) = Transmitter Power(dBm) - Transmitter Losses (dB) +  Antenna Gain (dBi). The antenna gain and transmitter losses are both mostly zero."
+		       unittype="eirp" />
+		
+		<field name="diversity"
+		       type="boolean"
+		       label="Diversity"
+			description="Is diversity employed at the receiver? Yes (TRUE). A 3dB diversity gain is assumed. (Mostly FALSE)"
+		       ui="dropdown(fixed, {'FALSE', 'TRUE'})" />
+		
+		<field name="rxsensitivity"
+		       type="real"
+		       label="Receiver sensitivity"
+			description="The minimum power for which the receiver will still work assuming thermal noise at room temperature."
+		       unittype="sensitivity" />
+		
+		<field name="rxlosses"
+		       type="real"
+		       label="Receiver losses"
+			description="The losses incurred by the signal between the antenna and the point where sensitivity is referenced. Mostly zero."
+			unittype="dbell" />
+		
+		<field name="antpatternkey"
+		       type="integer references antennapattern(id)"
+		       label="Antenna pattern"
+			description="Foreign Key identifying the antennapattern of the mobile. An isotropic antenna radiation pattern for handholds / phones is suggested."
+		       ui="dropdown(fromtable, antennapattern_view, patternfile)" />
+
+		<view name = "mobile_view" as = 'select * from mobile;'>
+		</view>
+	</table> <!-- mobile -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="antenna" label="Antennas"
+	description="This table represents the physical antennas that has been installed or are in stock. A Radio Installation ID of NULL indicates available stock.">
+
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name="serialnumber"
+		       type="varchar(150)"
+		       label="Serial number" />
+		
+		<field name="rikey"
+		       type="integer references radioinstallation(id) on delete cascade"
+		       label="Radio Installation"
+			description="Foreign Key to the Radio Installation where this antenna is used"
+		       ui="dropdown(fromtable,radioinstallation_view,sectorname)" />
+		
+		<field name="antdevicekey"
+		       type="integer references antennadevice(id)"
+		       label="Antenna Type"
+			description="Foreign Key to the Antenna Device table to indicate what kind of antenna this is"
+		       ui="dropdown(fromtable,antennadevice,devicename)" />
+		
+		<field name="installationdate"
+		       type="date"
+		       label="Installation Date" />
+		
+		<view name = "antenna_view" as = 'select 
+				antenna.id as id,
+				site.sitename as sitename,
+				antenna.serialnumber as serialnumber,
+				antenna.rikey as rikey,
+				antenna.antdevicekey as antdevicekey,
+				antenna.installationdate as installationdate
+				from antenna, radioinstallation, site 
+				where (antenna.rikey=radioinstallation.id and radioinstallation.siteid=site.id )
+				
+				union
+				
+				select	antenna.id as id,
+				null as sitename,
+				antenna.serialnumber as serialnumber,
+				antenna.rikey as rikey,
+				antenna.antdevicekey as antdevicekey,
+				antenna.installationdate as installationdate
+				from antenna where antenna.rikey is null'>
+			<field name="sitename" label="Site name" />
+		</view>
+	</table> <!-- antenna -->
+	
+<!-- *************************************************************************************************************************** -->
+	<table name="equipment" label="Equipment"
+	description="This table represents the physical equipment that has been installed or are in stock. A Radio Installation ID of NULL indicates available stock.">>
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name="serialnumber"
+		       type="text"
+		       label = "Serial Number" />
+		
+		<field name="rikey"
+		       type="integer references radioinstallation(id) on delete cascade"
+		       label="Radio Installation"
+			description="Foreign Key to the Radio Installation where this equipment is used"
+		       ui="dropdown(fromtable,radioinstallation_view,sectorname)" />
+		
+		<field name="equipkey"
+		       type="integer references equipmenttype(id)"
+		       label="Equipment Type"
+			description="Foreign Key to the Equipment Type to indicate what kind of equipment this is"
+		       ui="dropdown(fromtable,equipmenttype_view,devicename)" />
+		
+		<field name="installationdate"
+		       type="date"
+		       label="Installation date" />
+		
+		<view name = "equipment_view" as = 'select 
+				equipment.id as id,
+				site.sitename as sitename,
+				equipment.serialnumber as serialnumber,
+				equipment.rikey as rikey,
+				equipment.equipkey as equipkey,
+				equipment.installationdate as installationdate
+				from equipment, radioinstallation,site 
+				where (equipment.rikey=radioinstallation.id and radioinstallation.siteid=site.id )
+				
+				union
+				
+				select	equipment.id as id,
+				null as sitename,
+				equipment.serialnumber as serialnumber,
+				equipment.rikey as rikey,
+				equipment.equipkey as equipkey,
+				equipment.installationdate as installationdate
+				from equipment where equipment.rikey is null'>
+			<field name="sitename" label="Site Name" />
+		</view>
+	</table> <!-- equipment -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="cell" label="Cell" fulldownload="true"
+	description="A Cell is a logical entity typically representing traffic carried via a radio installation.">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name = "mastercell"
+		       type = "integer references cell(id) on delete cascade"
+		       label = "Master cell"
+			description="Normally NULL. In a overlay-underlay cell structure this will be the reference from the overlaying cell to the under-laying cell."
+		       ui = "dropdown(fromtable,cell_view,id)" />
+		
+		<field name = "risector"
+		       type = "integer references radioinstallation(id) on delete cascade"
+		       label = "Radio Installation"
+			description="The Radio Installation on which this cell is implemented."
+		       ui="dropdown(fromtable,radioinstallation_view,sectorname)" />
+		
+		<field name = "permanent"
+		       type = "boolean"
+		       label = "Permanent"
+		       ui = "dropdown(fixed,{'FALSE','TRUE'})"
+			visisble = "false"/>
+		
+		<field name = "cstraffic"
+		       type = "real"
+			description="Circuit Switched traffic measured in Erlang that is carried on this cell"
+		       label = "CS traffic" />
+		
+		<field name = "pstraffic"
+		       type = "real"
+			description="Packet Switched traffic measured in MegaByte per second that is carried on this cell"
+		       label = "PS traffic" />
+		
+		<field name = "txpower"
+		       type = "real"
+		       label = "Transmitter power" 
+			description="Transmitter power as can be altered via software."
+			unittype = "power"/>
+		
+		<field name = "beacon"
+		       type = "integer"
+			description="The unique cell identifier e.g. BSIC for GSM or CPICH for UMTS"
+		       label = "Beacon" />
+		
+		<field name = "layerthreshold"
+		       type = "integer"
+		       label = "Layer threshold" 
+			unittype = "sensitivity"/>
+	
+		<view name="cell_view" as='select 
+				cell.id as id,
+				site.sitename as sitename,
+				radioinstallation.sector as sector,
+				sitename||sector as sectorname,
+				cell.risector as risector,
+				cell.mastercell as mastercell,
+				cell.cstraffic as cstraffic,
+				cell.pstraffic as pstraffic,
+				cell.txpower as txpower,
+				cell.beacon as beacon,
+				cell.layerthreshold as layerthreshold
+				from site, radioinstallation, cell
+				where (cell.risector = radioinstallation.id 
+				and radioinstallation.siteid = site.id)'>
+			
+			<field name="sitename" label="Site Name" />
+			<field name="sector" label="Sector" />
+		</view>
+	</table> <!-- cell -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="frequencyallocationlist" label="Frequency allocation list" fulldownload="true"
+	description="This table contains the information regarding the frequency channels (as identified in the Technology Table) that is used in a particular cell">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name = "ci"
+		       type = "integer references cell(id) on delete cascade"
+		       label = "Cell ID"
+			description="Foreign Key referencing the Cell of which these frequencies are used."
+		       ui = "dropdown(fromtable,cell_view,id)" />
+		
+		<field name = "carrier"
+		       type = "integer"
+			description="The carrier or radio number e.g. 0 for BCCH in GSM."
+		       label = "Carrier" />
+		
+		<field name = "channel"
+		       type = "integer"
+			description="The channel allocated to the specific carrier or radio. The absolute frequency will be calculated using the entries in the Technology Table."
+		       label = "Channel" />
+		
+		<view name = "frequencyallocationlist_view" as = 'select 
+					frequencyallocationlist.id as id,
+					site.sitename as sitename,
+					radioinstallation.sector as sector,
+					frequencyallocationlist.ci as ci,
+					frequencyallocationlist.carrier as carrier,
+					frequencyallocationlist.channel as channel 
+					from frequencyallocationlist, cell, radioinstallation,site 
+					where (frequencyallocationlist.ci=cell.id 
+					and cell.risector=radioinstallation.id 
+					and radioinstallation.siteid=site.id )'>
+			<field name="sitename" label="Site name" />
+			<field name="sector" label="Sector" />
+		</view>
+	</table> <!-- frequencyallocationlist -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="cellparameters" label="Cell Parameters" fulldownload="true"
+	description="This table contains information and explation of the cell parmeters that can be set.">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name="techkey"
+		       type="smallint references technology(id)"
+		       label="Technology"
+			description="The technology to which this parameter apllies."
+		       ui="dropdown(fromtable,technology,technologytype)" />
+		
+		<field name = "parametername"
+		       type = "varchar(50)"
+			description="Short descriptive name for the parameter"
+		       label = "Parameter" />
+
+		<field name = "type"
+		       type = "varchar(30)"
+			description="The type of input this parameter require."
+		       label = "Data Type"
+			ui = "dropdown(fixed,{'integer','real', 'boolean', 'choice from list', 'word'})"/>
+
+		<field name = "defaultseting"
+		       type = "varchar(33)"
+			description="The default value of this parameter."
+		       label = "Default" />
+
+		<field name = "minimum"
+		       type = "varchar(33)"
+			description="The minimum value this parameter can assume."
+		       label = "Minimum" />
+
+		<field name = "maximum"
+		       type = "varchar(33)"
+			description="The maximum value this parameter can assume."
+		       label = "Maximum" />
+		
+		<field name = "description"
+		       type = "text"
+		       label = "Description" />
+
+		<view name = "cellparameters_view" as = 'select * from cellparameters;'>
+		</view>
+	</table> <!-- cellparameters -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="parametersettings" label="Cell Parameters Settings" fulldownload="true"
+	description="This table contains the actual values of the cell parameters">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name = "ci"
+		       type = "integer references cell(id) on delete cascade"
+		       label = "Cell ID"
+			description="Foreign Key referencing the Cell to which this parameter apply."
+		       ui = "dropdown(fromtable,cell_view,id)" />
+
+		<field name = "parameterid"
+		       type =  "integer references cellparameters(id) on delete cascade"
+		       label = "Parameter" 
+			description="Foreign Key referencing the Parameter table indicating the cell parameter for which the value is stored."
+			ui = "dropdown(fromtable,cellparameters_view,parametername)"/>
+
+		<field name = "setting"
+			label = "Setting"
+		       type = "varchar(33)"
+			description="Value of the parameter."/>
+	
+		<view name = "parametersettings_view" as = 'select 
+					parametersettings.id as id,
+					site.sitename as sitename,
+					radioinstallation.sector as sector,
+					parametersettings.ci as ci,
+					parametername as cell_parameter, parametersettings.setting as setting
+					from parametersettings, cell, radioinstallation, site, cellparameters 
+					where (parametersettings.ci=cell.id 
+					and cell.risector=radioinstallation.id 
+					and radioinstallation.siteid=site.id 
+					and parameterid=cellparameters.id)'>
+			<field name="sitename" label="Site name" readonly="true"/>
+			<field name="sector" label="Sector" readonly="true"/>
+		</view>
+	</table> <!-- parametersettings -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="links" label="Links"
+	desription="The link table provides information of all existing links between two Radio Installations">
+	       <field name="id"
+		      type="serial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+	       
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+	       
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+	       <field name = "linkname"
+		      type = "varchar(150)"
+			description="A short desriptive identifier for the link"
+		      label = "Link Name" />
+		
+	       <field name = "radioinstallation1"
+		      type = "integer references radioinstallation(id) on delete cascade"
+			description="Foreign Key reference to the Radio Installation table to the Transmitting Installation"
+		      label = "Tx Installation"  />
+	       
+	       <field name = "radioinstallation2"
+		      type = "integer references radioinstallation(id) on delete cascade"
+			description="Foreign Key reference to the Radio Installation table to the Receiving Installation"
+		      label = "Rx Installation"  />
+	       		
+		<field name = "minclearance"
+		       type = "real"
+		       label = "Minimum Clearance"
+			description="The minimum clearance along the path." />
+
+		<field name = "frequency"
+		       type = "real"
+		       label = "Frequency" 
+			description="The frequency at which the calculations were done."
+			unittype= "megahertz"/>
+
+		<field name = "pathloss"
+		       type = "real"
+			description="The path loss experienced along the path. It is reciprocal, i.e. the same for both directions."
+		       label = "Pathloss" 
+			unittype= "dbell"/>
+
+		<field name = "kfactor"
+		       type = "real"
+		       label = "k-factor "
+			description="Indication of the refractivity of the lower air. The k-Factor is used to determine the effective earth radius. Effective Earth Radius is the Real Earth Radius multiplied by the k-factor"/>
+
+	       <field name = "line"
+		      type = "LINESTRING"
+		      label = "Line"
+			description="The geographical line that is used to display the link visually."
+		      postgis="true" />
+		<view name = "links_view" as = 'select * from links'>
+		</view>
+
+<!--		<view name = "links_view" as = 'select linkname, 
+			site1.sitename||rad1.sector as txsite,
+			radioinstallation1 as r1,
+			site2.sitename||rad2.sector as rxsite,
+			radioinstallation2 as r2, 
+			minclearance as clear,
+			frequency, pathloss, kfactor
+			from links cross join radioinstallation as rad1 cross join site_view_only as site1
+	 		cross join radioinstallation as rad2 cross join site_view_only as site2
+	 		where rad1.id=radioinstallation1
+			and radioinstallation2=rad2.id
+			and rad1.siteid=site1.id
+			and rad2.siteid=site2.id;'>
+			<field name="txsite" label="Tx Site" />
+			<field name="rxsite" label="Rx Site" />	
+			<field name="r1" label="Tx Radio" />
+			<field name="r2" label="Rx Radio" />
+			<field name="clear" label="Clearance" />
+		</view>
+-->
+	</table> <!-- links -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="customareafilter" label="Custom Area Filter" description="A list of polygons to filter on">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name="areaname"
+		       type="text"
+		       label="Area Name"
+		       description="A descriptive name for this polygon" />
+		
+		<field name="the_geom"
+		       type="POLYGON"
+		       label="Co-ordinates"
+		       description="The geographical polygon that will be used in the queries"
+		       postgis="true" />
+
+		<view name = "customareafilter_view" as = 'select * from customareafilter'>
+		</view>
+
+	</table> <!-- areafilter -->
+	
+<!-- *************************************************************************************************************************** -->
+	<table name="servedkeylocations" label="Served key locations" fulldownload="true"
+	description="This table identifies important locations that need to be covered. In fact it can be used / mis-used for any selection of location the user would like to identify">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name = "keylocation"
+		       type = "text"
+		       label = "Key location Type"
+			description="The category of this important spot. The options can be edited in structure.xml."
+		       ui = "dropdown(fixed,{'Police Station','Sport Stadium','Important Spot'})" />
+
+		<field name="location"
+		       type="POINT"
+		       label="Co-ordinates"
+		       description="The geographical co-ordinates of this Important venue."
+		       postgis="true" />
+		
+		<field name = "rikey"
+		       type = "integer references radioinstallation(id) on delete cascade"
+		       label = "Radio Installation"
+			description="Foreign Key to the Radio Installation (if any) that covers this location."
+		       ui = "dropdown(fromtable,radioinstallation_view,sectorname)" />
+		
+		<field name = "rank"
+		       type = "integer"
+			description="Which importance does this venue / location have."
+		       label = "Rank" />
+
+		<view name = "servedkeylocations_view" as = 'select * from servedkeylocations;'>
+		</view>
+
+	</table> <!-- servedkeylocations  -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="colourmanagement" label="Colour Management"
+	description="This table describes the colour bands used for displaying the different plots">
+	       <field name="id"
+		      type="serial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+	
+		<field name = "r"
+		      type = "integer"
+			description="The level of red within the colour. Value between 0 and 255."
+		      label = "Red" />
+
+		<field name = "g"
+		      type = "integer"
+			description="The level of green within the colour. Value between 0 and 255."
+		      label = "Green" />
+
+		<field name = "b"
+		      type = "integer"
+			description="The level of blue within the colour. Value between 0 and 255."
+		      label = "Blue" />
+
+		<field name = "a"
+		      type = "integer"
+			description="The darkness of the colour. Value between 0 and 255."
+		      label = "Alpha" />
+
+		<field name = "val"
+		      type = "real"
+			description="The value that the colour represents."
+		      label = "Level" />
+	       
+	       <field name = "label"
+		      type = "varchar(50)"
+			description="A short description of the meaning of the colour."
+		      label = "Label" />
+
+		<field name = "plottype"
+		      type = "varchar(50)"
+			description="The plot type this colour is used to represent. The options can be changed in structure.xml."
+		      label = "Plot Type" 
+			ui = "dropdown(fixed,{'Coverage','Primary Server','Secondary Server', 'Number of Servers', 'DEM', 'Co-channel Interference',
+			'Adjacent-channel Interference', 'Interfered areas', 'Number of Interferers', 'Primary Co-channel interferer',
+			'Primary adjacent-channel interferer', 'Signal to Noise Ratio', 'Service Limiters'})"/>
+
+		<view name = "colourmanagement_view" as = 'select * from colourmanagement;'>
+		</view>	
+	</table> <!-- colourmanagement -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="classificationgroup" label="Classification Group" fulldownload="true"
+	description="This table is essentially to manage and allow tuning of propagation modules based on different sets of Land Cover or Clutter raster sources. A Classification Group identify a set of classifications occurring together. This will typically be the same for a File Set." >
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+	
+		<field name = "classgroup"
+		       type = "varchar(30)"
+			description="A short descriptive name to identify the Classification Group. There could/should be one called Standard"
+		       label = "Group" />
+		
+		<field name = "description"
+		       type = "text"
+		       label = "Description" />
+
+		<view name = "classificationgroup_view" as = 'select * from classificationgroup;'>
+		</view>
+	</table> <!-- classificationgroup  -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="cluttertype" label="Clutter Types" fulldownload="true" customsequence="true"
+	description="This file identify each different clutter type or land cover type as they occur in the original source file. They can be referenced to a set of Standard clutter types ">
+		<field name="id"
+		       type="smallint primary key unique not null default nextval('cluttertype_id_seq')"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>		
+
+		<field name = "landcoverid"
+		       type = "integer"
+			description = "The number in the file that is used to identify the clutter."
+		       label = "Land Cover ID" />
+
+		<field name = "cluttername"
+		       type = "varchar(30)"
+			description = "A short descriptive name to identify the clutter type"
+		       label = "Description" />
+		
+		<field name = "description"
+		       type = "text"
+		       label = "Description" />
+		
+		<field name = "height"
+		       type = "real"
+		       label = "Height"
+			description = "The average height of the clutter above local ground"
+			unittype = "height"/>
+		
+		<field name = "width"
+		       type = "real"
+		       label = "Width" 
+			decription = "The width of the clutter e.g. the width of streets."
+			unittype ="height"/>
+
+		<field name = "classgroup"
+		       type = "integer references classificationgroup(id) on delete cascade"
+		       label = "Classification Group"
+			description="Foreign Key referencing the Classification Group this clutter type/class forms part."
+		       ui = "dropdown(fromtable,classificationgroup,classgroup)" />
+
+		<field name = "standardtype"
+		       type = "integer references cluttertype(id) on delete cascade"
+		       label = "Reference Type"
+			description="Foreign Key referencing the Standard Type that reflects (about) the same characteristics as this one."
+		       ui = "dropdown(fromtable,cluttertype,cluttername)" />
+
+		<view name = "cluttertype_view" as = 'select * from cluttertype;'>
+		</view>	
+	</table> <!-- cluttertype  -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="clutterterms" label="Clutter Tuning Terms" fulldownload="true"
+	description="This table presents the different terms for which the coefficients or parameters needs to be tuned." >
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name = "term"
+		       type = "varchar(30)"
+		       label = "Term"
+		       description="The term that describes the particular kind of dependency on parameter the referencing parameter / coefficient" />
+		
+		<field name = "description"
+		       type = "text"
+		       label = "Description" />
+
+		<view name = "clutterterms_view" as = 'select * from clutterterms;'>
+		</view>			
+
+	</table> <!-- clutterterms  -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="coefficients" label="Tuned Coefficients/Parameters" fulldownload="true"
+	description="This table presents the coefficients or parameters that was tuned/altered to find the best propagation prediction model." >
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name = "term"
+		       type = "integer references clutterterms(id) on delete cascade"
+		       label = "Term"
+			description="Foreign Key referencing the Clutter Term by which the coefficient is multiply / this parameter forms part of."
+		       ui = "dropdown(fromtable,clutterterms,term)" />
+
+		<field name = "cluttertype"
+		       type = "integer references cluttertype(id) on delete cascade"
+		       label = "Clutter Type"
+			description="Foreign Key referencing the Clutter Type that this will apply to."
+		       ui = "dropdown(fromtable,cluttertype,cluttername)" />
+
+		<field name = "coefficient"
+		       type = "real"
+		       label = "Parameter"
+			description="The value of the parameter or multiplier" />
+		
+		<view name = "coefficients_view" as = 'select * from coefficients;'>
+		</view>			
+
+	</table> <!-- coefficients  -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="filesets" label="File Sets" fulldownload="true" customsequence="true"
+	description="A File Set combine a number of raster files that have the same origin and resolution and are intended to be used together. E.g. the 90m SRTM data.">
+		<field name="id"
+		       type="smallint primary key unique not null default nextval('filesets_id_seq')"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name = "SetName"
+		       type = "varchar(50)"
+			description="Short description to identify the File Set"
+		       label = "File Set Name" />
+
+		<field name = "description"
+		       type = "text"
+		       label = "Description" />
+		
+		<field name = "filetype"
+		       type = "varchar(20)"
+		       label = "File-type"
+			description="Are these files a Digital Elevation Model, Clutter / Land Cover Data or just separate files to be stored for later reference."
+		       ui = "dropdown(fixed,{'DEM','Clutter','Plots'})" />
+		
+		<field name = "classgroup"
+		       type = "integer references classificationgroup(id)"
+		       label = "Classification Group"
+			description="Foreign Key to the Classification Type table to indicate which method of classification applies in the case of a Clutter / Land Cover File Set."
+		       ui = "dropdown(fromtable,classificationgroup,classgroup)" />
+		
+		<field name = "resolution"
+		       type = "real"
+		       label = "Resolution"
+			description="Resolution of the File Set in meters." 
+			unittype= "height"/>
+		
+		<field name = "date"
+		       type = "date"
+			description="This should indicate the date the File Set was generated, or the origin of the File Set was captured." 
+		       label = "Date" />
+		
+		<field name = "use"
+		       type = "boolean"
+		       label = "Use"
+			description="Should this File Set be used in predictions?." 
+		       ui = "dropdown(fixed,{'FALSE','TRUE'})" />
+		
+		<field name="derivedbinary"
+		       type="boolean"
+		       label="Derived Binary?"
+		       description="Is the binary derived from another File Set?"
+		       ui="dropdown(fixed, {'FALSE', 'TRUE'})" />
+		
+		<field name="origin"
+		       type="smallint references filesets(id)"
+		       label="Origin"
+			description="Key to the entry this table to the originating File Set in the case of a Cut Binary"
+		       ui="dropdown(fromtable,filesets,setname)" />
+		
+		<field name = "fileformat"
+		       type = "varchar(10)"
+		       label = "File-format"
+			description="Is this File Set in the native format of QRAP (BINARY) or should GDAL be used to read the file?"
+		       ui = "dropdown(fixed,{'BINFILE','GDALFILE'})" />
+		
+		<field name="projection"
+		       type="varchar(10)"
+		       label="Internal GeoType" 
+			description="Is the raster provided as partial of a DEGree (as is the case with the SRTM data), or in meters using the UTM or Gauss Conform format with the WGS84 elipsiods (WGS84GC) (as would be the case for all Derived Binaries)"
+		       ui="dropdown(fixed, {'DEG', 'WGS84GC', 'UTM'})" />
+		
+		<field name="proj4string"
+		       type="varchar(100)"
+			description="See PROJ4 documentation for more information."
+		       label="Proj4 projection string" />
+
+		<view name = "filesets_view" as = 'select * from filesets;'>
+		</view>
+
+	</table> <!-- filesets  -->
+		
+<!-- *************************************************************************************************************************** -->
+	<table name="filesetsused" label="File sets to use" fulldownload="true" customsequence="true"
+	description="This table is used to set the ranking of first choice for the raster files.">
+	       <field name="id"
+		      type="smallint primary key unique not null default nextval('filesetsused_id_seq')"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+	       
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database."
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised."
+			visible="false"/>
+	       
+	       <field name="type"
+		      type="varchar(20)"
+		      label="Type"
+		      ui="dropdown(fixed, {'DEM', 'Clutter', 'Other'})" />
+	       
+		<field name="orderarray"
+		      type="smallint[]"
+		      label="Pointers to filesets"
+		      description="Pointers to filesets to be used in order of preference." />
+
+		<view name = "filesetsused_view" as = 'select * from filesetsused;'>
+		</view>
+	</table> <!-- filesetsused  -->
+
+<!-- *************************************************************************************************************************** -->	
+	<table name="sourcefiles" label="Source files" fulldownload="true"
+	description="This table contains reference to all raster files (Digital Elevation Models and Land Cover) being used in the predictions.">
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name="filesetkey"
+		       type="smallint references filesets(id)"
+		       label="File set"
+			description="Foreign Key to the File Set to which this file belongs. Compulsory."
+		       ui="dropdown(fromtable,filesets,description)" />
+		
+		<field name = "filename"
+		       type = "text"
+			description="The raster file name."
+		       label = "Description" />
+		
+		<field name = "location"
+		       type = "text"
+		       label = "Directory or Path" />
+		
+		<field name="areasquare"
+		       type="box"
+		       label="Coverage rectangle"
+		       description="A rectangle describing the area covered by the file."/>
+		
+		<field name="centmer"
+		       type="real"
+		       label="Central Meridian" 
+			description="This is important when Gauss Conform (as is the case with WGS84GC) or UTM projections are used."/>
+
+		<view name = "sourcefiles_view" as = 'select * from sourcefiles;'>
+		</view>
+	</table> <!-- sourcefiles  -->
+
+
+<!-- *************************************************************************************************************************** -->
+	<table name="measdatasource" label="Data Source" fulldownload="true" customsequence="true">
+	       <field name="id"
+		      type="smallint primary key unique not null default nextval('measdatasource_id_seq')"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+	       
+	       <field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+		      visible="false" />
+
+	       <field name = "name"
+		      type = "varchar(20)"
+		      label = "name" />
+
+		<field name = "description"
+		       type = "text"
+		       label = "Description" />
+	</table><!-- measdatasource -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="positionsource" label="Position Source" fulldownload="true" customsequence="true">
+	       <field name="id"
+		      type="smallint primary key unique not null default nextval('positionsource_id_seq')"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+	       
+	       <field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+		      visible="false" />
+
+	       <field name = "name"
+		      type = "varchar(20)"
+		      label = "name" />
+
+		<field name = "description"
+		       type = "text"
+		       label = "Description" />
+	</table><!-- positionsource -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="meastype" label="Measurement Type" fulldownload="true" customsequence="true">
+	       <field name="id"
+		      type="smallint primary key unique not null default nextval('meastype_id_seq')"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+	       
+	       <field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+		      visible="false" />
+
+	       <field name = "name"
+		      type = "varchar(20)"
+		      label = "name" />
+
+		<field name = "description"
+		       type = "text"
+		       label = "Description" />
+	</table><!-- meastype -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="testpoint" label="TestPoint">
+	       <field name="id"
+		      type="bigserial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+	       
+	       <field name="timeofmeas"
+		      type="timestamp without time zone"
+		      label="time measured"
+		      visible="true" />
+	       
+		<field name="location"
+		       type="POINT"
+		       label="Position"
+		       description="The latitude and longitude of measurement point "
+		       postgis="true" />
+		
+		<field name="originaltp"
+		       type="bigint references testpoint(id)"
+		       label="Original TestPoint"
+		       description="Original test point if location methods are being tested" />		
+
+		<field name="measdatasource"
+		       type="smallint references measdatasource(id)"
+		       label="File set"
+		       ui="dropdown(fromtable,measdatasource,name)" />
+
+		<field name="positionsource"
+		       type="smallint references positionsource(id)"
+		       label="File set"
+		       ui="dropdown(fromtable,positionsource,name)" />
+
+		<field name="meastype"
+		       type="smallint references meastype(id)"
+		       label="File set"
+		       ui="dropdown(fromtable,meastype,name)" />
+
+		<field name = "height"
+		       type = "real"
+		       label = "Height"
+			unittype = "height"
+		       description="Height above sea level of local ground in meters" />
+
+		<field name = "mobileheight"
+		       type = "real"
+		       label = "Mobile Height"
+			unittype = "height"
+		       description="Antenna height above local ground when measurement was made" />
+	</table> <!-- testpoint -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="measurement" label="Measurement">
+	       <field name="id"
+		      type="bigserial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+
+		<field name = "ci"
+		       type = "integer references cell(id) on delete cascade"
+		       label = "Cell ID"
+		       ui = "dropdown(fromtable,cell_view,id)" />
+				
+		<field name = "tp"
+		       type = "integer references testpoint(id) on delete cascade"
+		       label = "TestPoint"/>
+
+		<field name = "azimuth"
+		       type = "real"
+		       label = "Azimuth"
+		       description="The horisontal direction the measurement is from the cell/site" />		
+
+		<field name = "tilt"
+		       type = "real"
+		       label = "Tilt"
+		       description="The vertical direction the measurement point is from the cell/site" />
+
+		<field name = "distance"
+		       type = "real"
+		       label = "Distance"
+		       description="The distance measurement point is from the cell/site" />
+
+		<field name = "pathloss"
+		       type = "real"
+		       label = "pathloss"
+		       description="The calculated basix transmission loss between the site and the measurement point" />
+
+		<field name = "measvalue"
+		       type = "real"
+		       label = "Measurement Value"
+		       description="The actual received signal strenth measured in dBm" />
+
+		<field name = "predictvalue"
+		       type = "real"
+		       label = "Predicted Value"
+		       description="The predicted signal strenth in dBm" />
+
+		<field name = "simulatedvalue"
+		       type = "real"
+		       label = "Simulated Value"
+		       description="The estimated received signal strength in simulation in dBm" />
+	</table> <!-- measurement -->
+
+</structure>

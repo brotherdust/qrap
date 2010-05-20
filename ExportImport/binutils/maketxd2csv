@@ -1,0 +1,10 @@
+OBJS = csv2txd.o tokenizer.o
+PROGNAME = txd2csv
+
+%.o: %.cpp
+	g++ -c $<
+
+$(PROGNAME): $(OBJS)
+	g++ $(OBJS) -o $(PROGNAME)
+
+

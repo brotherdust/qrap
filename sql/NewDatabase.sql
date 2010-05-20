@@ -1,0 +1,6 @@
+DROP DATABASE qrap;
+DROP ROLE engine;
+CREATE USER qrap with PASSWORD 'qrap';
+CREATE DATABASE qrap;
+
+

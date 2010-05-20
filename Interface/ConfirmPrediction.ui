@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ConfirmPrediction</class>
+ <widget class="QDialog" name="ConfirmPrediction">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>989</width>
+    <height>607</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Confirm Prediction Information</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../DataBase/application.qrc">
+    <normaloff>:/images/logo_icon.png</normaloff>:/images/logo_icon.png</iconset>
+  </property>
+  <widget class="QTableWidget" name="tableWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>971</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="sortingEnabled">
+    <bool>true</bool>
+   </property>
+   <column>
+    <property name="text">
+     <string>Site</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Sector</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Radius</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Technology</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Radio Inst ID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Project</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Flag X</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Flag Z</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Status</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QWidget" name="gridLayout">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>260</y>
+     <width>972</width>
+     <height>300</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="PlotInput">
+    <item row="5" column="0">
+     <widget class="QLabel" name="RqRxlbl">
+      <property name="text">
+       <string>Minimum Required Received Signal:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QDoubleSpinBox" name="rxMinSpinBox">
+      <property name="minimum">
+       <double>-10000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>10000.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="2">
+     <widget class="QLabel" name="AngleReslbl">
+      <property name="text">
+       <string>Minimum Angle Resolution</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="2">
+     <widget class="QLabel" name="plotReslbl">
+      <property name="text">
+       <string>Plot Resolution:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="2">
+     <widget class="QLabel" name="kFactorIlbl">
+      <property name="text">
+       <string>k-Factor for Interferers:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="3">
+     <widget class="QDoubleSpinBox" name="plotResolutionSpinBox">
+      <property name="maximum">
+       <double>10000.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="3">
+     <widget class="QDoubleSpinBox" name="kFactorIntSpinBox">
+      <property name="minimum">
+       <double>-10000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>10000.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="3">
+     <widget class="QDoubleSpinBox" name="kFactorServerSpinBox">
+      <property name="minimum">
+       <double>-10000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>10000.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="2">
+     <widget class="QLabel" name="kFactorSlbl">
+      <property name="text">
+       <string>k-Factor for Servers:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="3">
+     <widget class="QDoubleSpinBox" name="minAngleResSpinBox"/>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="RqCCIRlbl">
+      <property name="text">
+       <string>Required Carrier to Co-Channel Interference Ratio:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="0">
+     <widget class="QLabel" name="RqCAIRlbl">
+      <property name="text">
+       <string>Required Carrier to Adjacent-Channel Interferece Ratio:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QDoubleSpinBox" name="rqCociSpinBox">
+      <property name="minimum">
+       <double>-10000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>10000.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1">
+     <widget class="QDoubleSpinBox" name="rqCiadSpinBox">
+      <property name="minimum">
+       <double>-10000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>10000.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="0">
+     <widget class="QLabel" name="RqEbNolbl">
+      <property name="text">
+       <string>Required Energy per Bit to Noise Ratio:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="1">
+     <widget class="QDoubleSpinBox" name="rqEbNoSpinBox">
+      <property name="minimum">
+       <double>-10000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>10000.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="FadeMlbl">
+      <property name="text">
+       <string>Fade Margin:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QDoubleSpinBox" name="fadeMarginSpin">
+      <property name="minimum">
+       <double>-10000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>10000.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QLabel" name="Nolbl">
+      <property name="text">
+       <string>Noise Level:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="3">
+     <widget class="QDoubleSpinBox" name="noiseLevelSpinBox">
+      <property name="minimum">
+       <double>-10000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>10000.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="3">
+     <widget class="QDoubleSpinBox" name="RqSNSpinBox">
+      <property name="minimum">
+       <double>-10000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>10000.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2">
+     <widget class="QLabel" name="RqSNlbl">
+      <property name="text">
+       <string>Required Signal to Noise Raio:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="mobilelbl">
+      <property name="text">
+       <string>Mobile Radio Used:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QComboBox" name="mobileCombo"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="Dirlbl">
+      <property name="text">
+       <string>Output Directory:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLabel" name="outputDirectoryEdit">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="filelbl">
+      <property name="text">
+       <string>Output File Name:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="outputFileNameEdit">
+      <property name="text">
+       <string>RapOutput</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QComboBox" name="outputTypeCombo">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>Edras Image Forma (*.img)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>GRASS</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="FileTypelbl">
+      <property name="text">
+       <string>File Output Type:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="plotlbl">
+      <property name="text">
+       <string>Prediction Type / Plot Type:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="plotTypeCombo">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>Coverage</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Primary Server</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Secondary Server</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Number of Servers</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Carrier to Co-channel Interference Ratio: </string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Carrier to Adjacent-channel Interf Ratio:</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Interfered Areas</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Number of Interferers</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Primary Co-channel Interferers</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Primary Adjacent-channel Interferers</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Signal to Noise Ratio</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Digital Elevation Model</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QLabel" name="unitlbl">
+      <property name="text">
+       <string>Output Units:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="3">
+     <widget class="QComboBox" name="displayUnitsCombo">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>dB</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>dBW</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>dBm</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>dBuV</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>dBuVm</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>dBWm2Hz</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>dBWm2</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QCheckBox" name="useClutterCheckBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Use Clutter </string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <layout class="QHBoxLayout" name="UpDownLink">
+      <item>
+       <widget class="QRadioButton" name="downLinkRadio">
+        <property name="text">
+         <string>Down Link</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="upLinkRadio">
+        <property name="text">
+         <string>Up Link</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayout">
+   <property name="geometry">
+    <rect>
+     <x>610</x>
+     <y>570</y>
+     <width>373</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout">
+    <item>
+     <widget class="QPushButton" name="pushButtonPrint">
+      <property name="text">
+       <string>Print</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="btnDone">
+      <property name="text">
+       <string>Done</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="btnCancel">
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="btnDo">
+      <property name="text">
+       <string>Do</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayout_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>570</y>
+     <width>473</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout">
+    <item>
+     <widget class="QRadioButton" name="radioArea">
+      <property name="text">
+       <string>Predict selected area</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="radioRadius">
+      <property name="text">
+       <string>Predict selected area with radius included</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../DataBase/application.qrc"/>
+ </resources>
+ <connections/>
+</ui>

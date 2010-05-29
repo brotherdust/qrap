@@ -235,9 +235,9 @@ www.QRap.org.za
 			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
 		      visible="false" />
 
-		<field name="qrapinst"
-			type="varchar(12)"
-			label="MachineName"
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
 			description="QRap Installation name, HOSTNAME or some unique identifier of machine. This is used to identify from which machine this entry originated when the system is synchronised"/>
 
 		<field name="siteid"
@@ -1566,12 +1566,12 @@ www.QRap.org.za
 			description="A short desriptive identifier for the link"
 		      label = "Link Name" />
 		
-	       <field name = "radioinstallation1"
+	       <field name = "txinst"
 		      type = "integer references radioinstallation(id) on delete cascade"
 			description="Foreign Key reference to the Radio Installation table to the Transmitting Installation"
 		      label = "Tx Installation"  />
 	       
-	       <field name = "radioinstallation2"
+	       <field name = "rxinst"
 		      type = "integer references radioinstallation(id) on delete cascade"
 			description="Foreign Key reference to the Radio Installation table to the Receiving Installation"
 		      label = "Rx Installation"  />

@@ -792,7 +792,7 @@ void cLink::SaveLink(string &LinkName, int &LinkID)
 		query = "INSERT INTO links ";
 	else
 		query = "UPDATE links set ";
-	query+= "(lastmodified,linkname,radioinstallation1,radioinstallation2, minclearance,frequency, pathloss, kfactor, line) ";
+	query+= "(lastmodified,linkname,txinst,rxinst, minclearance,frequency, pathloss, kfactor, line) ";
 	if (!LinkID)
 		query += " VALUES";
 	else

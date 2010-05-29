@@ -242,7 +242,7 @@ void cFilter::on_comboBoxTechType_currentIndexChanged(int index)
 		if ((NewValue!="")&&(NewValue!="All"))
 		{
 			string query;
-			query = "create view antennapattern_view as select antennapattern.* ";
+			query = "create view antennapattern_view as select distinct antennapattern.* ";
 			query += " from attennapattern cross join technology where techkey=technology.id ";
 			query += " and technologytype='"+NewValue+"';";
 
@@ -255,7 +255,7 @@ void cFilter::on_comboBoxTechType_currentIndexChanged(int index)
 				QRAP_ERROR("Error creating radioinstallation_view in cFilter::CreateViews");
 			}
 	
-			query = "create view equipmenttype_view as select equipmenttype.* ";
+			query = "create view equipmenttype_view as select distinct equipmenttype.* ";
 			query += " from equipmenttype cross join technology where techkey=technology.id ";
 			query += " and technologytype= '"+NewValue+"';";	
 

@@ -809,8 +809,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 //	cout << endl;
 #endif
 
-
-return DiffLoss;
+	return DiffLoss;
 } /* end CPathLossPrdictor::CalcDiffLoss */
 
 

@@ -166,7 +166,10 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 
 		}
 	}
-	cout << "Verlaat cDatabase::Connect " << endl;
+
+	//create any tables that might be new.
+	cout << "Implementing any possible table additions to the database structure" << endl;
+	Create (username, password);
 	
 	return true;
 }

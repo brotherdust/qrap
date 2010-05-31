@@ -1353,9 +1353,8 @@ www.QRap.org.za
 	
 		<view name="cell_view" as='select 
 				cell.id as id,
-				site.sitename as sitename,
-				radioinstallation.sector as sector,
 				sitename||sector as sectorname,
+				cell.id||sitename||sector as cellname,
 				cell.risector as risector,
 				cell.mastercell as mastercell,
 				cell.cstraffic as cstraffic,
@@ -1366,9 +1365,7 @@ www.QRap.org.za
 				from site, radioinstallation, cell
 				where (cell.risector = radioinstallation.id 
 				and radioinstallation.siteid = site.id)'>
-			
-			<field name="sitename" label="Site Name" />
-			<field name="sector" label="Sector" />
+
 		</view>
 	</table> <!-- cell -->
 
@@ -1397,7 +1394,7 @@ www.QRap.org.za
 		       type = "integer references cell(id) on delete cascade"
 		       label = "Cell ID"
 			description="Foreign Key referencing the Cell of which these frequencies are used."
-		       ui = "dropdown(fromtable,cell_view,id)" />
+		       ui = "dropdown(fromtable,cell_view,cellname)" />
 		
 		<field name = "carrier"
 		       type = "integer"
@@ -1411,17 +1408,11 @@ www.QRap.org.za
 		
 		<view name = "frequencyallocationlist_view" as = 'select 
 					frequencyallocationlist.id as id,
-					site.sitename as sitename,
-					radioinstallation.sector as sector,
-					frequencyallocationlist.ci as ci,
+					frequencyallocationlist.ci as ci, cell_view.cellname as cellname
 					frequencyallocationlist.carrier as carrier,
 					frequencyallocationlist.channel as channel 
-					from frequencyallocationlist, cell, radioinstallation,site 
-					where (frequencyallocationlist.ci=cell.id 
-					and cell.risector=radioinstallation.id 
-					and radioinstallation.siteid=site.id )'>
-			<field name="sitename" label="Site name" />
-			<field name="sector" label="Sector" />
+					from frequencyallocationlist, cell_view
+					where (frequencyallocationlist.ci=cell_view.id )'>
 		</view>
 	</table> <!-- frequencyallocationlist -->
 
@@ -1511,7 +1502,7 @@ www.QRap.org.za
 		       type = "integer references cell(id) on delete cascade"
 		       label = "Cell ID"
 			description="Foreign Key referencing the Cell to which this parameter apply."
-		       ui = "dropdown(fromtable,cell_view,id)" />
+		       ui = "dropdown(fromtable,cell_view,cellname)" />
 
 		<field name = "parameterid"
 		       type =  "integer references cellparameters(id) on delete cascade"
@@ -1526,14 +1517,10 @@ www.QRap.org.za
 	
 		<view name = "parametersettings_view" as = 'select 
 					parametersettings.id as id,
-					site.sitename as sitename,
-					radioinstallation.sector as sector,
-					parametersettings.ci as ci,
+					parametersettings.ci as ci, cell_view.cellname cellname
 					parametername as cell_parameter, parametersettings.setting as setting
-					from parametersettings, cell, radioinstallation, site, cellparameters 
-					where (parametersettings.ci=cell.id 
-					and cell.risector=radioinstallation.id 
-					and radioinstallation.siteid=site.id 
+					from parametersettings, cell_view, cellparameters 
+					where (parametersettings.ci=cell_view.id 
 					and parameterid=cellparameters.id)'>
 			<field name="sitename" label="Site name" readonly="true"/>
 			<field name="sector" label="Sector" readonly="true"/>

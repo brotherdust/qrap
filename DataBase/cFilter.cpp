@@ -652,6 +652,7 @@ void cFilter::CreateViews()
 		queryIN = " create view radioinstallation_view as select distinct site_view_list.sitename as sitename, ";
 		queryIN += " sitename||sector as sectorname, ";
 		queryIN +="radioinstallation.* from radioinstallation cross join site_view_list ";
+		queryIN +="where radioinstallation.siteid=site_view_list.id ";
 		if (radinvolved) 
 		{
 			queryIN += query;
@@ -676,7 +677,7 @@ void cFilter::CreateViews()
 		}
 		
 		//change cells view
-		query = "create view cell_view as select distinct sitename, sector, sectorname,";
+		query = "create view cell_view as select distinct sectorname, cell.id||sectorname as cellname,";
 		query += " cell.* from cell cross join radioinstallation_view";
 		query += " where cell.risector = radioinstallation_view.id; ";
 		
@@ -691,13 +692,12 @@ void cFilter::CreateViews()
 		
 		//change frequency allocation view
 		query = "create view frequencyallocationlist_view as ";
-		query+= "select distinct frequencyallocationlist.id as id,sitename, sector, sectorname,";
+		query+= "select distinct frequencyallocationlist.id as id,cellname,";
 		query += " frequencyallocationlist.ci as ci, ";
 		query += " frequencyallocationlist.carrier as carrier, ";
 		query += " frequencyallocationlist.channel as channel ";
-		query += " from frequencyallocationlist, cell, radioinstallation_view ";
-		query += " where frequencyallocationlist.ci=cell.id and ";
-		query += " cell.risector=radioinstallation_view.id;";
+		query += " from frequencyallocationlist, cell_view";
+		query += " where frequencyallocationlist.ci=cell_view.id;";
 		
 		if (gDb.ViewExists("frequencyallocationlist_view"))
 			gDb.RemoveView("frequencyallocationlist_view");
@@ -710,13 +710,12 @@ void cFilter::CreateViews()
 		
 		//change parametersettings view
 		query = "create view parametersettings_view as ";
-		query+= "select distinct parametersettings.id as id,sitename, sector, sectorname,";
+		query+= "select distinct parametersettings.id as id,cellname,";
 		query += " parametersettings.ci as ci, ";
 		query += " parameterid, parametername as cell_parameter, setting ";
-		query += " from parametersettings, cell, radioinstallation_view, cellparameters_view ";
-		query += " where parametersettings.ci=cell.id and ";
-		query += " cell.risector=radioinstallation_view.id";
-		query += " and parametersettings.parameterid=cellparameters_view.id;";
+		query += " from parametersettings, cell_view, cellparameters_view ";
+		query += " where parametersettings.ci=cell_view.id and ";
+		query += " parametersettings.parameterid=cellparameters_view.id;";
 		
 		if (gDb.ViewExists("parametersettings_view"))
 			gDb.RemoveView("parametersettings_view");

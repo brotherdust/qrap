@@ -159,5 +159,6 @@ void cConfirmSpectral::on_pushOk_clicked()
 	}
 	mRx = atoi(comboRx->currentText().latin1());	
 	mFrequencySpacing = doubleFreqRes->value()/1000;
+	mkFactor = doublekFactor->value();
 	accept();
 }

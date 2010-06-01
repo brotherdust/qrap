@@ -41,15 +41,16 @@ cSpectralPlot::~cSpectralPlot()
 }
 
 //*********************************************************************************************
-bool cSpectralPlot::SetPlotTask(unsigned Rx, QList<unsigned> Tx, double FrequencySpacing)
+bool cSpectralPlot::SetPlotTask(unsigned Rx, QList<unsigned> Tx, double FrequencySpacing, double kFactor)
 {
 	mFrequencySpacing=FrequencySpacing;
+	mkFactor=kFactor;
 	
 	for(int i=0;i<Tx.size();i++)
 	{
 		if (Rx!=Tx[i])
 		{
-			mLinks.push_back(new cSpectralLink(&mDem, Rx,Tx[i],mFrequencySpacing));
+			mLinks.push_back(new cSpectralLink(&mDem, Rx,Tx[i],mFrequencySpacing,mkFactor));
 			cout<<"Made a new link from "<<Rx<<" to "<<Tx[i]<<endl;
 		}
 	}
@@ -126,7 +127,7 @@ bool cSpectralPlot::ReadPlotRequest(const char *filename)
 		unsigned tempSiteID;
 		infile >> tempSiteID;
 		infile >> temp;
-		mLinks.push_back(new cSpectralLink(&mDem, RxInstKey,tempSiteID,mFrequencySpacing));
+		mLinks.push_back(new cSpectralLink(&mDem, RxInstKey,tempSiteID,mFrequencySpacing,mkFactor));
 		cout<<"Made a new link from "<<RxInstKey<<" to "<<tempSiteID<<endl;
 	}
 }

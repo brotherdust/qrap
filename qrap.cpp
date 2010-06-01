@@ -830,7 +830,7 @@ void QRap::PerformSpectral()
 		{
 			cSpectralAnalysis Plot(mQGisIface->mainWindow(), QgisGui::ModalDialogFlags);
 			Plot.DoAndSetUpDisplay(ConfirmSpectral.mRx,ConfirmSpectral.mRadInst,
-						ConfirmSpectral.mFrequencySpacing);
+						ConfirmSpectral.mFrequencySpacing, ConfirmSpectral.mkFactor);
 			if (Plot.exec())
 			{
 				mQGisIface->mapCanvas()->refresh();

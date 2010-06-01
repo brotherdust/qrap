@@ -44,7 +44,7 @@ class cSpectralLink
 {
 public:
 	cSpectralLink(cRasterFileHandler *);
-	cSpectralLink(cRasterFileHandler *, unsigned int &, unsigned int &, double &);
+	cSpectralLink(cRasterFileHandler *, unsigned int &, unsigned int &, double &, double &);
 	virtual ~cSpectralLink();
 	
 	//const cSpectralLink & operator=(const cSpectralLink &right);
@@ -59,7 +59,7 @@ public:
 	bool CalcDistribution();
 private:
 	bool GetDBinfo(tFixed &Inst);
-	
+	eOutputUnits	mUnits;
 	double mFrequencySpacing;	//Gaps between discreet frequencies which we examine
 	float *mEnvelopeFreq;	//Frequency offsets for the envelope
 	float *mEnvelopeValue;	//Relative gain at offsets
@@ -71,14 +71,8 @@ private:
 	vector<float> mDescValue;
 		
 	//These were copied from cLink on 25/03/2008 as a base
-	eOutputUnits	mUnits;			///< Description
 	bool			mDownlink;		///< Description
 	double			mFrequency;		///<
-	double			mRqSN;			///< dB
-	double			mRxMin;			///< dBm
-	double			mFadeMargin;	///< dB
-	double			mRqEbNo;		///< dB
-	double			mNoiseLevel;	///< dBm
 	double			mkFactor;		///< Description
 	double			mPlotResolution;///< Hz
 	short int		mDEMsource;		///< Description
@@ -88,8 +82,8 @@ private:
 	cRasterFileHandler 	mClutter;	///< Description
 	tFixed			mTxInst;		///< Description
 	tFixed			mRxInst;		///< Description
-	cAntennaPattern mTxAnt;			///<
-	cAntennaPattern mRxAnt;			///<
+	cAntennaPattern 	mTxAnt;			///<
+	cAntennaPattern 	mRxAnt;			///<
 	int 			mLength;		///< Size of the arrays
 	double 			mSlope;			///< Slope of LineOfSight
 	double 			mEffRadius;		///< Effective earth radius
@@ -100,8 +94,8 @@ private:
 	double 			mRxBearing;		///< Recommended bearing of receiving antenna
 	double 			mTxElevation;	///< True height of Tx site
 	double 			mRxElevation;	///< True height of Rx site
-	float 		mPropLoss;		///< Array storing the propagation loss at each point along the profile
-	float 		mRxLev;		///< Array storing the propagation loss at each point along the profile
+	float 			mPropLoss;		///< Array storing the propagation loss at each point along the profile
+	float 			mRxLev;		///< Array storing the propagation loss at each point along the profile
 };
 
 }

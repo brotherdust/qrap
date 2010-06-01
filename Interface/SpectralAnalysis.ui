@@ -95,7 +95,7 @@
  </customwidgets>
  <resources>
   <include location="../qrap.qrc"/>
-  <include location="../QRap.qrc"/>
+  <include location="../qrap.qrc"/>
  </resources>
  <connections/>
 </ui>

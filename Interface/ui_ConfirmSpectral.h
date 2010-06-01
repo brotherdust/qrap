@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'ConfirmSpectral.ui'
+** Form generated from reading UI file 'ConfirmSpectral.ui'
 **
-** Created: Thu Apr 15 21:24:32 2010
-**      by: Qt User Interface Compiler version 4.5.2
+** Created: Tue Jun 1 22:15:46 2010
+**      by: Qt User Interface Compiler version 4.6.2
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_CONFIRMSPECTRAL_H
@@ -18,6 +18,7 @@
 #include <QtGui/QDialog>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QGridLayout>
+#include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
@@ -29,68 +30,27 @@ QT_BEGIN_NAMESPACE
 class Ui_ConfirmSpectral
 {
 public:
-    QWidget *gridLayout;
-    QGridLayout *gridLayout1;
-    QLabel *label;
+    QTableWidget *tableInstallations;
+    QWidget *layoutWidget;
+    QHBoxLayout *horizontalLayout;
+    QLabel *lblRx;
     QComboBox *comboRx;
-    QLabel *label_2;
+    QLabel *lblkFactor;
+    QDoubleSpinBox *doublekFactor;
+    QLabel *lblFreqRes;
     QDoubleSpinBox *doubleFreqRes;
-    QWidget *gridLayout_2;
-    QGridLayout *gridLayout2;
+    QGridLayout *gridLayout;
     QPushButton *pushCancel;
     QPushButton *pushOk;
-    QTableWidget *tableInstallations;
 
     void setupUi(QDialog *ConfirmSpectral)
     {
         if (ConfirmSpectral->objectName().isEmpty())
             ConfirmSpectral->setObjectName(QString::fromUtf8("ConfirmSpectral"));
-        ConfirmSpectral->resize(921, 350);
+        ConfirmSpectral->resize(1009, 371);
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/QRap/Spectral.png"), QSize(), QIcon::Normal, QIcon::Off);
         ConfirmSpectral->setWindowIcon(icon);
-        gridLayout = new QWidget(ConfirmSpectral);
-        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        gridLayout->setGeometry(QRect(20, 270, 866, 31));
-        gridLayout1 = new QGridLayout(gridLayout);
-        gridLayout1->setObjectName(QString::fromUtf8("gridLayout1"));
-        gridLayout1->setContentsMargins(0, 0, 0, 0);
-        label = new QLabel(gridLayout);
-        label->setObjectName(QString::fromUtf8("label"));
-
-        gridLayout1->addWidget(label, 0, 0, 1, 1);
-
-        comboRx = new QComboBox(gridLayout);
-        comboRx->setObjectName(QString::fromUtf8("comboRx"));
-
-        gridLayout1->addWidget(comboRx, 0, 1, 1, 1);
-
-        label_2 = new QLabel(gridLayout);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
-
-        gridLayout1->addWidget(label_2, 0, 2, 1, 1);
-
-        doubleFreqRes = new QDoubleSpinBox(gridLayout);
-        doubleFreqRes->setObjectName(QString::fromUtf8("doubleFreqRes"));
-
-        gridLayout1->addWidget(doubleFreqRes, 0, 3, 1, 1);
-
-        gridLayout_2 = new QWidget(ConfirmSpectral);
-        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
-        gridLayout_2->setGeometry(QRect(710, 310, 178, 31));
-        gridLayout2 = new QGridLayout(gridLayout_2);
-        gridLayout2->setObjectName(QString::fromUtf8("gridLayout2"));
-        gridLayout2->setContentsMargins(0, 0, 0, 0);
-        pushCancel = new QPushButton(gridLayout_2);
-        pushCancel->setObjectName(QString::fromUtf8("pushCancel"));
-
-        gridLayout2->addWidget(pushCancel, 0, 1, 1, 1);
-
-        pushOk = new QPushButton(gridLayout_2);
-        pushOk->setObjectName(QString::fromUtf8("pushOk"));
-
-        gridLayout2->addWidget(pushOk, 0, 0, 1, 1);
-
         tableInstallations = new QTableWidget(ConfirmSpectral);
         if (tableInstallations->columnCount() < 9)
             tableInstallations->setColumnCount(9);
@@ -113,7 +73,68 @@ public:
         QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
         tableInstallations->setHorizontalHeaderItem(8, __qtablewidgetitem8);
         tableInstallations->setObjectName(QString::fromUtf8("tableInstallations"));
-        tableInstallations->setGeometry(QRect(5, 10, 911, 251));
+        tableInstallations->setGeometry(QRect(5, 10, 991, 311));
+        tableInstallations->setMinimumSize(QSize(911, 0));
+        layoutWidget = new QWidget(ConfirmSpectral);
+        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
+        layoutWidget->setGeometry(QRect(10, 330, 981, 33));
+        horizontalLayout = new QHBoxLayout(layoutWidget);
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        lblRx = new QLabel(layoutWidget);
+        lblRx->setObjectName(QString::fromUtf8("lblRx"));
+        lblRx->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        horizontalLayout->addWidget(lblRx);
+
+        comboRx = new QComboBox(layoutWidget);
+        comboRx->setObjectName(QString::fromUtf8("comboRx"));
+
+        horizontalLayout->addWidget(comboRx);
+
+        lblkFactor = new QLabel(layoutWidget);
+        lblkFactor->setObjectName(QString::fromUtf8("lblkFactor"));
+        lblkFactor->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        horizontalLayout->addWidget(lblkFactor);
+
+        doublekFactor = new QDoubleSpinBox(layoutWidget);
+        doublekFactor->setObjectName(QString::fromUtf8("doublekFactor"));
+        doublekFactor->setMinimum(-2);
+        doublekFactor->setMaximum(20);
+        doublekFactor->setValue(1.33);
+
+        horizontalLayout->addWidget(doublekFactor);
+
+        lblFreqRes = new QLabel(layoutWidget);
+        lblFreqRes->setObjectName(QString::fromUtf8("lblFreqRes"));
+        lblFreqRes->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        horizontalLayout->addWidget(lblFreqRes);
+
+        doubleFreqRes = new QDoubleSpinBox(layoutWidget);
+        doubleFreqRes->setObjectName(QString::fromUtf8("doubleFreqRes"));
+        doubleFreqRes->setMinimum(0.01);
+        doubleFreqRes->setMaximum(1000);
+        doubleFreqRes->setValue(10);
+
+        horizontalLayout->addWidget(doubleFreqRes);
+
+        gridLayout = new QGridLayout();
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        pushCancel = new QPushButton(layoutWidget);
+        pushCancel->setObjectName(QString::fromUtf8("pushCancel"));
+
+        gridLayout->addWidget(pushCancel, 0, 1, 1, 1);
+
+        pushOk = new QPushButton(layoutWidget);
+        pushOk->setObjectName(QString::fromUtf8("pushOk"));
+
+        gridLayout->addWidget(pushOk, 0, 0, 1, 1);
+
+
+        horizontalLayout->addLayout(gridLayout);
+
 
         retranslateUi(ConfirmSpectral);
 
@@ -122,11 +143,7 @@ public:
 
     void retranslateUi(QDialog *ConfirmSpectral)
     {
-        ConfirmSpectral->setWindowTitle(QApplication::translate("ConfirmSpectral", "Dialog", 0, QApplication::UnicodeUTF8));
-        label->setText(QApplication::translate("ConfirmSpectral", "Select Reciever Station :", 0, QApplication::UnicodeUTF8));
-        label_2->setText(QApplication::translate("ConfirmSpectral", "Frequency Resolution (kHz) : ", 0, QApplication::UnicodeUTF8));
-        pushCancel->setText(QApplication::translate("ConfirmSpectral", "Cancel", 0, QApplication::UnicodeUTF8));
-        pushOk->setText(QApplication::translate("ConfirmSpectral", "OK", 0, QApplication::UnicodeUTF8));
+        ConfirmSpectral->setWindowTitle(QApplication::translate("ConfirmSpectral", "Spectral Interference Analysis", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem = tableInstallations->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("ConfirmSpectral", "Site", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem1 = tableInstallations->horizontalHeaderItem(1);
@@ -134,18 +151,28 @@ public:
         QTableWidgetItem *___qtablewidgetitem2 = tableInstallations->horizontalHeaderItem(2);
         ___qtablewidgetitem2->setText(QApplication::translate("ConfirmSpectral", "Radio Inst ID", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem3 = tableInstallations->horizontalHeaderItem(3);
-        ___qtablewidgetitem3->setText(QApplication::translate("ConfirmSpectral", "New Column", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem3->setText(QApplication::translate("ConfirmSpectral", "Technology", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem4 = tableInstallations->horizontalHeaderItem(4);
         ___qtablewidgetitem4->setText(QApplication::translate("ConfirmSpectral", "Project", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem5 = tableInstallations->horizontalHeaderItem(5);
-        ___qtablewidgetitem5->setText(QApplication::translate("ConfirmSpectral", "Technology", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem5->setText(QApplication::translate("ConfirmSpectral", "FlagX", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem6 = tableInstallations->horizontalHeaderItem(6);
         ___qtablewidgetitem6->setText(QApplication::translate("ConfirmSpectral", "FlagZ", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem7 = tableInstallations->horizontalHeaderItem(7);
         ___qtablewidgetitem7->setText(QApplication::translate("ConfirmSpectral", "Status", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem8 = tableInstallations->horizontalHeaderItem(8);
         ___qtablewidgetitem8->setText(QApplication::translate("ConfirmSpectral", "Radius", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(ConfirmSpectral);
+        lblRx->setText(QApplication::translate("ConfirmSpectral", "Select Reciever Station :", 0, QApplication::UnicodeUTF8));
+        lblkFactor->setText(QApplication::translate("ConfirmSpectral", "k-Factor:", 0, QApplication::UnicodeUTF8));
+#ifndef QT_NO_TOOLTIP
+        doublekFactor->setToolTip(QString());
+#endif // QT_NO_TOOLTIP
+        lblFreqRes->setText(QApplication::translate("ConfirmSpectral", "Frequency Resolution (kHz) : ", 0, QApplication::UnicodeUTF8));
+#ifndef QT_NO_TOOLTIP
+        doubleFreqRes->setToolTip(QString());
+#endif // QT_NO_TOOLTIP
+        pushCancel->setText(QApplication::translate("ConfirmSpectral", "Cancel", 0, QApplication::UnicodeUTF8));
+        pushOk->setText(QApplication::translate("ConfirmSpectral", "OK", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

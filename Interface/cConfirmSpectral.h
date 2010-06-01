@@ -54,6 +54,7 @@ public:
 	QList<unsigned> mRadInst;
 	unsigned mRx;
 	double mFrequencySpacing;
+	double mkFactor;
 private:
 	
 public slots:

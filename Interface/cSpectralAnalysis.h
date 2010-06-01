@@ -46,7 +46,7 @@ public:
 	cSpectralAnalysis( QWidget* parent, Qt::WFlags fl = 0 );
 	~cSpectralAnalysis();
 	
-	void DoAndSetUpDisplay(unsigned mRx,QList<unsigned> TxList,double FrequencyRes);
+	void DoAndSetUpDisplay(unsigned mRx,QList<unsigned> TxList,double FrequencyRes, double kFactor);
 	
 	QwtPlotCurve *mSpectrum;	
 	cSpectralPlot mSpectralPlot;

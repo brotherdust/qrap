@@ -76,9 +76,9 @@ void cSpectralAnalysis::on_pushSave_clicked()
 }
 
 //********************************************************************************************************
-void cSpectralAnalysis::DoAndSetUpDisplay(unsigned mRx,QList<unsigned> TxList,double FrequencyRes)
+void cSpectralAnalysis::DoAndSetUpDisplay(unsigned mRx,QList<unsigned> TxList,double FrequencyRes, double kFactor)
 {
-	mSpectralPlot.SetPlotTask(mRx,TxList,FrequencyRes);
+	mSpectralPlot.SetPlotTask(mRx,TxList,FrequencyRes,kFactor);
 	if (mSpectralPlot.DoPlot())
 	{
 		cout << "In cSpectralAnalysis::DoAndSetUpDisplay voor mSpectrum = new QwtPlotCurve" << endl;

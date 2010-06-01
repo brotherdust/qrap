@@ -66,7 +66,8 @@ string MakeDBFromArray(vector<float> &input)
 }
 
 //**********************************************************************************************
-cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey, unsigned int &TxKey, double &Resol)
+cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey, 
+				unsigned int &TxKey, double &Resol, double &kFactor)
 {
 	bool FoundRasterSet=FALSE;
 	mFrequencySpacing=Resol;
@@ -82,13 +83,8 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey, unsig
 	
 	mMinClearance = 3.402823e+38;
 	mUnits = dBm;
-	mRqSN = 8; //dB
 	mFrequency = 60000;
-	mRxMin = -110; //dBm
-	mFadeMargin = 3; //dB
-	mRqEbNo = 8; //dB
-	mNoiseLevel = 144; //dBm
-	mkFactor = 1;
+	mkFactor = kFactor;
 	mDEMsource = 1;
 	mClutterSource = 1;
 	mUseClutter = false;
@@ -97,7 +93,7 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey, unsig
 	FoundRasterSet = mDEM->SetRasterFileRules(mDEMsource);
 	if (!FoundRasterSet)
 	{
-		string err = "Error gtting ";
+		string err = "Error getting ";
 		err+=" DEM: Trouble getting DEM list. Using default";
 		QRAP_WARN(err.c_str());
 	}
@@ -124,13 +120,8 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem)
 	//mEffRadius = reR;
 	mMinClearance = 3.402823e+38;
 	mUnits = dBm;
-	mRqSN = 8; //dB
 	mFrequency = 60000;
-	mRxMin = -110; //dBm
-	mFadeMargin = 3; //dB
-	mRqEbNo = 8; //dB
-	mNoiseLevel = 144; //dBm
-	mkFactor = 1;
+	mkFactor = 1.33;
 	mDEMsource = 1;
 	mClutterSource = 1;
 	mUseClutter = false;

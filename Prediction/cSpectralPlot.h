@@ -45,7 +45,7 @@ public:
 	virtual ~cSpectralPlot();
 	
 	bool ReadPlotRequest (const char *filename);
-	bool SetPlotTask(unsigned Rx, QList<unsigned> Tx, double FrequencySpacing);
+	bool SetPlotTask(unsigned Rx, QList<unsigned> Tx, double FrequencySpacing, double kFactor);
 	
 	bool DoPlot();
 	double *mPFDFreq;
@@ -60,6 +60,7 @@ private:
 	double mFrequencySpacing;	//Gaps between discreet frequencies which we examine
 	double mMinFreq;
 	double mMaxFreq;
+	double mkFactor;
 
 	eOutputUnits	mUnits;
 	double	mPlotResolution;///< Hz

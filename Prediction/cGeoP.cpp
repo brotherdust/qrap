@@ -144,7 +144,6 @@ void cGeoP::Set(double lat, double lon, GeoType type, int centMer)
 	}
 	else if (mType==UTM)
 	{
-//		mSouth = Hemisphere;
 		mSouth = (mLat<=0.0);
 		mCentMer = centMer;
 	}

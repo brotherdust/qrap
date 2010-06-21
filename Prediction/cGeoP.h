@@ -208,7 +208,7 @@ namespace Qrap
 			/**
 			 * Determine Hemishere -- true = South
 			 */
-			inline bool Hemishere()
+			inline bool Hemisphere()
 			{
 				GeoType RememberType=mType;
 				int CentMer=mCentMer; 

@@ -91,6 +91,10 @@ bool cConfirmPrediction::SetPoints(QList<QgsPoint> Points)
 	        }
 	        NorthWestCorner.Set(North,West,DEG);
 	        SouthEastCorner.Set(South,East,DEG);
+		cout << "North West corner: " << endl;
+		NorthWestCorner.Display();
+		cout << "South East corner: " << endl;
+		SouthEastCorner.Display();
 		gcvt(Points[0].x(),12,text);
 	        query += text;
 	        query += " ";

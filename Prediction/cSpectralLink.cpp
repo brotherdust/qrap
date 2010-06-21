@@ -270,10 +270,10 @@ bool cSpectralLink::GetDBinfo(tFixed &Inst)
 	query +="rxsensitivity,startfreq,spacing,channel,";
 	query+= "txantpatternkey,txbearing,txmechtilt,rxantpatternkey,";
 	query+="rxbearing,rxmechtilt,txantennaheight,rxantennaheight ";
-	query+= "FROM radioinstallation LEFT OUTER JOIN cell ";
+	query+= "FROM radioinstallation CROSS JOIN cell ";
 	query+= "ON cell.risector=radioinstallation.id ";
-	query+= "LEFT OUTER JOIN frequencyallocationlist ";
-	query += "ON cell.id=ci LEFT OUTER JOIN technology ";
+	query+= "CROSS JOIN frequencyallocationlist ";
+	query += "ON cell.id=ci CROSS JOIN technology ";
 	query +="ON radioinstallation.techkey=technology.id ";
 	query += "WHERE radioinstallation.id =";
 	query += text;
@@ -334,10 +334,10 @@ bool cSpectralLink::CalcDistribution()
 {
 	// \TODO: Fix once we have a radio installation to work with
 	pqxx::result r;
-	char text[33];
+	char *text =new char[33];
 	string query = "SELECT offsets,values,numpoints ";
-	query += "FROM radioinstallation LEFT OUTER JOIN ";
-	query += "(technology LEFT OUTER JOIN envelopes ";
+	query += "FROM radioinstallation CROSS JOIN ";
+	query += "(technology CROSS JOIN envelopes ";
 	query += "ON envelopes.techkey = technology.id) ";
 	query += " ON radioinstallation.techkey = technology.id ";
 	query += "WHERE radioinstallation.id ="; 
@@ -457,6 +457,7 @@ bool cSpectralLink::CalcDistribution()
 		mEnvelopeValue[i]=mEnvelopeValue[i]*TxPower/(mEnvelopeTotal*mFrequencySpacing*1000);
 		//cout<<mEnvelopeFreq[i]<<":"<<mEnvelopeValue[i]<<endl;
 	}
+	delete [] text;
 }
 
 }

@@ -40,9 +40,9 @@ cGDAL::~cGDAL()
 
 //***************************************************************************
 bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName, 
-						cGeoP &NW, cGeoP &SE, GeoType &Proj, projPJ &Proj4,
-						uint &rows, uint &cols, double &ns_res, double &ew_res,
-						float &min,	float &max)
+			cGeoP &NW, cGeoP &SE, GeoType &Proj, projPJ &Proj4,
+			uint &rows, uint &cols, double &ns_res, double &ew_res,
+			float &min,	float &max)
 {
 	Rows = 0;
 	Cols = 0;
@@ -192,14 +192,14 @@ bool cGDAL::writeFile(Float2DArray &Raster,
 	string extGDAL;
 	GDALDataType PxType =  GDT_Float32;
 	string File = Directory + "/" + FileName;
-	poDataset = poDriver->Create( File.c_str(), cols, rows, 1, PxType,
-                            papzOptions );
-    if (poDataset == NULL)
-    {
-    	//\TODO: Error Message
-    	cout << "Error creating GDAL File" << endl;
-    	return false;
-    }
+	poDataset = poDriver->Create( File.c_str(), cols, rows, 1, 
+					PxType, papzOptions );
+    	if (poDataset == NULL)
+    	{
+    		//\TODO: Error Message
+    		cout << "Error creating GDAL File" << endl;
+    		return false;
+   	}
     
 	poBand = poDataset->GetRasterBand(1);
 	char **papszMetadata;
@@ -209,12 +209,14 @@ bool cGDAL::writeFile(Float2DArray &Raster,
 	
 	double North, West;
 	int TempCentMer;
-	bool South;
+	bool South=NW.Hemisphere();
 	GeoType Temp;
 	NW.SetGeoType(OutProj,CentMer); // Transform
 	NW.Get(North,West,Temp,TempCentMer,South);
 	if ((South) && (NSRes > 0))
 		NSRes = - NSRes;
+	else if ((!(South)) && (NSRes > 0))
+		NSRes = -NSRes;
 
 	cout << "before GetGeoTrasform" << endl;
 //	cout << pj_get_def(OutProj4,0) << endl;
@@ -239,7 +241,7 @@ bool cGDAL::writeFile(Float2DArray &Raster,
 	CPLFree( pszSRS_WKT );
 	CPLErr lCrGdal;
 
-	cout << "Converting Raster: "<<endl;
+	cout << "Converting Raster to single array: "<<endl;
 	unsigned i,j,k,l;
 	l = rows*cols;
 	float *abyRaster;

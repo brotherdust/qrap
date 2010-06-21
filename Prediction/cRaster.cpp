@@ -38,7 +38,7 @@ cRaster::cRaster()
 	mUsed = false;
 	mSouth = true;
 	mRaster = new_Float2DArray(mRows,mCols);	
-	mDirectory = "/home/";
+	mDirectory = "qrap/Data/SRTM/";
 	mFilename = "raster.bin";
 	cout << "Default constructer Raster" << endl;
 }
@@ -74,6 +74,9 @@ cRaster::cRaster(string Directory,
 							Proj4String,CentMer,mSouth,
 							mMin,mMax); 
 	cout << "Constructer Raster" << endl;
+	cout << "mSouth = ";
+	if (mSouth) cout << " true" << endl;
+	else cout << " false" << endl;
 }
 
 //************************************************************************
@@ -105,6 +108,7 @@ bool cRaster::WriteFile(Float2DArray &Raster,
 	bool msgs=false;
 	mNW = NW;
 	mSE = SE;
+	South = mNW.Hemisphere();
 	if (OriginalProj!=ResultProj)
 	{
 		mNW.SetGeoType(OriginalProj,OriginalCentMer);
@@ -120,7 +124,7 @@ bool cRaster::WriteFile(Float2DArray &Raster,
 	mSE.SetGeoType(mProjType,mCentMer);
 	mNW.Get(rN,rW,mProjType,mCentMer,South);
 	mSE.Get(rS,rE,mProjType,mCentMer,South);
-	mSouth = mNW.Hemishere();
+
 	if (OriginalProj!=ResultProj)
 	{
 		mNSres = NSres*fabs((rN-rS)/(oN-oS));
@@ -139,7 +143,7 @@ bool cRaster::WriteFile(Float2DArray &Raster,
 	if (mProjType != NDEF && Proj4String != "")
 		mProj4=pj_init_plus(Proj4String.c_str());
 	else if (mProjType != NDEF && Proj4String == "")
-		ReturnProj4(mProjType,mCentMer,mSouth,mProj4);
+		ReturnProj4(mProjType,mCentMer,South,mProj4);
 	if (filetype == BIN)
 	{
 		mFileType = BINFILE;
@@ -168,32 +172,32 @@ bool cRaster::WriteFile(Float2DArray &Raster,
 		string TypeString;
 		switch (filetype)
 		{
-//			case GEOTIFF:	TypeString = "GTiff";		break;
-			case VRT:		TypeString = "VRT";			break;
+//			case GEOTIFF:		TypeString = "GTiff";		break;
+			case VRT:		TypeString = "VRT";		break;
 			case NITF:		TypeString = "NITF";		break;
-			case HFA:		TypeString = "HFA";			break;
+			case HFA:		TypeString = "HFA";		break;
 			case ELAS:		TypeString = "ELAS";		break;
-			case AAIGRID:	TypeString = "AAIGrid";		break;
-			case MEM:		TypeString = "MEM";			break;
-			case GIF:		TypeString = "GIF";			break;
-			case XPM:		TypeString = "XPM";			break;
-			case BMP:		TypeString = "BMP";			break;
-			case PCIDSK:	TypeString = "PCIDSK";		break;
-			case PCRASTER:	TypeString = "PCRaster";	break;
+			case AAIGRID:		TypeString = "AAIGrid";		break;
+			case MEM:		TypeString = "MEM";		break;
+			case GIF:		TypeString = "GIF";		break;
+			case XPM:		TypeString = "XPM";		break;
+			case BMP:		TypeString = "BMP";		break;
+			case PCIDSK:		TypeString = "PCIDSK";		break;
+			case PCRASTER:		TypeString = "PCRaster";	break;
 			case ILWIS:		TypeString = "ILWIS";		break;
-			case GMT:		TypeString = "GMT";			break;
-			case NETCDF:	TypeString = "netCDF";		break;
-			case HDF4IMAGE:	TypeString = "HDF4Image";	break;
+			case GMT:		TypeString = "GMT";		break;
+			case NETCDF:		TypeString = "netCDF";		break;
+			case HDF4IMAGE:		TypeString = "HDF4Image";	break;
 			case ENDR:		TypeString = "ENdr";		break;
 			case PAUX:		TypeString = "PAux";		break;
-			case MFF:		TypeString = "MFF";			break;
+			case MFF:		TypeString = "MFF";		break;
 			case MFF2:		TypeString = "MFF2";		break;
-			case BT:		TypeString = "BT";			break;
-			case IDA:		TypeString = "IDA";			break;
-			case JPEG2000:	TypeString = "JPEG2000";	break;
-			case RMF:		TypeString = "RMF";			break;
-			case RST:		TypeString = "RST";			break;
-			default:		TypeString = "HFA";			break;
+			case BT:		TypeString = "BT";		break;
+			case IDA:		TypeString = "IDA";		break;
+			case JPEG2000:		TypeString = "JPEG2000";	break;
+			case RMF:		TypeString = "RMF";		break;
+			case RST:		TypeString = "RST";		break;
+			default:		TypeString = "HFA";		break;
 		}
 		cGDAL MyRaster;
 		msgs = MyRaster.writeFile(Raster,Directory, FileName, 
@@ -277,8 +281,10 @@ bool cRaster::ReadFile(string Directory,
 		cGDAL MyGDALRaster;
 		msgs = (MyGDALRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 			mProjType,mProj4, mRows, mCols, mNSres, mEWres,mMin,mMax));
+
 		if (msgs) 
 		{
+			mSouth = mNW.Hemisphere();
 			mFileType = GDALFILE;
 		}
 		else
@@ -290,12 +296,14 @@ bool cRaster::ReadFile(string Directory,
 			{
 				mFileType = BINFILE;
 				mProjType = WGS84GC;
+				mSouth = mNW.Hemisphere();
 			}
 			else
 			{
 				cORT MyORTRaster;
 				msgs =(MyORTRaster.openFile(mRaster, Directory, mNW,mSE, 
 						mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer));
+				
 				if (msgs)
 				{
 					mFileType = ORTFILE;
@@ -312,7 +320,7 @@ bool cRaster::ReadFile(string Directory,
 			mCentMer = CentMer;
 		if (Min > mMin)	mMin = Min;
 		if (Max < mMax)	mMax = Max;
-		mSouth = mNW.Hemishere();
+		mSouth = mNW.Hemisphere();
 		if (Proj != NDEF && Proj != mProjType)
 		{
 			mProjType = Proj;
@@ -423,7 +431,7 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 		int MapCM,PointCM;
 		double dlat, dlon;                       // distance between point of interest
 	                                            // and closest point to NW
-		double h11, h12, h21, h22, h1dash, h2dash;   // heights at intermediary points (see diag)
+		double h11, h12, h21, h22, h1dash, h2dash;   // heights at intermediary points (see diagram)
 		double value;                           // height at point of interest
 
 		
@@ -441,9 +449,9 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 		}
 		else
 		{
-			mSE.SetGeoType(mProjType,mCentMer);
-			mSE.Get(MapLat,MapLon,MapType,MapCM,Hem);
-			drow = (double)mRows - (PointLat-MapLat)/mNSres;
+			mNW.SetGeoType(mProjType,mCentMer);
+			mNW.Get(MapLat,MapLon,MapType,MapCM,Hem);
+			drow = (MapLat-PointLat)/mNSres;
 		}
 		if (mProjType!=WGS84GC)
 			dcol = (PointLon - MapLon)/mEWres;
@@ -471,7 +479,7 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 			if (mSouth)
 				dlat = MapLat - (double)row*mNSres - PointLat;
 			else
-				dlat = PointLat - MapLat - (double)(mRows-row)*mNSres;
+				dlat = MapLat - (double)row*mNSres - PointLat;
 			if (mProjType!=WGS84GC)
 				dlon = PointLon - MapLon - (double)col*mEWres;
 			else
@@ -548,9 +556,9 @@ bool cRaster::IsIn(cGeoP point)
 
 //*****************************************************************************
 bool cRaster::ReturnProj4(GeoType PointType,
-									int PointCM,
-									bool South, 
-									projPJ &Proj)
+				int PointCM,
+				bool South, 
+				projPJ &Proj)
 {
 		if (Proj != NULL)
 		{

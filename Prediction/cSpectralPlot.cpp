@@ -145,6 +145,7 @@ bool cSpectralPlot::CombinePlots()
 			minFreq = (*i)->GetMinFreq();
 		if ((*i)->GetMaxFreq()>maxFreq)
 			maxFreq = (*i)->GetMaxFreq();
+		cout<< "     Max : "<<maxFreq<<" Min : "<<minFreq<<endl;
 	}
 	cout<<"Max : "<<maxFreq<<" Min : "<<minFreq<<endl;
 	mNumFreqs = (int)((maxFreq - minFreq)/mFrequencySpacing + 1);
@@ -154,6 +155,7 @@ bool cSpectralPlot::CombinePlots()
 	mPFDFreq = new double[mNumFreqs+1];
 	mPFDValue = new double[mNumFreqs+1];
 	
+	cout << "In na new bool cSpectralPlot::CombinePlots()" <<endl;
 	//Initialize the plot for freqs and zero it
 	double freq=minFreq;
 	for(int i=0;i<mNumFreqs;i++)

@@ -410,7 +410,7 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	cGeoP NE, SW, rNW, rSE, rNE, rSW, Point, tempP,Mid;
 	double N,W,S,E,WE, Ydist, Xdist, MidX, MidY, tempD;
 	unsigned i,j,k,midRow,midCol;
-	int CentMer,Sign, central;
+	int CentMer,Sign=1, central;
 	unsigned MeanSize, Current;
 	GeoType Proj=ProjIn;
 	bool Hemisphere=true;
@@ -424,7 +424,11 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	SE.SetGeoType(DEG);
 	SE.Get(S,E);
 	Mid.Set((N+S)/2,(W+E)/2.0, DEG);
+	Hemisphere = Mid.Hemisphere();
+	cout << " In  cRasterFileHandler::GetForDEM.   Mid: " << endl;
+	Mid.Display();
 	central=Mid.DefaultCentMer(ProjIn);
+
 	CentMer = central; 
 	NW.SetGeoType(ProjIn,central);
 	NW.Get(N,W,Proj,CentMer,Hemisphere);
@@ -442,8 +446,8 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 		Res=cDegResT*InRes;
 		Rows = 2*(int)ceil((N-S)/(2.0*Res)+0.5)+1;
 		Cols = 2*(int)ceil((E-W)/(2.0*Res)+0.5)+1;
-		DistRes = Res*max(	min(NW.Distance(NE),SW.Distance(SE))/(E-W),
-							min(SE.Distance(NE), SW.Distance(NW))/(N-S));
+		DistRes = Res*max(	min(NW.Distance(NE),SW.Distance(SE))/fabs(E-W),
+							min(SE.Distance(NE), SW.Distance(NW))/fabs(N-S));
 		Sign = 1;
 	}
 	else
@@ -474,13 +478,25 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	Ydist = (double)(0-(int)midRow)*Res;
 	Xdist = (double)(0-(int)midCol)*Res;
 	NW.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
+	cout << " In  cRasterFileHandler::GetForDEM.   NW: " << endl;
+	NW.Display();
 	Ydist = (double)((int)Rows-1-(int)midRow)*Res;
 	SW.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
+	cout << " In  cRasterFileHandler::GetForDEM.   SW: " << endl;
+	SW.Display();
 	Xdist = (double)((int)Cols-1-(int)midCol)*Res;
 	SE.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
+	cout << " In  cRasterFileHandler::GetForDEM.   SE: " << endl;
+	SE.Display();
 	Ydist = (double)(0-(int)midRow)*Res;
 	NE.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
-	
+	cout << " In  cRasterFileHandler::GetForDEM.   NE: " << endl;
+	NE.Display();
+
+	cout << "In cRasterFileHandler::GetForDEM.  Resolution: " << Res << endl;
+	cout << "In cRasterFileHandler::GetForDEM.  midRow: " << midRow << endl;
+	cout << "In cRasterFileHandler::GetForDEM.  midCol: " << midCol << endl;
+
 	for(i=0; i<Rows; i++)
 		for (j=0; j<Cols; j++)
 			Data[i][j]=OUTOFRASTER;
@@ -509,6 +525,7 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 		return false;
 	}
 
+	
 	for (i=0; (i<Rows); i++)
 	{
 //		Sign = i-midRow;
@@ -564,6 +581,7 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	}
 	for (k=0;k<mCurrentRasters.size(); k++)
 		mCurrentRasters[k]->mUsed = false;
+
 	cout << "Out GetForDEM" << endl;
 	return true;
 }

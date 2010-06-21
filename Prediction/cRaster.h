@@ -81,7 +81,8 @@ namespace Qrap
 		IDA, ///< IDA GDAL File Type
 		JPEG2000, ///< JPEG2000 GDAL File Type
 		RMF, ///< RMF GDAL File Type
-		RST///< RST GDAL File Type
+		RST,///< RST GDAL File Type
+		GEOTIFF
 		
 		
 	};

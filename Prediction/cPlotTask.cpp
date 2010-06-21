@@ -91,7 +91,7 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 								short int ClutterSourceList,
 								bool UseClutterDataInPathLossCalculations,
 								cGeoP NorthWestCorner,
-								cGeoP SouthWestCorner,
+								cGeoP SouthEastCorner,
 								double PlotResolution,
 								double MinimumAngularResolution,
 								unsigned MobileInstallationKey,
@@ -120,8 +120,12 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 	mClutterSource= ClutterSourceList;					
 	mUseClutter	= UseClutterDataInPathLossCalculations;							
 	mNorthWest	= NorthWestCorner;				
-	mSouthEast	= SouthWestCorner;
+	mSouthEast	= SouthEastCorner;
 	double N, W, S, E;
+	cout << "North West corner: " << endl;
+	NorthWestCorner.Display();
+	cout << "South East corner: " << endl;
+	SouthEastCorner.Display();
 	mNorthWest.Get(N,W);
 	mSouthEast.Get(S,E);
 	mSouthWest.Set(S,W);
@@ -201,6 +205,11 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 		string err ="  Trouble getting Clutter list. Using default.";
 		QRAP_WARN(err.c_str());
 	}
+
+	cout << "North West corner: " << endl;
+	NorthWestCorner.Display();
+	cout << "South East corner: " << endl;
+	SouthEastCorner.Display();
 
 	// \TODO: Remove at some stage
 	//DEBUGGING !!!!!!!!!!!!!

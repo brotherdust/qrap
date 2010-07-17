@@ -57,7 +57,7 @@ QString Qrap::FindLatLon(QString lat,QString lon)
 			
 		// Get the longitude value
 		longInput = lon;
-		if( (longitude = QString::fromStdString(ExtractDecimalDegrees(longInput.toStdString(),dfDegMinSec,true)))=="" )
+		if( (longitude = QString::fromStdString(ExtractDecimalDegrees(longInput.toStdString(),dfDegMinSec,false)))=="" )
 			return "";
 				
 		// Get the value to send to the table view
@@ -73,7 +73,7 @@ QString Qrap::FindLatLon(QString lat,QString lon)
 			if( (latitude = QString::fromStdString(ExtractDecimalDegrees(latInput.toStdString(),dfDegMin,true)))=="")
 				return "";
 			longInput = lon;
-			if( (longitude = QString::fromStdString(ExtractDecimalDegrees(longInput.toStdString(),dfDegMin,true)))=="")
+			if( (longitude = QString::fromStdString(ExtractDecimalDegrees(longInput.toStdString(),dfDegMin,false)))=="")
 				return "";
 		
 			// Get the value to send to the table view
@@ -96,7 +96,7 @@ QString Qrap::FindLatLon(QString lat,QString lon)
 					return "";
 				} // if latitude contains
 					
-				if(!longitude.contains(QRegExp("^[-+ ]{0,2}[0-9]{1,4}[.]{0,1}[0-9]{0,10}[ ]{0,1}$")) )
+				if(!longitude.contains(QRegExp("^[-+ ]{0,3}[0-9]{1,4}[.]{0,1}[0-9]{0,10}[ ]{0,1}$")) )
 				{
 //					QMessageBox::information(this, "QRap", "Incorrect longitude format.");					
 //					QRAP_ERROR_CODE("Incorrect longitude format.", acInvalidInputFormat);

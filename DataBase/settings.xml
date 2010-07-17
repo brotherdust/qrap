@@ -8,7 +8,7 @@ www.QRap.org.za -->
 	<database host="127.0.0.1" name="qrap" port="5432" />
 	
 	<!-- PostGIS settings -->
-	<postgis srid="27700" />
+	<postgis srid="4326" />
 	
 	<!-- Synchronisation server settings -->
 	<syncserver host="192.168.1.1" port="6234" />

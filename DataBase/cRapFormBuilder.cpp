@@ -417,7 +417,7 @@ int cRapFormBuilder::InsertData (const QString& tableName, QMap<QString,QWidget*
 							return -1;
 						} // if latitude contains
 						
-						if(!longitude.contains(QRegExp("^[-+ ]{0,2}[0-9]{1,4}[.]{0,1}[0-9]{0,8}[ ]{0,1}$")) )
+						if(!longitude.contains(QRegExp("^[-+ ]{0,3}[0-9]{1,4}[.]{0,1}[0-9]{0,8}[ ]{0,1}$")) )
 						{
 							QRAP_ERROR_CODE("Incorrect longitude format.", acInvalidInputFormat);
 							return -1;

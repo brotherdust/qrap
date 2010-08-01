@@ -766,7 +766,7 @@ void QRap::GetLink(double lat, double lon)
 	char Lon[33];
 	gcvt(lat,8,Lat);
 	gcvt(lon,8,Lon);
-	string query = "SELECT id, radioinstallation1,radioinstallation2, linkname, frequency, kfactor ";
+	string query = "SELECT id, txinst,rxinst, linkname, frequency, kfactor ";
 	query += "FROM links WHERE line && GeomFromText('POINT(";
 	query +=  Lon;
 	query += " ";
@@ -783,8 +783,8 @@ void QRap::GetLink(double lat, double lon)
 		if (Li.size()>0)
 		{
 			int ID =(int)atof(Li[0]["id"].c_str()) ;
-			int TxID =(int)atof(Li[0]["radioinstallation1"].c_str()) ;
-			int RxID = (int)atof(Li[0]["radioinstallation2"].c_str());
+			int TxID =(int)atof(Li[0]["txinst"].c_str()) ;
+			int RxID = (int)atof(Li[0]["rxinst"].c_str());
 			double frequency = (double)atof(Li[0]["frequency"].c_str());
 			double kfactor = (double)atof(Li[0]["kfactor"].c_str());
 			string name = Li[0]["linkname"].c_str();

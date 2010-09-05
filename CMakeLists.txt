@@ -13,7 +13,7 @@ ENDIF(COMMAND cmake_policy)
   SET (DEFAULT_BIN_SUBDIR     /usr/bin)
   SET (DEFAULT_LIB_SUBDIR     /usr/lib)
   SET (DEFAULT_DATA_SUBDIR    /usr/share/qgis)
-  SET (DEFAULT_PLUGIN_SUBDIR  /usr/lib/qgis)
+  SET (DEFAULT_PLUGIN_SUBDIR  /usr/lib/qgis/plugins)
   SET (DEFAULT_INCLUDE_SUBDIR /usr/include/qgis)
 
 SET(CMAKE_COLOR_MAKEFILE ON)
@@ -270,23 +270,23 @@ ENDIF (NOT QGIS_FOUND)
 # user-changeable settings which can be used to customize
 # layout of QGIS installation
 # (default values are platform-specific)
-
-SET (QGIS_BIN_SUBDIR     ${DEFAULT_BIN_SUBDIR}     CACHE STRING "Subdirectory where executables will be installed")
-SET (QGIS_LIB_SUBDIR     ${DEFAULT_LIB_SUBDIR}     CACHE STRING "Subdirectory where libraries will be installed")
-SET (QGIS_DATA_SUBDIR    ${DEFAULT_DATA_SUBDIR}    CACHE STRING "Subdirectory where QGIS data will be installed")
-SET (QGIS_PLUGIN_SUBDIR  ${DEFAULT_PLUGIN_SUBDIR}  CACHE STRING "Subdirectory where plugins will be installed")
-SET (QGIS_INCLUDE_SUBDIR ${DEFAULT_INCLUDE_SUBDIR} CACHE STRING "Subdirectory where header files will be installed")
+#
+#SET (QGIS_BIN_SUBDIR     ${DEFAULT_BIN_SUBDIR}     CACHE STRING "Subdirectory where executables will be installed")
+#SET (QGIS_LIB_SUBDIR     ${DEFAULT_LIB_SUBDIR}     CACHE STRING "Subdirectory where libraries will be installed")
+#SET (QGIS_DATA_SUBDIR    ${DEFAULT_DATA_SUBDIR}    CACHE STRING "Subdirectory where QGIS data will be installed")
+#SET (QGIS_PLUGIN_SUBDIR  ${DEFAULT_PLUGIN_SUBDIR}  CACHE STRING "Subdirectory where plugins will be installed")
+#SET (QGIS_INCLUDE_SUBDIR ${DEFAULT_INCLUDE_SUBDIR} CACHE STRING "Subdirectory where header files will be installed")
 
 # mark *_SUBDIR variables as advanced as this is not something
 # that an average user would use
-MARK_AS_ADVANCED (QGIS_BIN_SUBDIR QGIS_LIB_SUBDIR QGIS_DATA_SUBDIR QGIS_PLUGIN_SUBDIR QGIS_INCLUDE_SUBDIR)
+#MARK_AS_ADVANCED (QGIS_BIN_SUBDIR QGIS_LIB_SUBDIR QGIS_DATA_SUBDIR QGIS_PLUGIN_SUBDIR QGIS_INCLUDE_SUBDIR)
 
 # full paths for the installation
-SET (QGIS_BIN_DIR     ${QGIS_BIN_SUBDIR})
-SET (QGIS_LIB_DIR     ${QGIS_LIB_SUBDIR})
-SET (QGIS_DATA_DIR    ${QGIS_DATA_SUBDIR})
-SET (QGIS_PLUGIN_DIR  ${QGIS_PLUGIN_SUBDIR})
-SET (QGIS_INCLUDE_DIR ${QGIS_INCLUDE_SUBDIR})
+#SET (QGIS_BIN_DIR     ${QGIS_BIN_SUBDIR})
+#SET (QGIS_LIB_DIR     ${QGIS_LIB_SUBDIR})
+#SET (QGIS_DATA_DIR    ${QGIS_DATA_SUBDIR})
+#SET (QGIS_PLUGIN_DIR  ${QGIS_PLUGIN_SUBDIR})
+#SET (QGIS_INCLUDE_DIR ${QGIS_INCLUDE_SUBDIR})
 
     MESSAGE(STATUS "2) Found QGIS Plugins Dir: ${QGIS_PLUGIN_DIR}")
     MESSAGE(STATUS "2) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")

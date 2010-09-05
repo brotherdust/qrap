@@ -50,7 +50,7 @@ ELSE(WIN32)
       #MESSAGE("Searching for QGIS in /Applications/QGIS.app/Contents/MacOS")
       SET (QGIS_MAC_PATH /Applications/QGIS1.4.02.app/Contents/MacOS)
       SET (QGIS_LIB_DIR ${QGIS_MAC_PATH}/lib)
-      SET (QGIS_PLUGIN_DIR ${QGIS_MAC_PATH}/lib/qgis CACHE STRING INTERNAL)
+      SET (QGIS_PLUGIN_DIR ${QGIS_MAC_PATH}/lib/qgis/plugins CACHE STRING INTERNAL)
       # set INCLUDE_DIR to prefix+include
       SET(QGIS_INCLUDE_DIR ${QGIS_MAC_PATH}/include/qgis CACHE STRING INTERNAL)
       ## extract link dirs
@@ -59,9 +59,10 @@ ELSE(WIN32)
     ELSE (APPLE)
       #MESSAGE("Searching for QGIS in /usr/bin; /usr/local/bin")
       FIND_PATH(QGIS_PLUGIN_DIR libspitplugin.so
-	/usr/lib/
+	/usr/lib/qgis/plugins/
+        /usr/lib/
         /usr/lib/qgis/
-#	/usr/local/lib/qgis
+#	/usr/local/lib/qgis/
         )
       FIND_PATH(QGIS_INCLUDE_DIR qgis.h
         /usr/include/qgis/

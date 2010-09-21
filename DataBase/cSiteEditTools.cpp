@@ -179,6 +179,7 @@ int Qrap::GetGroundHeight(double lat, double lon)
 	string query;
 	pqxx::result r;
 	char *text= new char[33];
+	FileType Type=UNKNOWNFILE;
 	
 	QStringList Filesets;
 	int GroundHeight = 0;
@@ -227,21 +228,16 @@ int Qrap::GetGroundHeight(double lat, double lon)
 			gDb.GetLastResult(r);
 			if (r.size() >= 1)
 			{
-				FileType Type;
-				if (r[0]["fileformat"].c_str() == "GDALFILE")
+				strcpy(text,r[0]["fileformat"].c_str());
+				if (!strcmp(text,"BINFILE"))
+				{
+					Type = BINFILE;
+					cout << "In cSiteEditTools... Qrap::GetGroundHeight(double lat, double lon) ... fileformat ==BINFILE" << endl;
+				}
+				else
 				{
 					Type = GDALFILE;
-				}
-				else 
-				{
-					if (r[0]["fileformat"].c_str() == "BINFILE")
-					{
-						Type = BINFILE;
-					}
-					else
-					{
-						Type = GDALFILE;
-					}
+					cout << "In cSiteEditTools... Qrap::GetGroundHeight(double lat, double lon) ... fileformat ==GDALFILE" << endl;
 				}
 				cRaster CRaster(r[0]["location"].c_str(),r[0]["filename"].c_str(),Type);
 				cGeoP Temp(lat,lon,DEG);

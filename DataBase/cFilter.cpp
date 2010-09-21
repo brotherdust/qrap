@@ -561,7 +561,7 @@ void cFilter::CreateViews()
 
 		bool radinvolved=false;
 		query ="";
-		whereclause=" where siteid=site_view_list.id ";
+		whereclause=" siteid=site_view_list.id ";
 		if ((techtype!="")&&(techtype!="All"))
 		{
 			radinvolved=true;
@@ -607,7 +607,7 @@ void cFilter::CreateViews()
 			queryIN += " site_view_list.status, site_view_list.groundheight, site_view_list.location ";
 			queryIN += " from site_view_list cross join radioinstallation ";
 			queryIN += query;
-			queryIN += whereclause;
+			queryIN +=" where "+whereclause;
 //			queryIN += " union select * from site_view_list ";
 //			queryIN +=" where site_view_list.id not in (select distinct siteid from radioinstallation)";
 			queryIN += ";";
@@ -628,7 +628,7 @@ void cFilter::CreateViews()
 			queryIN += " site_view_list.status, site_view_list.groundheight, site_view_list.location ";
 			queryIN += " from site_view_list cross join radioinstallation ";
 			queryIN += query;
-			queryIN += whereclause;
+			queryIN +=" where "+whereclause;
 //			queryIN += " union select * from site_view_list ";
 //			queryIN +=" where site_view_list.id not in (select distinct siteid from radioinstallation)";
 			queryIN += ";";

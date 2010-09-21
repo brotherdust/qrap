@@ -251,6 +251,7 @@ bool cRaster::ReadFile(string Directory,
 
 	if (filetype == BINFILE) // binary file
 	{
+		cout << "In bool cRaster::ReadFile( ... filetype == BINFILE " << endl;
 		cBIN MyRaster;
 		msgs = MyRaster.openFile(mRaster, Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer);
@@ -258,6 +259,7 @@ bool cRaster::ReadFile(string Directory,
 	}
 	else if (filetype == GDALFILE) // GDAL file 
 	{
+		cout << "In bool cRaster::ReadFile( ... filetype == GDALFILE " << endl;
 		cGDAL MyRaster;
 		msgs = MyRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax);
@@ -271,6 +273,7 @@ bool cRaster::ReadFile(string Directory,
 */
 	else if (filetype == ORTFILE) // ORT file
 	{
+		cout << "In bool cRaster::ReadFile( ... filetype == ORTFILE " << endl;
 		cORT MyRaster; 
 		msgs = MyRaster.openFile(mRaster,Directory, mNW,mSE, 
 						mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer);
@@ -278,6 +281,7 @@ bool cRaster::ReadFile(string Directory,
 	}
 	if (!msgs)
 	{
+		cout << "In bool cRaster::ReadFile( ... !msgs " << endl;
 		cGDAL MyGDALRaster;
 		msgs = (MyGDALRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 			mProjType,mProj4, mRows, mCols, mNSres, mEWres,mMin,mMax));
@@ -286,6 +290,7 @@ bool cRaster::ReadFile(string Directory,
 		{
 			mSouth = mNW.Hemisphere();
 			mFileType = GDALFILE;
+			cout << "In bool cRaster::ReadFile( ... !msgs  GDALFILE " << endl;
 		}
 		else
 		{
@@ -297,6 +302,7 @@ bool cRaster::ReadFile(string Directory,
 				mFileType = BINFILE;
 				mProjType = WGS84GC;
 				mSouth = mNW.Hemisphere();
+				cout << "In bool cRaster::ReadFile( ... !msgs  BINFILE " << endl;
 			}
 			else
 			{
@@ -309,13 +315,15 @@ bool cRaster::ReadFile(string Directory,
 					mFileType = ORTFILE;
 					mProjType = WGS84GC;
 					mSouth = true;
+					cout << "In bool cRaster::ReadFile( ... !msgs  ORTFILE " << endl;
 				}
 				else return false;
 			}
 		}
 	}
 	if (msgs)
-	{		
+	{	
+		cout << "In bool cRaster::ReadFile( ... msgs true " << endl;	
 		if (CentMer != -1 && CentMer != mCentMer)
 			mCentMer = CentMer;
 		if (Min > mMin)	mMin = Min;

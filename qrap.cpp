@@ -283,7 +283,7 @@ void QRap::openDatabaseConnection()
 	/** \TODO: Get a place for settings.xml and structure.xml or find a way to set the location
 	 */
 
-	if (!gSettings.LoadFromFile("/usr/lib/qgis/settings.xml"))
+	if (!gSettings.LoadFromFile("/usr/lib/qgis/plugins/settings.xml"))
 	{
 		cout << "Error while loading settings from settings.xml" << endl;
 		exit(1);

@@ -14,5 +14,5 @@ www.QRap.org.za -->
 	<syncserver host="192.168.1.1" port="6234" />
 	
 	<!-- The location of the database structure XML file -->
-	<structure location="/usr/lib/qgis/structure.xml" />
+	<structure location="/usr/lib/qgis/plugins/structure.xml" />
 </settings>

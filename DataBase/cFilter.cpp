@@ -403,7 +403,7 @@ void cFilter::on_comboBoxField_currentIndexChanged(int index)
 	cout << "FilterAreaField" << "\t\t" << column << endl;
 	if ((NewValue!="")&&(NewValue!="Not Used"))
 	{
-		query = " select distinct '" +column +"' from " + table +";"; 
+		query = " select distinct " +column +" from " + table +";"; 
 		if (!gDb.PerformRawSql(query))
 		{	
 			comboBoxArea->setEnabled(false);
@@ -502,7 +502,7 @@ void cFilter::CreateViews()
 		{
 			if (whereclause!="")
 				whereclause += " and ";
-			whereclause += table+".'"+column+"'='"+area;
+			whereclause += table+"."+column+"='"+area;
 			whereclause += "' and location @ the_geom";
 			query += " cross join "+table;
 			
@@ -652,13 +652,13 @@ void cFilter::CreateViews()
 		queryIN = " create view radioinstallation_view as select distinct site_view_list.sitename as sitename, ";
 		queryIN += " sitename||sector as sectorname, ";
 		queryIN +="radioinstallation.* from radioinstallation cross join site_view_list ";
-		queryIN +="where radioinstallation.siteid=site_view_list.id ";
 		if (radinvolved) 
 		{
 			queryIN += query;
-			queryIN += whereclause;
+			queryIN +="where radioinstallation.siteid=site_view_list.id and ";
+			queryIN += whereclause+";";
 		}
-		else queryIN += ";";
+		else queryIN += "where radioinstallation.siteid=site_view_list.id; ";;
 
 		if (gDb.ViewExists("radioinstallation_view"))
 		{

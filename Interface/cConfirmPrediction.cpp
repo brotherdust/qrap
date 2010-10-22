@@ -885,11 +885,11 @@ void cConfirmPrediction::on_btnDo_clicked()
 	bool getFromDB;
 	switch(PlotType) // set up of the prediction's colour type
 	{
-		case Cov:		Plot = "Coverage";		getFromDB = true;	discrete = false;	break;
-		case PrimServer:	Plot = "Primary Server";	getFromDB = false;	discrete = false;	break;
-		case SecondServer:	Plot = "Secondary Server";	getFromDB = false;	discrete = false;	break;
-		case NumServers:	Plot = "Number of Servers";	getFromDB = true;	discrete = false;	break;
-		case DEM:		Plot = "DEM";			getFromDB = true;	discrete = false;	break;
+		case Cov:		Plot = "Combined Coverage";		getFromDB = true;	discrete = false;	break;
+		case PrimServer:	Plot = "Primary Server";		getFromDB = false;	discrete = false;	break;
+		case SecondServer:	Plot = "Secondary Server";		getFromDB = false;	discrete = false;	break;
+		case NumServers:	Plot = "Number of Servers";		getFromDB = true;	discrete = false;	break;
+		case DEM:		Plot = "Digital Elevation Model";	getFromDB = true;	discrete = false;	break;
 		case IntRatioCo:	Plot = "Co-channel Interference"; 	getFromDB = true;	discrete = false;	break;
 		case IntRatioAd:	Plot = "Adjacent-channel Interference";	getFromDB = true;	discrete = false;	break;
 		case IntAreas:		Plot = "Interfered areas"; 		getFromDB = false;	discrete = false;	break;
@@ -899,7 +899,7 @@ void cConfirmPrediction::on_btnDo_clicked()
 		case SN:		Plot = "Signal to Noise Ratio"; 	getFromDB = true;	discrete = false;	break;	
 //		case EbNo:		Plot = "Energy per Bit to Noise Power"; getFromDB = true;	discrete = false;	break;
 //		case ServiceLimits;	Plot = "Service Limiters"; 		getFromDB = true;	discrete = false;	break;	
-		default:		Plot = "Coverage";		getFromDB = true;	discrete = false;	break;
+		default:		Plot = "Combined Coverage";		getFromDB = true;	discrete = false;	break;
 	}
 	QString File = DirectoryToStoreResult.c_str();
 	File +="/"; //\TODO: Windows....

@@ -74,6 +74,7 @@ void cFilter::LoadCombos()
 	
 	comboBoxTechType->addItem(QString("All"));
 	int j=1;
+	cout << " In cFilter::LoadCombos() voor Technology " << endl;
 	string table="technology";
 	string field="technologytype";
 	uiType = gDb.GetFieldUiType(table,field);
@@ -82,7 +83,7 @@ void cFilter::LoadCombos()
 	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 	{
 		QString temp = QString::fromStdString(iterator->second);
-//		cout << iterator->second << endl;
+		cout << iterator->second << endl;
 		comboBoxTechType->addItem(temp);
 		j++;
 	} // for
@@ -359,9 +360,9 @@ void cFilter::on_comboBoxAreaType_currentIndexChanged(int index)
 			{
 				comboBoxField->setEnabled(false);
 				comboBoxArea->setEnabled(false);
-//				cout << "Database Select for columns in table containing polygon geometry is empty"<< endl;
-//				QMessageBox::information(this, "QRap", 
-//					"Database Select for columns in table containing polygon geometry is empty");			
+				cout << "Database Select for columns in table containing polygon geometry is empty"<< endl;
+				QMessageBox::information(this, "QRap", 
+					"Database Select for columns in table containing polygon geometry is empty");			
 			}
 			else
 			{	
@@ -403,7 +404,7 @@ void cFilter::on_comboBoxField_currentIndexChanged(int index)
 	cout << "FilterAreaField" << "\t\t" << column << endl;
 	if ((NewValue!="")&&(NewValue!="Not Used"))
 	{
-		query = " select distinct " +column +" from " + table +";"; 
+		query = " select distinct \"" +column +"\" from \"" + table +"\";"; 
 		if (!gDb.PerformRawSql(query))
 		{	
 			comboBoxArea->setEnabled(false);
@@ -412,6 +413,7 @@ void cFilter::on_comboBoxField_currentIndexChanged(int index)
 		}
 		else
 		{	
+			cout << "Database Select for areas succeeded"<< endl;
 			comboBoxArea->setEnabled(true);
 			gDb.GetLastResult(r);
 			if (r.size()==0)
@@ -422,17 +424,20 @@ void cFilter::on_comboBoxField_currentIndexChanged(int index)
 			}
 			else
 			{
+				cout << "Database Select for areas succeeded and is not empty"<< endl;
 				if (!Initialise)
 					comboBoxArea->setCurrentIndex(comboBoxArea->findText("All"));
 				num = comboBoxArea->count();
 				for (i=num-1; i>0; i--)
-					comboBoxArea->removeItem(i);	
+					comboBoxArea->removeItem(i);
+				cout << "Database Select for areas succeeded and is not empty 2"<< endl;	
 				for (i = 0; i < r.size(); i++)
 				{
-					ComboText = QString(r[i][column].c_str());
+					ComboText = QString(r[i][0].c_str());
 					if (ComboText.size()>1)
 						comboBoxArea->addItem(ComboText);
 				}
+				cout << "Database Select for areas succeeded and is not empty 3"<< endl;
 				setting = gDb.GetSetting("FilterArea");
 				if ((setting!="")&&(setting!="All"))
 					comboBoxArea->setCurrentIndex(comboBoxArea->findText(QString::fromStdString(setting)));
@@ -502,9 +507,9 @@ void cFilter::CreateViews()
 		{
 			if (whereclause!="")
 				whereclause += " and ";
-			whereclause += table+"."+column+"='"+area;
+			whereclause += "\""+table+"\".\""+column+"\"='"+area;
 			whereclause += "' and location @ the_geom";
-			query += " cross join "+table;
+			query += " cross join \""+table+"\" ";
 			
 		}
 		if (((status!="")&&(status!="All"))||((table!="")&&(table!="Not Used")&&

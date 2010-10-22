@@ -83,7 +83,7 @@ www.QRap.org.za
 		       description="Primary key"
 		       readonly="true" />
 		
-		 <field name="lastmodified"
+		<field name="lastmodified"
 		      type="timestamp without time zone"
 		      label="Last modified"
 			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
@@ -104,7 +104,7 @@ www.QRap.org.za
 		       type="varchar(15)"
 		       label="Status"
 		       description="This site status in the planning process. Options can be altered in structure.xml"
-		       ui="dropdown(fixed, {'Experimental', 'Draft', 'Planned', 'Active','Default', 'School', 'Office'})" />
+		       ui="dropdown(fixed, {'Experimental', 'Draft', 'Planned', 'Active', 'Default', 'Store', 'Office'})" />
 		
 		<field name="location"
 		       type="POINT"

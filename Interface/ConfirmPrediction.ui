@@ -86,8 +86,8 @@
     <rect>
      <x>10</x>
      <y>260</y>
-     <width>972</width>
-     <height>300</height>
+     <width>974</width>
+     <height>305</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="PlotInput">
@@ -367,12 +367,12 @@
       </item>
       <item>
        <property name="text">
-        <string>Carrier to Co-channel Interference Ratio: </string>
+        <string>Carrier to Co-channel Interference Ratio</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Carrier to Adjacent-channel Interf Ratio:</string>
+        <string>Carrier to Adjacent-channel Interf Ratio</string>
        </property>
       </item>
       <item>
@@ -534,7 +534,7 @@
     <rect>
      <x>10</x>
      <y>570</y>
-     <width>473</width>
+     <width>474</width>
      <height>25</height>
     </rect>
    </property>

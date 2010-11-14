@@ -58,10 +58,10 @@ public:
 	
 public slots:
     	void on_btnPlaceSite_clicked();
-    	void on_btnDefaultInst_clicked();
     	void on_btnCancel_clicked();
 	void on_btnMove_clicked();
     	void on_btnEditInstallation_clicked();
+	void on_btnDefaultInst_clicked();
 	
 	signals:
 	void MoveSiteClicked();

@@ -105,7 +105,7 @@ private:
 	
 	void LoadDefaults();
 	
-	ePlotType PlotType; 
+	ePlotType mPlotType; 
 	eOutputUnits DisplayUnits;
 	bool DownLink;
 	double RequiredSignalToNoise;

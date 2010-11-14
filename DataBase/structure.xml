@@ -1357,6 +1357,7 @@ www.QRap.org.za
 				cell.id||sitename||sector as cellname,
 				cell.risector as risector,
 				cell.mastercell as mastercell,
+				cell.permanent as permanent,
 				cell.cstraffic as cstraffic,
 				cell.pstraffic as pstraffic,
 				cell.txpower as txpower,

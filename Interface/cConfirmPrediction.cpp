@@ -348,7 +348,7 @@ void cConfirmPrediction::SetOwnColours()
 	r = (int)0;
 	g = (int)0;
 	b = (int)0;
-	switch(PlotType) // set up of the prediction's colour type
+	switch(mPlotType) // set up of the prediction's colour type
 	{
 		case Cov:			
 			myNewColorRampItem.value = RequiredMinimumReceiverLevel;
@@ -394,7 +394,7 @@ void cConfirmPrediction::SetOwnColours()
 	r = (int)0;
 	g = (int)0;
 	b = (int)0;
-	switch(PlotType) // set up of the prediction's colour type
+	switch(mPlotType) // set up of the prediction's colour type
 	{
 		case Cov:			
 			myNewColorRampItem.value = 0.5*RequiredMinimumReceiverLevel;
@@ -440,7 +440,7 @@ void cConfirmPrediction::SetOwnColours()
 	g = (int)0;
 	b = (int)0;
 	QgsColorRampShader::ColorRampItem myNewColorRampItem;
-	switch(PlotType) // set up of the prediction's colour type
+	switch(mPlotType) // set up of the prediction's colour type
 	{
 		case Cov:			
 			myNewColorRampItem.value = 0; 
@@ -480,7 +480,7 @@ void cConfirmPrediction::SetOwnColours()
 	myNewColorRampItem.color = Col;
 	mColorRampItems.push_back(myNewColorRampItem);
 	}
-	if (PlotType==DEM)
+	if (mPlotType==DEM)
 	{
 		QgsColorRampShader::ColorRampItem myNewColorRampItem;
 		myNewColorRampItem.value = 3500;
@@ -648,21 +648,21 @@ void cConfirmPrediction::on_btnDo_clicked()
 
 	switch (plotTypeCombo->currentIndex())
 	{
-		case 0:		PlotType = Cov;			break;
-		case 1:		PlotType = PrimServer;		break;
-		case 2:		PlotType = SecondServer;	break;
-		case 3:		PlotType = NumServers;		break;
-		case 4:		PlotType = IntRatioCo;		break;
-		case 5:		PlotType = IntRatioAd;		break;
-		case 6:		PlotType = IntAreas;		break;
-		case 7:		PlotType = NumInt;		break;
-		case 8:		PlotType = PrimIntCo;		break;
-		case 9:		PlotType = PrimIntAd;		break;
-		case 10:	PlotType = SN;			break;
-		case 11:	PlotType = DEM;			break;
-//		case 12:	PlotType =  EbNo;		break;
-//		case 13:	PlotType = ServiceLimits;	break;
-		default:	PlotType = Cov;			break;			
+		case 0:		mPlotType = Cov;			break;
+		case 1:		mPlotType = PrimServer;		break;
+		case 2:		mPlotType = SecondServer;	break;
+		case 3:		mPlotType = NumServers;		break;
+		case 4:		mPlotType = IntRatioCo;		break;
+		case 5:		mPlotType = IntRatioAd;		break;
+		case 6:		mPlotType = IntAreas;		break;
+		case 7:		mPlotType = NumInt;		break;
+		case 8:		mPlotType = PrimIntCo;		break;
+		case 9:		mPlotType = PrimIntAd;		break;
+		case 10:	mPlotType = SN;			break;
+		case 11:	mPlotType = DEM;			break;
+//		case 12:	mPlotType =  EbNo;		break;
+//		case 13:	mPlotType = ServiceLimits;	break;
+		default:	mPlotType = Cov;			break;			
 	}
 	switch (displayUnitsCombo->currentIndex())
 	{
@@ -721,7 +721,8 @@ void cConfirmPrediction::on_btnDo_clicked()
 				 	temp =  temp*10 + (QueryResult[i]-'0');
    					i++;
    				}
-			    	if (QueryResult[i]!='}') i++;
+			    	if (QueryResult[i]!='}') 
+					i++;
 				cout << temp << endl;
 			    	FileSetOrder.push_back(temp);
 			}// end while i<NumBytes
@@ -812,7 +813,7 @@ void cConfirmPrediction::on_btnDo_clicked()
 	
 	bool FileWritten=false;
 	cPlotTask Prediction;
-	Prediction.SetPlotTask(	PlotType, DisplayUnits, DownLink,
+	Prediction.SetPlotTask(	mPlotType, DisplayUnits, DownLink,
 				RequiredSignalToNoise, RequiredMinimumReceiverLevel,
 				FadeMargin, RequiredCoChannelCarrierToInterference,
 				RequiredAdjacentCarrierToInterference, RequiredEnergyPerBitToNoiseRatio,
@@ -824,7 +825,7 @@ void cConfirmPrediction::on_btnDo_clicked()
 				CoverangeRanges, // In Kilometer
 				DirectoryToStoreResult, OutputFileForResult);
 			
-	if (PlotType == DEM)
+	if (mPlotType == DEM)
 	{	
 		cout << "Entering DEM in QRap.cpp" << endl;
 		cRaster Output;
@@ -853,8 +854,8 @@ void cConfirmPrediction::on_btnDo_clicked()
 		delete_Float2DArray(Data);
 		cout << "Deleted Output Array in QRap.cpp" << endl;
 	}//end if DEM
- 	else if ((PlotType==Cov)||(PlotType==PrimServer)||(PlotType==SecondServer)
- 				||(PlotType==NumServers)||(PlotType==SN))
+ 	else if ((mPlotType==Cov)||(mPlotType==PrimServer)||(mPlotType==SecondServer)
+ 				||(mPlotType==NumServers)||(mPlotType==SN))
  	{
 		Prediction.CombineCov();
 		FileWritten = Prediction.WriteOutput(DEG);
@@ -883,23 +884,23 @@ void cConfirmPrediction::on_btnDo_clicked()
 	string Plot;
 	bool discrete;
 	bool getFromDB;
-	switch(PlotType) // set up of the prediction's colour type
+	switch(mPlotType) // set up of the prediction's colour type
 	{
-		case Cov:		Plot = "Combined Coverage";		getFromDB = true;	discrete = false;	break;
+		case Cov:		Plot = "Coverage";			getFromDB = true;	discrete = false;	break;
 		case PrimServer:	Plot = "Primary Server";		getFromDB = false;	discrete = false;	break;
 		case SecondServer:	Plot = "Secondary Server";		getFromDB = false;	discrete = false;	break;
 		case NumServers:	Plot = "Number of Servers";		getFromDB = true;	discrete = false;	break;
 		case DEM:		Plot = "Digital Elevation Model";	getFromDB = true;	discrete = false;	break;
-		case IntRatioCo:	Plot = "Co-channel Interference"; 	getFromDB = true;	discrete = false;	break;
-		case IntRatioAd:	Plot = "Adjacent-channel Interference";	getFromDB = true;	discrete = false;	break;
-		case IntAreas:		Plot = "Interfered areas"; 		getFromDB = false;	discrete = false;	break;
+		case IntRatioCo:	Plot = "Carrier to Co-channel Interference Ratio"; 	getFromDB = true;	discrete = false;	break;
+		case IntRatioAd:	Plot = "Carrier to Adjacent-channel Interf Ratio";	getFromDB = true;	discrete = false;	break;
+		case IntAreas:		Plot = "Interfered Areas"; 		getFromDB = false;	discrete = false;	break;
 		case NumInt:		Plot = "Number of Interferers"; 	getFromDB = true;	discrete = false;	break;
-		case PrimIntCo:		Plot = "Primary Co-channel interferer";	getFromDB = false;	discrete = false;	break;
-		case PrimIntAd:		Plot = "Primary adjacent-channel interferer"; 	getFromDB = false;	discrete = false;	break;
+		case PrimIntCo:		Plot = "Primary Co-channel Interferers";	getFromDB = false;	discrete = false;	break;
+		case PrimIntAd:		Plot = "Primary Adjacent-channel Interferers"; 	getFromDB = false;	discrete = false;	break;
 		case SN:		Plot = "Signal to Noise Ratio"; 	getFromDB = true;	discrete = false;	break;	
 //		case EbNo:		Plot = "Energy per Bit to Noise Power"; getFromDB = true;	discrete = false;	break;
 //		case ServiceLimits;	Plot = "Service Limiters"; 		getFromDB = true;	discrete = false;	break;	
-		default:		Plot = "Combined Coverage";		getFromDB = true;	discrete = false;	break;
+		default:		Plot = "";				getFromDB = true;	discrete = false;	break;
 	}
 	QString File = DirectoryToStoreResult.c_str();
 	File +="/"; //\TODO: Windows....
@@ -1402,10 +1403,14 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 		myLegendYPos = 0;
 	}
 
-	bool Server =((plotTypeCombo->currentText() == "Primary Server") ||
+/*	bool Server =((plotTypeCombo->currentText() == "Primary Server") ||
 			(plotTypeCombo->currentText() == "Secondary Server")	||
 			(plotTypeCombo->currentText() == "Primary Co-Channel Interferers") ||
 			(plotTypeCombo->currentText() == "Primary Adjacent-Channel Interferers"));
+*/
+
+	bool Server = 	((mPlotType == PrimServer) || (mPlotType == SecondServer) || 
+			(mPlotType == PrimIntCo) || (mPlotType == PrimIntAd));
 
 	string query = "SELECT * FROM colourmanagement WHERE plottype ='";
 	query +=plotTypeCombo->currentText().toStdString();
@@ -1425,8 +1430,10 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 		int r,g,b,a;	
 		if (!Server)
 		{
+			cout << " In cConfirmPrediction::on_pushButtonPrint_clicked(): Is NOT server " << endl;
 			for (int i = 0; i < res.size() ; i++)
 			{
+				cout << " In cConfirmPrediction::on_pushButtonPrint_clicked(): for kleure: i = "<< i << endl;
 				if (myLegendYPos > myLegendDimensionY)
 				{
 					myPrinter->newPage();
@@ -1498,14 +1505,14 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
   	// Draw the scale bar
   	//
   	int myYpos = myLegendDimensionY - myLegendVerticalSpacer - myLegendFontHeight;
-	int myLogoXDim = myLegendDimensionX - 7*myLegendFontWidth ;
+	int myLogoXDim = myLegendDimensionX - 8*myLegendFontWidth ;
   	myPainter->setViewport( myPrinter->pageRect().right() - myLogoXDim - myLegendXPos, myYpos, 
 				myPrinter->pageRect().right(),  myLegendDimensionY );
   	renderPrintScaleBar( myPainter, mMapRenderer,  myLogoXDim);
   	myPainter->setViewport( myOriginalViewport );
 
 	// Print plot info
-	bool CoInterf = (plotTypeCombo->currentText()=="Co-channel Interference")||
+/*	bool CoInterf = (plotTypeCombo->currentText()=="Co-channel Interference")||
 			(plotTypeCombo->currentText()=="Primary Co-channel interferer");
 	bool AdInterf = (plotTypeCombo->currentText()=="Adjacent-channel Interference")||
 			(plotTypeCombo->currentText()=="Primary adjacent-channel interferer");
@@ -1515,7 +1522,13 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 	bool Noise = (plotTypeCombo->currentText()=="Energy per Bit to Noise Power")||
 			(plotTypeCombo->currentText()=="Signal to Noise Ratio")||
 			(plotTypeCombo->currentText()=="Service Limiters");
-	
+*/	
+
+	bool CoInterf = (mPlotType==IntRatioCo)|| (mPlotType==PrimIntCo);
+	bool AdInterf = (mPlotType==IntRatioAd)||(mPlotType==PrimIntAd);
+	bool Interf = (mPlotType==IntAreas)||CoInterf||(mPlotType==NumInt)||AdInterf||(mPlotType==EbNo);
+	bool Noise = (mPlotType==EbNo)||(mPlotType==SN)||(mPlotType==ServiceLimits);
+
 	myYpos = max(myPrinter->pageRect().bottom()- myPlotInfoPercent*myDrawableHeight/100, myLegendYPos);
 	myPainter->drawLine(myPrinter->pageRect().left(),myYpos, myPrinter->pageRect().right()-myPrinter->pageRect().left(), myYpos);
    	myYpos += myLegendVerticalSpacer + myLegendFontHeight;
@@ -1524,12 +1537,12 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 	int myOriginXRight = myPrinter->pageRect().left() + 2*myDrawableWidth/3 + myHorizontalSpacing*2;
 	myPainter->drawText( myOriginXMid, myYpos, QString("Plot Resolution (m): %1").arg(plotResolutionSpinBox->value()));
 	
-	if (plotTypeCombo->currentText() != "Digital Elevation Model")
+	if (mPlotType != DEM)
 	{
 		myPainter->drawText( myOriginXRight, myYpos, QString("Plot Units: %1").arg(displayUnitsCombo->currentText()));
 		if (downLinkRadio->isChecked())
-			myPainter->drawText( myOriginXLeft, myYpos, QString("Direction: Downlink"));
-		else	myPainter->drawText( myOriginXLeft, myYpos, QString("Direction: Uplink"));
+			myPainter->drawText( myOriginXLeft, myYpos, QString("Direction:  Downlink"));
+		else	myPainter->drawText( myOriginXLeft, myYpos, QString("Direction:  Uplink"));
 		myYpos+= myLegendVerticalSpacer + myLegendFontHeight;
 
 		myPainter->drawText( myOriginXMid, myYpos, QString("Minimum Angle Resolution: %1").arg(minAngleResSpinBox->value()));
@@ -1538,15 +1551,18 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 		myYpos+= myLegendVerticalSpacer + myLegendFontHeight;
 
 		myPainter->drawText( myOriginXRight, myYpos, QString("k-factor for Servers: %1").arg(kFactorServerSpinBox->value()));
-		myPainter->drawText( myOriginXMid, row, QString("Fade Margin: %1").arg(fadeMarginSpin->value()));
+		myPainter->drawText( myOriginXMid, myYpos, QString("Fade Margin: %1").arg(fadeMarginSpin->value()));
 		if (Interf)
 		{
 			myYpos+= myLegendVerticalSpacer + myLegendFontHeight;
-			myPainter->drawText( myOriginXRight, myYpos, QString("k-factor for Interferers: %1").arg(kFactorIntSpinBox->value()));
+			myPainter->drawText( myOriginXRight, myYpos, 
+					QString("k-factor for Interferers: %1").arg(kFactorIntSpinBox->value()));
 			if (!AdInterf)
-				myPainter->drawText( myOriginXLeft, myYpos, QString("Required Co Channel to interferer: %1").arg(rqCociSpinBox->value()));
+				myPainter->drawText( myOriginXLeft, myYpos, 
+					QString("Required Co Channel to interferer: %1").arg(rqCociSpinBox->value()));
 			if (!CoInterf)
-				myPainter->drawText( myOriginXMid, myYpos, QString("Required Adjacent Channel to interferer: %1").arg(rqCiadSpinBox->value()));			
+				myPainter->drawText( myOriginXMid, myYpos, 
+					QString("Required Adjacent Channel to interferer: %1").arg(rqCiadSpinBox->value()));			
 			myYpos+= myLegendVerticalSpacer + myLegendFontHeight;
 		}
 		if (Noise)
@@ -1558,15 +1574,18 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 		}
 		
 		// Provide Site info
+		myYpos+= (myLegendVerticalSpacer + myLegendFontHeight);
 		int ListSiteY = myYpos;
-		myPainter->drawLine(myPrinter->pageRect().left(),myYpos, myPrinter->pageRect().right()-myPrinter->pageRect().left(), myYpos);
-		int iReqColWidth = 60*myLegendFontWidth;
+		myPainter->drawLine(myPrinter->pageRect().left(),myYpos+myLegendVerticalSpacer, 
+					myPrinter->pageRect().right()-myPrinter->pageRect().left(), myYpos+myLegendVerticalSpacer);
+		int NumCols = (int)(myDrawableWidth/(75*myLegendFontWidth));
+		int iReqColWidth = myDrawableWidth/NumCols;
 		bool nextCol = (iReqColWidth*2)<=myDrawableWidth;
 		int iSite = myOriginXLeft;
-		int iSector = iSite+ 23*myLegendFontWidth;
-		int iRadInst = iSector + 7*myLegendFontWidth;
-		int iStatus = iRadInst + 10*myLegendFontWidth;  
-		int iRadius = iStatus + 13*myLegendFontWidth;
+		int iSector = iSite+ 25*myLegendFontWidth;
+		int iRadInst = iSector + 10*myLegendFontWidth;
+		int iStatus = iRadInst + 13*myLegendFontWidth;  
+		int iRadius = iStatus + 16*myLegendFontWidth;
 		myPainter->drawText( iSite, myYpos, QString("Site"));
 		myPainter->drawText( iSector, myYpos, QString("Sector"));
 		myPainter->drawText( iRadInst, myYpos, QString("RadInstID"));
@@ -1574,7 +1593,7 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 		myPainter->drawText( iRadius, myYpos, QString("Radius"));
 
 		myYpos += myLegendVerticalSpacer + myLegendFontHeight;
-		myPainter->drawLine(myPrinter->pageRect().left(),myYpos, myPrinter->pageRect().right()-myPrinter->pageRect().left(), myYpos);
+//		myPainter->drawLine(myPrinter->pageRect().left(),myYpos, myPrinter->pageRect().right()-myPrinter->pageRect().left(), myYpos);
 		myYpos += myLegendVerticalSpacer;
 
 		void *Wid; 
@@ -1588,36 +1607,6 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 			get =(QCheckBox*) Wid;
 			if (get->isChecked())
 			{
-				if (tableWidget->item(i,7)!=NULL)
-					Rad =tableWidget->item(i,7)->text().toDouble(&ok);
-				else	Rad =0;
-					
-				if (tableWidget->item(i,2) != NULL)
-					sRadInst = tableWidget->item(i,2)->text();
-				else	sRadInst = "";
-				
-				sSite = get->text();
-
-				if (tableWidget->item(i,1) != NULL)
-					sSector = tableWidget->item(i,1)->text();
-				else	sSector = "";
-
-				if (tableWidget->item(i,6) != NULL)
-					sStatus = tableWidget->item(i,6)->text();
-				else	sStatus = "";
-				
-				sRange = QString("%1").arg(Rad);
-				if ((plotResolutionSpinBox->value()/1000 <=Rad) && ok)
-					sRange = tableWidget->item(i,7)->text();
-				else	sRange = QString("%1").arg(plotResolutionSpinBox->value()/1000);
-					
-				myPainter->drawText( iSite, myYpos, sSite);
-				myPainter->drawText( iSector, myYpos, sSector);
-				myPainter->drawText( iRadInst, myYpos, sRadInst);
-				myPainter->drawText( iStatus, myYpos, sStatus);
-				myPainter->drawText( iRadius, myYpos, sRange);
-				myYpos += myLegendVerticalSpacer + myLegendFontHeight;
-			
 				if (myYpos >= myPrinter->pageRect().height())
 				{
 					if (nextCol)
@@ -1635,17 +1624,52 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 						myPrinter->newPage();
 						myYpos = myLegendVerticalSpacer +myPrinter->pageRect().top();
 						iSite = myOriginXLeft;
-						iSector = iSite+ 23*myLegendFontWidth;
-						iRadInst = iSector + 7*myLegendFontWidth;
-						iStatus = iRadInst + 10*myLegendFontWidth;  
-						iRadius = iStatus + 13*myLegendFontWidth;
+						iSector = iSite+ 25*myLegendFontWidth;
+						iRadInst = iSector + 10*myLegendFontWidth;
+						iStatus = iRadInst + 13*myLegendFontWidth;  
+						iRadius = iStatus + 16*myLegendFontWidth;
+						myPainter->drawLine(myPrinter->pageRect().left(), myYpos+myLegendVerticalSpacer, 
+									myPrinter->pageRect().right()-myPrinter->pageRect().left(), 
+									myYpos+myLegendVerticalSpacer);
 					}
 					myPainter->drawText( iSite, myYpos, QString("Site"));
 					myPainter->drawText( iSector, myYpos, QString("Sector"));
 					myPainter->drawText( iRadInst, myYpos, QString("RadInstID"));
 					myPainter->drawText( iStatus, myYpos, QString("Status"));
 					myPainter->drawText( iRadius, myYpos, QString("Radius"));
+					myYpos += myLegendVerticalSpacer + myLegendFontHeight;
 				} // if end of page
+				
+				if (tableWidget->item(i,7)!=NULL)
+					Rad =tableWidget->item(i,7)->text().toDouble(&ok);
+				else	Rad =0;
+					
+				if (tableWidget->item(i,5) != NULL)
+					sRadInst = tableWidget->item(i,2)->text();
+				else	sRadInst = "";
+				
+				sSite = get->text();
+
+				if (tableWidget->item(i,1) != NULL)
+					sSector = tableWidget->item(i,1)->text();
+				else	sSector = "";
+
+				if (tableWidget->item(i,8) != NULL)
+					sStatus = tableWidget->item(i,6)->text();
+				else	sStatus = "";
+				
+				sRange = QString("%1").arg(Rad);
+				if (tableWidget->item(i,2) != NULL)
+					sRange = tableWidget->item(i,2)->text();
+				else	sRange = "";
+					
+				myPainter->drawText( iSite, myYpos, sSite);
+				myPainter->drawText( iSector, myYpos, sSector);
+				myPainter->drawText( iRadInst, myYpos, sRadInst);
+				myPainter->drawText( iStatus, myYpos, sStatus);
+				myPainter->drawText( iRadius, myYpos, sRange);
+				myYpos += myLegendVerticalSpacer + myLegendFontHeight;
+
 			} // is checked
 		} // for i
 	} // end if not DEM	

@@ -46,6 +46,8 @@ namespace Qrap
 	QString FindLatLon(QString lat,QString lon);
 	pqxx::result FindClosebySites(cGeoP point, int distance);
 	int GetGroundHeight(double lat, double lon);
+	bool InsertDefaultRadioInsts(int SiteId);
+	bool DeleteBTL(int SiteId);
 
 	/**
 	 * Extracts a value from the given string and converts to a decimal degrees format up to 6

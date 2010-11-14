@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'ColourManager.ui'
+** Form generated from reading UI file 'ColourManager.ui'
 **
-** Created: Sat Oct 3 12:14:09 2009
-**      by: Qt User Interface Compiler version 4.5.0
+** Created: Sat Nov 13 14:57:59 2010
+**      by: Qt User Interface Compiler version 4.6.2
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_COLOURMANAGER_H
@@ -55,6 +55,9 @@ public:
         if (ColourManager->objectName().isEmpty())
             ColourManager->setObjectName(QString::fromUtf8("ColourManager"));
         ColourManager->resize(437, 505);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(""), QSize(), QIcon::Normal, QIcon::Off);
+        ColourManager->setWindowIcon(icon);
         horizontalLayout_3 = new QWidget(ColourManager);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         horizontalLayout_3->setGeometry(QRect(320, 460, 101, 29));
@@ -135,11 +138,13 @@ public:
 
         addButton = new QPushButton(layoutWidget1);
         addButton->setObjectName(QString::fromUtf8("addButton"));
+        addButton->setIcon(icon);
 
         hboxLayout2->addWidget(addButton);
 
         removeButton = new QPushButton(layoutWidget1);
         removeButton->setObjectName(QString::fromUtf8("removeButton"));
+        removeButton->setIcon(icon);
 
         hboxLayout2->addWidget(removeButton);
 
@@ -165,17 +170,17 @@ public:
         plotTypeCombo->clear();
         plotTypeCombo->insertItems(0, QStringList()
          << QApplication::translate("ColourManager", "Digital Elevation Model", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("ColourManager", "Combined Coverage", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("ColourManager", "Number of Servers", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("ColourManager", "Co-Channel Carrier to Interference Ratio", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("ColourManager", "Adjacent Channel Carrier to Interference Ratio", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("ColourManager", "Number of Interferers", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("ColourManager", "Signal to Noise", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ColourManager", "Coverage", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ColourManager", "Carrier to Co-channel Interference Ratio", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ColourManager", "Carrier to Adjacent-channel Interf Ratio", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ColourManager", "Interfered Areas", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ColourManager", "Signal to Noise Ratio", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("ColourManager", "Primary Server", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("ColourManager", "Secondary Server", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("ColourManager", "Primary Co-channel Interfererer", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("ColourManager", "Primary Adjacent channel interferer", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("ColourManager", "Interfered Area", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ColourManager", "Number of Servers", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ColourManager", "Primary Co-channel Interferers", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ColourManager", "Primary Adjacent-channel Interferers", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ColourManager", "Number of Interferers", 0, QApplication::UnicodeUTF8)
         );
         mClassifyButton->setText(QApplication::translate("ColourManager", "Classify", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("ColourManager", "Min:", 0, QApplication::UnicodeUTF8));
@@ -186,7 +191,6 @@ public:
         ___qtreewidgetitem->setText(2, QApplication::translate("ColourManager", "Label", 0, QApplication::UnicodeUTF8));
         ___qtreewidgetitem->setText(1, QApplication::translate("ColourManager", "Colour", 0, QApplication::UnicodeUTF8));
         ___qtreewidgetitem->setText(0, QApplication::translate("ColourManager", "Value", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(ColourManager);
     } // retranslateUi
 
 };

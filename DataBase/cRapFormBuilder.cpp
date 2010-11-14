@@ -108,6 +108,14 @@ cRapFormBuilder::cRapFormBuilder (QWidget* parent, QString tableName, QTableWidg
 	mFormLayout->addWidget(mGroundHeightButton,9,2,1,1,Qt::AlignLeft);
 	connect(mGroundHeightButton,SIGNAL(clicked()),this,SLOT(FindGroundHeight()));
 
+	mDefaultRadiosButton = new QPushButton("Add &Default Radio Installations",this);
+	mDefaultRadiosButton->setToolTip("Add the default radioinstallation(s) for the current default technology to the site.");
+	mDefaultRadiosButton->setVisible(false);
+	mDefaultRadiosButton->setEnabled(false);
+	mUpdate=false;
+	mFormLayout->addWidget(mDefaultRadiosButton,10,1,1,1,Qt::AlignLeft);
+	connect(mDefaultRadiosButton,SIGNAL(clicked()),this,SLOT(InsertDefaultRadios()));
+
 	mButtonPosX0 = mUpdateButton->pos().x();
 	mButtonPosX1 = mPreviousButton->pos().x();
 	mButtonPosX2 = mNextButton->pos().x();
@@ -122,6 +130,8 @@ cRapFormBuilder::cRapFormBuilder (QWidget* parent, QString tableName, QTableWidg
 		mCloseByButton->setEnabled(true);
 		mGroundHeightButton->setVisible(true);
 		mGroundHeightButton->setEnabled(true);
+		mDefaultRadiosButton->setVisible(true);
+		mDefaultRadiosButton->setEnabled(true);
 	}
 
 	// Get the database structure
@@ -227,20 +237,21 @@ cRapFormBuilder::cRapFormBuilder (StringMap ref, QWidget* parent,
 	mFormLayout->addWidget(mGroundHeightButton,9,2,1,1,Qt::AlignLeft);
 	connect(mGroundHeightButton,SIGNAL(clicked()),this,SLOT(FindGroundHeight()));
 
+	mDefaultRadiosButton = new QPushButton("Add &Default Radio Installations",this);
+	mDefaultRadiosButton->setToolTip("Add the default radioinstallation(s) for the current default technology to the site.");
+	mDefaultRadiosButton->setVisible(false);
+	mDefaultRadiosButton->setEnabled(false);
+	mUpdate=false;
+	mFormLayout->addWidget(mDefaultRadiosButton,10,1,1,1,Qt::AlignLeft);
+	connect(mDefaultRadiosButton,SIGNAL(clicked()),this,SLOT(InsertDefaultRadios()));
+
 	mButtonPosX0 = mUpdateButton->pos().x();
 	mButtonPosX1 = mPreviousButton->pos().x();
 	mButtonPosX2 = mNextButton->pos().x();
 	mButtonPosY = mUpdateButton->pos().y();
-	if (mButtonRow)	
+	if (mButtonRow)
 		mLayoutDelta = mButtonPosY/mButtonRow;
 	else mLayoutDelta = mButtonPosY;
-
-	mLayoutRow++;
-	// Get the database structure
-	gDb.GetDbStructure(mDbs);
-	
-	if(mTableView->rowCount()<=0)
-		insert=true;
 
 	if (mTable=="site")
 	{
@@ -248,8 +259,17 @@ cRapFormBuilder::cRapFormBuilder (StringMap ref, QWidget* parent,
 		mCloseByButton->setEnabled(true);
 		mGroundHeightButton->setVisible(true);
 		mGroundHeightButton->setEnabled(true);
-	}	
+		mDefaultRadiosButton->setVisible(true);
+		mDefaultRadiosButton->setEnabled(true);
+	}
 
+	// Get the database structure
+	gDb.GetDbStructure(mDbs);
+	
+	cout << "cRapFormBuilder::cRapFormBuilder Voor rowCount:"<< mTableView->rowCount() << endl;
+	if(mTableView->rowCount()<=0)
+		insert=true;
+	mLayoutRow++;	
 	if(insert)
 	{
 		// Get the default values for the mTable
@@ -436,8 +456,9 @@ int cRapFormBuilder::InsertData (const QString& tableName, QMap<QString,QWidget*
 					} // if DDdddd
 				} // else DDMMmm
 			} // else DDMMSS
-			
 			values[parts[0].toStdString()] = "POINT("  +  longitude.toStdString() + " " + latitude.toStdString() + ")";
+			if (mTable=="site") 
+				DeleteBTL(mCurrentRecordID);
 		} // if contains
 		else
 		{
@@ -1125,6 +1146,8 @@ void cRapFormBuilder::Insert ()
 		mCloseByButton->setEnabled(true);
 		mGroundHeightButton->setVisible(true);
 		mGroundHeightButton->setEnabled(true);
+		mDefaultRadiosButton->setVisible(true);
+		mDefaultRadiosButton->setEnabled(true);
 	}
 }
 
@@ -1202,7 +1225,6 @@ void cRapFormBuilder::Update ()
 	if(InsertData(mTable, mFormWidgets,true)!=-1)
 	{
 		mUpdateButton->setEnabled(false);
-		mUpdate=false;
 	}
 }
 
@@ -1286,6 +1308,8 @@ void cRapFormBuilder::ContentChanged (const QString& text)
 		mCloseByButton->setEnabled(true);
 		mGroundHeightButton->setVisible(true);
 		mGroundHeightButton->setEnabled(true);
+		mDefaultRadiosButton->setVisible(true);
+		mDefaultRadiosButton->setEnabled(true);
 	}
 }
 
@@ -1391,6 +1415,23 @@ void cRapFormBuilder::FindGroundHeight()
 	static_cast<QSpinBox*>(mFormWidgets[fieldName])->setValue(Height);	
 	mGroundHeightButton->setVisible(false);
 	mGroundHeightButton->setEnabled(false);
+}
+
+//***************************************************************
+void cRapFormBuilder::InsertDefaultRadios()
+{
+	if (!mInserting)
+	{
+		mUpdateButton->setVisible(true);
+		mUpdateButton->setEnabled(true);		
+		mUpdateButton->animateClick (2);
+	}
+	else
+		mCommitButton->animateClick (2);
+
+	InsertDefaultRadioInsts(mCurrentRecordID);
+	mDefaultRadiosButton->setVisible(false);
+	mDefaultRadiosButton->setEnabled(false);
 }
 
 //***************************************************************

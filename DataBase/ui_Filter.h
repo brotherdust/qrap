@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'Filter.ui'
+** Form generated from reading UI file 'Filter.ui'
 **
-** Created: Mon May 4 12:31:24 2009
-**      by: Qt User Interface Compiler version 4.5.0
+** Created: Sun Nov 14 14:21:42 2010
+**      by: Qt User Interface Compiler version 4.6.2
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_FILTER_H
@@ -60,12 +60,12 @@ public:
     {
         if (Filter->objectName().isEmpty())
             Filter->setObjectName(QString::fromUtf8("Filter"));
-        Filter->resize(171, 633);
+        Filter->resize(174, 551);
         actionOnApply = new QAction(Filter);
         actionOnApply->setObjectName(QString::fromUtf8("actionOnApply"));
         groupBox = new QGroupBox(Filter);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(5, 0, 161, 626));
+        groupBox->setGeometry(QRect(0, 0, 161, 551));
         vboxLayout = new QVBoxLayout(groupBox);
         vboxLayout->setObjectName(QString::fromUtf8("vboxLayout"));
         pushButtonApplyFilter = new QPushButton(groupBox);
@@ -204,7 +204,6 @@ public:
         labelWhere->setText(QApplication::translate("Filter", "where the field:", 0, QApplication::UnicodeUTF8));
         labelArea->setText(QApplication::translate("Filter", "is Area:", 0, QApplication::UnicodeUTF8));
         pushButtonCreateArea->setText(QApplication::translate("Filter", "Create Custom Area", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(Filter);
     } // retranslateUi
 
 };

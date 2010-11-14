@@ -3,7 +3,7 @@ CC = g++ -g -Wall -W -D_REENTRANT -c -I/usr/include -I/usr/include/postgresql -I
 OBJECTS = cSettings.o cAlert.o cBase.o cDatabase.o Test.o cSiteEditTools.o cRaster.o cGeoP.o cBIN.o cORT.o cGDAL.o cMemmngr.o
 all: qraputil makefile
 
-qraputil: $(OBJECTS) makefile
+qraputil: $(OBJECTS) makefile 
 	g++ -g -o qraputil $(OBJECTS) -L/usr/local/pgsql/lib -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal1.7.0 -lproj  -lssl -lPocoXML  -lQtCore
 
 Test.o: Config.h Test.cpp makefile

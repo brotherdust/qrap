@@ -255,6 +255,245 @@ int Qrap::GetGroundHeight(double lat, double lon)
 	return GroundHeight;
 }
 
+//***********************************************************
+bool Qrap::InsertDefaultRadioInsts(int SiteId)
+{
+	char * siteID;
+	siteID = new char[33];
+	char * machineID;
+	machineID = new char[33];
+	QString Tech = QString("%1").arg(gDb.GetSetting("TechType").c_str());
+	Tech = Tech.mid(0,Tech.find(":"));
+	string Teg = Tech.toStdString();
+	if (Tech.toDouble()==0)
+	{
+//		QMessageBox::information(this, "QRap", "No Default technology type selected!");
+		QRAP_ERROR("No Default technology type selected!");
+		cout << "No Default technology type selected!"<< endl;
+		return false;
+	}
+	
+	string query = "SELECT * ";
+	query += "FROM radioinstallation ";
+	query += "CROSS JOIN technology ";
+	query += "CROSS JOIN site ";
+	query += "WHERE technology.defaultsite = site.id ";
+	query += "AND radioinstallation.siteid = site.id ";
+	query += "AND radioinstallation.id<>0 ";
+	query += "AND technology.id = ";
+	query += Teg.c_str();
+	//query +=" AND site.status='Default'";
+	cout << "In cEditeSiteTools::InsertDefaultRadios() Tech=" << Teg.c_str() << endl; 	
+	cout << query << endl;	
+
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Database Select for Default installations table failed: "<< query << endl;
+//		QMessageBox::information(this, "QRap", "Database Select for Default installations table failed.");
+		QRAP_ERROR("Database Select for Default installations table failed.");
+		return false;
+	}
+	else
+	{
+		pqxx::result radinst;
+		gDb.GetLastResult(radinst);
+		if (radinst.size() == 0)
+		{
+//			QMessageBox::information(this, "QRap", "It seems like there is no Default Site added to the Technology, or no Default Technology defined. See Technology entry under Supporting Tables of the Database and or Preference Settings");	
+			QRAP_ERROR("It seems like there is no Default Site added to the Technology or no Default Technology defined. \nSee Technology entry under Supporting Tables of the Database and or Preference Settings. \nGlobal Default is used instead.");			
+			query = "SELECT * ";
+			query += "FROM radioinstallation WHERE id =0";
+			gDb.PerformRawSql(query);
+			gDb.GetLastResult(radinst);	
+		}
+
+
+		cout << "In cSiteEditTools::InsertDefaultRadios() Inst Size =" << radinst.size() << endl; 
+		cout << "In cSiteEditTools::InsertDefaultRadios(): SiteId=" << SiteId << endl;
+		if (SiteId>-1)
+		{
+			cout << "In cSiteEditTools::InsertDefaultRadios() Inst Size =" << radinst.size() << endl; 
+			cout << "In cSiteEditTools::InsertDefaultRadios(): SiteId=" << SiteId << endl;		
+			for (int i = 0; i < radinst.size(); i++)
+			{
+
+				gcvt(SiteId,20,siteID);
+//				string ID = siteID;
+//				ID +=radinst[i]["sector"].c_str();
+
+				gcvt(gDb.globalMachineID,8,machineID);
+				query = "INSERT INTO radioinstallation ";
+				query += "(lastmodified, machineid, siteid, sector,techkey,eirp,txpower,";
+				query += "txlosses,txantennaheight,txantpatternkey,txbearing,txmechtilt,";
+				query += "rxlosses,rxantennaheight,rxantpatternkey,rxbearing,rxmechtilt,";
+				query += "rxsensitivity,project,flagx,flagz) VALUES (now(),";
+				query += machineID;
+				query += ", "; //+ID +", ";
+				query += siteID;
+				query += ", ";
+
+				string temp;
+				
+				temp = radinst[i]["sector"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "0";
+				query += ", ";
+
+				temp = radinst[i]["techkey"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "null";
+				query += ", ";
+
+				temp = radinst[i]["eirp"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "0";
+				query += ", ";
+
+				temp = radinst[i]["txpower"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "0";
+				query += ", ";
+
+				temp = radinst[i]["txlosses"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "0";
+				query += ", ";
+
+				temp = radinst[i]["txantennaheight"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "0";
+				query += ", ";
+
+				temp = radinst[i]["txantpatternkey"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "null";
+				query += ", ";
+
+				temp = radinst[i]["txbearing"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "0";
+				query += ", ";
+		
+				temp = radinst[i]["txmechtilt"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "0";
+				query += ", ";
+
+				temp = radinst[i]["rxlosses"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "0";
+				query += ", ";
+
+				temp = radinst[i]["rxantennaheight"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "0";
+				query += ", ";
+
+				temp = radinst[i]["rxantpatternkey"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "null";
+				query += ", ";
+
+				temp = radinst[i]["rxbearing"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "0";
+				query += ", ";
+
+				temp = radinst[i]["rxmechtilt"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "0";
+				query += ", ";
+
+				temp = radinst[i]["rxsensitivity"].c_str();
+				if (temp != "")	query += temp;
+				else		query += "null";
+				query += ", ";
+
+				temp = radinst[i]["project"].c_str();
+				if (temp!="") query += temp;
+				else query += "null";
+				query += ", ";
+
+				temp = radinst[i]["flagx"].c_str();
+				if (temp!="") query += temp;
+				else query += "null";
+				query += ", ";
+
+				temp = radinst[i]["flagz"].c_str();
+				if (temp!="") query += temp;
+				else query += "null";
+				query += ")";
+
+				if (!gDb.PerformRawSql(query))
+					cout << "Insert Defaults"<< endl;
+				else cout << "Inserted Sector " << i+1 << endl;
+			
+			} // end for loop go through all default radioinstallations / sectors
+			delete [] siteID;
+			delete [] machineID;
+			return true;
+		} // if Site successfully added	
+
+		else
+		{
+			delete [] siteID;
+			delete [] machineID;
+			return false;
+		}
+	}
+	delete [] siteID;
+	delete [] machineID;
+	return false;
+}
+
+//***********************************************************
+bool Qrap::DeleteBTL(int SiteId)
+{
+	char * siteID;
+	siteID = new char[33];
+	gcvt(SiteId,20,siteID);
+	char * machineID;
+	machineID = new char[33];
+	gcvt(gDb.globalMachineID,8,machineID);
+	string path;
+	path =  Qrap::gDb.GetSetting("BTLdir");
+	string file;
+	string query = "SELECT btlplot ";
+	query += "FROM BTL ";
+	query += "WHERE siteid = ";
+	query += siteID;
+	query += "AND machineid = ";
+	query += machineID;
+	query += ";";
+
+	if (!gDb.PerformRawSql(query))
+		return false;
+
+	pqxx::result btlfiles;
+	gDb.GetLastResult(btlfiles);
+
+	if (btlfiles.size() == 0)
+		return false;
+	
+	string filename="";
+	for (int i = 0; i < btlfiles.size(); i++)
+	{
+		filename = btlfiles[i]["btlplot"].c_str();
+		file = path +filename;
+		remove(file.c_str());
+	}
+
+	query = "DELETE FROM BTL ";
+	query += "WHERE siteid = ";
+	query += siteID;
+	query += ";";
+	if (!gDb.PerformRawSql(query))
+		return false;
+	delete [] siteID;
+	delete [] machineID;
+	return true;
+}
+
 //*************************************************************************
 string Qrap::ExtractDecimalDegrees (const string& val, DegreeFormat format, bool directionText, bool latitude)
 {

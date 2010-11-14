@@ -1665,8 +1665,8 @@ bool cPlotTask::GetDBIntInfo()
 	cout << radInstList << endl;
 	gcvt(mMaxRange,8,temp);
 	query = "select distinct interRadInst.id as id from "; 
-	query += "radioInst_view RadInst ";
-	query += "CROSS JOIN radioInst_view as interRadInst "; 
+	query += "radioinstallation_view RadInst ";
+	query += "CROSS JOIN radioinstallation_view as interRadInst "; 
 	query += "CROSS JOIN site CROSS JOIN site as interSite "; 
 	query += "CROSS JOIN cell CROSS JOIN cell as interCell ";
 	query += "CROSS JOIN frequencyallocationlist as Freq "; 
@@ -1678,6 +1678,7 @@ bool cPlotTask::GetDBIntInfo()
 	query += "AND Freq.ci = cell.id ";
 	query += "AND interFreq.ci = interCell.id ";
 	query += "AND Freq.channel = interFreq.channel ";
+	query += "AND Freq.id <> interFreq.id ";
 	query += "AND ST_Distance(site.location,interSite.location) <";
 	query += temp;
 	query += "AND RadInst.id in (";

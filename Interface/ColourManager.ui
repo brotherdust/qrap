@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ColourManager</class>
- <widget class="QWidget" name="ColourManager" >
-  <property name="geometry" >
+ <widget class="QWidget" name="ColourManager">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,14 +10,16 @@
     <height>505</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Colour Manager</string>
   </property>
-  <property name="windowIcon" >
-   <iconset/>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff/>
+   </iconset>
   </property>
-  <widget class="QWidget" name="horizontalLayout_3" >
-   <property name="geometry" >
+  <widget class="QWidget" name="horizontalLayout_3">
+   <property name="geometry">
     <rect>
      <x>320</x>
      <y>460</y>
@@ -24,18 +27,18 @@
      <height>29</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" >
+   <layout class="QHBoxLayout">
     <item>
-     <widget class="QPushButton" name="btnOk" >
-      <property name="text" >
+     <widget class="QPushButton" name="btnOk">
+      <property name="text">
        <string>Update </string>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget" >
-   <property name="geometry" >
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
     <rect>
      <x>10</x>
      <y>40</y>
@@ -43,37 +46,37 @@
      <height>29</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" >
+   <layout class="QHBoxLayout">
     <item>
-     <widget class="QLabel" name="mNumberOfEntriesLabel_3" >
-      <property name="enabled" >
+     <widget class="QLabel" name="mNumberOfEntriesLabel_3">
+      <property name="enabled">
        <bool>true</bool>
       </property>
-      <property name="text" >
+      <property name="text">
        <string>Number of entries:</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QSpinBox" name="sboxNumberOfEntries_2" >
-      <property name="enabled" >
+     <widget class="QSpinBox" name="sboxNumberOfEntries_2">
+      <property name="enabled">
        <bool>true</bool>
       </property>
-      <property name="sizePolicy" >
-       <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="maximum" >
+      <property name="maximum">
        <number>10000</number>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QLabel" name="label" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label">
+   <property name="geometry">
     <rect>
      <x>12</x>
      <y>12</y>
@@ -81,12 +84,12 @@
      <height>26</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Prediction:</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="plotTypeCombo" >
-   <property name="geometry" >
+  <widget class="QComboBox" name="plotTypeCombo">
+   <property name="geometry">
     <rect>
      <x>140</x>
      <y>10</y>
@@ -94,72 +97,72 @@
      <height>26</height>
     </rect>
    </property>
-   <property name="currentIndex" >
+   <property name="currentIndex">
     <number>0</number>
    </property>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>Digital Elevation Model</string>
     </property>
    </item>
    <item>
-    <property name="text" >
-     <string>Combined Coverage</string>
+    <property name="text">
+     <string>Coverage</string>
     </property>
    </item>
    <item>
-    <property name="text" >
-     <string>Number of Servers</string>
+    <property name="text">
+     <string>Carrier to Co-channel Interference Ratio</string>
     </property>
    </item>
    <item>
-    <property name="text" >
-     <string>Co-Channel Carrier to Interference Ratio</string>
+    <property name="text">
+     <string>Carrier to Adjacent-channel Interf Ratio</string>
     </property>
    </item>
    <item>
-    <property name="text" >
-     <string>Adjacent Channel Carrier to Interference Ratio</string>
+    <property name="text">
+     <string>Interfered Areas</string>
     </property>
    </item>
    <item>
-    <property name="text" >
-     <string>Number of Interferers</string>
+    <property name="text">
+     <string>Signal to Noise Ratio</string>
     </property>
    </item>
    <item>
-    <property name="text" >
-     <string>Signal to Noise</string>
-    </property>
-   </item>
-   <item>
-    <property name="text" >
+    <property name="text">
      <string>Primary Server</string>
     </property>
    </item>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>Secondary Server</string>
     </property>
    </item>
    <item>
-    <property name="text" >
-     <string>Primary Co-channel Interfererer</string>
+    <property name="text">
+     <string>Number of Servers</string>
     </property>
    </item>
    <item>
-    <property name="text" >
-     <string>Primary Adjacent channel interferer</string>
+    <property name="text">
+     <string>Primary Co-channel Interferers</string>
     </property>
    </item>
    <item>
-    <property name="text" >
-     <string>Interfered Area</string>
+    <property name="text">
+     <string>Primary Adjacent-channel Interferers</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Number of Interferers</string>
     </property>
    </item>
   </widget>
-  <widget class="QWidget" name="layoutWidget1" >
-   <property name="geometry" >
+  <widget class="QWidget" name="layoutWidget1">
+   <property name="geometry">
     <rect>
      <x>10</x>
      <y>80</y>
@@ -167,65 +170,69 @@
      <height>34</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" >
+   <layout class="QHBoxLayout">
     <item>
-     <widget class="QPushButton" name="mClassifyButton" >
-      <property name="enabled" >
+     <widget class="QPushButton" name="mClassifyButton">
+      <property name="enabled">
        <bool>true</bool>
       </property>
-      <property name="text" >
+      <property name="text">
        <string>Classify</string>
       </property>
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" >
+     <layout class="QHBoxLayout">
       <item>
-       <widget class="QLabel" name="label_3" >
-        <property name="text" >
+       <widget class="QLabel" name="label_3">
+        <property name="text">
          <string>Min:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="minEdit" />
+       <widget class="QLineEdit" name="minEdit"/>
       </item>
       <item>
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
+       <widget class="QLabel" name="label_4">
+        <property name="text">
          <string>Max:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="maxEdit" />
+       <widget class="QLineEdit" name="maxEdit"/>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="QPushButton" name="addButton" >
-      <property name="text" >
+     <widget class="QPushButton" name="addButton">
+      <property name="text">
        <string/>
       </property>
-      <property name="icon" >
-       <iconset/>
+      <property name="icon">
+       <iconset>
+        <normaloff/>
+       </iconset>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="removeButton" >
-      <property name="text" >
+     <widget class="QPushButton" name="removeButton">
+      <property name="text">
        <string/>
       </property>
-      <property name="icon" >
-       <iconset/>
+      <property name="icon">
+       <iconset>
+        <normaloff/>
+       </iconset>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QTreeWidget" name="mColormapTreeWidget" >
-   <property name="geometry" >
+  <widget class="QTreeWidget" name="mColormapTreeWidget">
+   <property name="geometry">
     <rect>
      <x>10</x>
      <y>120</y>
@@ -233,21 +240,21 @@
      <height>331</height>
     </rect>
    </property>
-   <property name="columnCount" >
+   <property name="columnCount">
     <number>3</number>
    </property>
    <column>
-    <property name="text" >
+    <property name="text">
      <string>Value</string>
     </property>
    </column>
    <column>
-    <property name="text" >
+    <property name="text">
      <string>Colour</string>
     </property>
    </column>
    <column>
-    <property name="text" >
+    <property name="text">
      <string>Label</string>
     </property>
    </column>

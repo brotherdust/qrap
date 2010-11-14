@@ -142,7 +142,7 @@ void QRap::initGui()
   	connect(mSpectralAction, SIGNAL(activated()), this, SLOT(SpectralAnalysis()));
   	connect(mPreferencesAction, SIGNAL(activated()), this, SLOT(Preferences()));
 //  	connect(mImportExportAction,SIGNAL(activated()), this, SLOT(ImportExport()));
-  	connect(mHelpAction,SIGNAL(activated()), this, SLOT(Help()));
+//  	connect(mHelpAction,SIGNAL(activated()), this, SLOT(Help()));
 //  	connect(mColourManagerAction, SIGNAL(activated()), this, SLOT(ColourManager()));
   	cout << "Na Connect" << endl;
 
@@ -164,7 +164,7 @@ void QRap::initGui()
   	mToolBarPointer->addAction(mPreferencesAction);
   	mToolBarPointer->addAction(mQActionPointer);
 //  	mToolBarPointer->addAction(mImportExportAction);
-  	mToolBarPointer->addAction(mHelpAction);  
+//  	mToolBarPointer->addAction(mHelpAction);  
  
   	openDatabaseConnection();
   	cout << "Na DataBase Connect" << endl;
@@ -179,7 +179,7 @@ void QRap::initGui()
 //method defined in interface
 void QRap::help()
 {
-  	//implement me!
+  	
 }
 
 // Slot called when the menu item is activated

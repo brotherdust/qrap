@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'LinkAnalysis.ui'
+** Form generated from reading UI file 'LinkAnalysis.ui'
 **
-** Created: Wed May 12 20:45:02 2010
-**      by: Qt User Interface Compiler version 4.5.2
+** Created: Sun Nov 14 14:10:24 2010
+**      by: Qt User Interface Compiler version 4.6.2
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_LINKANALYSIS_H
@@ -28,139 +28,141 @@ QT_BEGIN_NAMESPACE
 class Ui_LinkAnalysis
 {
 public:
-    QDialogButtonBox *buttonBox;
     QwtPlot *qwtLinkPlot;
     QWidget *gridLayout;
     QGridLayout *TxInfo;
-    QLabel *Lat;
-    QLabel *Lon;
-    QLabel *Bearing;
-    QLabel *RecomB;
-    QLabel *Tilt;
-    QLabel *RecomTilt;
+    QLabel *TxLat;
+    QLabel *TxLon;
+    QLabel *TxBearing;
+    QLabel *TxRecomB;
+    QLabel *TxTilt;
+    QLabel *TxRecomTilt;
     QLabel *lblTxLat;
     QLabel *lblTxLon;
     QLabel *lblTxBearing;
     QLabel *lblTxBearingR;
     QLabel *lblTxTilt;
     QLabel *lblTxTiltR;
-    QLabel *Elevation;
-    QLabel *AntHeight;
+    QLabel *TxElevation;
+    QLabel *TxAntHeight;
     QLabel *lblTxAntHeight;
     QLabel *lblTxElevation;
     QLabel *lblTxName;
+    QWidget *gridLayout_3;
+    QGridLayout *LinkInfo;
+    QLabel *lblkFactor;
+    QLabel *lblFresnel;
+    QLabel *lblPath;
+    QLabel *lblFreq;
+    QLabel *lblkfactor;
+    QLabel *lblClearance;
+    QLabel *lblLength;
+    QLabel *lblFrequency;
+    QLabel *lblLoss;
+    QLabel *lblPathLoss;
+    QLabel *lblRxLev;
+    QLabel *lblRxPower;
+    QPushButton *btnSave;
+    QwtPlot *qwtBTLPlot;
     QWidget *gridLayout_2;
     QGridLayout *RxInfo;
-    QLabel *Lat_2;
-    QLabel *Lon_2;
-    QLabel *BearR;
-    QLabel *lblRxTilt_2;
-    QLabel *RecomTilt_2;
+    QLabel *RxLat;
+    QLabel *RxLon;
+    QLabel *RxRecomB;
+    QLabel *RxRecomTilt_2;
+    QLabel *RxRecomTilt;
     QLabel *lblRxLat;
     QLabel *lblRxElevation;
     QLabel *lblRxBearing;
     QLabel *lblRxBearingR;
     QLabel *lblRxTilt;
     QLabel *lblRxTiltR;
-    QLabel *Elevation_2;
-    QLabel *Bearing_2;
+    QLabel *RxElevation;
+    QLabel *RxBearing;
     QLabel *lblRxAntHeight;
-    QLabel *AntHeight_2;
+    QLabel *RxAntHeight;
     QLabel *lblRxLon;
     QLabel *lblRxName;
-    QWidget *gridLayout_3;
-    QGridLayout *LinkInfo;
-    QLabel *label_32;
-    QLabel *label_34;
-    QLabel *label_35;
-    QLabel *label_36;
-    QLabel *lblkfactor;
-    QLabel *lblClearance;
-    QLabel *lblLength;
-    QLabel *lblFrequency;
-    QLabel *label_37;
-    QLabel *lblPathLoss;
-    QLabel *label_31;
-    QLabel *lblRxPower;
-    QPushButton *btnSave;
     QPushButton *btnPDF;
-    QwtPlot *qwtBTLPlot;
-    QPushButton *btnRedo;
     QPushButton *btnAlign;
+    QPushButton *btnRedo;
+    QDialogButtonBox *buttonBox;
 
     void setupUi(QDialog *LinkAnalysis)
     {
         if (LinkAnalysis->objectName().isEmpty())
             LinkAnalysis->setObjectName(QString::fromUtf8("LinkAnalysis"));
-        LinkAnalysis->resize(836, 732);
+        LinkAnalysis->setWindowModality(Qt::WindowModal);
+        LinkAnalysis->resize(978, 653);
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(LinkAnalysis->sizePolicy().hasHeightForWidth());
+        LinkAnalysis->setSizePolicy(sizePolicy);
+        LinkAnalysis->setMinimumSize(QSize(100, 100));
+        LinkAnalysis->setSizeIncrement(QSize(5, 5));
         QIcon icon;
-        icon.addFile(QString::fromUtf8("../../.designer/backup"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8("../Link.png"), QSize(), QIcon::Normal, QIcon::Off);
         LinkAnalysis->setWindowIcon(icon);
-        buttonBox = new QDialogButtonBox(LinkAnalysis);
-        buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
-        buttonBox->setGeometry(QRect(530, 690, 166, 32));
-        buttonBox->setContextMenuPolicy(Qt::DefaultContextMenu);
-        buttonBox->setOrientation(Qt::Horizontal);
-        buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
         qwtLinkPlot = new QwtPlot(LinkAnalysis);
         qwtLinkPlot->setObjectName(QString::fromUtf8("qwtLinkPlot"));
-        qwtLinkPlot->setGeometry(QRect(20, 25, 806, 311));
+        qwtLinkPlot->setGeometry(QRect(20, 25, 931, 281));
         qwtLinkPlot->setLayoutDirection(Qt::LeftToRight);
         gridLayout = new QWidget(LinkAnalysis);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        gridLayout->setGeometry(QRect(25, 355, 246, 171));
+        gridLayout->setGeometry(QRect(20, 310, 241, 203));
         TxInfo = new QGridLayout(gridLayout);
         TxInfo->setObjectName(QString::fromUtf8("TxInfo"));
         TxInfo->setVerticalSpacing(6);
         TxInfo->setContentsMargins(0, 0, 0, 0);
-        Lat = new QLabel(gridLayout);
-        Lat->setObjectName(QString::fromUtf8("Lat"));
+        TxLat = new QLabel(gridLayout);
+        TxLat->setObjectName(QString::fromUtf8("TxLat"));
         QFont font;
         font.setBold(false);
         font.setItalic(true);
         font.setWeight(50);
-        Lat->setFont(font);
+        TxLat->setFont(font);
 
-        TxInfo->addWidget(Lat, 1, 0, 1, 1);
+        TxInfo->addWidget(TxLat, 1, 0, 1, 1);
 
-        Lon = new QLabel(gridLayout);
-        Lon->setObjectName(QString::fromUtf8("Lon"));
-        Lon->setFont(font);
+        TxLon = new QLabel(gridLayout);
+        TxLon->setObjectName(QString::fromUtf8("TxLon"));
+        TxLon->setFont(font);
 
-        TxInfo->addWidget(Lon, 2, 0, 1, 1);
+        TxInfo->addWidget(TxLon, 2, 0, 1, 1);
 
-        Bearing = new QLabel(gridLayout);
-        Bearing->setObjectName(QString::fromUtf8("Bearing"));
-        Bearing->setFont(font);
+        TxBearing = new QLabel(gridLayout);
+        TxBearing->setObjectName(QString::fromUtf8("TxBearing"));
+        TxBearing->setFont(font);
 
-        TxInfo->addWidget(Bearing, 5, 0, 1, 1);
+        TxInfo->addWidget(TxBearing, 5, 0, 1, 1);
 
-        RecomB = new QLabel(gridLayout);
-        RecomB->setObjectName(QString::fromUtf8("RecomB"));
+        TxRecomB = new QLabel(gridLayout);
+        TxRecomB->setObjectName(QString::fromUtf8("TxRecomB"));
         QFont font1;
         font1.setPointSize(9);
-        RecomB->setFont(font1);
-        RecomB->setLayoutDirection(Qt::LeftToRight);
-        RecomB->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        TxRecomB->setFont(font1);
+        TxRecomB->setLayoutDirection(Qt::LeftToRight);
+        TxRecomB->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        TxInfo->addWidget(RecomB, 6, 0, 1, 1);
+        TxInfo->addWidget(TxRecomB, 6, 0, 1, 1);
 
-        Tilt = new QLabel(gridLayout);
-        Tilt->setObjectName(QString::fromUtf8("Tilt"));
-        Tilt->setFont(font);
+        TxTilt = new QLabel(gridLayout);
+        TxTilt->setObjectName(QString::fromUtf8("TxTilt"));
+        TxTilt->setFont(font);
 
-        TxInfo->addWidget(Tilt, 7, 0, 1, 1);
+        TxInfo->addWidget(TxTilt, 7, 0, 1, 1);
 
-        RecomTilt = new QLabel(gridLayout);
-        RecomTilt->setObjectName(QString::fromUtf8("RecomTilt"));
+        TxRecomTilt = new QLabel(gridLayout);
+        TxRecomTilt->setObjectName(QString::fromUtf8("TxRecomTilt"));
         QFont font2;
         font2.setPointSize(9);
         font2.setBold(false);
         font2.setWeight(50);
-        RecomTilt->setFont(font2);
-        RecomTilt->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        TxRecomTilt->setFont(font2);
+        TxRecomTilt->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        TxInfo->addWidget(RecomTilt, 8, 0, 1, 1);
+        TxInfo->addWidget(TxRecomTilt, 8, 0, 1, 1);
 
         lblTxLat = new QLabel(gridLayout);
         lblTxLat->setObjectName(QString::fromUtf8("lblTxLat"));
@@ -192,22 +194,22 @@ public:
 
         TxInfo->addWidget(lblTxTiltR, 8, 1, 1, 1);
 
-        Elevation = new QLabel(gridLayout);
-        Elevation->setObjectName(QString::fromUtf8("Elevation"));
-        Elevation->setFont(font);
+        TxElevation = new QLabel(gridLayout);
+        TxElevation->setObjectName(QString::fromUtf8("TxElevation"));
+        TxElevation->setFont(font);
 
-        TxInfo->addWidget(Elevation, 3, 0, 1, 1);
+        TxInfo->addWidget(TxElevation, 3, 0, 1, 1);
 
-        AntHeight = new QLabel(gridLayout);
-        AntHeight->setObjectName(QString::fromUtf8("AntHeight"));
+        TxAntHeight = new QLabel(gridLayout);
+        TxAntHeight->setObjectName(QString::fromUtf8("TxAntHeight"));
         QFont font3;
         font3.setFamily(QString::fromUtf8("Sans Serif"));
         font3.setBold(false);
         font3.setItalic(true);
         font3.setWeight(50);
-        AntHeight->setFont(font3);
+        TxAntHeight->setFont(font3);
 
-        TxInfo->addWidget(AntHeight, 4, 0, 1, 1);
+        TxInfo->addWidget(TxAntHeight, 4, 0, 1, 1);
 
         lblTxAntHeight = new QLabel(gridLayout);
         lblTxAntHeight->setObjectName(QString::fromUtf8("lblTxAntHeight"));
@@ -232,138 +234,36 @@ public:
 
         TxInfo->addWidget(lblTxName, 0, 0, 1, 2);
 
-        gridLayout_2 = new QWidget(LinkAnalysis);
-        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
-        gridLayout_2->setGeometry(QRect(580, 350, 246, 176));
-        RxInfo = new QGridLayout(gridLayout_2);
-        RxInfo->setObjectName(QString::fromUtf8("RxInfo"));
-        RxInfo->setContentsMargins(0, 0, 0, 0);
-        Lat_2 = new QLabel(gridLayout_2);
-        Lat_2->setObjectName(QString::fromUtf8("Lat_2"));
-        Lat_2->setFont(font);
-
-        RxInfo->addWidget(Lat_2, 1, 0, 1, 1);
-
-        Lon_2 = new QLabel(gridLayout_2);
-        Lon_2->setObjectName(QString::fromUtf8("Lon_2"));
-        Lon_2->setFont(font);
-
-        RxInfo->addWidget(Lon_2, 2, 0, 1, 1);
-
-        BearR = new QLabel(gridLayout_2);
-        BearR->setObjectName(QString::fromUtf8("BearR"));
-        BearR->setFont(font1);
-        BearR->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-
-        RxInfo->addWidget(BearR, 6, 0, 1, 1);
-
-        lblRxTilt_2 = new QLabel(gridLayout_2);
-        lblRxTilt_2->setObjectName(QString::fromUtf8("lblRxTilt_2"));
-        lblRxTilt_2->setFont(font);
-
-        RxInfo->addWidget(lblRxTilt_2, 7, 0, 1, 1);
-
-        RecomTilt_2 = new QLabel(gridLayout_2);
-        RecomTilt_2->setObjectName(QString::fromUtf8("RecomTilt_2"));
-        RecomTilt_2->setFont(font1);
-        RecomTilt_2->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-
-        RxInfo->addWidget(RecomTilt_2, 8, 0, 1, 1);
-
-        lblRxLat = new QLabel(gridLayout_2);
-        lblRxLat->setObjectName(QString::fromUtf8("lblRxLat"));
-
-        RxInfo->addWidget(lblRxLat, 1, 1, 1, 1);
-
-        lblRxElevation = new QLabel(gridLayout_2);
-        lblRxElevation->setObjectName(QString::fromUtf8("lblRxElevation"));
-
-        RxInfo->addWidget(lblRxElevation, 3, 1, 1, 1);
-
-        lblRxBearing = new QLabel(gridLayout_2);
-        lblRxBearing->setObjectName(QString::fromUtf8("lblRxBearing"));
-
-        RxInfo->addWidget(lblRxBearing, 5, 1, 1, 1);
-
-        lblRxBearingR = new QLabel(gridLayout_2);
-        lblRxBearingR->setObjectName(QString::fromUtf8("lblRxBearingR"));
-
-        RxInfo->addWidget(lblRxBearingR, 6, 1, 1, 1);
-
-        lblRxTilt = new QLabel(gridLayout_2);
-        lblRxTilt->setObjectName(QString::fromUtf8("lblRxTilt"));
-
-        RxInfo->addWidget(lblRxTilt, 7, 1, 1, 1);
-
-        lblRxTiltR = new QLabel(gridLayout_2);
-        lblRxTiltR->setObjectName(QString::fromUtf8("lblRxTiltR"));
-
-        RxInfo->addWidget(lblRxTiltR, 8, 1, 1, 1);
-
-        Elevation_2 = new QLabel(gridLayout_2);
-        Elevation_2->setObjectName(QString::fromUtf8("Elevation_2"));
-        Elevation_2->setFont(font);
-
-        RxInfo->addWidget(Elevation_2, 3, 0, 1, 1);
-
-        Bearing_2 = new QLabel(gridLayout_2);
-        Bearing_2->setObjectName(QString::fromUtf8("Bearing_2"));
-        Bearing_2->setFont(font);
-
-        RxInfo->addWidget(Bearing_2, 5, 0, 1, 1);
-
-        lblRxAntHeight = new QLabel(gridLayout_2);
-        lblRxAntHeight->setObjectName(QString::fromUtf8("lblRxAntHeight"));
-
-        RxInfo->addWidget(lblRxAntHeight, 4, 1, 1, 1);
-
-        AntHeight_2 = new QLabel(gridLayout_2);
-        AntHeight_2->setObjectName(QString::fromUtf8("AntHeight_2"));
-        AntHeight_2->setFont(font3);
-
-        RxInfo->addWidget(AntHeight_2, 4, 0, 1, 1);
-
-        lblRxLon = new QLabel(gridLayout_2);
-        lblRxLon->setObjectName(QString::fromUtf8("lblRxLon"));
-
-        RxInfo->addWidget(lblRxLon, 2, 1, 1, 1);
-
-        lblRxName = new QLabel(gridLayout_2);
-        lblRxName->setObjectName(QString::fromUtf8("lblRxName"));
-        lblRxName->setFont(font4);
-
-        RxInfo->addWidget(lblRxName, 0, 0, 1, 2);
-
         gridLayout_3 = new QWidget(LinkAnalysis);
         gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
-        gridLayout_3->setGeometry(QRect(280, 375, 291, 151));
+        gridLayout_3->setGeometry(QRect(280, 340, 291, 171));
         LinkInfo = new QGridLayout(gridLayout_3);
         LinkInfo->setSpacing(7);
         LinkInfo->setObjectName(QString::fromUtf8("LinkInfo"));
         LinkInfo->setContentsMargins(0, 0, 0, 0);
-        label_32 = new QLabel(gridLayout_3);
-        label_32->setObjectName(QString::fromUtf8("label_32"));
-        label_32->setFont(font);
+        lblkFactor = new QLabel(gridLayout_3);
+        lblkFactor->setObjectName(QString::fromUtf8("lblkFactor"));
+        lblkFactor->setFont(font);
 
-        LinkInfo->addWidget(label_32, 2, 0, 1, 1);
+        LinkInfo->addWidget(lblkFactor, 2, 0, 1, 1);
 
-        label_34 = new QLabel(gridLayout_3);
-        label_34->setObjectName(QString::fromUtf8("label_34"));
-        label_34->setFont(font);
+        lblFresnel = new QLabel(gridLayout_3);
+        lblFresnel->setObjectName(QString::fromUtf8("lblFresnel"));
+        lblFresnel->setFont(font);
 
-        LinkInfo->addWidget(label_34, 3, 0, 1, 1);
+        LinkInfo->addWidget(lblFresnel, 3, 0, 1, 1);
 
-        label_35 = new QLabel(gridLayout_3);
-        label_35->setObjectName(QString::fromUtf8("label_35"));
-        label_35->setFont(font);
+        lblPath = new QLabel(gridLayout_3);
+        lblPath->setObjectName(QString::fromUtf8("lblPath"));
+        lblPath->setFont(font);
 
-        LinkInfo->addWidget(label_35, 4, 0, 1, 1);
+        LinkInfo->addWidget(lblPath, 4, 0, 1, 1);
 
-        label_36 = new QLabel(gridLayout_3);
-        label_36->setObjectName(QString::fromUtf8("label_36"));
-        label_36->setFont(font);
+        lblFreq = new QLabel(gridLayout_3);
+        lblFreq->setObjectName(QString::fromUtf8("lblFreq"));
+        lblFreq->setFont(font);
 
-        LinkInfo->addWidget(label_36, 5, 0, 1, 1);
+        LinkInfo->addWidget(lblFreq, 5, 0, 1, 1);
 
         lblkfactor = new QLabel(gridLayout_3);
         lblkfactor->setObjectName(QString::fromUtf8("lblkfactor"));
@@ -385,22 +285,22 @@ public:
 
         LinkInfo->addWidget(lblFrequency, 5, 1, 1, 1);
 
-        label_37 = new QLabel(gridLayout_3);
-        label_37->setObjectName(QString::fromUtf8("label_37"));
-        label_37->setFont(font);
+        lblLoss = new QLabel(gridLayout_3);
+        lblLoss->setObjectName(QString::fromUtf8("lblLoss"));
+        lblLoss->setFont(font);
 
-        LinkInfo->addWidget(label_37, 1, 0, 1, 1);
+        LinkInfo->addWidget(lblLoss, 1, 0, 1, 1);
 
         lblPathLoss = new QLabel(gridLayout_3);
         lblPathLoss->setObjectName(QString::fromUtf8("lblPathLoss"));
 
         LinkInfo->addWidget(lblPathLoss, 1, 1, 1, 1);
 
-        label_31 = new QLabel(gridLayout_3);
-        label_31->setObjectName(QString::fromUtf8("label_31"));
-        label_31->setFont(font);
+        lblRxLev = new QLabel(gridLayout_3);
+        lblRxLev->setObjectName(QString::fromUtf8("lblRxLev"));
+        lblRxLev->setFont(font);
 
-        LinkInfo->addWidget(label_31, 0, 0, 1, 1);
+        LinkInfo->addWidget(lblRxLev, 0, 0, 1, 1);
 
         lblRxPower = new QLabel(gridLayout_3);
         lblRxPower->setObjectName(QString::fromUtf8("lblRxPower"));
@@ -409,23 +309,133 @@ public:
 
         btnSave = new QPushButton(LinkAnalysis);
         btnSave->setObjectName(QString::fromUtf8("btnSave"));
-        btnSave->setGeometry(QRect(430, 690, 91, 32));
-        btnSave->setIcon(icon);
-        btnPDF = new QPushButton(LinkAnalysis);
-        btnPDF->setObjectName(QString::fromUtf8("btnPDF"));
-        btnPDF->setGeometry(QRect(190, 690, 101, 32));
-        btnPDF->setIcon(icon);
+        btnSave->setGeometry(QRect(850, 360, 111, 32));
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8("../../.designer/backup"), QSize(), QIcon::Normal, QIcon::Off);
+        btnSave->setIcon(icon1);
         qwtBTLPlot = new QwtPlot(LinkAnalysis);
         qwtBTLPlot->setObjectName(QString::fromUtf8("qwtBTLPlot"));
-        qwtBTLPlot->setGeometry(QRect(20, 545, 811, 136));
-        btnRedo = new QPushButton(LinkAnalysis);
-        btnRedo->setObjectName(QString::fromUtf8("btnRedo"));
-        btnRedo->setGeometry(QRect(300, 690, 121, 32));
-        btnRedo->setIcon(icon);
+        qwtBTLPlot->setGeometry(QRect(20, 520, 941, 131));
+        gridLayout_2 = new QWidget(LinkAnalysis);
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
+        gridLayout_2->setGeometry(QRect(590, 310, 246, 203));
+        RxInfo = new QGridLayout(gridLayout_2);
+        RxInfo->setObjectName(QString::fromUtf8("RxInfo"));
+        RxInfo->setContentsMargins(0, 0, 0, 0);
+        RxLat = new QLabel(gridLayout_2);
+        RxLat->setObjectName(QString::fromUtf8("RxLat"));
+        RxLat->setFont(font);
+
+        RxInfo->addWidget(RxLat, 3, 0, 1, 1);
+
+        RxLon = new QLabel(gridLayout_2);
+        RxLon->setObjectName(QString::fromUtf8("RxLon"));
+        RxLon->setFont(font);
+
+        RxInfo->addWidget(RxLon, 4, 0, 1, 1);
+
+        RxRecomB = new QLabel(gridLayout_2);
+        RxRecomB->setObjectName(QString::fromUtf8("RxRecomB"));
+        RxRecomB->setFont(font1);
+        RxRecomB->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        RxInfo->addWidget(RxRecomB, 8, 0, 1, 1);
+
+        RxRecomTilt_2 = new QLabel(gridLayout_2);
+        RxRecomTilt_2->setObjectName(QString::fromUtf8("RxRecomTilt_2"));
+        RxRecomTilt_2->setFont(font);
+
+        RxInfo->addWidget(RxRecomTilt_2, 9, 0, 1, 1);
+
+        RxRecomTilt = new QLabel(gridLayout_2);
+        RxRecomTilt->setObjectName(QString::fromUtf8("RxRecomTilt"));
+        RxRecomTilt->setFont(font1);
+        RxRecomTilt->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        RxInfo->addWidget(RxRecomTilt, 10, 0, 1, 1);
+
+        lblRxLat = new QLabel(gridLayout_2);
+        lblRxLat->setObjectName(QString::fromUtf8("lblRxLat"));
+
+        RxInfo->addWidget(lblRxLat, 3, 1, 1, 1);
+
+        lblRxElevation = new QLabel(gridLayout_2);
+        lblRxElevation->setObjectName(QString::fromUtf8("lblRxElevation"));
+
+        RxInfo->addWidget(lblRxElevation, 5, 1, 1, 1);
+
+        lblRxBearing = new QLabel(gridLayout_2);
+        lblRxBearing->setObjectName(QString::fromUtf8("lblRxBearing"));
+
+        RxInfo->addWidget(lblRxBearing, 7, 1, 1, 1);
+
+        lblRxBearingR = new QLabel(gridLayout_2);
+        lblRxBearingR->setObjectName(QString::fromUtf8("lblRxBearingR"));
+
+        RxInfo->addWidget(lblRxBearingR, 8, 1, 1, 1);
+
+        lblRxTilt = new QLabel(gridLayout_2);
+        lblRxTilt->setObjectName(QString::fromUtf8("lblRxTilt"));
+
+        RxInfo->addWidget(lblRxTilt, 9, 1, 1, 1);
+
+        lblRxTiltR = new QLabel(gridLayout_2);
+        lblRxTiltR->setObjectName(QString::fromUtf8("lblRxTiltR"));
+
+        RxInfo->addWidget(lblRxTiltR, 10, 1, 1, 1);
+
+        RxElevation = new QLabel(gridLayout_2);
+        RxElevation->setObjectName(QString::fromUtf8("RxElevation"));
+        RxElevation->setFont(font);
+
+        RxInfo->addWidget(RxElevation, 5, 0, 1, 1);
+
+        RxBearing = new QLabel(gridLayout_2);
+        RxBearing->setObjectName(QString::fromUtf8("RxBearing"));
+        RxBearing->setFont(font);
+
+        RxInfo->addWidget(RxBearing, 7, 0, 1, 1);
+
+        lblRxAntHeight = new QLabel(gridLayout_2);
+        lblRxAntHeight->setObjectName(QString::fromUtf8("lblRxAntHeight"));
+
+        RxInfo->addWidget(lblRxAntHeight, 6, 1, 1, 1);
+
+        RxAntHeight = new QLabel(gridLayout_2);
+        RxAntHeight->setObjectName(QString::fromUtf8("RxAntHeight"));
+        RxAntHeight->setFont(font3);
+
+        RxInfo->addWidget(RxAntHeight, 6, 0, 1, 1);
+
+        lblRxLon = new QLabel(gridLayout_2);
+        lblRxLon->setObjectName(QString::fromUtf8("lblRxLon"));
+
+        RxInfo->addWidget(lblRxLon, 4, 1, 1, 1);
+
+        lblRxName = new QLabel(gridLayout_2);
+        lblRxName->setObjectName(QString::fromUtf8("lblRxName"));
+        lblRxName->setFont(font4);
+
+        RxInfo->addWidget(lblRxName, 0, 0, 1, 2);
+
+        btnPDF = new QPushButton(LinkAnalysis);
+        btnPDF->setObjectName(QString::fromUtf8("btnPDF"));
+        btnPDF->setGeometry(QRect(850, 400, 111, 32));
+        btnPDF->setIcon(icon1);
         btnAlign = new QPushButton(LinkAnalysis);
         btnAlign->setObjectName(QString::fromUtf8("btnAlign"));
-        btnAlign->setGeometry(QRect(300, 690, 121, 31));
-        btnAlign->setIcon(icon);
+        btnAlign->setGeometry(QRect(850, 470, 111, 31));
+        btnAlign->setIcon(icon1);
+        btnRedo = new QPushButton(LinkAnalysis);
+        btnRedo->setObjectName(QString::fromUtf8("btnRedo"));
+        btnRedo->setGeometry(QRect(850, 470, 111, 32));
+        btnRedo->setIcon(icon1);
+        buttonBox = new QDialogButtonBox(LinkAnalysis);
+        buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
+        buttonBox->setGeometry(QRect(850, 310, 111, 51));
+        buttonBox->setContextMenuPolicy(Qt::DefaultContextMenu);
+        buttonBox->setOrientation(Qt::Horizontal);
+        buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
 
         retranslateUi(LinkAnalysis);
         QObject::connect(buttonBox, SIGNAL(accepted()), LinkAnalysis, SLOT(accept()));
@@ -437,66 +447,65 @@ public:
     void retranslateUi(QDialog *LinkAnalysis)
     {
         LinkAnalysis->setWindowTitle(QApplication::translate("LinkAnalysis", "Link Analysis", 0, QApplication::UnicodeUTF8));
-        Lat->setText(QApplication::translate("LinkAnalysis", "Latitude:", 0, QApplication::UnicodeUTF8));
-        Lon->setText(QApplication::translate("LinkAnalysis", "Longitude:", 0, QApplication::UnicodeUTF8));
-        Bearing->setText(QApplication::translate("LinkAnalysis", "Bearing:", 0, QApplication::UnicodeUTF8));
-        RecomB->setText(QApplication::translate("LinkAnalysis", "  (Recommended)", 0, QApplication::UnicodeUTF8));
-        Tilt->setText(QApplication::translate("LinkAnalysis", "Tilt:", 0, QApplication::UnicodeUTF8));
-        RecomTilt->setText(QApplication::translate("LinkAnalysis", "  (Recommended)", 0, QApplication::UnicodeUTF8));
+        TxLat->setText(QApplication::translate("LinkAnalysis", "Latitude:", 0, QApplication::UnicodeUTF8));
+        TxLon->setText(QApplication::translate("LinkAnalysis", "Longitude:", 0, QApplication::UnicodeUTF8));
+        TxBearing->setText(QApplication::translate("LinkAnalysis", "Bearing:", 0, QApplication::UnicodeUTF8));
+        TxRecomB->setText(QApplication::translate("LinkAnalysis", "  (Recommended)", 0, QApplication::UnicodeUTF8));
+        TxTilt->setText(QApplication::translate("LinkAnalysis", "Tilt:", 0, QApplication::UnicodeUTF8));
+        TxRecomTilt->setText(QApplication::translate("LinkAnalysis", "  (Recommended)", 0, QApplication::UnicodeUTF8));
         lblTxLat->setText(QString());
         lblTxLon->setText(QString());
         lblTxBearing->setText(QString());
         lblTxBearingR->setText(QString());
         lblTxTilt->setText(QString());
         lblTxTiltR->setText(QString());
-        Elevation->setText(QApplication::translate("LinkAnalysis", "Elevation (m):", 0, QApplication::UnicodeUTF8));
-        AntHeight->setText(QApplication::translate("LinkAnalysis", "Antenna Height (m):", 0, QApplication::UnicodeUTF8));
+        TxElevation->setText(QApplication::translate("LinkAnalysis", "Elevation (m):", 0, QApplication::UnicodeUTF8));
+        TxAntHeight->setText(QApplication::translate("LinkAnalysis", "Antenna Height (m):", 0, QApplication::UnicodeUTF8));
         lblTxAntHeight->setText(QString());
         lblTxElevation->setText(QString());
         lblTxName->setText(QApplication::translate("LinkAnalysis", "Name", 0, QApplication::UnicodeUTF8));
-        Lat_2->setText(QApplication::translate("LinkAnalysis", "Latitude:", 0, QApplication::UnicodeUTF8));
-        Lon_2->setText(QApplication::translate("LinkAnalysis", "Longitude:", 0, QApplication::UnicodeUTF8));
-        BearR->setText(QApplication::translate("LinkAnalysis", "  (Recommended)", 0, QApplication::UnicodeUTF8));
-        lblRxTilt_2->setText(QApplication::translate("LinkAnalysis", "Tilt:", 0, QApplication::UnicodeUTF8));
-        RecomTilt_2->setText(QApplication::translate("LinkAnalysis", "  (Recommended)", 0, QApplication::UnicodeUTF8));
+        lblkFactor->setText(QApplication::translate("LinkAnalysis", "k-Factor:", 0, QApplication::UnicodeUTF8));
+        lblFresnel->setText(QApplication::translate("LinkAnalysis", "Fresnel Clearance (%):", 0, QApplication::UnicodeUTF8));
+        lblPath->setText(QApplication::translate("LinkAnalysis", "Path Length (km):", 0, QApplication::UnicodeUTF8));
+        lblFreq->setText(QApplication::translate("LinkAnalysis", "Frequency (MHz):", 0, QApplication::UnicodeUTF8));
+        lblkfactor->setText(QString());
+        lblClearance->setText(QString());
+        lblLength->setText(QString());
+        lblFrequency->setText(QString());
+        lblLoss->setText(QApplication::translate("LinkAnalysis", "Pathloss (dB):", 0, QApplication::UnicodeUTF8));
+        lblPathLoss->setText(QString());
+        lblRxLev->setText(QApplication::translate("LinkAnalysis", "Received Power (dBm):", 0, QApplication::UnicodeUTF8));
+        lblRxPower->setText(QString());
+#ifndef QT_NO_TOOLTIP
+        btnSave->setToolTip(QString());
+#endif // QT_NO_TOOLTIP
+        btnSave->setText(QApplication::translate("LinkAnalysis", "Save", 0, QApplication::UnicodeUTF8));
+        RxLat->setText(QApplication::translate("LinkAnalysis", "Latitude:", 0, QApplication::UnicodeUTF8));
+        RxLon->setText(QApplication::translate("LinkAnalysis", "Longitude:", 0, QApplication::UnicodeUTF8));
+        RxRecomB->setText(QApplication::translate("LinkAnalysis", "  (Recommended)", 0, QApplication::UnicodeUTF8));
+        RxRecomTilt_2->setText(QApplication::translate("LinkAnalysis", "Tilt:", 0, QApplication::UnicodeUTF8));
+        RxRecomTilt->setText(QApplication::translate("LinkAnalysis", "  (Recommended)", 0, QApplication::UnicodeUTF8));
         lblRxLat->setText(QString());
         lblRxElevation->setText(QString());
         lblRxBearing->setText(QString());
         lblRxBearingR->setText(QString());
         lblRxTilt->setText(QString());
         lblRxTiltR->setText(QString());
-        Elevation_2->setText(QApplication::translate("LinkAnalysis", "Elevation (m):", 0, QApplication::UnicodeUTF8));
-        Bearing_2->setText(QApplication::translate("LinkAnalysis", "Bearing:", 0, QApplication::UnicodeUTF8));
+        RxElevation->setText(QApplication::translate("LinkAnalysis", "Elevation (m):", 0, QApplication::UnicodeUTF8));
+        RxBearing->setText(QApplication::translate("LinkAnalysis", "Bearing:", 0, QApplication::UnicodeUTF8));
         lblRxAntHeight->setText(QString());
-        AntHeight_2->setText(QApplication::translate("LinkAnalysis", "Antenna Height (m):", 0, QApplication::UnicodeUTF8));
+        RxAntHeight->setText(QApplication::translate("LinkAnalysis", "Antenna Height (m):", 0, QApplication::UnicodeUTF8));
         lblRxLon->setText(QString());
         lblRxName->setText(QApplication::translate("LinkAnalysis", "Name", 0, QApplication::UnicodeUTF8));
-        label_32->setText(QApplication::translate("LinkAnalysis", "k-Factor:", 0, QApplication::UnicodeUTF8));
-        label_34->setText(QApplication::translate("LinkAnalysis", "Fresnel Clearance (%):", 0, QApplication::UnicodeUTF8));
-        label_35->setText(QApplication::translate("LinkAnalysis", "Path Length (km):", 0, QApplication::UnicodeUTF8));
-        label_36->setText(QApplication::translate("LinkAnalysis", "Frequency (MHz):", 0, QApplication::UnicodeUTF8));
-        lblkfactor->setText(QString());
-        lblClearance->setText(QString());
-        lblLength->setText(QString());
-        lblFrequency->setText(QString());
-        label_37->setText(QApplication::translate("LinkAnalysis", "Pathloss (dB):", 0, QApplication::UnicodeUTF8));
-        lblPathLoss->setText(QString());
-        label_31->setText(QApplication::translate("LinkAnalysis", "Received Power (dBm):", 0, QApplication::UnicodeUTF8));
-        lblRxPower->setText(QString());
-#ifndef QT_NO_TOOLTIP
-        btnSave->setToolTip(QString());
-#endif // QT_NO_TOOLTIP
-        btnSave->setText(QApplication::translate("LinkAnalysis", "Save", 0, QApplication::UnicodeUTF8));
         btnPDF->setText(QApplication::translate("LinkAnalysis", "Export to PDF", 0, QApplication::UnicodeUTF8));
-#ifndef QT_NO_TOOLTIP
-        btnRedo->setToolTip(QString());
-#endif // QT_NO_TOOLTIP
-        btnRedo->setText(QApplication::translate("LinkAnalysis", "Recalculate", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP
         btnAlign->setToolTip(QString());
 #endif // QT_NO_TOOLTIP
         btnAlign->setText(QApplication::translate("LinkAnalysis", " Align Antennae", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(LinkAnalysis);
+#ifndef QT_NO_TOOLTIP
+        btnRedo->setToolTip(QString());
+#endif // QT_NO_TOOLTIP
+        btnRedo->setText(QApplication::translate("LinkAnalysis", "Recalculate", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

@@ -195,6 +195,8 @@ namespace Qrap
 		void FindGroundHeight();
 
 		void CloseBySite();
+
+		void InsertDefaultRadios();
 	
 		/**
 		 * Private SLOT - This slot will enable the antenna device form widgets and disable the browseButton.
@@ -295,6 +297,8 @@ namespace Qrap
 		QPushButton*		mGroundHeightButton;
 
 		QPushButton*		mCloseByButton;
+
+		QPushButton*		mDefaultRadiosButton;
 
 		StringMap		mDefaults;		///< This contains the default values for all the fields.
 		QString			mTable;			///< This QString holds the name of the table that this form builder represents.

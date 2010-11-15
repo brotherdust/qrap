@@ -1110,13 +1110,16 @@ void cRapFormBuilder::PopulateForm ()
 //***********************************************************************
 void cRapFormBuilder::Insert ()
 {
-	if(InsertData(mTable, mFormWidgets)!=-1)
+	int TempID = InsertData(mTable, mFormWidgets);
+	if (TempID!=-1)
 	{
+		mCurrentRecordID = TempID;
+		cout << "In cRapFormBuilder::Insert ()  mCurrentRecordID = " << mCurrentRecordID << endl;
 		mCommitButton->setVisible(false);
 		mCommitButton->setEnabled(false);
 		mCommitAddNextButton->setVisible(false);
 		mCommitAddNextButton->setEnabled(false);
-		emit InsertComplete(0);
+		emit InsertComplete(TempID);
 	
 //		Clear();
 	
@@ -1422,13 +1425,17 @@ void cRapFormBuilder::InsertDefaultRadios()
 {
 	if (!mInserting)
 	{
+		cout << "In cRapFormBuilder::InsertDefaultRadios() NOT Inserting " << endl;
 		mUpdateButton->setVisible(true);
 		mUpdateButton->setEnabled(true);		
-		mUpdateButton->animateClick (2);
+		mUpdateButton->click();
 	}
 	else
-		mCommitButton->animateClick (2);
-
+	{
+		cout << "In cRapFormBuilder::InsertDefaultRadios() Inserting " << endl;
+		mCommitButton->click();
+	}
+	cout << "In cRapFormBuilder::InsertDefaultRadios()  mCurrentRecordID = " << mCurrentRecordID << endl;
 	InsertDefaultRadioInsts(mCurrentRecordID);
 	mDefaultRadiosButton->setVisible(false);
 	mDefaultRadiosButton->setEnabled(false);

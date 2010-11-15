@@ -1645,7 +1645,7 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 				else	Rad =0;
 					
 				if (tableWidget->item(i,5) != NULL)
-					sRadInst = tableWidget->item(i,2)->text();
+					sRadInst = tableWidget->item(i,5)->text();
 				else	sRadInst = "";
 				
 				sSite = get->text();
@@ -1658,7 +1658,6 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 					sStatus = tableWidget->item(i,6)->text();
 				else	sStatus = "";
 				
-				sRange = QString("%1").arg(Rad);
 				if (tableWidget->item(i,2) != NULL)
 					sRange = tableWidget->item(i,2)->text();
 				else	sRange = "";

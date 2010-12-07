@@ -48,7 +48,7 @@ ELSE(WIN32)
     # try to use bundle on mac
     IF (APPLE)
       #MESSAGE("Searching for QGIS in /Applications/QGIS.app/Contents/MacOS")
-      SET (QGIS_MAC_PATH /Applications/QGIS1.4.02.app/Contents/MacOS)
+      SET (QGIS_MAC_PATH /Applications/QGIS1.6.02.app/Contents/MacOS)
       SET (QGIS_LIB_DIR ${QGIS_MAC_PATH}/lib)
       SET (QGIS_PLUGIN_DIR ${QGIS_MAC_PATH}/lib/qgis/plugins CACHE STRING INTERNAL)
       # set INCLUDE_DIR to prefix+include

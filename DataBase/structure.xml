@@ -104,7 +104,7 @@ www.QRap.org.za
 		       type="varchar(15)"
 		       label="Status"
 		       description="This site status in the planning process. Options can be altered in structure.xml"
-		       ui="dropdown(fixed, {'Experimental', 'Draft', 'Planned', 'Active', 'Default', 'Store', 'Office'})" />
+		       ui="dropdown(fixed, {'Experimental', 'Draft', 'Planned', 'Active','Default', 'School', 'Health', 'Office', 'Nkangala', 'Moutse', 'Tzaneen', 'extraNka'})" />
 		
 		<field name="location"
 		       type="POINT"
@@ -1589,29 +1589,29 @@ www.QRap.org.za
 		      label = "Line"
 			description="The geographical line that is used to display the link visually."
 		      postgis="true" />
-		<view name = "links_view" as = 'select * from links'>
+<!--		<view name = "links_view" as = 'select * from links'>
 		</view>
-
-<!--		<view name = "links_view" as = 'select linkname, 
-			site1.sitename||rad1.sector as txsite,
-			radioinstallation1 as r1,
-			site2.sitename||rad2.sector as rxsite,
-			radioinstallation2 as r2, 
+-->
+		<view name = "links_view" as = 'select links.id as id, linkname, 
+			site1.sitename||rad1.sector as txsite, txinst, rad1.txantennaheight as txheight,
+			site2.sitename||rad2.sector as rxsite, rxinst, rad2.rxantennaheight as rxheight,
 			minclearance as clear,
-			frequency, pathloss, kfactor
+			frequency, pathloss, kfactor, line
 			from links cross join radioinstallation as rad1 cross join site_view_only as site1
 	 		cross join radioinstallation as rad2 cross join site_view_only as site2
-	 		where rad1.id=radioinstallation1
-			and radioinstallation2=rad2.id
+	 		where txinst=rad1.id
+			and rxinst=rad2.id
 			and rad1.siteid=site1.id
 			and rad2.siteid=site2.id;'>
 			<field name="txsite" label="Tx Site" />
 			<field name="rxsite" label="Rx Site" />	
-			<field name="r1" label="Tx Radio" />
-			<field name="r2" label="Rx Radio" />
+			<field name="txinst" label="Tx Radio" />
+			<field name="rxsite" label="Rx Radio" />
+			<field name="txheight" label="Tx Height" />
+			<field name="rxheight" label="Rx Height" />
 			<field name="clear" label="Clearance" />
 		</view>
--->
+
 	</table> <!-- links -->
 
 <!-- *************************************************************************************************************************** -->

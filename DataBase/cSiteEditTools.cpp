@@ -263,7 +263,7 @@ bool Qrap::InsertDefaultRadioInsts(int SiteId)
 	char * machineID;
 	machineID = new char[33];
 	QString Tech = QString("%1").arg(gDb.GetSetting("TechType").c_str());
-	Tech = Tech.mid(0,Tech.find(":"));
+	Tech = Tech.mid(0,Tech.indexOf(":",1));
 	string Teg = Tech.toStdString();
 	if (Tech.toDouble()==0)
 	{

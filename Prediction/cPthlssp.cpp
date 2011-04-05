@@ -50,7 +50,7 @@ cPathLossPredictor::cPathLossPredictor(double k, double f, double txh, double rx
 	m_tempIPD = 200;
 	m_slope = 0;
 	m_counter=0;
-	m_SmoothWidth=1;
+        m_SmoothWidth=1;
 	m_SeekWidth=2;
 
 }/* end CPathLossPredictor:: Default Constructor */
@@ -238,7 +238,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 								KnifeEdge, RoundHill);
 					if (IfTooManyPeaks) i++;
 				}
-				else i++;
+                                else i++;
 				if ((i+1)==MAXPEAK)
 				{
  //           		cout << "MAXPEAK limit reached" << endl;
@@ -247,12 +247,12 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 			}
 		}
 	}
-/*
+
 #ifndef NO_DEBUG
-	m_counter++;
-	cout << m_counter << "   m_size="<< m_size <<"      m_Loss=" << m_Loss << endl<<  endl;
+//	m_counter++;
+//	cout << m_counter << "   m_size="<< m_size <<"      m_Loss=" << m_Loss << endl<<  endl;
 #endif
-*/
+
 	return (float)m_Loss;
 
 }/* end TotPathLoss */
@@ -563,19 +563,16 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex)
 	SPeakIndex = PeakIndex;
 	// Shift peak to the left if SmoothProfile has a peak to the left.
 	if (SPeakIndex > 0)
-		if (*(SmoothProfile+SPeakIndex-1)
-			>*(SmoothProfile+SPeakIndex))
+                if (*(SmoothProfile+SPeakIndex-1) >*(SmoothProfile+SPeakIndex))
 			while ((SPeakIndex>1)&&(SPeakIndex>(PeakIndex-m_SeekWidth)) &&
-				(*(SmoothProfile+SPeakIndex-1)
-				>*(SmoothProfile+SPeakIndex)))
+                                (*(SmoothProfile+SPeakIndex-1)>*(SmoothProfile+SPeakIndex)))
 				SPeakIndex--;
 	// Shift peak right if SmoothProfile has a peak to the right.
 	if (SPeakIndex < sizeSP-1)
 		if (*(SmoothProfile+SPeakIndex+1)
 			> *(SmoothProfile+SPeakIndex))
 			while ((SPeakIndex<sizeSP-1)&&(SPeakIndex<(PeakIndex+m_SeekWidth))
-				&&(*(SmoothProfile+SPeakIndex+1)
-				>*(SmoothProfile+SPeakIndex)))
+				&&(*(SmoothProfile+SPeakIndex+1)>*(SmoothProfile+SPeakIndex)))
 				SPeakIndex++;
 	// Determine the left inflection point.
 	leftInfl = SPeakIndex;
@@ -583,11 +580,11 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex)
 		(*(SmoothProfile+leftInfl)>*(SmoothProfile+leftInfl-1)))
 		leftInfl--;
 	if (leftInfl<m_size-1)
-	while ((leftInfl>start+1)&&(leftInfl>(PeakIndex-m_SeekWidth))&&
-		((*(SmoothProfile+leftInfl)-*(SmoothProfile+leftInfl-1)+0.5)
-		>= (*(SmoothProfile+leftInfl+1)-*(SmoothProfile+leftInfl))))
+        while ((leftInfl>start+1)&&(leftInfl>(PeakIndex-m_SeekWidth))&&
+                ((*(SmoothProfile+leftInfl)-*(SmoothProfile+leftInfl-1))
+                > (*(SmoothProfile+leftInfl+1)-*(SmoothProfile+leftInfl))))
 		leftInfl--;
-	if ((leftInfl==start+1)&&((*(SmoothProfile+start+2)-*(SmoothProfile+start+1)-0.5)<
+        if ((leftInfl==start+1)&&((*(SmoothProfile+start+2)-*(SmoothProfile+start+1))<
 			(*(SmoothProfile+start+1)-*(SmoothProfile+start))))
 		leftInfl=start;
 	// Determine the right inflection point
@@ -597,8 +594,8 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex)
 		rightInfl++;
 	if (rightInfl>0)
 	while ((rightInfl<stop-1)&&(rightInfl<(PeakIndex+m_SeekWidth))&&
-		((*(SmoothProfile+rightInfl)-*(SmoothProfile+rightInfl+1)+0.5)
-		>= (*(SmoothProfile+rightInfl-1)-*(SmoothProfile+rightInfl))))
+                ((*(SmoothProfile+rightInfl)-*(SmoothProfile+rightInfl+1))
+                > (*(SmoothProfile+rightInfl-1)-*(SmoothProfile+rightInfl))))
 		rightInfl++;
 	if ((rightInfl==stop-1)&&((*(SmoothProfile+stop)-*(SmoothProfile+stop-1))
 			<(*(SmoothProfile+stop-1)-*(SmoothProfile+stop-2))))
@@ -612,15 +609,20 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex)
 		    (*(SmoothProfile+rightInfl)>*(SmoothProfile+leftInfl)))
 			SPeakIndex++;
 	}
-	xL = (double)(leftInfl-SPeakIndex)*m_tempIPD;
+        xL = (double)(SPeakIndex-leftInfl)*m_tempIPD;
 	xR = (double)(rightInfl-SPeakIndex)*m_tempIPD;
 	yL = (double)(*(SmoothProfile+leftInfl)-*(SmoothProfile+SPeakIndex));
 	yR = (double)(*(SmoothProfile+rightInfl)-*(SmoothProfile+SPeakIndex));
 //        cout << "xL=" << xL << "  xR=" << xR << "  yL=" << yL << "  yR=" << yR << endl;
 	tempL = xL*xL + yL*yL;
 	tempR = xR*xR + yR*yR;
-	if ((yR==0.0)&&(yL==0.0))
-		{radius=1.0;}
+        double h = (yL+yR)/2.0;
+        double c2 = (xL-xR)*(xL-xR) + (yL-yR)*(yL-yR);
+        if ((yR==0.0)&&(yL==0.0))
+                {radius=6370000.0*7;}
+        else radius = h/2.0 + c2/(8.0*h);
+/*	if ((yR==0.0)&&(yL==0.0))
+                {radius=6370000.0*7;}
 	else if (xL==0.0)
 		{radius = tempR/(-2.0*yR);}
 	else if (xR==0.0)
@@ -630,7 +632,8 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex)
 	else	{x0 = (yR*tempL-yL*tempR);
 		 y0 = (xL*tempR-xR*tempL);
 		 radius=(sqrt(x0*x0+y0*y0)/(2.0*(xL*yR-xR*yL)));}
-	delete [] SmoothProfile;
+*/
+        delete [] SmoothProfile;
 	return radius;
 }/*end SetPeakRadii*/
 
@@ -665,10 +668,10 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 			* sqrt(2.0/lambda)/SQd1d2;
 	MhuRho = mhu*rho;
 
-#ifndef NO_DEBUG
-//	cout	<< " radius=" << radius << "  rho=" << rho
-//		<< "   mhu=" << mhu << "   MhuRho=" << MhuRho << endl;
-#endif
+//#ifndef NO_DEBUG
+        cout	<< " radius=" << radius << "  rho=" << rho
+                << "   mhu=" << mhu << "   MhuRho=" << MhuRho << endl;
+//#endif
 
 	temp = (double)(EndIndex-BeginIndex)*m_interPixelDist/2.0;
 	if ((radius>0)&&((radius<2.0e5) || ((rho<=1.5)&&(radius<5.0e6))
@@ -771,11 +774,11 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 	DiffLoss = KnifeEdge + RoundHill + Surface;
 
 #ifndef NO_DEBUG
-/*	cout << " KnifeEdge=" << KnifeEdge;
-	cout << " RoundHill=" << RoundHill;
-	cout << " Surface=" << Surface << endl ;
-	cout << PeakIndex << "   Diffraction Loss=" << DiffLoss << endl;
-*/
+//      cout << " KnifeEdge=" << KnifeEdge;
+//	cout << " RoundHill=" << RoundHill;
+//	cout << " Surface=" << Surface << endl ;
+//	cout << PeakIndex << "   Diffraction Loss=" << DiffLoss << endl;
+
 #endif
 
 	int i,j;

@@ -267,15 +267,14 @@ bool cSpectralLink::GetDBinfo(tFixed &Inst)
 
 	gcvt(Inst.sInstKey,10,text);
 	query = "SELECT siteid,eirp,radioinstallation.txpower,txlosses,rxlosses,";
-	query +="rxsensitivity,startfreq,spacing,channel,";
-	query+= "txantpatternkey,txbearing,txmechtilt,rxantpatternkey,";
-	query+="rxbearing,rxmechtilt,txantennaheight,rxantennaheight ";
-	query+= "FROM radioinstallation CROSS JOIN cell ";
-	query+= "ON cell.risector=radioinstallation.id ";
-	query+= "CROSS JOIN frequencyallocationlist ";
-	query += "ON cell.id=ci CROSS JOIN technology ";
-	query +="ON radioinstallation.techkey=technology.id ";
-	query += "WHERE radioinstallation.id =";
+        query += "rxsensitivity,startfreq,spacing,channel,";
+        query += "txantpatternkey,txbearing,txmechtilt,rxantpatternkey,";
+        query += "rxbearing,rxmechtilt,txantennaheight,rxantennaheight ";
+        query += " FROM radioinstallation CROSS JOIN technology";
+        query += " LEFT OUTER JOIN cell ON cell.risector=radioinstallation.id ";
+        query += " LEFT OUTER JOIN frequencyallocationlist ON cell.id=ci  ";
+        query += " WHERE radioinstallation.techkey=technology.id ";
+        query += " AND radioinstallation.id =";
 	query += text;
 	query +=";";
 

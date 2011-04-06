@@ -247,7 +247,7 @@ namespace Qrap
 			 *
 			 * @return A double
 			 */
-			inline double HeightGain(const double Y, const double K);
+			inline double HeightGain(double K, double B);
 		
 		private:
 		
@@ -258,6 +258,7 @@ namespace Qrap
 			double m_freq;			///< The operating frequency in MHz.
 			double m_htx;			///< The height of the transmitter antenna in meter.
 			double m_hrx;			///< The height of the receiver antenna in meter.
+			bool mSmooth;			///< Is the terrain smooth
 			float *m_TempProfile;	///< Temporary (horizontilized profile).
 			float *m_CurvedProfile;	///< Storage for original profile.
 			double m_tempIPD;		///< Temporary InterPixelDist used to "flatten" the profile in meter

@@ -176,9 +176,9 @@ int cPathLossPredictor::setParameters(double k, double f,
 //	cout << "Freq: " << m_freq << endl;
 
         m_SeekWidth = (int)(2*400.0/m_interPixelDist*sqrt(400.0/m_freq)+0.5);
- 	m_SmoothWidth = (int)(1.5*400.0/m_interPixelDist*sqrt(m_freq/400.0)+0.5) - 1;
+        m_SmoothWidth = (int)(1.5*400.0/m_interPixelDist*sqrt(400.0/m_freq)+0.5) - 1;
 	if (m_SeekWidth<1) m_SeekWidth = 1;
-	if (m_SmoothWidth<1) m_SmoothWidth=1;
+//	if (m_SmoothWidth<1) m_SmoothWidth=1;
 
 
 return 1;
@@ -189,9 +189,9 @@ return 1;
 //************************************************************************
 // Calculates the Total Path Loss
 float cPathLossPredictor::TotPathLoss(cProfile &InputProfile, 
-										float &ElevAngleTX,
-										bool UseClutter,
-										cProfile &ClutterProfile)
+                                        float &ElevAngleTX,
+                                        bool UseClutter,
+                                        cProfile &ClutterProfile)
 {
 	double LinkLength=0.0;
 	double MinClearance=DBL_MAX;
@@ -209,7 +209,8 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //	InputProfile.Display();
 	LinkLength = CalcDist(InputProfile);
 	m_Loss = CalcFreeSpaceLoss(LinkLength);
-	if (InputProfile.GetSize()>1)
+        int ProfSize=InputProfile.GetSize();
+        if (ProfSize>1)
 	{
 		InitEffectEarth(InputProfile);
 		FindElevAngles(ElevAngleTX,ElevAngleRX);
@@ -218,6 +219,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		PeakIndex = FindMainPeak(0,1,ReffHeight, MinClearance,sqrtD1D2);
                 if ((MinClearance<=0.78)&&(PeakIndex!=0))
 		{
+//                        cout << ProfSize << "  Main Peak" << endl;
 			radius = SetPeakRadius(PeakIndex);
 			m_Loss += CalcDiffLoss(m_markers[0],m_markers[1],PeakIndex,
 							ReffHeight,sqrtD1D2,radius,IfTooManyPeaks,
@@ -226,13 +228,15 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 			i=0;
 			while (m_markers[i+1]!=-1)
 			{
+
 				ReffHeight = Horizontalize(i,i+1);
 				PeakIndex = FindMainPeak(i,i+1,ReffHeight,
 								MinClearance,sqrtD1D2);
                                 if ((MinClearance<=0.6)&&(PeakIndex!=0))
-				{     
-					radius= SetPeakRadius(PeakIndex);
-					m_Loss += CalcDiffLoss(m_markers[i],m_markers[i+1],
+                                {
+ //                                   cout << ProfSize << "   Peak:" << i << endl;
+                                    radius= SetPeakRadius(PeakIndex);
+                                    m_Loss += CalcDiffLoss(m_markers[i],m_markers[i+1],
 								PeakIndex,ReffHeight,
 								sqrtD1D2,radius,IfTooManyPeaks,
 								KnifeEdge, RoundHill);
@@ -633,9 +637,10 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex)
 			SPeakIndex++;
 	}
 
-        // method 1 for determining radius
-        radius = 0.0;
+        // method 1 for determining radius: ITU-R P.526-11 $4.2
+
         int count = 0;
+/*      radius = 0.0;
         for (i=leftInfl; i<=rightInfl; i++)
         {
             if (abs(*(SmoothProfile+SPeakIndex)-*(SmoothProfile+i))>0.0)
@@ -646,37 +651,47 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex)
             }
         }
         if (count>0)
+        {
             radius /= count;
+            cout << "   radius m1: " << radius;
+        }
+ */
+        // method 2 for determining radius ... results corresponds very closely to method 1
+        radius = 0.0;
+        count = 0;
+        for (i=leftInfl; i<=rightInfl; i++)
+        {
+            if (abs(*(SmoothProfile+SPeakIndex)-*(SmoothProfile+i))>0.0)
+            {
+                xL = (double)(SPeakIndex-i)*m_tempIPD;
+                yL = -(double)(*(SmoothProfile+i)-*(SmoothProfile+SPeakIndex));
+                tempL = xL*xL + yL*yL;
+                radius += tempL/(2.0*yL);
+                count++;
+            }
+        }
+        if (count>0)
+        {
+            radius /= count;
+//            cout << "      radius m2: " << radius;
+        }
         else
         {
-        // method 2 for determining radius
-            xL = (double)(SPeakIndex-leftInfl)*m_tempIPD;
+         // method 3 for determining radius: http://liutaiomottola.com/formulae/sag.htm
+            xL = (double)(leftInfl-SPeakIndex)*m_tempIPD;
             xR = (double)(rightInfl-SPeakIndex)*m_tempIPD;
-            yL = -(double)(*(SmoothProfile+leftInfl)-*(SmoothProfile+SPeakIndex));
-            yR = -(double)(*(SmoothProfile+rightInfl)-*(SmoothProfile+SPeakIndex));
-//        cout << "xL=" << xL << "  xR=" << xR << "  yL=" << yL << "  yR=" << yR << endl;
-            double h = (yL+yR)/2.0;
+            yL = *(SmoothProfile+leftInfl);
+            yR = *(SmoothProfile+rightInfl);
+            double xM = (xL+xR)/2.0;
+            double dY = *(SmoothProfile+SPeakIndex)-(yL+yR)/2.0;
+            double h = sqrt(xM*xM + dY*dY);
+            if (dY<0.0) h =-h;
             double c2 = (xL-xR)*(xL-xR) + (yL-yR)*(yL-yR);
-            if ((yR==0.0)&&(yL==0.0))
-                {radius=6370000.0*10;}
+            if (h==0.0) radius=6370000.0*10;
             else radius = h/2.0 + c2/(8.0*h);
-//        cout << "       radius m2: " << radius << endl;
-        }
-/*        tempL = xL*xL + yL*yL;
-        tempR = xR*xR + yR*yR;
-        if ((yR==0.0)&&(yL==0.0))
-                {radius=6370000.0*7;}
-        else if (xL==0.0)
-                {radius = tempR/(2.0*yR);}
-        else if (xR==0.0)
-                {radius = tempL/(2.0*yL);}
-        else if ((xR==xL)&&(yL==yR))
-                {radius = tempL/(2.0*yL);}
-        else	{x0 = (yR*tempL-yL*tempR);
-                 y0 = (xL*tempR-xR*tempL);
-                 radius=(sqrt(x0*x0+y0*y0)/(2.0*(xL*yR-xR*yL)));}
-        cout << "       radius m3: " << radius << endl;
-*/
+ //           cout << "       radius m3: " << radius << endl;
+         }
+
         delete [] SmoothProfile;
 	return radius;
 }/*end SetPeakRadii*/

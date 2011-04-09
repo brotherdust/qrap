@@ -27,7 +27,7 @@
 using namespace Qrap;
 
 double cPathLossPredictor::m_c = 2.997924562e8;  // Speed of Light in m/s
-double cPathLossPredictor::m_reR = 6370000.0;    // real earth Radius in m
+double cPathLossPredictor::m_reR = 6367444.0;    // real earth Radius in m
 
 // Class CPathLossPredictor
 //## Constructors (implementation)

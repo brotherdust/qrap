@@ -88,7 +88,7 @@ namespace Qrap
 			int 	GetSize() { return mLength; }
 			double 	GetInterDist() { return mPlotResolution; }
 		    	double 	GetMinClearance() { return mMinClearance; }
-			double 	GetPathLoss() { return mMinClearance; }
+			double 	GetPathLoss() { return mPathLossEnd; }
 			double 	GetTxElevation() { return mTxElevation; }
 			double 	GetRxElevation() { return mRxElevation; }
 			double 	GetTxTilt() { return mTxTilt; }

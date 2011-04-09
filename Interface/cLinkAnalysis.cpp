@@ -53,7 +53,7 @@ cLinkAnalysis::~cLinkAnalysis()
 //************************************************************************************
 void cLinkAnalysis::DoAndSetUpDisplay(eOutputUnits Units, bool Downlink, double Frequency, 
 					double kFactor, double PlotResolution, 
-					short int DEMsource, short int ClutterSource, bool UseClutter,
+                                        short int DEMsource, short int ClutterSource, bool UseClutter,
 					int TxID, int RxID, QString LinkName, 
 					QString TxName, QString RxName, int LinkID)
 {

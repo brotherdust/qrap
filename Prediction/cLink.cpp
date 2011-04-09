@@ -28,7 +28,7 @@
 using namespace Qrap;
 using namespace std;
 
-double cLink::reR = 6367444;    	///< real earth Radius in m
+double cLink::reR = 6367444.0;    	///< real earth Radius in m
 double cLink::c = 2.997924562e8;  	///< Speed of Light in m/s
 
 //************************************************************************
@@ -530,8 +530,8 @@ void cLink::SetFresnelClear()
 		else
 			mClearance[i] = 3.402823e+38;
 
-		if (mMinClearance > mClearance[i])
-			mMinClearance= mClearance[i];
+//		if (mMinClearance > mClearance[i])
+//			mMinClearance= mClearance[i];
 
 	}/* end for i*/
 }/* end CLink::SetFresnel */

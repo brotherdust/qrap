@@ -376,10 +376,13 @@ void cConfirmMultiLink::on_pushOk_clicked()
 	string LinkName="Link";
 	QString Linkname = "Link";
 	int LinkID=0;
-	Link.SetLink(Units, DownLink, mInst.sFrequency, mkFactor, PlotResolution,
-			DEMsource, ClutterSource, UseClutter, 0, 0, true);
+
         pushOk->setText("wait");
         pushCancel->setText("wait");
+
+	Link.SetLink(Units, DownLink, mInst.sFrequency, mkFactor, PlotResolution,
+			DEMsource, ClutterSource, UseClutter, 0, 0, true);
+
 	for (i=0; i<size; i++)
 	{
 		if (Link.SetTxSite(mSiteList[i],mInst))

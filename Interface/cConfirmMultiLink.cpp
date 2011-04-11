@@ -243,8 +243,6 @@ void cConfirmMultiLink::on_pushOk_clicked()
 {
 	pushOk->setEnabled(false);
 	pushCancel->setEnabled(false);
-	pushOk->setText("wait");
-	pushCancel->setText("wait");
 	pqxx::result r;
 	QList<string> SiteNames;
 	bool SavePDF=false;
@@ -380,6 +378,8 @@ void cConfirmMultiLink::on_pushOk_clicked()
 	int LinkID=0;
 	Link.SetLink(Units, DownLink, mInst.sFrequency, mkFactor, PlotResolution,
 			DEMsource, ClutterSource, UseClutter, 0, 0, true);
+        pushOk->setText("wait");
+        pushCancel->setText("wait");
 	for (i=0; i<size; i++)
 	{
 		if (Link.SetTxSite(mSiteList[i],mInst))

@@ -1593,23 +1593,28 @@ www.QRap.org.za
 		</view>
 -->
 		<view name = "links_view" as = 'select links.id as id, linkname, 
-			site1.sitename||rad1.sector as txsite, txinst, rad1.txantennaheight as txheight,
-			site2.sitename||rad2.sector as rxsite, rxinst, rad2.rxantennaheight as rxheight,
+			site1.sitename||rad1.sector as txsite, txinst, rad1.txantennaheight as txheight, rad1.txbearing as txbearing,
+			site2.sitename||rad2.sector as rxsite, rxinst, rad2.rxantennaheight as rxheight, rad2.rxbearing as rxbearing,
 			minclearance as clear,
-			frequency, pathloss, kfactor, line
+			frequency, 
+			ST_Distance( site1.location::geography, site2.location::geography)/1000 as distance, 
+			pathloss, kfactor, line
 			from links cross join radioinstallation as rad1 cross join site_view_only as site1
 	 		cross join radioinstallation as rad2 cross join site_view_only as site2
 	 		where txinst=rad1.id
 			and rxinst=rad2.id
 			and rad1.siteid=site1.id
 			and rad2.siteid=site2.id;'>
-			<field name="txsite" label="Tx Site" />
-			<field name="rxsite" label="Rx Site" />	
-			<field name="txinst" label="Tx Radio" />
-			<field name="rxsite" label="Rx Radio" />
-			<field name="txheight" label="Tx Height" />
-			<field name="rxheight" label="Rx Height" />
+			<field name="txsite" label="TxSite" />
+			<field name="rxsite" label="RxSite" />	
+			<field name="txinst" label="TxRadio" />
+			<field name="rxsite" label="RxRadio" />
+			<field name="txheight" label="TxHeight" />
+			<field name="rxheight" label="RxHeight" />
+			<field name="txbearing" label="TxBearing" />
+			<field name="rxbearing" label="RxBearing" />
 			<field name="clear" label="Clearance" />
+			<field name="distance" label="Distance(km)" />
 		</view>
 
 	</table> <!-- links -->

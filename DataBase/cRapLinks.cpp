@@ -66,7 +66,7 @@ cRapLinks::cRapLinks (QWidget* parent) : QWidget(parent)
 	// Populate the table list
 	PopulateTableList();
 	
-	tableViewSelected = true;
+        mTableViewSelected = true;
 	mInsertingRow = false;
 	
 	// Setup all the signals and slots
@@ -125,7 +125,7 @@ void cRapLinks::ReloadTable ()
 	
 	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"",-1,false);
 	
-	if (!tableViewSelected)
+        if (!mTableViewSelected)
 		mCurrentTable->CreateUpdateForm();
 	// Reconnect the update signals
 	connect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),this,SLOT(UpdateDatabase(int,int)));
@@ -230,7 +230,7 @@ void cRapLinks::TableSelectionChanged ()
 	connect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),this,SLOT(UpdateDatabase(int,int)));
 	
 	// Check whether the form view is selected or the table view
-	if(tableViewSelected)
+        if(mTableViewSelected)
 		mCurrentTable->setCurrentIndex(0);
 	else
 		mCurrentTable->setCurrentIndex(1);
@@ -287,7 +287,7 @@ void cRapLinks::PopulateTableList ()
 		it.value()->GetTable()->verticalHeader()->setVisible(false);
 		it.value()->GetTable()->setMinimumSize(600,400);
 		it.value()->setVisible(false);
-		it.value()->mTableViewSelected = &tableViewSelected;
+                it.value()->mTableViewSelected = &mTableViewSelected;
 		
 		// Load the headers for each table
 		mDbCommunicator->LoadTableHeaders(it.value()->GetTable(),it.key(),"");

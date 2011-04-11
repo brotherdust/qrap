@@ -156,7 +156,7 @@ namespace Qrap
 			bool				mInsertingRow;		///< Keeps track whether a row is being inserted or not.
 			QProgressBar*			mProgress;		///< A pointer to a Qt4 progress bar widget that indicates the progress of loading data.
 			RapDbCommunicator*		mDbCommunicator;	///< A pointer to a RapDbCommunicator class that handles interaction with the database engine.
-			bool				tableViewSelected;	///< A boolean that checks if the table view of any form is selected.
+			bool				mTableViewSelected;	///< A boolean that checks if the table view of any form is selected.
 	};
 }
 

@@ -307,11 +307,13 @@ bool cSpectralLink::GetDBinfo(tFixed &Inst)
 			Inst.sRxMechTilt = atof(r[0]["rxmechtilt"].c_str());
 			Inst.sTxHeight = atof(r[0]["txantennaheight"].c_str());
 			Inst.sRxHeight = atof(r[0]["rxantennaheight"].c_str());
-			//if (mFrequency>59999)
-			Inst.sFrequency = atof(r[0]["startfreq"].c_str())+1000.0*atof(r[0]["channel"].c_str())*atof(r[0]["spacing"].c_str());
-			//else Inst.sFrequency = mFrequency;
-			cout<<"Startfreq : "<<atof(r[0]["startfreq"].c_str())<<endl;
-			cout<<"Channel no : "<<atof(r[0]["channel"].c_str())<<endl;
+
+                        Inst.sFrequency = atof(r[0]["startfreq"].c_str()) +
+                                          atof(r[0]["channel"].c_str())*atof(r[0]["spacing"].c_str())/1000.0;
+
+                        cout<<"Inst.sFrequency : "<< Inst.sFrequency;
+                        cout<<"     Startfreq : "<<atof(r[0]["startfreq"].c_str());
+                        cout<<"     Channel no : "<<atof(r[0]["channel"].c_str())<<endl;
 		}
 		else
 		{
@@ -340,11 +342,7 @@ bool cSpectralLink::CalcDistribution()
         query += " ON envelopes.techkey = technology.id ";
         query += " WHERE radioinstallation.techkey = technology.id ";
         query += " AND radioinstallation.id =";
- /*       SELECT offsets,values,numpoints FROM radioinstallation
-        CROSS JOIN technology
-        LEFT OUTER JOIN envelopes ON envelopes.techkey = technology.id
-        WHERE radioinstallation.techkey = technology.id AND radioinstallation.id =29168;
-*/	gcvt(mTxInst.sInstKey,8,text);
+        gcvt(mTxInst.sInstKey,8,text);
 	query+=text;
 	query+=";";
 	//query += "FROM envelopes WHERE envelopes.id = '1';";
@@ -366,7 +364,7 @@ bool cSpectralLink::CalcDistribution()
 			mDescSize = atoi(r[0]["numpoints"].c_str());
 			if (mDescSize<=0)
 			{
-				string err = " Relavant frequency allocation or spectral envelop does not exist in the database."; 
+                                string err = " Relevant frequency allocation or spectral envelop does not exist in the database.";
                                 cout << query << endl;
                                 cout << err.c_str()  << endl;
 				QRAP_WARN(err.c_str());
@@ -374,6 +372,7 @@ bool cSpectralLink::CalcDistribution()
 			}
 				
 			cout<<"Description size : "<<mDescSize<<endl;
+                        cout << mTxInst.sInstKey << endl;
 			MakeArrayFromDB(mDescOffset, r[0]["offsets"].c_str());
 			for (int i=0; i<mDescSize; ++i)
 				cout<<mDescOffset[i]<<",";

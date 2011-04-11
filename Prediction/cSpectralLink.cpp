@@ -335,12 +335,16 @@ bool cSpectralLink::CalcDistribution()
 	pqxx::result r;
 	char *text =new char[33];
 	string query = "SELECT offsets,values,numpoints ";
-	query += "FROM radioinstallation CROSS JOIN ";
-	query += "(technology CROSS JOIN envelopes ";
-	query += "ON envelopes.techkey = technology.id) ";
-	query += " ON radioinstallation.techkey = technology.id ";
-	query += "WHERE radioinstallation.id ="; 
-	gcvt(mTxInst.sInstKey,8,text);
+        query += "FROM radioinstallation CROSS JOIN technology";
+        query += " LEFT OUTER JOIN envelopes ";
+        query += " ON envelopes.techkey = technology.id ";
+        query += " WHERE radioinstallation.techkey = technology.id ";
+        query += " AND radioinstallation.id =";
+ /*       SELECT offsets,values,numpoints FROM radioinstallation
+        CROSS JOIN technology
+        LEFT OUTER JOIN envelopes ON envelopes.techkey = technology.id
+        WHERE radioinstallation.techkey = technology.id AND radioinstallation.id =29168;
+*/	gcvt(mTxInst.sInstKey,8,text);
 	query+=text;
 	query+=";";
 	//query += "FROM envelopes WHERE envelopes.id = '1';";
@@ -363,7 +367,8 @@ bool cSpectralLink::CalcDistribution()
 			if (mDescSize<=0)
 			{
 				string err = " Relavant frequency allocation or spectral envelop does not exist in the database."; 
-				cout << err.c_str()  << endl;
+                                cout << query << endl;
+                                cout << err.c_str()  << endl;
 				QRAP_WARN(err.c_str());
 				return false;
 			}
@@ -397,9 +402,9 @@ bool cSpectralLink::CalcDistribution()
 			/mFrequencySpacing)*mFrequencySpacing;
 	double maxFreq = ceil((mTxInst.sFrequency + mDescOffset[mDescSize-1]/1000.0)
 			/mFrequencySpacing)*mFrequencySpacing;
-	//cout<<"Center Freq : "<<mTxInst.sFrequency<<endl;
-	//cout<<"Spacing : "<<mFrequencySpacing<<endl;
-	//cout<<"Min : "<<minFreq<<" and Max : "<<maxFreq<<endl;
+        cout<<"Center Freq : "<<mTxInst.sFrequency<<endl;
+        cout<<"Spacing : "<<mFrequencySpacing<<endl;
+        cout<<"Min : "<<minFreq<<" and Max : "<<maxFreq<<endl;
 	double tempEnvelopeSize=(maxFreq-minFreq)/mFrequencySpacing;
 	if ((tempEnvelopeSize-floor(tempEnvelopeSize))>0.5)
 		mEnvelopeSize= (int)(ceil(tempEnvelopeSize)+1);

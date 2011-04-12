@@ -780,16 +780,19 @@ void cFilter::CreateViews()
 
 		//change links view
 		query = "create view links_view as select links.id as id, linkname, "; 
-		query += "site1.sitename||rad1.sector as txsite, txinst, rad1.txantennaheight as txheight, ";
-		query += "site2.sitename||rad2.sector as rxsite, rxinst, rad2.rxantennaheight as rxheight, ";
+		query += "site1.sitename||rad1.sector as txsite, txinst, rad1.txantennaheight as txheight, rad1.txbearing as txbearing, ";
+		query += "site2.sitename||rad2.sector as rxsite, rxinst, rad2.rxantennaheight as rxheight, rad2.rxbearing as rxbearing, ";
 		query += "minclearance as clear, ";
-		query += "frequency, pathloss, kfactor, line ";
+		query += "frequency, ";
+		query += "ST_Distance( site1.location::geography, site2.location::geography)/1000 as distance, ";
+		query += "pathloss, kfactor, line ";
 		query += "from links cross join radioinstallation as rad1 cross join site_view_only as site1 ";
 	 	query += "cross join radioinstallation as rad2 cross join site_view_only as site2 ";
 	 	query += "where txinst=rad1.id ";
 		query += "and rxinst=rad2.id ";
 		query += "and rad1.siteid=site1.id ";
 		query += "and rad2.siteid=site2.id;";
+
 		
 		if (gDb.ViewExists("links_view"))
 			gDb.RemoveView("links_view");

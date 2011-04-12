@@ -58,6 +58,7 @@ cLink::cLink()
 	mClutterSource = 1;
 	mUseClutter = false;
 	mPlotResolution = 90;
+	mRestorePlotRes = 90;
 	mTxInst.sInstKey=1;
 	mTxInst.sSiteID=1;
 	mTxInst.sSitePos.Set(-25,25);
@@ -145,7 +146,6 @@ const cLink & cLink::operator=(const cLink &right)
 
 	mLength			= right.mLength;
 	mSlope 			= right.mSlope;
-	mPlotResolution	= right.mPlotResolution;
 	mEffRadius 		= right.mEffRadius;
     	mMinClearance  	= right.mMinClearance;
 	mFrequency		= right.mFrequency;
@@ -159,6 +159,7 @@ const cLink & cLink::operator=(const cLink &right)
 	mDownlink		= right.mDownlink;			///< Description
 	mkFactor		= right.mkFactor;			///< Description
 	mPlotResolution	= right.mPlotResolution;	///< m
+	mRestorePlotRes	= right.mRestorePlotRes;
 	mDEMsource		= right.mDEMsource;			///< Description
 	mClutterSource	= right.mClutterSource;		///< Description
 	// \TODO: Does mRasterfileHandler have an assignment overload ... implement
@@ -219,6 +220,7 @@ void cLink::SetLink(eOutputUnits	Units,
 	mFrequency = Frequency;
 	mkFactor = kFactor;
 	mPlotResolution = PlotResolution;
+	mRestorePlotRes =PlotResolution;
 	mDEMsource = DEMsource;
 	mClutterSource = ClutterSource;
 	mDEM.SetRasterFileRules(mDEMsource);
@@ -292,8 +294,14 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 			return DBworked;
 		}
 	}
+	mPlotResolution = mRestorePlotRes;
 
 	double Dist = mTxInst.sSitePos.Distance(mRxInst.sSitePos);
+	cout << endl;
+	mTxInst.sSitePos.Display();
+	mRxInst.sSitePos.Display();
+	cout << "	Dist:" << Dist << "  MaxDist: " << MaxDist <<endl; 
+
 	if (Dist>MaxDist)
 		return false;
 	else if ((int)(Dist/mPlotResolution)<2)
@@ -304,7 +312,8 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	DEM = mDEM.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution);
 	Length = DEM.GetSize();
 	mLength = DEM.GetSize();
-	
+	cout << "mPlotResolution: "<< mPlotResolution << "	Length:" << Length << endl; 
+
 	if (Length < 2)
 		return false;
 
@@ -350,6 +359,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	mRxLev = new float[Length];
 	delete [] mPropLoss;
 	mPropLoss = new float[Length];
+	
 
 	if (mUseClutter)
 		Clutter=mClutter.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution);
@@ -382,6 +392,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 		if (mClearance[i]<mMinClearance)
 			mMinClearance = mClearance[i];
 
+	cout << "Clear: "<< mMinClearance << "	PathLoss: " << mPathLossEnd << endl;
 	delete [] Tilt;
 	return true;
 }
@@ -396,7 +407,7 @@ void cLink::Initialize(const cProfile &DEMProfile,const cProfile &ClutterProfile
 /*	for (int j=0;j<mLength;j++)
 		cout << mFlatProfile[j] << " ";
 	cout << endl;
-*/	
+*/
 	mPlotResolution = DEMProfile.GetInterPixelDist();
 	mTxElevation = mFlatProfile[0];
 	mRxElevation = mFlatProfile[mLength-1];

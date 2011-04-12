@@ -169,6 +169,7 @@ namespace Qrap
 			double			mFrequency;	///< Operating frequency of Link
 			double			mkFactor;	///< k Factor used to calculate Effective earth radio(vs. real earth)
 			double			mPlotResolution;///< Requested plot resolution in meter
+			double			mRestorePlotRes;///< Requested plot resolution in meter
 			short int		mDEMsource;	///< Key to file-set-order array for height data
 			short int		mClutterSource;	///< Key to file-set-order array for clutter
 			cRasterFileHandler 	mDEM;		///< Rasterfile handler to get height data

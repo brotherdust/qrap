@@ -297,10 +297,6 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	mPlotResolution = mRestorePlotRes;
 
 	double Dist = mTxInst.sSitePos.Distance(mRxInst.sSitePos);
-	cout << endl;
-	mTxInst.sSitePos.Display();
-	mRxInst.sSitePos.Display();
-	cout << "	Dist:" << Dist << "  MaxDist: " << MaxDist <<endl; 
 
 	if (Dist>MaxDist)
 		return false;
@@ -312,7 +308,6 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	DEM = mDEM.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution);
 	Length = DEM.GetSize();
 	mLength = DEM.GetSize();
-	cout << "mPlotResolution: "<< mPlotResolution << "	Length:" << Length << endl; 
 
 	if (Length < 2)
 		return false;
@@ -392,7 +387,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 		if (mClearance[i]<mMinClearance)
 			mMinClearance = mClearance[i];
 
-	cout << "Clear: "<< mMinClearance << "	PathLoss: " << mPathLossEnd << endl;
+//	cout << "Clear: "<< mMinClearance << "	PathLoss: " << mPathLossEnd << endl;
 	delete [] Tilt;
 	return true;
 }

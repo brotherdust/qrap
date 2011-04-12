@@ -50,7 +50,7 @@ bool cSpectralPlot::SetPlotTask(unsigned Rx, QList<unsigned> Tx, double Frequenc
 	{
 		if (Rx!=Tx[i])
 		{
-			mLinks.push_back(new cSpectralLink(&mDem, Rx,Tx[i],mFrequencySpacing,mkFactor));
+                        mLinks.push_back(new cSpectralLink(&mDem, Rx,Tx[i],mFrequencySpacing,mkFactor));
 			cout<<"Made a new link from "<<Rx<<" to "<<Tx[i]<<endl;
 		}
 	}
@@ -127,7 +127,7 @@ bool cSpectralPlot::ReadPlotRequest(const char *filename)
 		unsigned tempSiteID;
 		infile >> tempSiteID;
 		infile >> temp;
-		mLinks.push_back(new cSpectralLink(&mDem, RxInstKey,tempSiteID,mFrequencySpacing,mkFactor));
+                mLinks.push_back(new cSpectralLink(&mDem, RxInstKey,tempSiteID,mFrequencySpacing,mkFactor));
 		cout<<"Made a new link from "<<RxInstKey<<" to "<<tempSiteID<<endl;
 	}
 }
@@ -149,7 +149,7 @@ bool cSpectralPlot::CombinePlots()
 	}
 	cout<<"Max : "<<maxFreq<<" Min : "<<minFreq<<endl;
 	mNumFreqs = (int)((maxFreq - minFreq)/mFrequencySpacing + 1);
-	cout<<"NumFreqs : "<<mNumFreqs<<endl;
+        cout << "NumFreqs : " << mNumFreqs << endl;
 	
 	//Generate the memory for our plot
 	mPFDFreq = new double[mNumFreqs+1];
@@ -173,12 +173,15 @@ bool cSpectralPlot::CombinePlots()
 		cout<<"Startindex : "<<startIndex<<" and there are "<<linkFreqs<<" Freqs"<<endl;
 		for(int j=0;j<linkFreqs;++j)
 		{
+                        cout << (*i)->GetEnvelopeValue(j)<< endl;
 			mPFDValue[startIndex+j]+=pow(10,(*i)->GetEnvelopeValue(j)/10);
 		}
 	}
 	for(int i=0;i<mNumFreqs;i++)
 	{
+            if (mPFDValue[i]>0)
 		mPFDValue[i]=10*log10(mPFDValue[i]);
+            else mPFDValue[i]=0;
 	}
 }
 

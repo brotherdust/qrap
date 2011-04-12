@@ -385,6 +385,7 @@ void cConfirmMultiLink::on_pushOk_clicked()
 
 	for (i=0; i<size; i++)
 	{
+		
 		if (Link.SetTxSite(mSiteList[i],mInst))
 		{
 			for (j=i+1; j<size; j++)
@@ -396,8 +397,7 @@ void cConfirmMultiLink::on_pushOk_clicked()
 					{
 		    				MinClearance = Link.GetMinClearance();
 						PathLoss = Link.GetPathLoss();	
-						Work = (MinClearance>=mMinClear)
-							&&(PathLoss<=mMaxPath);
+						Work = (MinClearance>=mMinClear)&&(PathLoss<=mMaxPath);
 						if (Work)
 						{
 							TxRadID=InsertRadInst(mSiteList[i], j, Link.GetTxBearing(), Link.GetTxTilt());

@@ -800,21 +800,21 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
             RoundHill = 0.0;
             KnifeEdge = 0.0;
             temp = 60.0*60.0*lambda*lambda*Sigma*Sigma;
-            cout << "   temp; "<< temp;
+//            cout << "   temp; "<< temp;
             K = pow(2.0*M_PI*radius/lambda,-1.0/3.0)
                      * pow((Er-1.0)*(Er-1.0) + temp, -0.25);
-            cout << "   K; "<< K;
+//            cout << "   K; "<< K;
             if (Vertical) K *= sqrt(Er*Er +temp);
             temp = K*K*K*K;
             Betha = ( 1.0+1.6*K*K+0.67*temp)/(1.0+4.5*K*K+1.53*temp);
-            cout << "   Betha; "<< Betha;
+//            cout << "   Betha; "<< Betha;
 
 //          Betha=1.0;
             X = Betha*pow(M_PI/(lambda*radius*radius),1.0/3.0)*
                     (m_interPixelDist*(double)(EndIndex-BeginIndex));
-            cout << "   X; "<< X;
+//            cout << "   X; "<< X;
             temp = 2.0*Betha*pow(M_PI*M_PI/(lambda*lambda*radius),1.0/3.0);
-            cout << "   temp; "<< temp;
+//           cout << "   temp; "<< temp;
             Y1 = m_htx*temp;
             Y2 = m_hrx*temp;
 

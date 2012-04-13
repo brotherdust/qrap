@@ -36,7 +36,7 @@ cLoadFile::cLoadFile()
 }
 
 //********************************************************************************
-cLoadFile::cLoadFile(int SourceFileSet, int BinaryFileSet, string BinaryDirectory)
+cLoadFile::cLoadFile(unsigned SourceFileSet, unsigned BinaryFileSet, string BinaryDirectory)
 {
 	mSourceFileSet = SourceFileSet;
 	mBinaryFileSet = BinaryFileSet;
@@ -198,7 +198,8 @@ bool cLoadFile::LoadTextList(string Directory, string List, FileType filetype,
 
 //***************************************************************
 bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
-								unsigned ResultFileSet)
+                                unsigned ResultFileSet, bool Interpolate,
+                                short int inFileType)
 {
 	string Type, Oproj4, Rproj4, projection;
 	MetaData OldMetaData;
@@ -395,8 +396,9 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 
 	cRasterFileHandler RastersSet;
 	bool RValue;
-//	RastersSet.DirectChangeSetToUse(OriginalFileSet);
-	RastersSet.SetRasterFileRules(1);
+        RastersSet.DirectChangeSetToUse(OriginalFileSet);
+        RastersSet.SetRasterFileRules(inFileType);
+        if (!Interpolate) RastersSet.SetSampleMethod(1);
 	StructMetaData NewHeader;
 	cGeoP NW, SE, NE, SW, Mid, inNW, inSE, inSW, inNE;
 	Float2DArray NewRaster = new_Float2DArray(2,2);

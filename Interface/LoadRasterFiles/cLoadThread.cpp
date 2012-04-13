@@ -53,8 +53,8 @@ cLoadThread::~cLoadThread()
 
 
 //***************************************************************
-void cLoadThread::Set(short int Source,
-					short int Bin,
+void cLoadThread::Set(unsigned Source,
+					unsigned Bin,
 					GeoType Type,
 					int CentMer,
 					string Dir,
@@ -62,7 +62,9 @@ void cLoadThread::Set(short int Source,
 					QString SourceDir,
 					int FileCount,
 					QString FileType,
-					bool cut)
+					bool cut,
+					short int Rule,
+					bool interpolate)
 {
 	try {
 	mSource = Source;
@@ -75,6 +77,8 @@ void cLoadThread::Set(short int Source,
 	mFileCount = FileCount;
 	mFileType = FileType;
 	mCut = cut;
+	mInterpolate=interpolate;
+	mFileType=Rule;
 	}catch(const exception &e) {
 		cout << e.what() << endl;}
 }
@@ -139,7 +143,7 @@ void cLoadThread::run()
 			emit Set(0,"Cutting fileset");
 			try
 			{
-				Rasters.CutCurrentSet(mSource,mBin);
+				Rasters.CutCurrentSet(mSource,mBin,mFileRule,mInterpolate);
 			}
 			catch (const exception &e1)
 			{

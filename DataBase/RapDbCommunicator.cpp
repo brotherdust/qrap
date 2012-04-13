@@ -189,14 +189,14 @@ void RapDbCommunicator::UpdateDatabase(QTableWidget* table,
 			// A QRAP_ERROR,QRAP_INFO,QRAP_WARN or QRAP_FATAL is called by the cDatabase class and handled by Qrap::cMainWindow::Alert()
 			
 			// Clear the items data on error
-			updateItem->setData(Qt::DisplayRole,QVariant::QVariant(""));
+			updateItem->setData(Qt::DisplayRole,QVariant(""));
 		} // if
 	} // if mode
 	else
 	{
 		if(!gDb.SetDefaults(tableName.toStdString(),tableData))
 		{
-			updateItem->setData(Qt::DisplayRole,QVariant::QVariant(""));
+			updateItem->setData(Qt::DisplayRole,QVariant(""));
 		} // if
 	} // if mode
 }
@@ -223,7 +223,7 @@ void RapDbCommunicator::LoadTableHeaders(QTableWidget* table,
 			
 			// Store the descriptive name and the database table name in the table header
 			QTableWidgetItem* headerItem = new QTableWidgetItem(QString::fromStdString(it->second.mLabel));
-			headerItem->setData(Qt::UserRole,QVariant::QVariant(QString::fromStdString(it->first)));
+			headerItem->setData(Qt::UserRole,QVariant(QString::fromStdString(it->first)));
 			
 			table->setColumnCount(j+1);
 			
@@ -264,7 +264,7 @@ void RapDbCommunicator::LoadTableHeaders(QTableWidget* table,
 				for(viewFieldIt=viewStruct.mFieldLabels.begin() ; viewFieldIt!=viewStruct.mFieldLabels.end() ; viewFieldIt++)
 				{
 					QTableWidgetItem* header = new QTableWidgetItem(QString::fromStdString(viewFieldIt->second));
-					header->setData(Qt::UserRole,QVariant::QVariant(QString::fromStdString(viewFieldIt->first)));
+					header->setData(Qt::UserRole,QVariant(QString::fromStdString(viewFieldIt->first)));
 					table->setColumnCount(j+1);
 					table->setHorizontalHeaderItem(j,header);
 					

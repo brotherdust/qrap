@@ -189,7 +189,7 @@ void cRapSites::Paste ()
 	if(mCurrentTable->GetTable()->currentItem()!=NULL)
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(clipboard->text()));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(clipboard->text()));
 	}
 }
 
@@ -202,7 +202,7 @@ void cRapSites::Cut ()
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
 		clipboard->setText(mCurrentTable->GetTable()->currentItem()->data(Qt::DisplayRole).toString());
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(""));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(""));
 	}
 }
 
@@ -370,13 +370,13 @@ void cRapSites::PopulateTableList ()
 	QListWidgetItem* radioInstallationItem = new QListWidgetItem("Radio Installation");
 	
 	// Setup the items
-	siteItem->setData(Qt::UserRole,QVariant::QVariant("site"));
+	siteItem->setData(Qt::UserRole,QVariant("site"));
 	siteItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	siteDescriptionItem->setData(Qt::UserRole,QVariant::QVariant("sitedescription"));
+	siteDescriptionItem->setData(Qt::UserRole,QVariant("sitedescription"));
 	siteDescriptionItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	siteContactsItem->setData(Qt::UserRole,QVariant::QVariant("sitecontacts"));
+	siteContactsItem->setData(Qt::UserRole,QVariant("sitecontacts"));
 	siteContactsItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	radioInstallationItem->setData(Qt::UserRole,QVariant::QVariant("radioinstallation"));
+	radioInstallationItem->setData(Qt::UserRole,QVariant("radioinstallation"));
 	radioInstallationItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 	
 	// Add the items to the mTableList

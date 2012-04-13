@@ -164,7 +164,7 @@ void cRapSupportingTables::Paste ()
 	if(mCurrentTable->GetTable()->currentItem()!=NULL)
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(clipboard->text()));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(clipboard->text()));
 	}
 }
 
@@ -177,7 +177,7 @@ void cRapSupportingTables::Cut ()
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
 		clipboard->setText(mCurrentTable->GetTable()->currentItem()->data(Qt::DisplayRole).toString());
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(""));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(""));
 	}
 }
 
@@ -269,23 +269,23 @@ void cRapSupportingTables::PopulateTableList ()
 	QListWidgetItem* signalenvelopeItem = new QListWidgetItem("Signal Envelope");
 	
 	// Setup the items
-	projectItem->setData(Qt::UserRole,QVariant::QVariant("projects"));
+	projectItem->setData(Qt::UserRole,QVariant("projects"));
 	projectItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	flagxItem->setData(Qt::UserRole,QVariant::QVariant("flagx"));
+	flagxItem->setData(Qt::UserRole,QVariant("flagx"));
 	flagxItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	flagzItem->setData(Qt::UserRole,QVariant::QVariant("flagz"));
+	flagzItem->setData(Qt::UserRole,QVariant("flagz"));
 	flagzItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	technologyItem->setData(Qt::UserRole,QVariant::QVariant("technology"));
+	technologyItem->setData(Qt::UserRole,QVariant("technology"));
 	technologyItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	mobileInstallationItem->setData(Qt::UserRole,QVariant::QVariant("mobile"));
+	mobileInstallationItem->setData(Qt::UserRole,QVariant("mobile"));
 	mobileInstallationItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	antennaDeviceItem->setData(Qt::UserRole,QVariant::QVariant("antennadevice"));
+	antennaDeviceItem->setData(Qt::UserRole,QVariant("antennadevice"));
 	antennaDeviceItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	antennaPatternItem->setData(Qt::UserRole,QVariant::QVariant("antennapattern"));
+	antennaPatternItem->setData(Qt::UserRole,QVariant("antennapattern"));
 	antennaPatternItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	equipmentTypeItem->setData(Qt::UserRole,QVariant::QVariant("equipmenttype"));
+	equipmentTypeItem->setData(Qt::UserRole,QVariant("equipmenttype"));
 	equipmentTypeItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	signalenvelopeItem->setData(Qt::UserRole,QVariant::QVariant("envelopes"));
+	signalenvelopeItem->setData(Qt::UserRole,QVariant("envelopes"));
 	signalenvelopeItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 
 	// Add the items to the mTableList

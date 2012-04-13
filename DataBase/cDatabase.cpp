@@ -1756,6 +1756,7 @@ short int cDatabase::getsetMachineID()
 {
 	cout << "In cDataBase::getsetMachineID()" << endl;
 	char* HostID;
+	 
 	bool found = false;
 	HostID = getenv("QRAPINST");
 	if (HostID==NULL)
@@ -1767,7 +1768,10 @@ short int cDatabase::getsetMachineID()
 	if (HostID==NULL)
 		HostID = getenv("UID");
 	if (HostID==NULL)
+	{
+		HostID = new char[10];
 		strcpy(HostID,"LOCAL");
+	}
 	string query = "select id from machine where qrapinst='";
 	query += HostID;
 	query += "';"; 

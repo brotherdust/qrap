@@ -66,7 +66,7 @@ cRapLinks::cRapLinks (QWidget* parent) : QWidget(parent)
 	// Populate the table list
 	PopulateTableList();
 	
-        mTableViewSelected = true;
+	tableViewSelected = true;
 	mInsertingRow = false;
 	
 	// Setup all the signals and slots
@@ -125,7 +125,7 @@ void cRapLinks::ReloadTable ()
 	
 	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"",-1,false);
 	
-        if (!mTableViewSelected)
+	if (!tableViewSelected)
 		mCurrentTable->CreateUpdateForm();
 	// Reconnect the update signals
 	connect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),this,SLOT(UpdateDatabase(int,int)));
@@ -165,7 +165,7 @@ void cRapLinks::Paste ()
 	if(mCurrentTable->GetTable()->currentItem()!=NULL)
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(clipboard->text()));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(clipboard->text()));
 	}
 }
 
@@ -178,7 +178,7 @@ void cRapLinks::Cut ()
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
 		clipboard->setText(mCurrentTable->GetTable()->currentItem()->data(Qt::DisplayRole).toString());
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(""));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(""));
 	}
 }
 
@@ -230,7 +230,7 @@ void cRapLinks::TableSelectionChanged ()
 	connect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),this,SLOT(UpdateDatabase(int,int)));
 	
 	// Check whether the form view is selected or the table view
-        if(mTableViewSelected)
+	if(tableViewSelected)
 		mCurrentTable->setCurrentIndex(0);
 	else
 		mCurrentTable->setCurrentIndex(1);
@@ -264,7 +264,7 @@ void cRapLinks::PopulateTableList ()
 	QListWidgetItem* linksItem = new QListWidgetItem("Links");
 	
 	// Setup the items
-	linksItem->setData(Qt::UserRole,QVariant::QVariant("links"));
+	linksItem->setData(Qt::UserRole,QVariant("links"));
 	linksItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 	
 	// Add the items to the mTableList
@@ -287,7 +287,7 @@ void cRapLinks::PopulateTableList ()
 		it.value()->GetTable()->verticalHeader()->setVisible(false);
 		it.value()->GetTable()->setMinimumSize(600,400);
 		it.value()->setVisible(false);
-                it.value()->mTableViewSelected = &mTableViewSelected;
+		it.value()->mTableViewSelected = &tableViewSelected;
 		
 		// Load the headers for each table
 		mDbCommunicator->LoadTableHeaders(it.value()->GetTable(),it.key(),"");

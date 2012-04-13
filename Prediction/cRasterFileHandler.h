@@ -72,7 +72,11 @@ namespace Qrap
 			 * @return A boolean
 			 */
 			bool SetRasterFileRules(short int Source);
-			
+	
+			bool SetSampleMethod(int SampleMethod)
+			{
+				mSampleMethod=SampleMethod;
+			}
 			
 			bool DirectChangeSetToUse(int OriginalSet);
 			

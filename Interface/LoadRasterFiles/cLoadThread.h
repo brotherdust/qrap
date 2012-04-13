@@ -45,8 +45,8 @@ public:
 	cLoadThread(QObject *parent = 0);
 	virtual ~cLoadThread();
 	
-	void Set(short int Source,
-					short int Bin,
+	void Set(unsigned Source,
+					unsigned Bin,
 					GeoType Type,
 					int CentMer,
 					string Dir,
@@ -54,7 +54,9 @@ public:
 					QString SourceDir,
 					int FileCount,
 					QString FileType,
-					bool cut = false);
+					bool cut = false,
+					short int Rule=0,
+					bool interpolate=true);
 					
 	
 					
@@ -66,8 +68,8 @@ protected:
      void run();
      
 private:
-    short int mSource;
-	short int mBin;
+    	unsigned mSource;
+	unsigned mBin;
 	GeoType mType;
 	int mCentMer;
 	string mDir;
@@ -76,6 +78,8 @@ private:
 	int mFileCount;
 	QString mFileType;
 	bool mCut;
+	bool mInterpolate;
+	short int mFileRule;
 	
 	QMutex mutex;
      QWaitCondition condition;

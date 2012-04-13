@@ -551,7 +551,7 @@ void cFilter::CreateViews()
 		queryB = "create view site_view_only as select distinct site.* from site "+query; 
 		if (gDb.ViewExists("site_view_only"))
 		{
-			string drop = "drop view site_view_only cascade";
+			string drop = "drop view site_view_only";
 			if (!gDb.PerformRawSql(drop))
 			{
 				cout << "Error dropping site_view_only in cFilter::CreateViews" << endl;
@@ -618,14 +618,7 @@ void cFilter::CreateViews()
 			queryIN += ";";
 	
 			if (gDb.ViewExists("site_view_only"))
-			{
-				string drop = "drop view site_view_only cascade";
-				if (!gDb.PerformRawSql(drop))
-				{
-					cout << "Error dropping site_view_only in cFilter::CreateViews" << endl;
-					QRAP_ERROR("Error dropping site_view_only in cFilter::CreateViews");
-				}
-			}
+				gDb.RemoveView("site_view_only");
 		
 			if (!gDb.PerformRawSql(queryIN))
 			{
@@ -694,14 +687,7 @@ void cFilter::CreateViews()
 		query += " where cell.risector = radioinstallation_view.id; ";
 		
 		if (gDb.ViewExists("cell_view"))
-		{
-			string drop = "drop view cell_view cascade";
-			if (!gDb.PerformRawSql(drop))
-			{
-				cout << "Error dropping cell_view in cFilter::CreateViews" << endl;
-				QRAP_ERROR("Error dropping cell_view in cFilter::CreateViews");
-			}
-		}
+			gDb.RemoveView("cell_view");
 		
 		if (!gDb.PerformRawSql(query))
 		{
@@ -775,32 +761,6 @@ void cFilter::CreateViews()
 		{
 			cout << "Error creating equipment_view in cFilter::CreateViews" << endl;
 			QRAP_ERROR("Error creating equipment_view in cFilter::CreateViews");
-		}
-		radinvolved=false;
-
-		//change links view
-		query = "create view links_view as select links.id as id, linkname, "; 
-		query += "site1.sitename||rad1.sector as txsite, txinst, rad1.txantennaheight as txheight, rad1.txbearing as txbearing, ";
-		query += "site2.sitename||rad2.sector as rxsite, rxinst, rad2.rxantennaheight as rxheight, rad2.rxbearing as rxbearing, ";
-		query += "minclearance as clear, ";
-		query += "frequency, ";
-		query += "ST_Distance( site1.location::geography, site2.location::geography)/1000 as distance, ";
-		query += "pathloss, kfactor, line ";
-		query += "from links cross join radioinstallation as rad1 cross join site_view_only as site1 ";
-	 	query += "cross join radioinstallation as rad2 cross join site_view_only as site2 ";
-	 	query += "where txinst=rad1.id ";
-		query += "and rxinst=rad2.id ";
-		query += "and rad1.siteid=site1.id ";
-		query += "and rad2.siteid=site2.id;";
-
-		
-		if (gDb.ViewExists("links_view"))
-			gDb.RemoveView("links_view");
-		
-		if (!gDb.PerformRawSql(query))
-		{
-			cout << "Error creating links_view in cFilter::CreateViews" << endl;
-			QRAP_ERROR("Error creating links_view in cFilter::CreateViews");
 		}
 		radinvolved=false;
 												

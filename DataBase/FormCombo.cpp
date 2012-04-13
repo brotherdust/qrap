@@ -58,6 +58,6 @@ void FormCombo::setCaption (QString val)
 		QStringList parts = val.split(":");
 		int id = parts[0].toInt();
 		
-		setCurrentIndex(findData(QVariant::QVariant(id),Qt::UserRole));
+		setCurrentIndex(findData(QVariant(id),Qt::UserRole));
 	}
 }

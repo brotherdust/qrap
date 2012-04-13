@@ -133,8 +133,8 @@ cProfile cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes
 	RxLoc.SetGeoType(WGS84GC);
 	Distance = TxLoc.Distance(RxLoc);
 	Bearing = TxLoc.Bearing(RxLoc);
-        NumPoints = (int)ceil(Distance/DistRes)+1;
-        DistRes = Distance/(double)(NumPoints-1);
+	NumPoints = (int)ceil(Distance/DistRes);
+	DistRes = Distance/(double)NumPoints;
 	profile = new float[NumPoints];
 	cGeoP point;
 	point.SetGeoType(WGS84GC);
@@ -281,8 +281,8 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 		}
 //		for (i=0; i<mCurrentRasters.size(); i++)
 //			DistRes = min(DistRes,mCurrentRasters[i]->GetRes());
-                NumDistance = (int)ceil(Range/DistRes)+1;
-                Range = (NumDistance-1)*DistRes;
+		NumDistance = (int)ceil(Range/DistRes);
+		Range = NumDistance*DistRes;
 	}
 
 	if (mCurrentRasters.size()==0)

@@ -43,8 +43,8 @@ string MakeDBFromArray(vector<float> &input);
 class cSpectralLink
 {
 public:
-	cSpectralLink(cRasterFileHandler *RasterHandel);
-	cSpectralLink(cRasterFileHandler *RasterHandel, unsigned int &, unsigned int &, double &, double &);
+	cSpectralLink(cRasterFileHandler *);
+	cSpectralLink(cRasterFileHandler *, unsigned int &, unsigned int &, double &, double &);
 	virtual ~cSpectralLink();
 	
 	//const cSpectralLink & operator=(const cSpectralLink &right);
@@ -77,7 +77,7 @@ private:
 	double			mPlotResolution;///< Hz
 	short int		mDEMsource;		///< Description
 	short int		mClutterSource;	///< Description
-	cRasterFileHandler 	mDEM;		///< Description
+	cRasterFileHandler 	*mDEM;		///< Description
 	bool			mUseClutter;	///< Description
 	cRasterFileHandler 	mClutter;	///< Description
 	tFixed			mTxInst;		///< Description

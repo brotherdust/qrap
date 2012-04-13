@@ -47,6 +47,9 @@ namespace Qrap
 		cGeoP	sSitePos;	///< Position of installation
 		double	sFrequency;	///< Frequency at which prediction will be done
 		double 	sEIRP;		///< Effective Isotropic power in dBm
+		double 	sLayerThres;	///< Layer Threshold in dBm
+		double 	sCStraffic;	///< Circuit switched traffic in Erlang
+		double 	sPStraffic;	///< Packet switched traffic in Megabytes/s
 		double	sTxPower;	///< Transmitter power in ???
 		double	sTxSysLoss;	///< Transmitter system losses in dB
 		double	sRxSysLoss;	///< Receiver system losses in dB
@@ -79,7 +82,8 @@ namespace Qrap
 		Left.sSitePos		= Right.sSitePos;
 		Left.sSiteName		= Right.sSiteName;
 		Left.sFrequency		= Right.sFrequency;
-		Left.sEIRP			= Right.sEIRP;
+		Left.sEIRP		= Right.sEIRP;
+		Left.sLayerThres	= Right.sLayerThres;
 		Left.sTxPower		= Right.sTxPower;
 		Left.sTxSysLoss		= Right.sTxSysLoss;
 		Left.sRxSysLoss		= Right.sRxSysLoss;
@@ -93,9 +97,9 @@ namespace Qrap
 		Left.sDiversityGain	= Right.sDiversityGain;
 		Left.sTxHeight		= Right.sTxHeight;
 		Left.sRxHeight		= Right.sRxHeight;
-		Left.sRange			= Right.sRange;
-		Left.sFEdge			= Right.sFEdge;
-		Left.sBEdge			= Right.sBEdge;
+		Left.sRange		= Right.sRange;
+		Left.sFEdge		= Right.sFEdge;
+		Left.sBEdge		= Right.sBEdge;
 		Left.sBandWidth 	= Right.sBandWidth;
 		Left.sFreqList.clear();
 		for (unsigned i=0; i<Right.sFreqList.size(); i++)
@@ -110,14 +114,14 @@ namespace Qrap
 	 */
 	struct tMobile	
 	{
-		int		sInstKey;		///< Primary k=Key of Mobile unit
+		int	sInstKey;		///< Primary k=Key of Mobile unit
 		double	sEIRP;			///< Effective Isotropic Radiated Power in dBm
 		double	sTxPower;		///< Transmitted Power in ???
 		double	sTxSysLoss;		///< Transmitter system losses in dB
 		double	sRxSysLoss;		///< Reciever system losses in dB
 		double	sRxSens;		///< Receiver sensitivity in dBm
-		int		sPatternKey;	///< Primary key to Antenna Pattern on mobile
-		double	sMobileHeight;	///< Assumed height of mobile unit
+		int	sPatternKey;		///< Primary key to Antenna Pattern on mobile
+		double	sMobileHeight;		///< Assumed height of mobile unit
 		double  sFrequency;		///< Assumed transmitter frequency of mobile.
 	};	
 	
@@ -129,11 +133,12 @@ namespace Qrap
 	 */
 	struct tSignalRaster	
 	{
-		int		sInstKey;	///< Primary key of the radio installation
-		int		sTop;		///< northern most boundary of plot in decimal degrees
+		int	sInstKey;	///< Primary key of the radio installation
+		int	sLayerThres;	///< Threshold level of installation
+		int	sTop;		///< northern most boundary of plot in decimal degrees
 		int 	sLeft;		///< western most boundary of plot in decimal degrees
-		int		sNSsize;	///< Number of rows in the raster
-		int		sEWsize;	///< Number of columns in the raster
+		int	sNSsize;	///< Number of rows in the raster
+		int	sEWsize;	///< Number of columns in the raster
 		double  sBandWidth; ///< Bandwidth of channels in MHz
 		vector<double> sFreqList; /// < Frequencies allocated to radio installation
 		Float2DArray	sRaster;	///< stores Signal strength in rectagular coordinates 

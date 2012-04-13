@@ -164,7 +164,7 @@ void cRapRasterFiles::Paste ()
 	if(mCurrentTable->GetTable()->currentItem()!=NULL)
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(clipboard->text()));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(clipboard->text()));
 	}
 }
 
@@ -177,7 +177,7 @@ void cRapRasterFiles::Cut ()
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
 		clipboard->setText(mCurrentTable->GetTable()->currentItem()->data(Qt::DisplayRole).toString());
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(""));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(""));
 	}
 }
 
@@ -268,19 +268,19 @@ void cRapRasterFiles::PopulateTableList ()
 	QListWidgetItem* coefficientsItem = new QListWidgetItem("Tuning Coefficient");
 	
 	// Setup the items
-	sourceFilesItem->setData(Qt::UserRole,QVariant::QVariant("sourcefiles"));
+	sourceFilesItem->setData(Qt::UserRole,QVariant("sourcefiles"));
 	sourceFilesItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	fileSetsItem->setData(Qt::UserRole,QVariant::QVariant("filesets"));
+	fileSetsItem->setData(Qt::UserRole,QVariant("filesets"));
 	fileSetsItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	fileSetsUsedItem->setData(Qt::UserRole,QVariant::QVariant("filesetsused"));
+	fileSetsUsedItem->setData(Qt::UserRole,QVariant("filesetsused"));
 	fileSetsUsedItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	classificationsGroupItem->setData(Qt::UserRole,QVariant::QVariant("classificationgroup"));
+	classificationsGroupItem->setData(Qt::UserRole,QVariant("classificationgroup"));
 	classificationsGroupItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	clutterTypeItem->setData(Qt::UserRole,QVariant::QVariant("cluttertype"));
+	clutterTypeItem->setData(Qt::UserRole,QVariant("cluttertype"));
 	clutterTypeItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	clutterTermsItem->setData(Qt::UserRole,QVariant::QVariant("clutterterms"));
+	clutterTermsItem->setData(Qt::UserRole,QVariant("clutterterms"));
 	clutterTermsItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	coefficientsItem->setData(Qt::UserRole,QVariant::QVariant("coefficients"));
+	coefficientsItem->setData(Qt::UserRole,QVariant("coefficients"));
 	coefficientsItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 
 	// Add the items to the mTableList

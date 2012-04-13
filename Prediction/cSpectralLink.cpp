@@ -66,7 +66,7 @@ string MakeDBFromArray(vector<float> &input)
 }
 
 //**********************************************************************************************
-cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey,
+cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey, 
 				unsigned int &TxKey, double &Resol, double &kFactor)
 {
 	bool FoundRasterSet=FALSE;
@@ -76,10 +76,10 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey,
 	GetDBinfo(mRxInst);
 	GetDBinfo(mTxInst);
 	
-        mEnvelopeFreq=new float[2];
-        mEnvelopeValue=new float[2];
+	mEnvelopeFreq=NULL;
+	mEnvelopeValue=NULL;
 	
-        mDEM=*Dem;
+	mDEM=Dem;
 	
 	mMinClearance = 3.402823e+38;
 	mUnits = dBm;
@@ -90,7 +90,7 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey,
 	mUseClutter = false;
 	mPlotResolution = 90;
 	
-        FoundRasterSet = mDEM.SetRasterFileRules(mDEMsource);
+	FoundRasterSet = mDEM->SetRasterFileRules(mDEMsource);
 	if (!FoundRasterSet)
 	{
 		string err = "Error getting ";
@@ -113,7 +113,7 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey,
 //******************************************************************************************
 cSpectralLink::cSpectralLink(cRasterFileHandler *Dem)
 {
-        mDEM=*Dem;
+	mDEM=Dem;
 	
 	mLength = 2;
 	mSlope = 0.0;
@@ -169,8 +169,8 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem)
 	mRxInst.sFEdge=0;
 	mRxInst.sBEdge=0;
 
-        mEnvelopeFreq=new float[2];
-        mEnvelopeValue=new float[2];
+	mEnvelopeFreq=NULL;
+	mEnvelopeValue=NULL;
 
 	mFrequencySpacing=0.1;
 }
@@ -178,8 +178,7 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem)
 //****************************************************************************************
 cSpectralLink::~cSpectralLink()
 {
-        delete [] mEnvelopeFreq;
-        delete [] mEnvelopeValue;
+	//cout<< " DESTROY SPECTRAL LINK "<<endl;
 }
 
 //******************************************************************************************
@@ -222,22 +221,40 @@ bool cSpectralLink::DoLink()
 	}
 	//\\TODO Check and verify this
 	LinkOtherGain = EIRP+20.0*log10(mTxInst.sFrequency)+32.44;
-        DEM = mDEM.GetForLink(mTxInst.sSitePos, mRxInst.sSitePos, mPlotResolution);
+	//Loss_qrap -20log(f) - 32.44 + 10log(4*PI)
+	cout<<"PreDEM"<<endl;
+	DEM = mDEM->GetForLink(mTxInst.sSitePos, mRxInst.sSitePos, mPlotResolution);
+	cout<<"PostDEM"<<endl;
 	if (mUseClutter)
 		Clutter=mClutter.GetForLink(mTxInst.sSitePos, mRxInst.sSitePos,	mPlotResolution);
+	cout<<"PrePathloss"<<endl;
 	mPropLoss = PathLoss.TotPathLoss(DEM, Tilt, mUseClutter, Clutter);
-        cout<<"PostPathloss: "<< mPropLoss << endl;
+	cout<<"PostPathloss"<<endl;
 	AntValue = mTxAnt.GetPatternValue(mTxBearing, Tilt)
 			+mRxAnt.GetPatternValue(mRxBearing, -Tilt);
 	mRxLev = -mPropLoss + LinkOtherGain ;//- AntValue;
-        cout<<"PostRxLev: "<< mRxLev <<endl;
-
-        for (int i=0; i<mEnvelopeSize; ++i)
+	cout<<"PostRxLev"<<endl;
+/*	for (int i=0; i<mEnvelopeSize; ++i)
 	{
-            cout<< "Voor Log: " << mEnvelopeValue[i];
-                mEnvelopeValue[i]=10*log10(mEnvelopeValue[i])+mRxLev;
-            cout<<"     Fin Val "<<i<<" = "<<mEnvelopeValue[i]<<endl;
+		//mEnvelopeValue[i]/=surface;
+		//cout<<"Surf Val "<<i<<" = "<<mEnvelopeValue[i]<<endl;
 	}
+	//cout<<"PostSurface"<<endl;
+	// Convert power distribution to dB and apply total losses to reciever
+	//cout<<"PreDBise"<<endl;
+*/	for (int i=0; i<mEnvelopeSize; ++i)
+	{
+		mEnvelopeValue[i]=10*log10(mEnvelopeValue[i])-mRxLev;
+		//cout<<"Fin Val "<<i<<" = "<<mEnvelopeValue[i]<<endl;
+	}
+	//cout<<"PostDBise"<<endl;
+	/*
+	 Initialize(DEM,Clutter);	
+	 SetEffProfile();	//Calculates the effective profile
+	 SetLineOfSight();
+	 SetFresnelClear();*/
+	mTxTilt = Tilt;
+	mRxTilt = -mTxTilt;
 	return true;
 }
 
@@ -246,19 +263,19 @@ bool cSpectralLink::GetDBinfo(tFixed &Inst)
 {
 	pqxx::result r;
 	string query;
-        char *text;
-        text = new char[33];
+	char text[33];
 
 	gcvt(Inst.sInstKey,10,text);
-        query =  "SELECT siteid,eirp,radioinstallation.txpower,txlosses,rxlosses,";
-        query += "rxsensitivity,startfreq,spacing,channel,";
-        query += "txantpatternkey,txbearing,txmechtilt,rxantpatternkey,";
-        query += "rxbearing,rxmechtilt,txantennaheight,rxantennaheight ";
-        query += " FROM radioinstallation CROSS JOIN technology";
-        query += " LEFT OUTER JOIN cell ON cell.risector=radioinstallation.id ";
-        query += " LEFT OUTER JOIN frequencyallocationlist ON cell.id=ci  ";
-        query += " WHERE radioinstallation.techkey=technology.id ";
-        query += " AND radioinstallation.id =";
+	query = "SELECT siteid,eirp,radioinstallation.txpower,txlosses,rxlosses,";
+	query +="rxsensitivity,startfreq,spacing,channel,";
+	query+= "txantpatternkey,txbearing,txmechtilt,rxantpatternkey,";
+	query+="rxbearing,rxmechtilt,txantennaheight,rxantennaheight ";
+	query+= "FROM radioinstallation CROSS JOIN cell ";
+	query+= "ON cell.risector=radioinstallation.id ";
+	query+= "CROSS JOIN frequencyallocationlist ";
+	query += "ON cell.id=ci CROSS JOIN technology ";
+	query +="ON radioinstallation.techkey=technology.id ";
+	query += "WHERE radioinstallation.id =";
 	query += text;
 	query +=";";
 
@@ -291,9 +308,11 @@ bool cSpectralLink::GetDBinfo(tFixed &Inst)
 			Inst.sRxMechTilt = atof(r[0]["rxmechtilt"].c_str());
 			Inst.sTxHeight = atof(r[0]["txantennaheight"].c_str());
 			Inst.sRxHeight = atof(r[0]["rxantennaheight"].c_str());
-
-                        Inst.sFrequency = atof(r[0]["startfreq"].c_str()) +
-                                          atof(r[0]["channel"].c_str())*atof(r[0]["spacing"].c_str())/1000.0;
+			//if (mFrequency>59999)
+			Inst.sFrequency = atof(r[0]["startfreq"].c_str())+1000.0*atof(r[0]["channel"].c_str())*atof(r[0]["spacing"].c_str());
+			//else Inst.sFrequency = mFrequency;
+			cout<<"Startfreq : "<<atof(r[0]["startfreq"].c_str())<<endl;
+			cout<<"Channel no : "<<atof(r[0]["channel"].c_str())<<endl;
 		}
 		else
 		{
@@ -304,26 +323,25 @@ bool cSpectralLink::GetDBinfo(tFixed &Inst)
 			// \TODO: exceptions and messages
 			gcvt(Inst.sInstKey,8,text);
 			cout << "Warning, radio installation " << Inst.sInstKey << " does not exist in the database." << endl;
-                        delete [] text;
 			return false;
 		} // else
 	} // else
-        delete [] text;
 	return true;
 }
 
 //*******************************************************************************************************************
 bool cSpectralLink::CalcDistribution()
 {
+	// \TODO: Fix once we have a radio installation to work with
 	pqxx::result r;
 	char *text =new char[33];
 	string query = "SELECT offsets,values,numpoints ";
-        query += " FROM radioinstallation CROSS JOIN technology";
-        query += " LEFT OUTER JOIN envelopes ";
-        query += " ON envelopes.techkey = technology.id ";
-        query += " WHERE radioinstallation.techkey = technology.id ";
-        query += " AND radioinstallation.id =";
-        gcvt(mTxInst.sInstKey,8,text);
+	query += "FROM radioinstallation CROSS JOIN ";
+	query += "(technology CROSS JOIN envelopes ";
+	query += "ON envelopes.techkey = technology.id) ";
+	query += " ON radioinstallation.techkey = technology.id ";
+	query += "WHERE radioinstallation.id ="; 
+	gcvt(mTxInst.sInstKey,8,text);
 	query+=text;
 	query+=";";
 	//query += "FROM envelopes WHERE envelopes.id = '1';";
@@ -345,15 +363,13 @@ bool cSpectralLink::CalcDistribution()
 			mDescSize = atoi(r[0]["numpoints"].c_str());
 			if (mDescSize<=0)
 			{
-                                string err = " Relevant frequency allocation or spectral envelop does not exist in the database.";
-                                cout << query << endl;
-                                cout << err.c_str()  << endl;
+				string err = " Relavant frequency allocation or spectral envelop does not exist in the database."; 
+				cout << err.c_str()  << endl;
 				QRAP_WARN(err.c_str());
 				return false;
 			}
 				
 			cout<<"Description size : "<<mDescSize<<endl;
-                        cout << mTxInst.sInstKey << endl;
 			MakeArrayFromDB(mDescOffset, r[0]["offsets"].c_str());
 			for (int i=0; i<mDescSize; ++i)
 				cout<<mDescOffset[i]<<",";
@@ -382,6 +398,9 @@ bool cSpectralLink::CalcDistribution()
 			/mFrequencySpacing)*mFrequencySpacing;
 	double maxFreq = ceil((mTxInst.sFrequency + mDescOffset[mDescSize-1]/1000.0)
 			/mFrequencySpacing)*mFrequencySpacing;
+	//cout<<"Center Freq : "<<mTxInst.sFrequency<<endl;
+	//cout<<"Spacing : "<<mFrequencySpacing<<endl;
+	//cout<<"Min : "<<minFreq<<" and Max : "<<maxFreq<<endl;
 	double tempEnvelopeSize=(maxFreq-minFreq)/mFrequencySpacing;
 	if ((tempEnvelopeSize-floor(tempEnvelopeSize))>0.5)
 		mEnvelopeSize= (int)(ceil(tempEnvelopeSize)+1);
@@ -425,10 +444,14 @@ bool cSpectralLink::CalcDistribution()
 			}
 		}
 		mEnvelopeValue[i]=pow(10, mEnvelopeValue[i]/10);
+		
+		//cout<<mEnvelopeFreq[i]<<":"<<mEnvelopeValue[i]<<endl;
 		mEnvelopeTotal+=mEnvelopeValue[i];
 	}
 	// \TODO: Are there other factors as well from Transmitter?
-        double TxPower = pow(10, mTxInst.sTxPower/10);
+	cout<<"Normalizing ... "<<endl;
+	double TxPower = mTxInst.sTxPower;
+	//mEnvelopeTotal=pow(10, mEnvelopeTotal/10);
 	for (int i=0; i<mEnvelopeSize; ++i)
 	{
 		mEnvelopeValue[i]=mEnvelopeValue[i]*TxPower/(mEnvelopeTotal*mFrequencySpacing*1000);

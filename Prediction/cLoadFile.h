@@ -74,8 +74,8 @@ namespace Qrap
 	 		* @param BinaryFileSet Filesetkey of the binary fileset
 	 		* @param BinaryDirectory The directory to which the binary file will be written
 	 		*/
-			cLoadFile(int SourceFileSet, 
-							int BinaryFileSet=0, 
+			cLoadFile(unsigned SourceFileSet, 
+							unsigned BinaryFileSet=0, 
 							string BinaryDirectory="");
 			/**
 	 		* Destructor
@@ -129,7 +129,9 @@ namespace Qrap
 			 * @return A bool.
 			 */	
 			 bool CutCurrentSet(	unsigned OriginalFileSet, 
-			 						unsigned ResultFileSet);
+			 			unsigned ResultFileSet,
+						bool Interpolate,
+                                		short int inFileType);
 			 
 			 /**
 			 * Description of WriteDB
@@ -172,8 +174,8 @@ namespace Qrap
 			 
 		private:
 			MetaData mMetaData;
-			int mSourceFileSet;
-			int mBinaryFileSet;
+			unsigned mSourceFileSet;
+			unsigned mBinaryFileSet;
 			string mBinaryDirectory;
 			int mGlobalCounter;
 				 

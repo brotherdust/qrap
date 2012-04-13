@@ -1,4 +1,4 @@
-CC = g++ -g -Wall -W -D_REENTRANT -c -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore
+CC = g++ -g -Wall -W -D_REENTRANT -c -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore  -I/usr/include/armadillo_bits
 
 OBJECTS = cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cORT.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o main.o
 
@@ -9,7 +9,7 @@ all: rap makefile
 #	$(CC) main.cpp 
 
 rap: $(OBJECTS) makefile
-	g++ -g -o rap $(OBJECTS) -L/usr/local/pgsql/lib -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal1.7.0 -lproj  -lssl -lPocoXML  -lQtCore
+	g++ -O1 -g -o rap $(OBJECTS) -L/usr/local/pgsql/lib -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal1.7.0 -lproj  -lssl -lPocoXML  -lQtCore -larmadillo
 
 main.o: ../DataBase/Config.h main.cpp makefile
 	$(CC) main.cpp

@@ -350,7 +350,6 @@ SET (IMAGE_FILES
 SET (XML_FILES
 	DataBase/settings.xml
 	DataBase/structure.xml
-	#DataBase/ska-structure.xml
 )
 
 
@@ -512,6 +511,7 @@ SET (qrap_MOC_HDRS
 	Prediction/cRaster.h
 	Prediction/cRasterFileHandler.h
 	Prediction/PredStructs.h
+	Prediction/IntMatrixCalc.h
 	Prediction/cLink.h
 	Prediction/cLoadFile.h
 
@@ -588,7 +588,10 @@ INCLUDE_DIRECTORIES(
 	/usr/include/gdal
      	/usr/include/Poco/
 	/usr/include/qwt-qt4
+#	/usr/include/qwt
      	/usr/include/pqxx
+	/usr/include/armadillo_bits
+	/usr/include/boost
 )
 
 TARGET_LINK_LIBRARIES(qrapplugin
@@ -608,6 +611,7 @@ TARGET_LINK_LIBRARIES(qrapplugin
 	libqgis_core.so
   	libqgis_gui.so
 	libqwt-qt4.so
+#	libqwt.so
 )
 
 

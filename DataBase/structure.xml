@@ -104,7 +104,7 @@ www.QRap.org.za
 		       type="varchar(15)"
 		       label="Status"
 		       description="This site status in the planning process. Options can be altered in structure.xml"
-		       ui="dropdown(fixed, {'Experimental', 'Draft', 'Planned', 'Active','Default', 'School', 'Health', 'Office', 'Nkangala', 'Moutse', 'Tzaneen', 'extraNka', 'nkacluster'})" />
+		       ui="dropdown(fixed, {'Used', 'Not Used', 'Experimental', 'Draft', 'Planned', 'Active', 'Store', 'Office', 'Default'})" />
 		
 		<field name="location"
 		       type="POINT"
@@ -1589,34 +1589,29 @@ www.QRap.org.za
 		      label = "Line"
 			description="The geographical line that is used to display the link visually."
 		      postgis="true" />
-<!--		<view name = "links_view" as = 'select * from links'>
-		</view>
--->
-		<view name = "links_view" as = 'select links.id as id, linkname, 
-			site1.sitename||rad1.sector as txsite, txinst, rad1.txantennaheight as txheight, rad1.txbearing as txbearing,
-			site2.sitename||rad2.sector as rxsite, rxinst, rad2.rxantennaheight as rxheight, rad2.rxbearing as rxbearing,
-			minclearance as clear,
-			frequency, 
-			ST_Distance( site1.location::geography, site2.location::geography)/1000 as distance, 
-			pathloss, kfactor, line
-			from links cross join radioinstallation as rad1 cross join site_view_only as site1
-	 		cross join radioinstallation as rad2 cross join site_view_only as site2
-	 		where txinst=rad1.id
-			and rxinst=rad2.id
-			and rad1.siteid=site1.id
-			and rad2.siteid=site2.id;'>
-			<field name="txsite" label="TxSite" />
-			<field name="rxsite" label="RxSite" />	
-			<field name="txinst" label="TxRadio" />
-			<field name="rxsite" label="RxRadio" />
-			<field name="txheight" label="TxHeight" />
-			<field name="rxheight" label="RxHeight" />
-			<field name="txbearing" label="TxBearing" />
-			<field name="rxbearing" label="RxBearing" />
-			<field name="clear" label="Clearance" />
-			<field name="distance" label="Distance(km)" />
+		<view name = "links_view" as = 'select * from links'>
 		</view>
 
+<!--		<view name = "links_view" as = 'select linkname, 
+			site1.sitename||rad1.sector as txsite,
+			radioinstallation1 as r1,
+			site2.sitename||rad2.sector as rxsite,
+			radioinstallation2 as r2, 
+			minclearance as clear,
+			frequency, pathloss, kfactor
+			from links cross join radioinstallation as rad1 cross join site_view_only as site1
+	 		cross join radioinstallation as rad2 cross join site_view_only as site2
+	 		where rad1.id=radioinstallation1
+			and radioinstallation2=rad2.id
+			and rad1.siteid=site1.id
+			and rad2.siteid=site2.id;'>
+			<field name="txsite" label="Tx Site" />
+			<field name="rxsite" label="Rx Site" />	
+			<field name="r1" label="Tx Radio" />
+			<field name="r2" label="Rx Radio" />
+			<field name="clear" label="Clearance" />
+		</view>
+-->
 	</table> <!-- links -->
 
 <!-- *************************************************************************************************************************** -->
@@ -1843,13 +1838,13 @@ www.QRap.org.za
 			unittype ="height"/>
 
 		<field name = "classgroup"
-		       type = "integer references classificationgroup(id) on delete cascade"
+		       type = "integer references classificationgroup(id)"
 		       label = "Classification Group"
 			description="Foreign Key referencing the Classification Group this clutter type/class forms part."
 		       ui = "dropdown(fromtable,classificationgroup,classgroup)" />
 
 		<field name = "standardtype"
-		       type = "integer references cluttertype(id) on delete cascade"
+		       type = "integer references cluttertype(id)"
 		       label = "Reference Type"
 			description="Foreign Key referencing the Standard Type that reflects (about) the same characteristics as this one."
 		       ui = "dropdown(fromtable,cluttertype,cluttername)" />
@@ -1859,8 +1854,9 @@ www.QRap.org.za
 	</table> <!-- cluttertype  -->
 
 <!-- *************************************************************************************************************************** -->	
+<!-- This "clutterterms" table should rather not be edited unless you change the code too -->
 	<table name="clutterterms" label="Clutter Tuning Terms" fulldownload="true"
-	description="This table presents the different terms for which the coefficients or parameters needs to be tuned." >
+	description="This table presents the different terms for which the coefficients or parameters needs to be tuned. It should not be altered unless you change the propagation prediction code." >
 		<field name="id"
 		       type="serial primary key unique not null"
 		       label="ID"
@@ -1894,6 +1890,8 @@ www.QRap.org.za
 	</table> <!-- clutterterms  -->
 
 <!-- *************************************************************************************************************************** -->
+
+
 	<table name="coefficients" label="Tuned Coefficients/Parameters" fulldownload="true"
 	description="This table presents the coefficients or parameters that was tuned/altered to find the best propagation prediction model." >
 		<field name="id"
@@ -1921,7 +1919,7 @@ www.QRap.org.za
 		       ui = "dropdown(fromtable,clutterterms,term)" />
 
 		<field name = "cluttertype"
-		       type = "integer references cluttertype(id) on delete cascade"
+		       type = "integer references cluttertype(id)"
 		       label = "Clutter Type"
 			description="Foreign Key referencing the Clutter Type that this will apply to."
 		       ui = "dropdown(fromtable,cluttertype,cluttername)" />

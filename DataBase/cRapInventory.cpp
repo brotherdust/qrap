@@ -164,7 +164,7 @@ void cRapInventory::Paste ()
 	if(mCurrentTable->GetTable()->currentItem()!=NULL)
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(clipboard->text()));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(clipboard->text()));
 	}
 }
 
@@ -177,7 +177,7 @@ void cRapInventory::Cut ()
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
 		clipboard->setText(mCurrentTable->GetTable()->currentItem()->data(Qt::DisplayRole).toString());
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(""));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(""));
 	}
 }
 
@@ -270,9 +270,9 @@ void cRapInventory::PopulateTableList ()
 	QListWidgetItem* equipmentItem = new QListWidgetItem("Equipment");
 	
 	// Setup the items
-	antennaItem->setData(Qt::UserRole,QVariant::QVariant("antenna"));
+	antennaItem->setData(Qt::UserRole,QVariant("antenna"));
 	antennaItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	equipmentItem->setData(Qt::UserRole,QVariant::QVariant("equipment"));
+	equipmentItem->setData(Qt::UserRole,QVariant("equipment"));
 	equipmentItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 	
 	// Add the items to the mTableList

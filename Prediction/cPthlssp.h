@@ -119,13 +119,23 @@ namespace Qrap
 			int setParameters (double k,
 					   			double f,
 					   			double TxHeight,
-					   			double RxHeight);
+					   			double RxHeight,
+								bool UseClutter=false);
+			/**
+			 * Setting the Clutter coefficients 
+			 * 
+			 * @return An integer
+			 */
+
+//			void setClutterCoefficients (double *kc);
 			
+
 			/**
 			 * Description of set_kFactor
 			 * 
 			 * @param value Description
 			 */
+
 			void set_kFactor(const double value) {m_kFactor = value;}
 			
 			/**
@@ -247,7 +257,7 @@ namespace Qrap
 			 *
 			 * @return A double
 			 */
-			inline double HeightGain(double K, double B);
+			inline double HeightGain(const double Y, const double K);
 		
 		private:
 		
@@ -258,7 +268,6 @@ namespace Qrap
 			double m_freq;			///< The operating frequency in MHz.
 			double m_htx;			///< The height of the transmitter antenna in meter.
 			double m_hrx;			///< The height of the receiver antenna in meter.
-			bool mSmooth;			///< Is the terrain smooth
 			float *m_TempProfile;	///< Temporary (horizontilized profile).
 			float *m_CurvedProfile;	///< Storage for original profile.
 			double m_tempIPD;		///< Temporary InterPixelDist used to "flatten" the profile in meter
@@ -269,6 +278,7 @@ namespace Qrap
 			int m_counter;			///< for debuging purpses
 			int m_SmoothWidth;		///< Used to Smooth the profile when calculating the radii of the peaks
 			int m_SeekWidth;		///< Use to seek the inflection points when calculating the peak radii
+			bool mUseClutter;		///< indicates whether clutter dependancies should be included. 
 	};
 }
 

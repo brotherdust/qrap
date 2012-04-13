@@ -163,7 +163,7 @@ void cRapServedKeyLocations::Paste ()
 	if(mCurrentTable->GetTable()->currentItem()!=NULL)
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(clipboard->text()));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(clipboard->text()));
 	}
 }
 
@@ -176,7 +176,7 @@ void cRapServedKeyLocations::Cut ()
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
 		clipboard->setText(mCurrentTable->GetTable()->currentItem()->data(Qt::DisplayRole).toString());
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(""));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(""));
 	}
 }
 
@@ -260,7 +260,7 @@ void cRapServedKeyLocations::PopulateTableList ()
 	QListWidgetItem* servedKeyItem = new QListWidgetItem("Served Key Locations");
 	
 	// Setup the items
-	servedKeyItem->setData(Qt::UserRole,QVariant::QVariant("servedkeylocations"));
+	servedKeyItem->setData(Qt::UserRole,QVariant("servedkeylocations"));
 	servedKeyItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 	
 	// Add the items to the mTableList

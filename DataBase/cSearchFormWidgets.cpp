@@ -69,7 +69,7 @@ cSearchFormWidgets::cSearchFormWidgets (QListWidget& fieldsList, const QString& 
 						formWidgets[fieldName]->setEnabled(false);
 						
 						item = new QListWidgetItem(label);
-						item->setData(Qt::UserRole,QVariant::QVariant(it->first.c_str()));
+						item->setData(Qt::UserRole,QVariant(it->first.c_str()));
 						fieldsList.addItem(item);
 						break;
 					case cDatabase::dtInteger:
@@ -83,7 +83,7 @@ cSearchFormWidgets::cSearchFormWidgets (QListWidget& fieldsList, const QString& 
 						formWidgets[fieldName]->setEnabled(false);
 						
 						item = new QListWidgetItem(label);
-						item->setData(Qt::UserRole,QVariant::QVariant(it->first.c_str()));
+						item->setData(Qt::UserRole,QVariant(it->first.c_str()));
 						fieldsList.addItem(item);
 						break;
 					case cDatabase::dtReal:
@@ -97,7 +97,7 @@ cSearchFormWidgets::cSearchFormWidgets (QListWidget& fieldsList, const QString& 
 						formWidgets[fieldName]->setEnabled(false);
 						
 						item = new QListWidgetItem(label);
-						item->setData(Qt::UserRole,QVariant::QVariant(it->first.c_str()));
+						item->setData(Qt::UserRole,QVariant(it->first.c_str()));
 						fieldsList.addItem(item);
 						break;
 					case cDatabase::dtDate:
@@ -109,7 +109,7 @@ cSearchFormWidgets::cSearchFormWidgets (QListWidget& fieldsList, const QString& 
 						formWidgets[fieldName]->setEnabled(false);
 						
 						item = new QListWidgetItem(label);
-						item->setData(Qt::UserRole,QVariant::QVariant(it->first.c_str()));
+						item->setData(Qt::UserRole,QVariant(it->first.c_str()));
 						fieldsList.addItem(item);
 						break;
 					case cDatabase::dtDateTime:
@@ -121,7 +121,7 @@ cSearchFormWidgets::cSearchFormWidgets (QListWidget& fieldsList, const QString& 
 						formWidgets[fieldName]->setEnabled(false);
 						
 						item = new QListWidgetItem(label);
-						item->setData(Qt::UserRole,QVariant::QVariant(it->first.c_str()));
+						item->setData(Qt::UserRole,QVariant(it->first.c_str()));
 						fieldsList.addItem(item);
 						break;
 					default:

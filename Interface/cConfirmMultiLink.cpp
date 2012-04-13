@@ -243,6 +243,8 @@ void cConfirmMultiLink::on_pushOk_clicked()
 {
 	pushOk->setEnabled(false);
 	pushCancel->setEnabled(false);
+	pushOk->setText("wait");
+	pushCancel->setText("wait");
 	pqxx::result r;
 	QList<string> SiteNames;
 	bool SavePDF=false;
@@ -376,16 +378,10 @@ void cConfirmMultiLink::on_pushOk_clicked()
 	string LinkName="Link";
 	QString Linkname = "Link";
 	int LinkID=0;
-
-        pushOk->setText("wait");
-        pushCancel->setText("wait");
-
 	Link.SetLink(Units, DownLink, mInst.sFrequency, mkFactor, PlotResolution,
 			DEMsource, ClutterSource, UseClutter, 0, 0, true);
-
 	for (i=0; i<size; i++)
 	{
-		
 		if (Link.SetTxSite(mSiteList[i],mInst))
 		{
 			for (j=i+1; j<size; j++)
@@ -397,7 +393,8 @@ void cConfirmMultiLink::on_pushOk_clicked()
 					{
 		    				MinClearance = Link.GetMinClearance();
 						PathLoss = Link.GetPathLoss();	
-						Work = (MinClearance>=mMinClear)&&(PathLoss<=mMaxPath);
+						Work = (MinClearance>=mMinClear)
+							&&(PathLoss<=mMaxPath);
 						if (Work)
 						{
 							TxRadID=InsertRadInst(mSiteList[i], j, Link.GetTxBearing(), Link.GetTxTilt());

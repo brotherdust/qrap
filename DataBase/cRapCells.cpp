@@ -165,7 +165,7 @@ void cRapCells::Paste ()
 	if(mCurrentTable->GetTable()->currentItem()!=NULL)
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(clipboard->text()));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(clipboard->text()));
 	}
 }
 
@@ -178,7 +178,7 @@ void cRapCells::Cut ()
 	{
 		QClipboard* clipboard = static_cast<MainWindow*>(window())->clipboard;
 		clipboard->setText(mCurrentTable->GetTable()->currentItem()->data(Qt::DisplayRole).toString());
-		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant::QVariant(""));
+		mCurrentTable->GetTable()->currentItem()->setData(Qt::DisplayRole,QVariant(""));
 	}
 }
 
@@ -307,13 +307,13 @@ void cRapCells::PopulateTableList ()
 	QListWidgetItem* cellparameterItem = new QListWidgetItem("Cell Parameters List");
 	
 	// Setup the items
-	cellItem->setData(Qt::UserRole,QVariant::QVariant("cell"));
+	cellItem->setData(Qt::UserRole,QVariant("cell"));
 	cellItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	frequencyAllocationItem->setData(Qt::UserRole,QVariant::QVariant("frequencyallocationlist"));
+	frequencyAllocationItem->setData(Qt::UserRole,QVariant("frequencyallocationlist"));
 	frequencyAllocationItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	parametersettingsItem->setData(Qt::UserRole,QVariant::QVariant("parametersettings"));
+	parametersettingsItem->setData(Qt::UserRole,QVariant("parametersettings"));
 	parametersettingsItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-	cellparameterItem->setData(Qt::UserRole,QVariant::QVariant("cellparameters"));
+	cellparameterItem->setData(Qt::UserRole,QVariant("cellparameters"));
 	cellparameterItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 	
 	// Add the items to the mTableList

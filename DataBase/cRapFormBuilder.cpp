@@ -2051,8 +2051,8 @@ void cRapFormBuilder::CreateGenericInsertForm ()
 				QTableWidgetItem* anglesHeader = new QTableWidgetItem("Angles");
 				QTableWidgetItem* patternHeader = new QTableWidgetItem("Pattern Values");
 				
-				anglesHeader->setData(Qt::UserRole,QVariant::QVariant("azimuthangles"));
-				patternHeader->setData(Qt::UserRole,QVariant::QVariant("azimuthpattern"));
+				anglesHeader->setData(Qt::UserRole,QVariant("azimuthangles"));
+				patternHeader->setData(Qt::UserRole,QVariant("azimuthpattern"));
 				
 				mAzimuthTable->setHorizontalHeaderItem(0,anglesHeader);
 				mAzimuthTable->setHorizontalHeaderItem(1,patternHeader);
@@ -2079,8 +2079,8 @@ void cRapFormBuilder::CreateGenericInsertForm ()
 					QTableWidgetItem* anglesHeader = new QTableWidgetItem("Angles");
 					QTableWidgetItem* patternHeader = new QTableWidgetItem("Pattern Values");
 								
-					anglesHeader->setData(Qt::UserRole,QVariant::QVariant("elevationangles"));
-					patternHeader->setData(Qt::UserRole,QVariant::QVariant("elevationpattern"));
+					anglesHeader->setData(Qt::UserRole,QVariant("elevationangles"));
+					patternHeader->setData(Qt::UserRole,QVariant("elevationpattern"));
 								
 					mElevationTable->setHorizontalHeaderItem(0,anglesHeader);
 					mElevationTable->setHorizontalHeaderItem(1,patternHeader);
@@ -2107,8 +2107,8 @@ void cRapFormBuilder::CreateGenericInsertForm ()
 						QTableWidgetItem* anglesHeader = new QTableWidgetItem("Frequency Offsets");
 						QTableWidgetItem* patternHeader = new QTableWidgetItem("Envelope Values");
 								
-						anglesHeader->setData(Qt::UserRole,QVariant::QVariant("offsets"));
-						patternHeader->setData(Qt::UserRole,QVariant::QVariant("values"));
+						anglesHeader->setData(Qt::UserRole,QVariant("offsets"));
+						patternHeader->setData(Qt::UserRole,QVariant("values"));
 								
 						mEnvelopeTable->setHorizontalHeaderItem(0,anglesHeader);
 						mEnvelopeTable->setHorizontalHeaderItem(1,patternHeader);
@@ -2315,8 +2315,8 @@ void cRapFormBuilder::CreateGenericUpdateForm ()
 				QTableWidgetItem* anglesHeader = new QTableWidgetItem("Angles");
 				QTableWidgetItem* patternHeader = new QTableWidgetItem("Pattern Values");
 				
-				anglesHeader->setData(Qt::UserRole,QVariant::QVariant("azimuthangles"));
-				patternHeader->setData(Qt::UserRole,QVariant::QVariant("azimuthpattern"));
+				anglesHeader->setData(Qt::UserRole,QVariant("azimuthangles"));
+				patternHeader->setData(Qt::UserRole,QVariant("azimuthpattern"));
 				
 				mAzimuthTable->setHorizontalHeaderItem(0,anglesHeader);
 				mAzimuthTable->setHorizontalHeaderItem(1,patternHeader);
@@ -2394,8 +2394,8 @@ void cRapFormBuilder::CreateGenericUpdateForm ()
 					QTableWidgetItem* anglesHeader = new QTableWidgetItem("Angles");
 					QTableWidgetItem* patternHeader = new QTableWidgetItem("Pattern Values");
 								
-					anglesHeader->setData(Qt::UserRole,QVariant::QVariant("elevationangles"));
-					patternHeader->setData(Qt::UserRole,QVariant::QVariant("elevationpattern"));
+					anglesHeader->setData(Qt::UserRole,QVariant("elevationangles"));
+					patternHeader->setData(Qt::UserRole,QVariant("elevationpattern"));
 								
 					mElevationTable->setHorizontalHeaderItem(0,anglesHeader);
 					mElevationTable->setHorizontalHeaderItem(1,patternHeader);
@@ -2473,8 +2473,8 @@ void cRapFormBuilder::CreateGenericUpdateForm ()
 						QTableWidgetItem* anglesHeader = new QTableWidgetItem("Frequency Offsets");
 						QTableWidgetItem* patternHeader = new QTableWidgetItem("Envelope Value");
 								
-						anglesHeader->setData(Qt::UserRole,QVariant::QVariant("offsets"));
-						patternHeader->setData(Qt::UserRole,QVariant::QVariant("values"));
+						anglesHeader->setData(Qt::UserRole,QVariant("offsets"));
+						patternHeader->setData(Qt::UserRole,QVariant("values"));
 								
 						mEnvelopeTable->setHorizontalHeaderItem(0,anglesHeader);
 						mEnvelopeTable->setHorizontalHeaderItem(1,patternHeader);
@@ -2768,8 +2768,8 @@ void cRapFormBuilder::CreateAntennaDeviceForm ()
 								QTableWidgetItem* anglesHeader = new QTableWidgetItem("Angles");
 								QTableWidgetItem* patternHeader = new QTableWidgetItem("Pattern Values");
 								
-								anglesHeader->setData(Qt::UserRole,QVariant::QVariant("azimuthangles"));
-								patternHeader->setData(Qt::UserRole,QVariant::QVariant("azimuthpattern"));
+								anglesHeader->setData(Qt::UserRole,QVariant("azimuthangles"));
+								patternHeader->setData(Qt::UserRole,QVariant("azimuthpattern"));
 								
 								mAzimuthTable->setHorizontalHeaderItem(0,anglesHeader);
 								mAzimuthTable->setHorizontalHeaderItem(1,patternHeader);
@@ -2796,8 +2796,8 @@ void cRapFormBuilder::CreateAntennaDeviceForm ()
 									QTableWidgetItem* anglesHeader = new QTableWidgetItem("Angles");
 									QTableWidgetItem* patternHeader = new QTableWidgetItem("Pattern Values");
 								
-									anglesHeader->setData(Qt::UserRole,QVariant::QVariant("elevationangles"));
-									patternHeader->setData(Qt::UserRole,QVariant::QVariant("elevationpattern"));
+									anglesHeader->setData(Qt::UserRole,QVariant("elevationangles"));
+									patternHeader->setData(Qt::UserRole,QVariant("elevationpattern"));
 								
 									mElevationTable->setHorizontalHeaderItem(0,anglesHeader);
 									mElevationTable->setHorizontalHeaderItem(1,patternHeader);

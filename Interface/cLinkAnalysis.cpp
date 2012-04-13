@@ -53,7 +53,7 @@ cLinkAnalysis::~cLinkAnalysis()
 //************************************************************************************
 void cLinkAnalysis::DoAndSetUpDisplay(eOutputUnits Units, bool Downlink, double Frequency, 
 					double kFactor, double PlotResolution, 
-                                        short int DEMsource, short int ClutterSource, bool UseClutter,
+					short int DEMsource, short int ClutterSource, bool UseClutter,
 					int TxID, int RxID, QString LinkName, 
 					QString TxName, QString RxName, int LinkID)
 {
@@ -87,7 +87,6 @@ void cLinkAnalysis::DoAndSetUpDisplay(eOutputUnits Units, bool Downlink, double 
 			mPathLoss, mRxLevEnd, mTxAntHeight, mRxAntHeight, 
 			mTxTilt,mRxTilt, mTxAzimuth, mRxAzimuth,
 			mTxLat, mTxLon, mRxLat, mRxLon, maxH, minH);
-	cout << "	cLinkAnalysis::DoAndSetUpDisplay::  mMinClearance: " << mMinClearance << "	mPathLoss: " << mPathLoss << endl;
 
 	lblTxName->setText(TxName);
 	lblTxLat->setText(MakeStringFromDecDegrees(mTxLat,mOutputFormat,true));

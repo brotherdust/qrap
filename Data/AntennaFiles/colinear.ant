@@ -1,0 +1,28 @@
+NAME Colinear
+FREQUENCY 420
+GAIN 9.6 dBi
+TILT ELECTRICAL
+COMMENT Omnidirectional colinear antenna
+HORIZONTAL 5
+0 0
+90 0
+180 0
+270 0
+359 0
+VERTICAL 15
+-89.5 25
+-75 22
+-60 25
+-45 20
+-37 25
+-20 20
+-12 12.5
+-10 7.5
+-5 2.5
+0 0
+5 2.5
+8 7.5
+9.5 12.5
+10 15
+89.5 15
+

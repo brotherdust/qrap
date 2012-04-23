@@ -89,7 +89,7 @@ LoginDialog::LoginDialog (QWidget *parent) : QDialog(parent)
 	
 	// Setup the SIGNAL SLOT connections
 	connect(loginButton,SIGNAL(released()),this,SLOT(AuthenticateUser()));
-	connect(cancelButton,SIGNAL(released()),this,SLOT(close()));
+	connect(cancelButton,SIGNAL(released()),this,SLOT(Close()));
 }
 
 //************************************************************************************
@@ -105,6 +105,7 @@ void LoginDialog::AuthenticateUser ()
 	// Create a new connections
 	if(!gDb.Connect(mUser,mPass,false,mDb,mHost,mPort))
 	{
+		mPasswordEdit->insert("postqrap");
 		AlertCode alert = gDb.GetLastAlert();
 		string lastAlert = TranslateAlertCode(alert);
 		cout << "Database connect failed:" + lastAlert << endl;
@@ -120,6 +121,17 @@ void LoginDialog::AuthenticateUser ()
 	}
 }
 
+//***************************************************************************************
+void LoginDialog::Close()
+{
+	mUser = mUsernameEdit->text().toStdString();
+	mPasswordEdit->insert("postqrap");
+	mPass = mPasswordEdit->text().toStdString();
+	mHost = mHostEdit->text().toStdString();
+	mDb = mDbEdit->text().toStdString();
+	mPort = atoi(mPortEdit->text().toStdString().c_str());
+	close();
+}
 
 //****************************************
 string LoginDialog::getUserName()

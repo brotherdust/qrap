@@ -49,6 +49,7 @@ cLoadFiles::~cLoadFiles()
 //********************************************
 void cLoadFiles::on_pushButtonBrowse_clicked()
 {
+	pushButtonImport->setEnabled(true);
 	int currentRow = tableWidgetFileSets->currentRow();
 	QTableWidgetItem *FileType = static_cast<QTableWidgetItem*>(tableWidgetFileSets->item(currentRow,3));
 	if (FileType != NULL)
@@ -58,36 +59,33 @@ void cLoadFiles::on_pushButtonBrowse_clicked()
 			QDir MyDir;
 			mFiles.clear();
 			listWidgetFiles->clear();
-			QStringList list = QFileDialog::getOpenFileNames(
-                    "",
-                    "",
-                    this,
-                    "open file dialog",
-                    "Choose files to load" );
+			QStringList list = QFileDialog::getOpenFileNames("","", this,
+                  							  "open file dialog",
+                    							"Choose files to load" );
     	
-    		if (list.size() > 0)
-    		{
-    			pushButtonImport->setEnabled(true);
-    			QStringList::Iterator it = list.begin();
-    			QString String = *it;
-    			QString File;
-    			mCount = 0;
+    			if (list.size() > 0)
+    			{
+    				pushButtonImport->setEnabled(true);
+    				QStringList::Iterator it = list.begin();
+    				QString String = *it;
+    				QString File;
+    				mCount = 0;
    				mSourceDir = String.mid(0,String.lastIndexOf("/"));
 				labelDirectory->setText(mSourceDir);
-    			while( it != list.end() ) 
-    			{
-    				String = *it;
-    				File = String.mid(mSourceDir.length()+1);
-    				mFiles.append(File);
-    				QListWidgetItem *Item = new QListWidgetItem(File,listWidgetFiles);
-    				mCount++;
-    				++it;
+    				while( it != list.end() ) 
+    				{
+    					String = *it;
+    					File = String.mid(mSourceDir.length()+1);
+    					mFiles.append(File);
+    					QListWidgetItem *Item = new QListWidgetItem(File,listWidgetFiles);
+    					mCount++;
+    					++it;
+    				}
     			}
-    		}
-    		else
-    		{
-    			pushButtonImport->setEnabled(false);
-    		}
+    			else
+    			{
+    				pushButtonImport->setEnabled(false);
+    			}
 		}
 		else
 		{
@@ -95,22 +93,22 @@ void cLoadFiles::on_pushButtonBrowse_clicked()
                                                  labelDirectory->text(),
                                                  QFileDialog::ShowDirsOnly
                                                  | QFileDialog::DontResolveSymlinks);
-    		if (dir.length() >0)
-    		{
-    			labelDirectory->setText(dir);
-    			if (lineEditORTDirectory->text().length() > 0)
+    			if (dir.length() >0)
     			{
-    				pushButtonImport->setEnabled(true);
+    				labelDirectory->setText(dir);
+    				if (lineEditORTDirectory->text().length() > 0)
+    				{
+    					pushButtonImport->setEnabled(true);
+    				}
+    				else
+    				{
+    					pushButtonImport->setEnabled(false);
+    				}
     			}
     			else
     			{
     				pushButtonImport->setEnabled(false);
-    			}
-    		}
-    		else
-    		{
-    			pushButtonImport->setEnabled(false);
-    		}	
+    			}	
 		}
 	}
 }
@@ -228,7 +226,8 @@ void cLoadFiles::on_pushButtonImport_clicked()
 						string File =  lineEditORTFile->text().toStdString();
 						unsigned FileSet = (unsigned)mSource;
 						int CentMer = spinBoxORTCentralMeridian->value();
-						printf("ORTDir: %s\nBIN: %s\nFile: %s\nFileSet:%d\nCentMer:%d\n",Source.c_str(),ORTDir.c_str(),File.c_str(),FileSet,CentMer);
+						printf("ORTDir: %s\nBIN: %s\nFile: %s\nFileSet:%d\nCentMer:%d\n",
+							Source.c_str(),ORTDir.c_str(),File.c_str(),FileSet,CentMer);
 						Files.LoadOrt(Source,
 							ORTDir, 
 							 File,
@@ -259,12 +258,17 @@ void cLoadFiles::Set(int tel,QString msgs)
 //******************************************************
 void cLoadFiles::Finished()
 {
-	disconnect(CLoadThread,SIGNAL(Set(int,QString)),this,SLOT(Set(int,QString)));
-	disconnect(CLoadThread,SIGNAL(Finished()),this,SLOT(Finished()));
-	
+	int Persentage = 100;
+	cout << "tel: "<<mCount<< "\tmCount:"<<mCount<< "\tPer:"<< Persentage<<endl;
+	QString msgs = "Files loaded.";
+
+	emit GiveFeedback(Persentage,msgs);
 	mFiles.clear();
 	listWidgetFiles->clear();
-	pushButtonImport->setEnabled(true);
+
+	disconnect(CLoadThread,SIGNAL(Set(int,QString)),this,SLOT(Set(int,QString)));
+	disconnect(CLoadThread,SIGNAL(Finished()),this,SLOT(Finished()));
+
 	pushButtonBrowse->setEnabled(true);
 }
 
@@ -299,81 +303,81 @@ void cLoadFiles::Setup()
 void cLoadFiles::LoadData()
 {
 	while (tableWidgetFileSets->rowCount() > 0)
-		{
-			tableWidgetFileSets->removeRow(0);
-		}
-		string query = "SELECT * FROM filesets ";
-		query += "WHERE ";
-		query += "filetype = '";
-		query += comboBoxFileType->currentText().toStdString();
+	{
+		tableWidgetFileSets->removeRow(0);
+	}
+	string query = "SELECT * FROM filesets ";
+	query += "WHERE ";
+	query += "filetype = '";
+	query += comboBoxFileType->currentText().toStdString();
+	query += "'";
+	if (comboBoxFileFormat->currentText() != "All")
+	{
+		query += " AND fileformat = '";
+		query += comboBoxFileFormat->currentText().toStdString();
 		query += "'";
-		if (comboBoxFileFormat->currentText() != "All")
+	}
+	if (comboBoxProjection->currentText() != "All")
+	{
+		query += " AND projection = '";
+		query += comboBoxProjection->currentText().toStdString();
+		query += "'";
+	}
+	pqxx::result r;
+	if (!gDb.PerformRawSql(query))
+	{
+		//\TODO: Error message
+	}
+	else
+	{
+		gDb.GetLastResult(r);
+		for (int i = 0; i < r.size() ; i++)
 		{
-			query += " AND fileformat = '";
-			query += comboBoxFileFormat->currentText().toStdString();
-			query += "'";
-		}
-		if (comboBoxProjection->currentText() != "All")
-		{
-			query += " AND projection = '";
-			query += comboBoxProjection->currentText().toStdString();
-			query += "'";
-		}
-		pqxx::result r;
-		if (!gDb.PerformRawSql(query))
-		{
-			//\TODO: Error message
-		}
-		else
-		{
-			gDb.GetLastResult(r);
-			for (int i = 0; i < r.size() ; i++)
+			int Col = 0;
+			string Boolean;
+			tableWidgetFileSets->insertRow(i);
+			QTableWidgetItem *ID = new QTableWidgetItem(r[i]["id"].c_str());
+			tableWidgetFileSets->setItem(i,Col++,ID);
+			QTableWidgetItem *Description = new QTableWidgetItem(r[i]["description"].c_str());
+			tableWidgetFileSets->setItem(i,Col++,Description);
+			QTableWidgetItem *Res = new QTableWidgetItem(r[i]["resolution"].c_str());
+			tableWidgetFileSets->setItem(i,Col++,Res);
+			QTableWidgetItem *FileFormat = new QTableWidgetItem(r[i]["fileformat"].c_str());
+			tableWidgetFileSets->setItem(i,Col++,FileFormat);
+			
+			Boolean = r[i]["use"].c_str();
+			if (Boolean == "t")
 			{
-				int Col = 0;
-				string Boolean;
-				tableWidgetFileSets->insertRow(i);
-				QTableWidgetItem *ID = new QTableWidgetItem(r[i]["id"].c_str());
-				tableWidgetFileSets->setItem(i,Col++,ID);
-				QTableWidgetItem *Description = new QTableWidgetItem(r[i]["description"].c_str());
-				tableWidgetFileSets->setItem(i,Col++,Description);
-				QTableWidgetItem *Res = new QTableWidgetItem(r[i]["resolution"].c_str());
-				tableWidgetFileSets->setItem(i,Col++,Res);
-				QTableWidgetItem *FileFormat = new QTableWidgetItem(r[i]["fileformat"].c_str());
-				tableWidgetFileSets->setItem(i,Col++,FileFormat);
-				
-				Boolean = r[i]["use"].c_str();
-				if (Boolean == "t")
-				{
-					Boolean = "True";
-				}
-				else
-				{
-					Boolean = "False";
-				}
-				QTableWidgetItem *Use = new QTableWidgetItem(Boolean.c_str());
-				tableWidgetFileSets->setItem(i,Col++,Use);
-				
-				Boolean = r[i]["derivedbinary"].c_str();
-				if (Boolean == "t")
-				{
-					Boolean = "True";
-				}
-				else
-				{
-					Boolean = "False";
-				}
-				
-				QTableWidgetItem *DerivedBinary = new QTableWidgetItem(Boolean.c_str());
-				tableWidgetFileSets->setItem(i,Col++,DerivedBinary);
-				QTableWidgetItem *Projection = new QTableWidgetItem(r[i]["projection"].c_str());
-				tableWidgetFileSets->setItem(i,Col++,Projection);
-				QTableWidgetItem *Classification = new QTableWidgetItem(r[i]["classgroup"].c_str());
-				tableWidgetFileSets->setItem(i,Col++,Classification);
-				//mGeoType.push_back((GeoType)(int)atof(r[i]["projection"].c_str()));
+				Boolean = "True";
 			}
+			else
+			{
+				Boolean = "False";
+			}
+			QTableWidgetItem *Use = new QTableWidgetItem(Boolean.c_str());
+			tableWidgetFileSets->setItem(i,Col++,Use);
+			
+			Boolean = r[i]["derivedbinary"].c_str();
+			if (Boolean == "t")
+			{
+				Boolean = "True";
+			}
+			else
+			{
+				Boolean = "False";
+			}
+			
+			QTableWidgetItem *DerivedBinary = new QTableWidgetItem(Boolean.c_str());
+			tableWidgetFileSets->setItem(i,Col++,DerivedBinary);
+			QTableWidgetItem *Projection = new QTableWidgetItem(r[i]["projection"].c_str());
+			tableWidgetFileSets->setItem(i,Col++,Projection);
+			QTableWidgetItem *Classification = new QTableWidgetItem(r[i]["classgroup"].c_str());
+			tableWidgetFileSets->setItem(i,Col++,Classification);
+			//mGeoType.push_back((GeoType)(int)atof(r[i]["projection"].c_str()));
 		}
-		
-		// Selecting the first row
+	}
+	
+	// Selecting the first row
 	if (tableWidgetFileSets->rowCount() > 0)
 	{
 		tableWidgetFileSets->setCurrentCell(0,0);

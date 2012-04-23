@@ -148,6 +148,11 @@ namespace Qrap
 		 * Private SLOT - This function will load the raster file importing widget.
 		 */
 		void ImportRasters ();
+
+		/**
+		 * Private SLOT - This function will load the measurement importing widget.
+		 */
+		void ImportMeasurements ();
 		
 		/**
 		 * Private SLOT - This function will open the CSV export dialog.
@@ -221,6 +226,7 @@ namespace Qrap
 		QAction*	preferencesAct;		///< A pointer to a Qt4 action object that loads the preferences dialog, this will allow the user to set a number of system preferences.
 		QAction*	antennaImportAct;	///< A pointer to a Qt4 action object that loads the antenna importing function in the cRapDbCommunicator class.
 		QAction*	rasterImportAct;	///< A pointer to a Qt4 action object that loads the raster file importing widget.
+		QAction*	measImportAct;		///< A pointer to a Qt4 action object that loads the measurement file importing widget.
 		QAction*	csvExportAct;           ///< A pointer to a Qt4 action object that opens the CSV export dialog.
 		QAction*	csvImportAct;           ///< A pointer to a Qt4 action object that opens the CSV import dialog.
 		

@@ -422,6 +422,7 @@ SET (qrap_SRCS
 	Interface/cCreateUpdateFile.cpp
 	Interface/cImportUpdateFile.cpp   
 
+	Interface/cLoadMeasurements.cpp
 	Interface/LoadRasterFiles/cLoadRasterFiles.cpp
 	Interface/LoadRasterFiles/cLoadThread.cpp
 	Interface/LoadRasterFiles/cLoadFiles.cpp
@@ -447,6 +448,7 @@ SET (qrap_UIS
         Interface/ConfirmLink.ui
         Interface/LinkAnalysis.ui
         Interface/ConfirmPrediction.ui
+	Interface/LoadMeasurements.ui
 	Interface/LoadRasterFiles/CreateDataSet.ui
 	Interface/LoadRasterFiles/CutSet.ui
 	Interface/LoadRasterFiles/LoadFiles.ui
@@ -532,6 +534,7 @@ SET (qrap_MOC_HDRS
 	Interface/cCreateUpdateFile.h
 	Interface/cImportUpdateFile.h
 
+	Interface/cLoadMeasurements.h
 	Interface/LoadRasterFiles/cLoadRasterFiles.h
 	Interface/LoadRasterFiles/cLoadThread.h
 	Interface/LoadRasterFiles/cLoadFiles.h

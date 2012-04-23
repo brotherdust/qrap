@@ -119,18 +119,25 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 		cout << "Connect 8" << endl;
 	} catch (pqxx::broken_connection& e)
 	{
+		mConnected=false;
 		QRAP_FATAL_CODE("Invalid username or password specified. ... or port ... or host" , acDbAuth);
 	} catch (pqxx::internal_error& e)
 	{
+		mConnected=false;
 		QRAP_FATAL_CODE("Internal PQXX error.", acInternalError);
 	} catch (...)
 	{
+		mConnected=false;
 		QRAP_FATAL_CODE("Unknown exception caught while connecting.", acDbConnect);
 	}
 	
 	cout << "After connection attempt" << endl;
 	if (msAlertCode != acOk)
+	{
+		mConnected =false;
 		return false;
+	}
+	else mConnected = true;
 	cout << "returning true ? ... " << endl;
 	if (!Create)
 	{
@@ -139,6 +146,7 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 		mUserGroup = GetGroupName(mUsername);
 		if (!PerformRawSql("select name, value from qrap_config where type='local' and username='"+mUsername+"';"))
 		{
+			mConnected=false;
 			QRAP_WARN("Unable to load settings for user "+mUsername+".");
 		} 
 		else
@@ -170,7 +178,7 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 	//create any tables that might be new.
 //	cout << "Implementing any possible table additions to the database structure" << endl;
 //	gDb.Create (username, password);
-	
+	mConnected=true;	
 	return true;
 }
 
@@ -178,6 +186,7 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 //******************************************************************************
 bool cDatabase::Disconnect ()
 {
+	mConnected=false;
 	if (mConnection)
 	{
 		// clear the qrap_undo table

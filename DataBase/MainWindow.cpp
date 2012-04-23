@@ -35,6 +35,7 @@
 #include "MainWindow.h"
 #include "PreferencesDialog.h"
 #include "../Interface/LoadRasterFiles/cLoadRasterFiles.h"
+#include "../Interface/cLoadMeasurements.h"
 #include "cCsvExportDialog.h"
 #include "cCsvImportDialog.h"
 #include "cSearchForm.h"
@@ -307,6 +308,10 @@ void MainWindow::CreateActions ()
 	rasterImportAct = new QAction(tr("Raster Files"),this);
 	rasterImportAct->setStatusTip(tr("Import raster files."));
 	connect(rasterImportAct,SIGNAL(triggered()),this,SLOT(ImportRasters()));
+
+	measImportAct = new QAction(tr("Measurements"),this);
+	measImportAct->setStatusTip(tr("Import Measurements in various formats to the database"));
+	connect(measImportAct,SIGNAL(triggered()),this,SLOT(ImportMeasurements()));
 	
 	searchAct = new QAction(QIcon(":images/find.png"),tr("Search"),this);
 	searchAct->setStatusTip(tr("Search for values in the current table"));
@@ -339,6 +344,7 @@ void MainWindow::CreateMenus ()
 	importMenu->addAction(antennaImportAct);
 	importMenu->addAction(rasterImportAct);
 	importMenu->addAction(csvImportAct);
+	importMenu->addAction(measImportAct);
 	
 	exportMenu = fileMenu->addMenu(tr("&Export"));
 	exportMenu->addAction(csvExportAct);
@@ -432,6 +438,16 @@ void MainWindow::ImportAntennas ()
 	cAntennaFilesImporter* antennas = new cAntennaFilesImporter(0);
 	antennas->show();
 }
+
+
+//******************************************************************************
+// Import measurements files
+void MainWindow::ImportMeasurements()
+{
+	cLoadMeasurements* loadMeasurments = new cLoadMeasurements(0);
+	loadMeasurments->show();
+}
+
 
 //******************************************************************************
 // Import the rasters

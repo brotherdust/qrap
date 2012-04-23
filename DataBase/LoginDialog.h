@@ -82,7 +82,8 @@ namespace Qrap
 		* the Qrap user.
 		*/
 		void AuthenticateUser ();
-		
+		void Close();		
+
 	private:
 		QLineEdit*	mUsernameEdit;	///< A pointer to a Qt4 line edit widget that will allow the user to enter their username for the gisrap system.
 		QLineEdit*	mPasswordEdit;	///< A pointer to a Qt4 line edit widget that will allow the user to enter their password.

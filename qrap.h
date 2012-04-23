@@ -264,7 +264,7 @@ private:
   	void UpdateSiteLayer();
   	void InitRubberBand(bool IsArea);
   	void DesRubberBand();
-  	void openDatabaseConnection();
+  	bool openDatabaseConnection();
   	void PerformLink();
   	bool PerformPrediction();
   	void FilterArea();
@@ -277,7 +277,7 @@ private:
   	QList<QgsPoint> mPoints;
   	QgsRubberBand *mRubberBand;  
 	cPlaceSite *mPlacedSite;
-	
+	bool mLoaded;
 	// the username and password for the database login.
   	string machinename;
 };

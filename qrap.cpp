@@ -164,7 +164,8 @@ void QRap::initGui()
   	mToolBarPointer->addAction(mPreferencesAction);
   	mToolBarPointer->addAction(mQActionPointer);
 //  	mToolBarPointer->addAction(mImportExportAction);
-//  	mToolBarPointer->addAction(mHelpAction);  
+//  	mToolBarPointer->addAction(mHelpAction); 
+	mLoaded = true; 
  
   	openDatabaseConnection();
   	cout << "Na DataBase Connect" << endl;
@@ -191,29 +192,54 @@ void QRap::help()
 // Unload the plugin by cleaning up the GUI
 void QRap::unload()
 {
-  	// remove the GUI  
-	// \TODO -- this destructor is incomplete.
-
-  	mQGisIface->removePluginMenu("&QRap",mSiteAction);
-  	mQGisIface->removePluginMenu("&QRap",mLinkAction);
-  	mQGisIface->removePluginMenu("&QRap",mRadioAction);
-  	mQGisIface->removePluginMenu("&QRap",mQActionPointer);
-  	mQGisIface->removeToolBarIcon(mSiteAction);
-  	mQGisIface->removeToolBarIcon(mLinkAction);
-  	mQGisIface->removeToolBarIcon(mRadioAction);
-  	mQGisIface->removeToolBarIcon(mSpectralAction);
-  	mQGisIface->removeToolBarIcon(mQActionPointer);
-  	delete mQActionPointer;
-  	delete mSiteAction;
-  	delete mRadioAction;
-  	delete mLinkAction;
-  	delete mSpectralAction;
-  	delete mSelectSiteAction;
-  	delete mSelectLinkAction;
-  	delete mPreferencesAction;
-  	delete Mouse;
-//  	delete mImportExportAction;
-  	delete mHelpAction;
+	if (mLoaded)
+	{
+	  	// remove the GUI  
+		cout << "QRap::unload(): removing pulgin menu's" << endl;
+	  	mQGisIface->removePluginMenu("&QRap",mSiteAction);
+		mQGisIface->removePluginMenu("&QRap",mSelectSiteAction);
+		mQGisIface->removePluginMenu("&QRap",mDeleteSiteAction);
+	  	mQGisIface->removePluginMenu("&QRap",mLinkAction);
+		mQGisIface->removePluginMenu("&QRap",mSelectLinkAction);
+		mQGisIface->removePluginMenu("&QRap",mDeleteLinkAction);
+	  	mQGisIface->removePluginMenu("&QRap",mRadioAction);
+		mQGisIface->removePluginMenu("&QRap",mMultiLinkAction);
+		mQGisIface->removePluginMenu("&QRap",mSpectralAction);
+		mQGisIface->removePluginMenu("&QRap",mPreferencesAction);
+	  	mQGisIface->removePluginMenu("&QRap",mQActionPointer);
+	  
+	  	mQGisIface->removeToolBarIcon(mSiteAction);
+		mQGisIface->removeToolBarIcon(mSelectSiteAction);
+		mQGisIface->removeToolBarIcon(mDeleteSiteAction);
+	  	mQGisIface->removeToolBarIcon(mLinkAction);
+		mQGisIface->removeToolBarIcon(mSelectLinkAction);
+		mQGisIface->removeToolBarIcon(mDeleteLinkAction);
+	  	mQGisIface->removeToolBarIcon(mRadioAction);
+		mQGisIface->removeToolBarIcon(mMultiLinkAction);
+	  	mQGisIface->removeToolBarIcon(mSpectralAction);
+		mQGisIface->removeToolBarIcon(mPreferencesAction);
+	  	mQGisIface->removeToolBarIcon(mQActionPointer);
+		cout << "QRap::unload(): deleting mQActionPointer" << endl;
+	  	delete mQActionPointer;
+		cout << "QRap::unload(): deleting mSiteAction" << endl;
+	  	delete mSelectSiteAction;
+		delete mDeleteSiteAction;
+		delete mSiteAction;
+		cout << "QRap::unload(): deleting mRadioAction" << endl;
+	  	delete mRadioAction;
+		cout << "QRap::unload(): deleting mLinkAction" << endl;
+	  	delete mLinkAction;
+		delete mSelectLinkAction;
+		delete mDeleteLinkAction;
+		cout << "QRap::unload(): deleting mSpectralAction" << endl;
+	  	delete mSpectralAction;
+		delete mMultiLinkAction;
+		cout << "QRap::unload(): deleting mPreferencesAction" << endl;
+	  	delete mPreferencesAction;
+	//  	delete mImportExportAction;
+	//  	delete mHelpAction;
+		mLoaded =false;
+	}
 }
 
 
@@ -276,7 +302,7 @@ QGISEXTERN void unload( QgisPlugin * thePluginPointer )
 }
 
 //*****************************************************************************
-void QRap::openDatabaseConnection()
+bool QRap::openDatabaseConnection()
 {
 	cout << "In QRap::openDatabaseConnection() " << endl;
 	
@@ -336,23 +362,34 @@ void QRap::openDatabaseConnection()
 		//einde van Christo se junk
 		*/
 
-		if (gDb.GetSetting("Units") == "") 		gDb.SetSetting("Units","dBm");
-		if (gDb.GetSetting("RqSN") == "") 		gDb.SetSetting("RqSN","8");
-		if (gDb.GetSetting("RxMin") == "") 		gDb.SetSetting("RxMin","-110");
-		if (gDb.GetSetting("FadeMargin") == "") 	gDb.SetSetting("FadeMargin","3");
-		if (gDb.GetSetting("RqClco") == "")		gDb.SetSetting("RqClco","9");
-		if (gDb.GetSetting("RqClad") == "")		gDb.SetSetting("RqClad","-9");
-		if (gDb.GetSetting("RqEbNo") == "")		gDb.SetSetting("RqEbNo","8");
-		if (gDb.GetSetting("kFactorServ") == "")	gDb.SetSetting("kFactorServ","1");
-		if (gDb.GetSetting("kFactorInt") == "")		gDb.SetSetting("kFactorInt","2.5");
-		if (gDb.GetSetting("DEMsource") == "")		gDb.SetSetting("DEMsource","1");
-		if (gDb.GetSetting("DownLink") == "")		gDb.SetSetting("DownLink","1");
-		if (gDb.GetSetting("ClutterSource") == "")	gDb.SetSetting("ClutterSource","1");
-		if (gDb.GetSetting("UseClutter") == "")		gDb.SetSetting("UseClutter","-1");
-		if (gDb.GetSetting("PlotResolution") == "")	gDb.SetSetting("PlotResolution","90");
-		if (gDb.GetSetting("BTLDir") == "")		gDb.SetSetting("BTLDir","Data/BTL/");
-		if (gDb.GetSetting("OutputDir") == "")		gDb.SetSetting("OutputDir","Data/Output/");
-		if (gDb.GetSetting("SiteSelectSense") == "")	gDb.SetSetting("SiteSelectSense","150");
+		if (gDb.Connected())
+		{
+			if (gDb.GetSetting("Units") == "") 		gDb.SetSetting("Units","dBm");
+			if (gDb.GetSetting("RqSN") == "") 		gDb.SetSetting("RqSN","8");
+			if (gDb.GetSetting("RxMin") == "") 		gDb.SetSetting("RxMin","-110");
+			if (gDb.GetSetting("FadeMargin") == "") 	gDb.SetSetting("FadeMargin","3");
+			if (gDb.GetSetting("RqClco") == "")		gDb.SetSetting("RqClco","9");
+			if (gDb.GetSetting("RqClad") == "")		gDb.SetSetting("RqClad","-9");
+			if (gDb.GetSetting("RqEbNo") == "")		gDb.SetSetting("RqEbNo","8");
+			if (gDb.GetSetting("kFactorServ") == "")	gDb.SetSetting("kFactorServ","1");
+			if (gDb.GetSetting("kFactorInt") == "")		gDb.SetSetting("kFactorInt","2.5");
+			if (gDb.GetSetting("DEMsource") == "")		gDb.SetSetting("DEMsource","1");
+			if (gDb.GetSetting("DownLink") == "")		gDb.SetSetting("DownLink","1");
+			if (gDb.GetSetting("ClutterSource") == "")	gDb.SetSetting("ClutterSource","1");
+			if (gDb.GetSetting("UseClutter") == "")		gDb.SetSetting("UseClutter","-1");
+			if (gDb.GetSetting("PlotResolution") == "")	gDb.SetSetting("PlotResolution","90");
+			if (gDb.GetSetting("BTLDir") == "")		gDb.SetSetting("BTLDir","Data/BTL/");
+			if (gDb.GetSetting("OutputDir") == "")		gDb.SetSetting("OutputDir","Data/Output/");
+			if (gDb.GetSetting("SiteSelectSense") == "")	gDb.SetSetting("SiteSelectSense","150");
+			cout << "QRap::openDatabaseConnection(): Done setting defaults " << endl;
+		}
+		else
+		{
+			QMessageBox::information(mQGisIface->mainWindow(), "QRap", "Failing to connect to QRap-database. Removing Q-Rap plugin");	
+			cout << "QRap::openDatabaseConnection(): else gDb.Connected() " << endl;
+			unload();
+		}
+
 	}
 	cout << "Verlaat openDatabaseConnection " << endl;
 } 

@@ -204,6 +204,8 @@ namespace Qrap
 		bool Connect (const string& username, const string& password, bool Create=false,
 			const string& database="qrap", const string& host="localhost", const int Iport=5432);
 		
+
+		bool Connected() { return mConnected;}
 		/**
 		 * Disconnects from the local database.
 		 * 
@@ -705,6 +707,7 @@ namespace Qrap
 		std::string       mUsername;               ///< The username of the currently logged in user.
 		std::string       mUserGroup;              ///< The group name to which the currently logged in user belongs.
 		StringMap         mSettings;               ///< The internal settings structure.
+		bool		mConnected;
 		
 		
 		/**

@@ -94,49 +94,49 @@ void cLoadThread::run()
 		if (!mCut)
 		{
 			QStringList::Iterator it = mFiles.begin();
-    		QString File;
-    		FileType Type;
-    		int k = 0;
-    		if (mFileType == "BIN" || mFileType == "BINFILE")
-    		{
-    			Type = BINFILE;
-    		}
-    		else if (mFileType == "GDAL" || mFileType == "GDALFILE")
-    		{
-    			Type = GDALFILE;
-    		}
-    		else
-    		{
-    			Type == GDALFILE;
-    		}
-   	 		while( it != mFiles.end() ) 
-    		{
-    			File = *it;
-    			emit Set(k,File);
-    			printf("SourceDir: %s\nFile; %s\nType: %d\nmType: %d\n",mSourceDir.latin1(),File.latin1(),Type,mType);
-    			try
-    			{
-    				Rasters.LoadFile(mSourceDir.latin1(),File.latin1(),Type,mType,"",mCentMer);
-    				++it;
-    				k++;
-    			}
-    			catch (const exception &e1)
-    			{
-    				printf("Error trying to Load files:\n%s",e1.what());
-    				emit (mFileCount,e1.what());
-    			}
-    		}
-    		emit Set(mFileCount,"Writng to Database");
-    		try
-    		{
-    			Rasters.WriteDB();
-    		}
-    		catch (const exception &e1)
-    		{
-    			printf("Error trying to Load files to db:\n%s",e1.what());
-    		}
-    		emit Set(mFileCount,"Finished");
-    		emit Finished();
+    			QString File;
+	    		FileType Type;
+	    		int k = 0;
+	    		if (mFileType == "BIN" || mFileType == "BINFILE")
+	    		{
+	    			Type = BINFILE;
+	    		}
+	    		else if (mFileType == "GDAL" || mFileType == "GDALFILE")
+	    		{
+	    			Type = GDALFILE;
+	    		}
+	    		else
+	    		{
+	    			Type == GDALFILE;
+	    		}
+	   	 	while( it != mFiles.end() ) 
+	    		{
+	    			File = *it;
+	    			emit Set(k,File);
+	    			printf("SourceDir: %s\nFile; %s\nType: %d\nmType: %d\n",mSourceDir.latin1(),File.latin1(),Type,mType);
+	    			try
+	    			{
+	    				Rasters.LoadFile(mSourceDir.latin1(),File.latin1(),Type,mType,"",mCentMer);
+	    				++it;
+	    				k++;
+	    			}
+	    			catch (const exception &e1)
+	    			{
+	    				printf("Error trying to Load files:\n%s",e1.what());
+	    				emit (mFileCount,e1.what());
+	    			}
+	    		}
+	    		emit Set(mFileCount,"Writng to Database");
+	    		try
+	    		{
+	    			Rasters.WriteDB();
+	    		}
+	    		catch (const exception &e1)
+	    		{
+	    			printf("Error trying to Load files to db:\n%s",e1.what());
+	    		}
+	    		emit Set(mFileCount,"Finished");
+	    		emit Finished();
 		}
 		else//cut set
 		{
@@ -150,7 +150,7 @@ void cLoadThread::run()
 				printf("Error trying to Cut files:\n%s",e1.what());
 			}
 			emit Set(100,"Finished");
-    		emit Finished();
+    			emit Finished();
 		}
 	}
 	catch(const exception &e) 

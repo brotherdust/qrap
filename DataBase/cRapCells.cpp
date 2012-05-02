@@ -42,7 +42,7 @@ cRapCells::cRapCells (QWidget* parent) : QWidget(parent)
 	
 	// Setup the mTableList
 	mTableList->setMinimumSize(140,400);
-	mTableList->setMaximumWidth(140);
+	mTableList->setMaximumWidth(160);
 	
 	// create the mProgress bar
 	mProgress = new QProgressBar(this);
@@ -253,6 +253,11 @@ void cRapCells::CellSelectionChanged ()
 		if (mCurrentTable->GetTable()->currentRow()==-1)
 			return;
 		
+		if (mCurrentTable->GetTable()->rowCount()<2)
+		{
+			mCurrentCellId=0;
+			return;
+		}
 		// Store the current site Id
 		mCurrentCellId = mCurrentTable->GetTable()->item(mCurrentTable->GetTable()->currentRow(),0)->data(Qt::DisplayRole).toInt();
 		

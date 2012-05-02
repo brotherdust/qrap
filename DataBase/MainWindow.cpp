@@ -125,16 +125,20 @@ MainWindow::MainWindow (QWidget* parent, Qt::WFlags fl)
 	setCentralWidget(splitter);
 
 	rapTab = new RapTab(splitter);
-	rapTab->setGeometry(QRect(10,10,1550,1000));
-	rapTab->setMinimumSize(QSize(20, 20));
+	rapTab->setGeometry(QRect(10,10,1550,450));
+	rapTab->setMinimumSize(QSize(100, 100));
 	rapTab->setSizePolicy(sizePolicy);
     	splitter->addWidget(rapTab);	
 
 	Filter = new cFilter(splitter);
-	Filter->setGeometry(QRect(10,10,350,1000));
-	Filter->setMinimumSize(QSize(20, 20));
+	Filter->setGeometry(QRect(10,10,350,450));
+	Filter->setMinimumSize(QSize(100, 100));
 	Filter->setSizePolicy(sizePolicy);
 	splitter->addWidget(Filter);
+
+	setMaximumHeight(700);
+	showMaximized ();
+	
 
 //	QSpacerItem *spacerItem1 = new QSpacerItem(1, 90, QSizePolicy::Minimum, QSizePolicy::Minimum);
 //    gridLayout1->addItem(spacerItem1, 0, 1, 1, 1);
@@ -309,10 +313,10 @@ void MainWindow::CreateActions ()
 	rasterImportAct->setStatusTip(tr("Import raster files."));
 	connect(rasterImportAct,SIGNAL(triggered()),this,SLOT(ImportRasters()));
 
-	measImportAct = new QAction(tr("Measurements"),this);
+/*	measImportAct = new QAction(tr("Measurements"),this);
 	measImportAct->setStatusTip(tr("Import Measurements in various formats to the database"));
 	connect(measImportAct,SIGNAL(triggered()),this,SLOT(ImportMeasurements()));
-	
+*/	
 	searchAct = new QAction(QIcon(":images/find.png"),tr("Search"),this);
 	searchAct->setStatusTip(tr("Search for values in the current table"));
 	searchAct->setShortcut(tr("Ctrl+F"));
@@ -344,7 +348,7 @@ void MainWindow::CreateMenus ()
 	importMenu->addAction(antennaImportAct);
 	importMenu->addAction(rasterImportAct);
 	importMenu->addAction(csvImportAct);
-	importMenu->addAction(measImportAct);
+//	importMenu->addAction(measImportAct);
 	
 	exportMenu = fileMenu->addMenu(tr("&Export"));
 	exportMenu->addAction(csvExportAct);

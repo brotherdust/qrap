@@ -32,9 +32,9 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <errno.h>
+#include <values.h>
 
 #define MAX_HOST 1024
-#define PATH_MAX 1024
 
 class FClient
 {

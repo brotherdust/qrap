@@ -42,7 +42,7 @@ cRapSites::cRapSites (QWidget* parent) : QWidget(parent)
 	
 	// Setup the mTableList
 	mTableList->setMinimumSize(140,400);
-	mTableList->setMaximumWidth(140);
+	mTableList->setMaximumWidth(200);
 	
 	// create the mProgress bar
 	mProgress = new QProgressBar(this);
@@ -318,15 +318,22 @@ void cRapSites::TableSelectionChanged ()
 // Populate the tables with details related to the selected site
 void cRapSites::SiteSelectionChanged ()
 {
-	cout << " Entering cRapSites::SiteSelectionChanged " << endl;
 	if(!mInsertingRow)
 	{
 		if (mCurrentTable->GetTable()->currentRow()==-1)
 			return;
+
+		if (mCurrentTable->GetTable()->rowCount()<2)
+		{
+			mCurrentSiteId=0;
+			return;
+		}
 		
+		cout << " cRapSites::SiteSelectionChanged Before mCurrentSiteID" << endl;
 		// Store the current site Id
 		mCurrentSiteId = mCurrentTable->GetTable()->item(mCurrentTable->GetTable()->currentRow(),0)->data(Qt::DisplayRole).toInt();
 		
+		cout << " cRapSites::SiteSelectionChanged After mCurrentSiteID" << endl;
 		QMapIterator<QString,cRapTableTab*> it(mTables);
 		
 		// Populate the different tables

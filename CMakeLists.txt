@@ -373,6 +373,7 @@ SET (qrap_SRCS
     	DataBase/cRapLinks.cpp
     	DataBase/cRapServedKeyLocations.cpp
     	DataBase/cRapRasterFiles.cpp
+	DataBase/cRapMeasurements.cpp
     	DataBase/cSearchFormWidgets.cpp
     	DataBase/cSearchForm.cpp
     	DataBase/AdminWindow.cpp
@@ -395,7 +396,6 @@ SET (qrap_SRCS
      	Prediction/cSpectralLink.cpp
      	Prediction/cSpectralPlot.cpp
      	Prediction/cGDAL.cpp
-	Prediction/cORT.cpp
      	Prediction/cGeoP.cpp
 	Prediction/cPlotTask.cpp
 	Prediction/cProfile.cpp
@@ -404,6 +404,7 @@ SET (qrap_SRCS
 	Prediction/cRasterFileHandler.cpp
 	Prediction/cLink.cpp
 	Prediction/cLoadFile.cpp
+	Prediction/cMeasImportSpace.cpp
      
 	Interface/cPlaceSite.cpp
 	Interface/cConfirmLink.cpp
@@ -481,6 +482,7 @@ SET (qrap_MOC_HDRS
 	DataBase/cRapLinks.h
 	DataBase/cRapServedKeyLocations.h
 	DataBase/cRapRasterFiles.h
+	DataBase/cRapMeasurements.h
 	DataBase/cSearchFormWidgets.h
 	DataBase/cSearchForm.h
 	DataBase/AdminWindow.h
@@ -505,7 +507,6 @@ SET (qrap_MOC_HDRS
 	Prediction/cSpectralLink.h
 	Prediction/cSpectralPlot.h
 	Prediction/cGDAL.h
-	Prediction/cORT.h
 	Prediction/cGeoP.h
 	Prediction/cPlotTask.h
 	Prediction/cProfile.h
@@ -516,6 +517,7 @@ SET (qrap_MOC_HDRS
 	Prediction/IntMatrixCalc.h
 	Prediction/cLink.h
 	Prediction/cLoadFile.h
+	Prediction/cMeasImportSpace.h
 
 	Interface/cPlaceSite.h
 	Interface/cConfirmLink.h

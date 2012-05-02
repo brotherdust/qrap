@@ -53,7 +53,7 @@ QString Qrap::FindLatLon(QString lat,QString lon)
 		// Get the latitude value
 		latInput = lat;
 		if( (latitude = QString::fromStdString(ExtractDecimalDegrees(latInput.toStdString(),dfDegMinSec,true)))=="" )
-			return false;
+			return latitude;
 			
 		// Get the longitude value
 		longInput = lon;

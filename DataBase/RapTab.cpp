@@ -41,6 +41,7 @@ RapTab::RapTab (QWidget* parent) : QTabWidget(parent)
 	mLinks = new cRapLinks(this);
 	mServedKeyLocations = new cRapServedKeyLocations(this);
 	mRasterFiles = new cRapRasterFiles(this);
+//	mMeasurements = new cRapMeasurements(this);
 	
 	// Add the mSites to the tab widget
 	addTab(mSites,"Sites");
@@ -50,16 +51,17 @@ RapTab::RapTab (QWidget* parent) : QTabWidget(parent)
 	addTab(mLinks,"Links");
 	addTab(mServedKeyLocations,"Served Key Locations");
 	addTab(mRasterFiles,"Raster Files");
+//	addTab(mMeasurements,"Measurements");
 	
 	//Customize the tab widget
 	setTabPosition(QTabWidget::North);
 	QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    sizePolicy.setHorizontalStretch(200);
-    sizePolicy.setVerticalStretch(200);	
+    	sizePolicy.setHorizontalStretch(200);
+    	sizePolicy.setVerticalStretch(200);	
 	setSizePolicy(sizePolicy);
 	// Add to the tab widget
-	//setMinimumSize(600,450);
-	setGeometry(QRect(0,0,900,450));
+//	setMinimumSize(600,450);
+	setGeometry(QRect(0,0,900,400));
 	
 	cout << "RapTab::RapTab connecting TabIndexChanged" << endl;
 		connect(this,SIGNAL(currentChanged(int)),this,SLOT(TabIndexChanged(int)));
@@ -148,7 +150,7 @@ void RapTab::TabIndexChanged (int index)
 			break;
 			
 		case 3:
-			// Make the necessary connections for the mSupportingTables objec
+			// Make the necessary connections for the mSupportingTables object
 			connect(insertAct,SIGNAL(triggered()),mSupportingTables,SLOT(InsertRow()));
 			connect(deleteAct,SIGNAL(triggered()),mSupportingTables,SLOT(DeleteRows()));
 			connect(reloadAct,SIGNAL(triggered()),mSupportingTables,SLOT(ReloadTable()));
@@ -162,7 +164,7 @@ void RapTab::TabIndexChanged (int index)
 			break;
 			
 		case 4:
-			// Make the necessary connections for the mLinks objec
+			// Make the necessary connections for the mLinks object
 			connect(insertAct,SIGNAL(triggered()),mLinks,SLOT(InsertRow()));
 			connect(deleteAct,SIGNAL(triggered()),mLinks,SLOT(DeleteRows()));
 			connect(reloadAct,SIGNAL(triggered()),mLinks,SLOT(ReloadTable()));
@@ -176,7 +178,7 @@ void RapTab::TabIndexChanged (int index)
 			break;
 			
 		case 5:
-			// Make the necessary connections for the mServedKeyLocations objec
+			// Make the necessary connections for the mServedKeyLocations object
 			connect(insertAct,SIGNAL(triggered()),mServedKeyLocations,SLOT(InsertRow()));
 			connect(deleteAct,SIGNAL(triggered()),mServedKeyLocations,SLOT(DeleteRows()));
 			connect(reloadAct,SIGNAL(triggered()),mServedKeyLocations,SLOT(ReloadTable()));
@@ -190,7 +192,7 @@ void RapTab::TabIndexChanged (int index)
 			break;
 			
 		case 6:
-			// Make the necessary connections for the mRasterFiles objec
+			// Make the necessary connections for the mRasterFiles object
 			connect(insertAct,SIGNAL(triggered()),mRasterFiles,SLOT(InsertRow()));
 			connect(deleteAct,SIGNAL(triggered()),mRasterFiles,SLOT(DeleteRows()));
 			connect(reloadAct,SIGNAL(triggered()),mRasterFiles,SLOT(ReloadTable()));
@@ -202,5 +204,19 @@ void RapTab::TabIndexChanged (int index)
 			insertAct->setEnabled(true);
 			deleteAct->setEnabled(true);
 			break;
-	} // switch
+
+/*		case 7:
+			// Make the necessary connections for the mMeasurements object
+			connect(insertAct,SIGNAL(triggered()),mMeasurements,SLOT(InsertRow()));
+			connect(deleteAct,SIGNAL(triggered()),mMeasurements,SLOT(DeleteRows()));
+			connect(reloadAct,SIGNAL(triggered()),mMeasurements,SLOT(ReloadTable()));
+			connect(showAllAct,SIGNAL(triggered()),mMeasurements,SLOT(ShowAllContents()));
+			connect(copyAct,SIGNAL(triggered()),mMeasurements,SLOT(Copy()));
+			connect(pasteAct,SIGNAL(triggered()),mMeasurements,SLOT(Paste()));
+			connect(cutAct,SIGNAL(triggered()),mMeasurements,SLOT(Cut()));
+			connect(searchAct,SIGNAL(triggered()),mMeasurements,SLOT(Search()));
+			insertAct->setEnabled(true);
+			deleteAct->setEnabled(true);
+			break;
+*/	} // switch
 }

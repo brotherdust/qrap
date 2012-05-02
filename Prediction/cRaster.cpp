@@ -270,7 +270,7 @@ bool cRaster::ReadFile(string Directory,
 		msgs = MyRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer);
 	}
-*/
+
 	else if (filetype == ORTFILE) // ORT file
 	{
 		cout << "In bool cRaster::ReadFile( ... filetype == ORTFILE " << endl;
@@ -279,6 +279,7 @@ bool cRaster::ReadFile(string Directory,
 						mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer);
 		mProjType=WGS84GC;
 	}
+*/
 	if (!msgs)
 	{
 		cout << "In bool cRaster::ReadFile( ... !msgs " << endl;
@@ -304,7 +305,7 @@ bool cRaster::ReadFile(string Directory,
 				mSouth = mNW.Hemisphere();
 				cout << "In bool cRaster::ReadFile( ... !msgs  BINFILE " << endl;
 			}
-			else
+/*			else
 			{
 				cORT MyORTRaster;
 				msgs =(MyORTRaster.openFile(mRaster, Directory, mNW,mSE, 
@@ -317,8 +318,9 @@ bool cRaster::ReadFile(string Directory,
 					mSouth = true;
 					cout << "In bool cRaster::ReadFile( ... !msgs  ORTFILE " << endl;
 				}
-				else return false;
-			}
+*/
+			else return false;
+			
 		}
 	}
 	if (msgs)

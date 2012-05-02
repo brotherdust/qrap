@@ -239,9 +239,9 @@ bool cGeoP::SetGeoType(GeoType type, int central)
 		case DEG:
 			switch (type)
 			{
-				case DEG: 			return true;
+				case DEG: 		return true;
 				case WGS84GC: 		return DEGtoWGS84GC(central);
-				case UTM:			return DEGtoUTM(central);
+				case UTM:		return DEGtoUTM(central);
 				case NDEF:
 				{
 					cout << "Assuming Not Defined GeoType is Degrees." << endl;
@@ -252,9 +252,9 @@ bool cGeoP::SetGeoType(GeoType type, int central)
 		case WGS84GC:
 			switch (type)
 			{
-				case DEG:			return WGS84GCtoDEG();
+				case DEG:		return WGS84GCtoDEG();
 				case WGS84GC:		return WGS84GCtoWGS84GC(central);
-				case UTM:			return WGS84GCtoUTM(central);
+				case UTM:		return WGS84GCtoUTM(central);
 				case NDEF:
 				{
 					cout << "Assuming Not Defined GeoType is Degrees." << endl;

@@ -41,7 +41,7 @@ cRapInventory::cRapInventory (QWidget* parent) : QWidget(parent)
 	
 	// Setup the mTableList
 	mTableList->setMinimumSize(140,400);
-	mTableList->setMaximumWidth(140);
+	mTableList->setMaximumWidth(160);
 	
 	// create the mProgress bar
 	mProgress = new QProgressBar(this);

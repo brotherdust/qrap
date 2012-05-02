@@ -33,8 +33,6 @@
 #include "cMemmngr.h"
 #include "cGDAL.h"
 #include "cBIN.h"
-#include "cORT.h"
-//#include "cGRASS.h"
 
 namespace Qrap
 {

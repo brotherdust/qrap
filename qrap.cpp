@@ -124,9 +124,8 @@ void QRap::initGui()
     	mSpectralAction = new QAction(QIcon(":/qrap/Spectral.png"),tr("Perform Spectral Interference Analysis"), this);
     	mPreferencesAction = new QAction(QIcon(":/qrap/Preferences.png"),tr("Preferences"), this);
 //    	mImportExportAction = new QAction(QIcon(":/qrap/ImportExport.png"),tr("Import Export"),this);
-    	mHelpAction = new QAction(QIcon(":/qrap/Help.png"),tr("QRap Help"), this);
+//    	mHelpAction = new QAction(QIcon(":/qrap/Help.png"),tr("QRap Help"), this);
 
-//    	mColourManagerAction = new QAction(QIcon(":/qrap/Colour.png"),tr("Colour Manager"), this);
      	cout << "Na new Actions" << endl;
   
 	// Connect the action to the run
@@ -143,7 +142,6 @@ void QRap::initGui()
   	connect(mPreferencesAction, SIGNAL(activated()), this, SLOT(Preferences()));
 //  	connect(mImportExportAction,SIGNAL(activated()), this, SLOT(ImportExport()));
 //  	connect(mHelpAction,SIGNAL(activated()), this, SLOT(Help()));
-//  	connect(mColourManagerAction, SIGNAL(activated()), this, SLOT(ColourManager()));
   	cout << "Na Connect" << endl;
 
   	// Add the toolbar to the main window
@@ -219,6 +217,7 @@ void QRap::unload()
 	  	mQGisIface->removeToolBarIcon(mSpectralAction);
 		mQGisIface->removeToolBarIcon(mPreferencesAction);
 	  	mQGisIface->removeToolBarIcon(mQActionPointer);
+
 		cout << "QRap::unload(): deleting mQActionPointer" << endl;
 	  	delete mQActionPointer;
 		cout << "QRap::unload(): deleting mSiteAction" << endl;
@@ -238,8 +237,12 @@ void QRap::unload()
 	  	delete mPreferencesAction;
 	//  	delete mImportExportAction;
 	//  	delete mHelpAction;
+
+		disconnect(Mouse);
+	//	delete Mouse;
 		mLoaded =false;
 	}
+	cout << "QRap::unload(): leaving" << endl;
 }
 
 
@@ -298,7 +301,7 @@ QGISEXTERN QString version()
 // Delete ourself
 QGISEXTERN void unload( QgisPlugin * thePluginPointer )
 {
-  	delete thePluginPointer;
+//  	delete thePluginPointer;
 }
 
 //*****************************************************************************
@@ -385,7 +388,7 @@ bool QRap::openDatabaseConnection()
 		}
 		else
 		{
-			QMessageBox::information(mQGisIface->mainWindow(), "QRap", "Failing to connect to QRap-database. Removing Q-Rap plugin");	
+			QMessageBox::information(mQGisIface->mainWindow(), "QRap", "Failing to connect to QRap-database. Q-Rap is a Radio Planning Tool that uses a PostgreSQL database. For more information on how to create the database see the manual.pdf $3.2. Also see http://www.QRap.org.za for more info. Removing Q-Rap plugin");	
 			cout << "QRap::openDatabaseConnection(): else gDb.Connected() " << endl;
 			unload();
 		}

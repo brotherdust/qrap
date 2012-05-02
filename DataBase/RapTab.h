@@ -39,6 +39,7 @@
 #include "cRapLinks.h"
 #include "cRapServedKeyLocations.h"
 #include "cRapRasterFiles.h"
+#include "cRapMeasurements.h"
 
 namespace Qrap
 {
@@ -74,7 +75,8 @@ namespace Qrap
 		cRapSupportingTables*	mSupportingTables;	///< A pointer to a cSupportingTables object that allows the user to manage the supporting tables.
 		cRapLinks*		mLinks;			///< A pointer to a cRapLinks object that allows the user to manage the links data.
 		cRapServedKeyLocations*	mServedKeyLocations;	///< A pointer to a cRapServedKeyLocations object that allows the user to manage the served key locations.
-		cRapRasterFiles*	mRasterFiles;		///< A pointer to a cRapRasterFiles object that allos the user to manage the raster file data.
+		cRapRasterFiles*	mRasterFiles;		///< A pointer to a cRapRasterFiles object that allows the user to manage the raster file data.
+		cRapMeasurements*	mMeasurements;		///< A pointer to a cRapMeasurements object that allows the user to manage the measurement data.
 	};
 }
 #endif

@@ -2126,9 +2126,19 @@ www.QRap.org.za
 		      label="Last modified"
 		      visible="false" />
 
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+	       <field name="date"
+		      type="timestamp without time zone"
+		      label="Date of Measurements"/>
+
 	       <field name = "name"
 		      type = "varchar(20)"
-		      label = "name" />
+		      label = "Name" />
 
 		<field name = "description"
 		       type = "text"
@@ -2148,9 +2158,15 @@ www.QRap.org.za
 		      label="Last modified"
 		      visible="false" />
 
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
 	       <field name = "name"
 		      type = "varchar(20)"
-		      label = "name" />
+		      label = "Name" />
 
 		<field name = "description"
 		       type = "text"
@@ -2170,9 +2186,15 @@ www.QRap.org.za
 		      label="Last modified"
 		      visible="false" />
 
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
 	       <field name = "name"
 		      type = "varchar(20)"
-		      label = "name" />
+		      label = "Name" />
 
 		<field name = "description"
 		       type = "text"
@@ -2197,7 +2219,7 @@ www.QRap.org.za
 		       label="Position"
 		       description="The latitude and longitude of measurement point "
 		       postgis="true" />
-		
+
 		<field name="originaltp"
 		       type="bigint references testpoint(id)"
 		       label="Original TestPoint"
@@ -2242,11 +2264,16 @@ www.QRap.org.za
 		<field name = "ci"
 		       type = "integer references cell(id) on delete cascade"
 		       label = "Cell ID"
-		       ui = "dropdown(fromtable,cell_view,id)" />
+		       ui = "dropdown(fromtable,cell_view,sectorname)" />
 				
 		<field name = "tp"
 		       type = "integer references testpoint(id) on delete cascade"
 		       label = "TestPoint"/>
+
+		<field name = "frequency"
+		       type = "real"
+		       label = "Frequency"
+		       description="The frequency in MHz at which the measurement was done." />
 
 		<field name = "azimuth"
 		       type = "real"
@@ -2266,7 +2293,7 @@ www.QRap.org.za
 		<field name = "pathloss"
 		       type = "real"
 		       label = "pathloss"
-		       description="The calculated basix transmission loss between the site and the measurement point" />
+		       description="The calculated basic transmission loss between the site and the measurement point" />
 
 		<field name = "measvalue"
 		       type = "real"

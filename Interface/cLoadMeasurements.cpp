@@ -46,51 +46,115 @@ cLoadMeasurements::~cLoadMeasurements()
 {
 }
 
-//***********************************************************
-void cLoadMeasurements::on_cBoxMeasType_currentIndexChanged()
+//****************************************************************
+void cLoadMeasurements::on_pButtonClose_clicked()
 {
-	if ("CW *.csv with Timestamp, Lat, Lon, and RSSI"==cBoxMeasType->currentText())
-	{
-		mFileFormat=eCSV;
-		cBoxCell->setEnabled(true);
-		lTxCell->setEnabled(true);
-	}
-	else if ("CW space delimited Lat, Lon and RxLev"==cBoxMeasType->currentText())
+	close();
+}
+
+//***********************************************************
+void cLoadMeasurements::on_cBoxFileType_currentIndexChanged()
+{
+	bool InputsRequired=false;
+	if (1==cBoxFileType->currentIndex())
 	{
 		mFileFormat=eSpaceDelimited;
-		cBoxCell->setEnabled(true);
-		lTxCell->setEnabled(true);
+		InputsRequired=true;
 	}
-	else if ("CW *.val file"==cBoxMeasType->currentText())
+	else if (2==cBoxFileType->currentIndex())
 	{
-		mFileFormat=eVal;
-		cBoxCell->setEnabled(true);
-		lTxCell->setEnabled(true);
+		mFileFormat=eCSV;
+		InputsRequired=true;
 	}
-	else if ("GSM Drivetest"==cBoxMeasType->currentText())
+	else if (0==cBoxFileType->currentIndex())
 	{
 		mFileFormat=eDriveTest;
+		InputsRequired=false;
+	}
+	if (InputsRequired)
+	{
+		StringIntArray vals;
+		StringIntArrayIterator iterator;
+		int j=1;
+		cBoxCell->insertItem(0,"0:NULL");
+		gDb.GetFieldUiParams("measurement", "ci" ,vals);
+		for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
+		{
+			QString temp = QString::number(iterator->first) + ":" + QString::fromStdString(iterator->second);
+			cBoxCell->insertItem(j,temp,qVariantFromValue(iterator->first));
+			j++;
+		} // for
+		cBoxCell->setEnabled(true);
+		lTxCell->setEnabled(true);
+		lFrequency->setEnabled(true);
+		dSpinBoxFreq->setEnabled(true);
+	}
+	else
+	{
 		cBoxCell->setEnabled(false);
 		lTxCell->setEnabled(false);
+		lFrequency->setEnabled(false);
+		dSpinBoxFreq->setEnabled(false);
 	}
 }
 
 //****************************************************************************
 void cLoadMeasurements::on_pButtonLoad_clicked()
 {
-	if ("CW *.csv with Timestamp, Lat, Lon, and RSSI"==cBoxMeasType->currentText())
+
+	QStringList parts;
+	cout << " In cLoadMeasurements::on_pButtonLoad_clicked()" << endl;
+	parts = cBoxCell->currentText().split(":");
+	unsigned CI = (unsigned) parts[0].toInt();
+
+	parts = cBoxMeasType->currentText().split(":");
+	unsigned MeasType = (unsigned) parts[0].toInt();
+	
+	parts = cBoxMeasSource->currentText().split(":");
+	unsigned MeasSource = (unsigned) parts[0].toInt();
+
+	parts = cBoxPosSource->currentText().split(":");
+	unsigned PosSource = (unsigned) parts[0].toInt();
+
+	double Sensitivity = dSpinBoxSensitivity->value();
+	double MobileHeight = dSpinBoxMobileH->value();
+	double Frequency = dSpinBoxFreq->value();
+
+	cout << " In cLoadMeasurements::on_pButtonLoad_clicked(), ";
+	cout << "cBoxFileType->currentIndex() = " << cBoxFileType->currentIndex() << endl;
+	if (1==cBoxFileType->currentIndex())
+	{
+		mFileFormat=eSpaceDelimited;
+		cMeasImportSpace MeasImport(Sensitivity, Frequency, MobileHeight,
+					CI, MeasType, MeasSource, PosSource);
+
+		QStringList::Iterator it = mFiles.begin();
+		QString File;
+		char * filename;
+		filename = new char[MAX_PATH];
+		string directory = mSourceDir.toStdString();
+		string file;
+		pButtonLoad->setEnabled(false);
+		pButtonBrowse->setEnabled(false);
+		pButtonClose->setEnabled(false);
+	   	while( it != mFiles.end() ) 
+	    	{
+			File = *it;
+			file = File.toStdString(); 
+			sprintf(filename,"%s/%s",directory.c_str(),file.c_str());
+			MeasImport.LoadMeasurement(filename);
+	    		++it;
+	    	}
+		pButtonLoad->setEnabled(true);
+		pButtonBrowse->setEnabled(true);
+		pButtonClose->setEnabled(true);
+		delete [] filename;
+	}
+	else if (2==cBoxFileType->currentIndex())
 	{
 		mFileFormat=eCSV;
 	}
-	else if ("CW space delimited Lat, Lon and RxLev"==cBoxMeasType->currentText())
-	{
-		mFileFormat=eSpaceDelimited;
-	}
-	else if ("CW *.val file"==cBoxMeasType->currentText())
-	{
-		mFileFormat=eVal;
-	}
-	else if ("GSM Drivetest"==cBoxMeasType->currentText())
+	else if (0==cBoxFileType->currentIndex())
 	{
 		mFileFormat=eDriveTest;
 	}
@@ -149,38 +213,36 @@ void cLoadMeasurements::LoadData()
 	StringIntArray vals;
 	StringIntArrayIterator iterator;
 	int j=1;
-	int key = 0;
 	
 	cBoxMeasType->insertItem(0,"0:NULL");
-	gDb.GetFieldUiParams("meastype","name",vals);
+	gDb.GetFieldUiParams("testpoint","meastype",vals);
+	
 	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 	{
 		QString temp = QString::number(iterator->first) + ":" + QString::fromStdString(iterator->second);
-		cBoxMeasType->insertItem(j,temp,qVariantFromValue(iterator->first));
+		cBoxMeasType->insertItem(j,temp);
 		j++;
 	} // for
-	cBoxMeasType->setCurrentIndex(key);
 
 	cBoxMeasSource->insertItem(0,"0:NULL");
-	gDb.GetFieldUiParams("measdatasource","name",vals);
+	gDb.GetFieldUiParams("testpoint","measdatasource",vals);
 	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 	{
 		QString temp = QString::number(iterator->first) + ":" + QString::fromStdString(iterator->second);
 		cBoxMeasSource->insertItem(j,temp,qVariantFromValue(iterator->first));
 		j++;
 	} // for
-	cBoxMeasSource->setCurrentIndex(key);
 
 
 	cBoxPosSource->insertItem(0,"0:NULL");
-	gDb.GetFieldUiParams("positionsource","name",vals);
+	gDb.GetFieldUiParams("testpoint","positionsource",vals);
+//	cout << vals.begin()->second << endl;
 	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 	{
 		QString temp = QString::number(iterator->first) + ":" + QString::fromStdString(iterator->second);
 		cBoxPosSource->insertItem(j,temp,qVariantFromValue(iterator->first));
 		j++;
 	} // for
-	cBoxPosSource->setCurrentIndex(key);
 
 }//end cLoadMeasurements::LoadData()
 

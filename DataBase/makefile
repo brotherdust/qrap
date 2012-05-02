@@ -1,6 +1,6 @@
 CC = g++ -g -Wall -W -D_REENTRANT -c -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore
 
-OBJECTS = cSettings.o cAlert.o cBase.o cDatabase.o Test.o cSiteEditTools.o cRaster.o cGeoP.o cBIN.o cORT.o cGDAL.o cMemmngr.o
+OBJECTS = cSettings.o cAlert.o cBase.o cDatabase.o Test.o cSiteEditTools.o cRaster.o cGeoP.o cBIN.o cGDAL.o cMemmngr.o
 all: qraputil makefile
 
 qraputil: $(OBJECTS) makefile 
@@ -38,9 +38,6 @@ cGDAL.o: ../Prediction/cGDAL.h ../Prediction/cGDAL.cpp makefile
 
 cBIN.o: ../Prediction/cBIN.h ../Prediction/cBIN.cpp makefile
 	$(CC) ../Prediction/cBIN.cpp 
-
-cORT.o: ../Prediction/cORT.h ../Prediction/cORT.cpp makefile
-	$(CC) ../Prediction/cORT.cpp 
 	
 clean: 
 	-rm -f *.o *~ *.out qraputil

@@ -34,6 +34,9 @@
 #include <QDir>
 #include <QMessageBox>
 #include <stdio.h>
+#include "../Prediction/cMeasImportSpace.h"
+#include <limits.h>
+#define MAX_PATH 250
 
 using namespace std;
 using namespace Qrap;
@@ -58,8 +61,8 @@ public:
 public slots:
 	void on_pButtonBrowse_clicked();
 	void on_pButtonLoad_clicked();
-	void on_cBoxMeasType_currentIndexChanged();
-	void on_cBoxCell_currentIndexChanged();
+	void on_pButtonClose_clicked();
+	void on_cBoxFileType_currentIndexChanged();
 	void Finished();
 		
 private:

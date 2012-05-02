@@ -64,11 +64,11 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 	/* Getting the meta data */
 
 	printf( "Driver: %s/%s\n",
-    poDataset->GetDriver()->GetDescription(),
-    poDataset->GetDriver()->GetMetadataItem( GDAL_DMD_LONGNAME ) );
+    	poDataset->GetDriver()->GetDescription(),
+    	poDataset->GetDriver()->GetMetadataItem( GDAL_DMD_LONGNAME ) );
 	printf( "Size is %dx%dx%d\n",
-    poDataset->GetRasterXSize(), poDataset->GetRasterYSize(),
-    poDataset->GetRasterCount() );
+    	poDataset->GetRasterXSize(), poDataset->GetRasterYSize(),
+    	poDataset->GetRasterCount() );
 	if( poDataset->GetProjectionRef() != NULL ) 
 	{
 		poSRS = OGRSpatialReference(poDataset->GetProjectionRef());
@@ -82,6 +82,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		else
 		{
 			//printf("Error in: %s",pszProjWKT);
+			
 			static char *pszProjWKT1[] = {"proj=latlong"};
 			if ((Proj4=pj_init(sizeof(pszProjWKT1)/sizeof(char*),pszProjWKT1)))
 			{
@@ -114,16 +115,16 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 	if( poDataset->GetGeoTransform( adfGeoTransform ) == CE_None )
 	{
 		printf( "Origin = (%.6f,%.6f)\n",adfGeoTransform[0], adfGeoTransform[3] );
-        Rows = poBand->GetYSize();
+        	Rows = poBand->GetYSize();
 		Cols = poBand->GetXSize();
 		rows = Rows;
 		cols = Cols;
 		printf( "Pixel Size = (%.6f,%.6f)\n", adfGeoTransform[1], adfGeoTransform[5] );
-        ns_res = adfGeoTransform[5];
-        ew_res = adfGeoTransform[1];
-        NW.Set(adfGeoTransform[3],adfGeoTransform[0],Proj,-1);
-        SE.Set((adfGeoTransform[3]+ns_res*rows),(adfGeoTransform[0]+ew_res*cols),Proj,-1);
-        printf("Rotation (0 = north is up): %d\n",(int)adfGeoTransform[2]);
+        	ns_res = adfGeoTransform[5];
+        	ew_res = adfGeoTransform[1];
+        	NW.Set(adfGeoTransform[3],adfGeoTransform[0],Proj,-1);
+        	SE.Set((adfGeoTransform[3]+ns_res*rows),(adfGeoTransform[0]+ew_res*cols),Proj,-1);
+        	printf("Rotation (0 = north is up): %d\n",(int)adfGeoTransform[2]);
 	}
 	
 	if (Rows <1 || Cols < 1)
@@ -133,8 +134,8 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		return false;
 	}
 //	cout << Raster << endl;
-    delete_Float2DArray(Raster);
-//    cout << Raster << endl;
+    	delete_Float2DArray(Raster);
+//    	cout << Raster << endl;
 	Raster = new_Float2DArray(Rows,Cols);
 //	cout << Raster << endl;
 
@@ -162,10 +163,10 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		}
 	}
 	delete [] pafScanline;
-    ns_res = fabs(ns_res); 	// MS added fabs 2008-04-16
-    ew_res = fabs(ew_res);	// MS added fabs 2008-04-16
+    	ns_res = fabs(ns_res); 	// MS added fabs 2008-04-16
+    	ew_res = fabs(ew_res);	// MS added fabs 2008-04-16
 	printf("Read GDAL\n");
-    return true;
+	return true;
 }
 
 //**************************************************************************

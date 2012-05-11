@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ColourManager.ui'
 **
-** Created: Sat Nov 13 14:57:59 2010
-**      by: Qt User Interface Compiler version 4.6.2
+** Created: Wed May 9 18:24:32 2012
+**      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -163,7 +163,7 @@ public:
 
     void retranslateUi(QWidget *ColourManager)
     {
-        ColourManager->setWindowTitle(QApplication::translate("ColourManager", "Colour Manager", 0, QApplication::UnicodeUTF8));
+        ColourManager->setWindowTitle(QApplication::translate("ColourManager", "Q-Rap Colour Manager", 0, QApplication::UnicodeUTF8));
         btnOk->setText(QApplication::translate("ColourManager", "Update ", 0, QApplication::UnicodeUTF8));
         mNumberOfEntriesLabel_3->setText(QApplication::translate("ColourManager", "Number of entries:", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("ColourManager", "Prediction:", 0, QApplication::UnicodeUTF8));

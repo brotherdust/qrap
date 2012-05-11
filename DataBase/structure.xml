@@ -1101,9 +1101,9 @@ www.QRap.org.za
 			description="The average expected height of the mobile units."
 			unittype="height"/>
 		       
-		 <field name="description"
-		       type="text"
-		       label="Description" />
+		 <field name="name"
+		       type="varchar(30)"
+		       label="Name" />
 		
 		<field name="techkey"
 		       type="smallint references technology(id)"
@@ -2143,6 +2143,13 @@ www.QRap.org.za
 		<field name = "description"
 		       type = "text"
 		       label = "Description" />
+
+		<field name = "mobile"
+		       type = "integer references mobile(id)"
+		       label = "Mobile Measurement Instrument"
+		       description="Refence to the mobile instrument used during the measurements" 
+			ui="dropdown(fromtable,mobile,name)"/>
+
 	</table><!-- measdatasource -->
 
 <!-- *************************************************************************************************************************** -->
@@ -2246,11 +2253,7 @@ www.QRap.org.za
 			unittype = "height"
 		       description="Height above sea level of local ground in meters" />
 
-		<field name = "mobileheight"
-		       type = "real"
-		       label = "Mobile Height"
-			unittype = "height"
-		       description="Antenna height above local ground when measurement was made" />
+
 	</table> <!-- testpoint -->
 
 <!-- *************************************************************************************************************************** -->

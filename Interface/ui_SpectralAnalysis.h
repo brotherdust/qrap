@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'SpectralAnalysis.ui'
+** Form generated from reading UI file 'SpectralAnalysis.ui'
 **
-** Created: Sun Apr 18 16:29:28 2010
-**      by: Qt User Interface Compiler version 4.5.2
+** Created: Wed May 9 18:29:00 2012
+**      by: Qt User Interface Compiler version 4.8.1
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_SPECTRALANALYSIS_H
@@ -70,7 +70,6 @@ public:
         pushSave->setText(QApplication::translate("SpectralAnalysis", "Save", 0, QApplication::UnicodeUTF8));
         lineFilename->setText(QApplication::translate("SpectralAnalysis", "flux.csv", 0, QApplication::UnicodeUTF8));
         lblFilename->setText(QApplication::translate("SpectralAnalysis", "Filename :", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(SpectralAnalysis);
     } // retranslateUi
 
 };

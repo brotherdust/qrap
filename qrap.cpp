@@ -50,7 +50,7 @@ static const QString pluginVersion = QObject::tr( "Version 0.1" );
 
 static const char * const pIdent = "$Id: qrap.cpp 9327 2008-06-10 11:18:44Z magdaleen $";
 static const QgisPlugin::PLUGINTYPE pPluginType = QgisPlugin::UI;
-static const QString pName = QObject::tr("QRap");
+static const QString pName = QObject::tr("Q-Rap");
 static const QString pDescription = QObject::tr("Radio Systems Planning Tool");
 static const QString pPluginVersion = QObject::tr("Version 0.1");
 
@@ -61,7 +61,7 @@ static const QString pPluginVersion = QObject::tr("Version 0.1");
 		mQGisIface (theQgisInterface)
 {
 	pType = QgisPlugin::UI;
-	pName = QObject::tr("QRap");
+	pName = QObject::tr("Q-Rap");
 	pDescription = QObject::tr("Radio Systems Planning Tool");
 	pPluginVersion = QObject::tr("Version 0.1");	
 }
@@ -75,7 +75,7 @@ QRap::~QRap()
 /* Following functions return name, description, version, and type for the plugin */
 QString QRap::name()
 {
-	pName = QObject::tr("QRap");
+	pName = QObject::tr("Q-Rap");
   	return pName;
 }
 
@@ -112,19 +112,20 @@ void QRap::initGui()
 	mMouseType = CLEAN;
 	// Create the action for tool
 	cout << "Voor new Actions" << endl;
-	mQActionPointer = new QAction(QIcon(":/qrap/Data.png"),tr("QRap Database Interface"), this);
-	mSiteAction = new QAction(QIcon(":/qrap/Site.png"),tr("Place a Site"), this);
-    	mSelectSiteAction = new QAction(QIcon(":/qrap/SiteSelect.png"),tr("Select a Site"), this);
-    	mDeleteSiteAction = new QAction(QIcon(":/qrap/SiteDelete.png"),tr("Delete a Site"), this);
-	mLinkAction = new QAction(QIcon(":/qrap/Link.png"),tr("Link Analysis"), this);
-	mSelectLinkAction = new QAction(QIcon(":/qrap/LinkSelect.png"),tr("Select a Link"), this);
-	mDeleteLinkAction = new QAction(QIcon(":/qrap/LinkDelete.png"),tr("Delete a Link"), this);
-	mMultiLinkAction = new QAction(QIcon(":/qrap/MultiLink.png"),tr("Establish all Links possible in set of Sites"), this);
-	mRadioAction = new QAction(QIcon(":/qrap/Coverage.png"),tr("Perform a Prediction"), this);
-    	mSpectralAction = new QAction(QIcon(":/qrap/Spectral.png"),tr("Perform Spectral Interference Analysis"), this);
-    	mPreferencesAction = new QAction(QIcon(":/qrap/Preferences.png"),tr("Preferences"), this);
+	mQActionPointer = new QAction(QIcon(":/qrap/Data.png"),tr("Q-Rap Database Interface"), this);
+	mSiteAction = new QAction(QIcon(":/qrap/Site.png"),tr("Q-Rap: Place a Site"), this);
+    	mSelectSiteAction = new QAction(QIcon(":/qrap/SiteSelect.png"),tr("Q-Rap: Select a Site"), this);
+    	mDeleteSiteAction = new QAction(QIcon(":/qrap/SiteDelete.png"),tr("Q-Rap: Delete a Site"), this);
+	mLinkAction = new QAction(QIcon(":/qrap/Link.png"),tr("Q-Rap: Link Analysis"), this);
+	mSelectLinkAction = new QAction(QIcon(":/qrap/LinkSelect.png"),tr("Q-Rap: Select a Link"), this);
+	mDeleteLinkAction = new QAction(QIcon(":/qrap/LinkDelete.png"),tr("Q-Rap: Delete a Link"), this);
+	mMultiLinkAction = new QAction(QIcon(":/qrap/MultiLink.png"),tr("Q-Rap: Establish all Links possible in set of Sites"), this);
+	mRadioAction = new QAction(QIcon(":/qrap/Coverage.png"),tr("Q-Rap: Perform a Prediction"), this);
+	mMeasAnalysisAction = new QAction(QIcon(":/qrap/Measurements.png"),tr("Q-Rap: Compare measurements with predictions"), this);
+    	mSpectralAction = new QAction(QIcon(":/qrap/Spectral.png"),tr("Q-Rap: Perform Spectral Interference Analysis"), this);
+    	mPreferencesAction = new QAction(QIcon(":/qrap/Preferences.png"),tr("Q-Rap Preferences"), this);
 //    	mImportExportAction = new QAction(QIcon(":/qrap/ImportExport.png"),tr("Import Export"),this);
-//    	mHelpAction = new QAction(QIcon(":/qrap/Help.png"),tr("QRap Help"), this);
+//    	mHelpAction = new QAction(QIcon(":/qrap/Help.png"),tr("Q-Rap Help"), this);
 
      	cout << "Na new Actions" << endl;
   
@@ -138,6 +139,7 @@ void QRap::initGui()
 	connect(mMultiLinkAction, SIGNAL(activated()), this, SLOT(MultiLink()));
   	connect(mSelectLinkAction, SIGNAL(activated()), this, SLOT(SelectLink()));
   	connect(mRadioAction, SIGNAL(activated()), this, SLOT(Prediction()));
+	connect(mMeasAnalysisAction, SIGNAL(activated()), this, SLOT(Measurements()));
   	connect(mSpectralAction, SIGNAL(activated()), this, SLOT(SpectralAnalysis()));
   	connect(mPreferencesAction, SIGNAL(activated()), this, SLOT(Preferences()));
 //  	connect(mImportExportAction,SIGNAL(activated()), this, SLOT(ImportExport()));
@@ -145,9 +147,9 @@ void QRap::initGui()
   	cout << "Na Connect" << endl;
 
   	// Add the toolbar to the main window
-  	mToolBarPointer = mQGisIface->addToolBar(tr("QRap")); 
+  	mToolBarPointer = mQGisIface->addToolBar(tr("Q-Rap")); 
   	mToolBarPointer->setIconSize(QSize(24,24));
-  	mToolBarPointer->setObjectName("QRap");
+  	mToolBarPointer->setObjectName("Q-Rap");
   	// Add the icon to the toolbar
 
   	mToolBarPointer->addAction(mSiteAction);
@@ -158,6 +160,7 @@ void QRap::initGui()
   	mToolBarPointer->addAction(mDeleteLinkAction);
   	mToolBarPointer->addAction(mRadioAction);
 	mToolBarPointer->addAction(mMultiLinkAction);
+	mToolBarPointer->addAction(mMeasAnalysisAction);
   	mToolBarPointer->addAction(mSpectralAction);
   	mToolBarPointer->addAction(mPreferencesAction);
   	mToolBarPointer->addAction(mQActionPointer);
@@ -218,22 +221,16 @@ void QRap::unload()
 		mQGisIface->removeToolBarIcon(mPreferencesAction);
 	  	mQGisIface->removeToolBarIcon(mQActionPointer);
 
-		cout << "QRap::unload(): deleting mQActionPointer" << endl;
 	  	delete mQActionPointer;
-		cout << "QRap::unload(): deleting mSiteAction" << endl;
 	  	delete mSelectSiteAction;
 		delete mDeleteSiteAction;
 		delete mSiteAction;
-		cout << "QRap::unload(): deleting mRadioAction" << endl;
 	  	delete mRadioAction;
-		cout << "QRap::unload(): deleting mLinkAction" << endl;
 	  	delete mLinkAction;
 		delete mSelectLinkAction;
 		delete mDeleteLinkAction;
-		cout << "QRap::unload(): deleting mSpectralAction" << endl;
 	  	delete mSpectralAction;
 		delete mMultiLinkAction;
-		cout << "QRap::unload(): deleting mPreferencesAction" << endl;
 	  	delete mPreferencesAction;
 	//  	delete mImportExportAction;
 	//  	delete mHelpAction;
@@ -273,7 +270,7 @@ QGISEXTERN QgisPlugin * classFactory(QgisInterface * theQgisInterfacePointer)
 // the class may not yet be insantiated when this method is called.
 QGISEXTERN QString name()
 {
-	return QObject::tr("QRap");
+	return QObject::tr("Q-Rap");
 }
 
 //*******************************************************************************
@@ -340,9 +337,9 @@ bool QRap::openDatabaseConnection()
 		int ret,id;
 		cout << "Voor connectDB " << endl;
 		// connect to the local database
-		ret = idr.connectDB("localhost","qrap", dbusername.c_str(),dbpassword.c_str());
+		ret = idr.connectDB("localhost","Q-Rap", dbusername.c_str(),dbpassword.c_str());
 		if (!ret) {
-			QMessageBox::information(NULL,"QRap","Failed to connect to the local database");
+			QMessageBox::information(NULL,"Q-Rap","Failed to connect to the local database");
 		}
 
 		// retrieve the hostname
@@ -388,7 +385,7 @@ bool QRap::openDatabaseConnection()
 		}
 		else
 		{
-			QMessageBox::information(mQGisIface->mainWindow(), "QRap", "Failing to connect to QRap-database. Q-Rap is a Radio Planning Tool that uses a PostgreSQL database. For more information on how to create the database see the manual.pdf $3.2. Also see http://www.QRap.org.za for more info. Removing Q-Rap plugin");	
+			QMessageBox::information(mQGisIface->mainWindow(), "Q-Rap", "Failing to connect to QRap-database. Q-Rap is a Radio Planning Tool that uses a PostgreSQL database. For more information on how to create the database see the manual.pdf $3.2. Also see http://www.QRap.org.za for more info. Removing Q-Rap plugin");	
 			cout << "QRap::openDatabaseConnection(): else gDb.Connected() " << endl;
 			unload();
 		}
@@ -515,7 +512,7 @@ void QRap::ReceivedLeftPoint(QgsPoint &Point)
 		if (mMouseType == MOVESITE)
 		{
 			cout << " movesite " << endl;
-			QMessageBox::information(mQGisIface->mainWindow(), "QRap", "Wait: getting height data at point");
+			QMessageBox::information(mQGisIface->mainWindow(), "Q-Rap", "Wait: getting height data at point");
 			MoveSiteDialog((Point.y()),(Point.x()));
 			mMouseType = CLEAN;
 			mQGisIface->mapCanvas()->setCursor(Qt::OpenHandCursor);
@@ -524,7 +521,7 @@ void QRap::ReceivedLeftPoint(QgsPoint &Point)
 		else if (mMouseType == PLACESITE)
 		{
 			cout << " placesite " << endl;
-			QMessageBox::information(mQGisIface->mainWindow(), "QRap", "Wait: getting height data at point");
+			QMessageBox::information(mQGisIface->mainWindow(), "Q-Rap", "Wait: getting height data at point");
 			PlaceSiteDialog((Point.y()),(Point.x()),false);
 			if (mMouseType!=MOVESITE)
 			{
@@ -678,7 +675,7 @@ void QRap::UpdateSiteLayer()
 	int LayerCount = mQGisIface->mapCanvas()->layerCount();
 	QString temp = QString("%1").arg(LayerCount);
 	QgsLegend *Legend;
-	QMessageBox::information(mQGisIface->mainWindow(), "QRap", temp);
+	QMessageBox::information(mQGisIface->mainWindow(), "Q-Rap", temp);
 }
 
 //****************************************************************************************
@@ -729,6 +726,14 @@ void QRap::Preferences()
 {
 	PreferencesDialog *Preferences = new PreferencesDialog();
 	Preferences->show();
+}
+
+
+//************************************************************************************
+void QRap::Measurements()
+{
+	cMeasurementAnalysis *Measurements = new cMeasurementAnalysis();
+	Measurements->show();
 }
 
 

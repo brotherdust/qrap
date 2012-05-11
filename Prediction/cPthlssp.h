@@ -39,7 +39,7 @@
 #include "cProfile.h"
 
 // local defines
-#define MAXPEAK 10
+#define MAXPEAK 4
 
 namespace Qrap
 {
@@ -244,6 +244,7 @@ namespace Qrap
 			double CalcDiffLoss(const int BeginIndex, const int EndIndex,
 						int PeakIndex, const double ReffHeight,
 						const double SQd1d2, double radius,
+						bool MainEdge,
 						int &TooManyPeaks, double &KnifeEdge, double & RoundHill, 
 						const double GroundPermittivity = 12.0,
 						const double GroundConductivity = 0.0005,

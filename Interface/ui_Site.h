@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'Site.ui'
+** Form generated from reading UI file 'Site.ui'
 **
-** Created: Sat May 1 08:44:25 2010
-**      by: Qt User Interface Compiler version 4.5.2
+** Created: Wed May 9 18:28:43 2012
+**      by: Qt User Interface Compiler version 4.8.1
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_SITE_H
@@ -147,7 +147,6 @@ public:
         btnMove->setToolTip(QApplication::translate("Site", "To move the site to specific point on the map, click here, than click on the position. The values of the new position will appear combo boxes, but will only change after updating or committing the site.", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
         btnMove->setText(QApplication::translate("Site", "Move Site to ...", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(Site);
     } // retranslateUi
 
 };

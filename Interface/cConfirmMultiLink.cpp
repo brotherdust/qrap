@@ -352,7 +352,7 @@ void cConfirmMultiLink::on_pushOk_clicked()
 	}
 
 
-	eOutputUnits Units = dB;
+	eOutputUnits Units = dBm;
 	double PlotResolution = atof(gDb.GetSetting("PlotResolution").c_str());
 	string Down = gDb.GetSetting("Downlink");
 	bool DownLink;

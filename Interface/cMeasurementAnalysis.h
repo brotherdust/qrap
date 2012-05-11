@@ -4,7 +4,7 @@
  *    Version     : 0.1
  *    Date        : 2012/04/18
  *    License     : GNU GPLv3
- *    File        : cLoadMeasurements.h
+ *    File        : cMeasurementAnalysis.h
  *    Copyright   : (c) University of Pretoria
  *    Author      : Magdaleen Ballot 
  *                : email: magdaleen.ballot@up.ac.za
@@ -24,60 +24,41 @@
  ************************************************************************* */
 //\TODO: This whole LoadRasterFile bunch need to be cleaned up.
 
-#ifndef CLOADMEASUREMENTS_H_
-#define CLOADMEASUREMENTS_H_
+#ifndef CMeasurementAnalysis_H_
+#define CMeasurementAnalysis_H_
 
 #include "../DataBase/Config.h"
-#include "ui_LoadMeasurements.h"
+#include "../Prediction/cMeasAnalysisCalc.h"
 #include <QFileDialog>
 #include <QFile>
 #include <QDir>
 #include <QMessageBox>
 #include <stdio.h>
-#include "../Prediction/cMeasImportSpace.h"
-#include "../Prediction/cMeasImportCSV.h"
 #include <limits.h>
 #define MAX_PATH 250
 
 using namespace std;
 using namespace Qrap;
 
-enum eFileFormat
-{
-	eCSV,
-	eSpaceDelimited,
-	eVal,
-	eDriveTest	
-};
 
-
-class cLoadMeasurements:   public QDialog, private Ui::LoadMeasurements
+class cMeasurementAnalysis:   public QDialog, private Ui::MeasurementAnalysis
 {Q_OBJECT
 public:
-	cLoadMeasurements();
-	cLoadMeasurements( QWidget* parent = 0, Qt::WFlags fl = 0 );
-	virtual ~cLoadMeasurements();
+	cMeasurementAnalysis();
+//	cMeasurementAnalysis( QWidget* parent = 0, Qt::WFlags fl = 0 );
+	virtual ~cMeasurementAnalysis();
+
 
 
 public slots:
-	void on_pButtonBrowse_clicked();
-	void on_pButtonLoad_clicked();
-	void on_pButtonClose_clicked();
-	void on_cBoxFileType_currentIndexChanged();
+	void on_pushOk_clicked();
+	void on_pushCancel_clicked();
 	void Finished();
 		
 private:
 
 	void Setup();
 	void LoadData();
-
-	unsigned mFileCount;
-	QStringList mFiles;
-	QString mSourceDir;
-	eFileFormat mFileFormat;
-	unsigned mPosSource;
-	unsigned mMeasSource;
-	unsigned mCI_CellID;
 };
 
 #endif /*CLOADRASTERFILES_H_*/

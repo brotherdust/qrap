@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>deleteDialog</class>
- <widget class="QDialog" name="deleteDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="deleteDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,14 +10,15 @@
     <height>94</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>Delete an Object</string>
+  <property name="windowTitle">
+   <string>Q-Rap Delete an Object</string>
   </property>
-  <property name="windowIcon" >
-   <iconset resource="../DataBase/application.qrc" >:/images/logo_icon.png</iconset>
+  <property name="windowIcon">
+   <iconset resource="../DataBase/application.qrc">
+    <normaloff>:/images/logo_icon.png</normaloff>:/images/logo_icon.png</iconset>
   </property>
-  <widget class="QLabel" name="label" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>20</y>
@@ -24,12 +26,12 @@
      <height>18</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>TextLabel</string>
    </property>
   </widget>
-  <widget class="QWidget" name="horizontalLayout" >
-   <property name="geometry" >
+  <widget class="QWidget" name="horizontalLayout">
+   <property name="geometry">
     <rect>
      <x>79</x>
      <y>50</y>
@@ -37,13 +39,13 @@
      <height>31</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" >
+   <layout class="QHBoxLayout">
     <item>
      <spacer>
-      <property name="orientation" >
+      <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <property name="sizeHint" >
+      <property name="sizeHint" stdset="0">
        <size>
         <width>40</width>
         <height>20</height>
@@ -52,15 +54,15 @@
      </spacer>
     </item>
     <item>
-     <widget class="QPushButton" name="btnCancel" >
-      <property name="text" >
+     <widget class="QPushButton" name="btnCancel">
+      <property name="text">
        <string>Cancel</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="btnOk" >
-      <property name="text" >
+     <widget class="QPushButton" name="btnOk">
+      <property name="text">
        <string>Delete</string>
       </property>
      </widget>
@@ -69,7 +71,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="../DataBase/application.qrc" />
+  <include location="../DataBase/application.qrc"/>
  </resources>
  <connections/>
 </ui>

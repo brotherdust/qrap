@@ -117,7 +117,6 @@ void cLoadMeasurements::on_pButtonLoad_clicked()
 	unsigned PosSource = (unsigned) parts[0].toInt();
 
 	double Sensitivity = dSpinBoxSensitivity->value();
-	double MobileHeight = dSpinBoxMobileH->value();
 	double Frequency = dSpinBoxFreq->value();
 
 	cout << " In cLoadMeasurements::on_pButtonLoad_clicked(), ";
@@ -125,7 +124,7 @@ void cLoadMeasurements::on_pButtonLoad_clicked()
 	if (1==cBoxFileType->currentIndex())
 	{
 		mFileFormat=eSpaceDelimited;
-		cMeasImportSpace MeasImport(Sensitivity, Frequency, MobileHeight,
+		cMeasImportSpace MeasImport(Sensitivity, Frequency,
 					CI, MeasType, MeasSource, PosSource);
 
 		QStringList::Iterator it = mFiles.begin();
@@ -153,6 +152,32 @@ void cLoadMeasurements::on_pButtonLoad_clicked()
 	else if (2==cBoxFileType->currentIndex())
 	{
 		mFileFormat=eCSV;
+		cMeasImportCSV MeasImport(Sensitivity, Frequency,
+					CI, MeasType, MeasSource, PosSource);
+
+		QStringList::Iterator it = mFiles.begin();
+		QString File;
+		char * filename;
+		filename = new char[MAX_PATH];
+		string directory = mSourceDir.toStdString();
+		string file;
+		pButtonLoad->setEnabled(false);
+		pButtonBrowse->setEnabled(false);
+		pButtonClose->setEnabled(false);
+		setEnabled(false);
+	   	while( it != mFiles.end() ) 
+	    	{
+			File = *it;
+			file = File.toStdString(); 
+			sprintf(filename,"%s/%s",directory.c_str(),file.c_str());
+			MeasImport.LoadMeasurement(filename);
+	    		++it;
+	    	}
+		setEnabled(true);
+		pButtonLoad->setEnabled(true);
+		pButtonBrowse->setEnabled(true);
+		pButtonClose->setEnabled(true);
+		delete [] filename;	
 	}
 	else if (0==cBoxFileType->currentIndex())
 	{
@@ -224,7 +249,7 @@ void cLoadMeasurements::LoadData()
 		j++;
 	} // for
 
-	cBoxMeasSource->insertItem(0,"0:NULL");
+	j=0;
 	gDb.GetFieldUiParams("testpoint","measdatasource",vals);
 	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 	{
@@ -233,7 +258,7 @@ void cLoadMeasurements::LoadData()
 		j++;
 	} // for
 
-
+	j=1;
 	cBoxPosSource->insertItem(0,"0:NULL");
 	gDb.GetFieldUiParams("testpoint","positionsource",vals);
 //	cout << vals.begin()->second << endl;

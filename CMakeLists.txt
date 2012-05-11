@@ -324,7 +324,7 @@ ADD_CUSTOM_TARGET(uninstall
 ########################################################
 # Files
 SET (IMAGE_FILES
-	DataBase/images/add.png
+	DataBase/images/add.png			
 	DataBase/images/back.png
 	DataBase/images/configure.png
 	DataBase/images/connect.png
@@ -405,6 +405,8 @@ SET (qrap_SRCS
 	Prediction/cLink.cpp
 	Prediction/cLoadFile.cpp
 	Prediction/cMeasImportSpace.cpp
+	Prediction/cMeasImportCSV.cpp
+	Prediction/cMeasAnalysisCalc.cpp
      
 	Interface/cPlaceSite.cpp
 	Interface/cConfirmLink.cpp
@@ -422,8 +424,9 @@ SET (qrap_SRCS
 	Interface/cUpdateToServer.cpp
 	Interface/cCreateUpdateFile.cpp
 	Interface/cImportUpdateFile.cpp   
-
+	Interface/cMeasurementAnalysis.cpp
 	Interface/cLoadMeasurements.cpp
+
 	Interface/LoadRasterFiles/cLoadRasterFiles.cpp
 	Interface/LoadRasterFiles/cLoadThread.cpp
 	Interface/LoadRasterFiles/cLoadFiles.cpp
@@ -450,6 +453,7 @@ SET (qrap_UIS
         Interface/LinkAnalysis.ui
         Interface/ConfirmPrediction.ui
 	Interface/LoadMeasurements.ui
+	Interface/MeasurementAnalysis.ui
 	Interface/LoadRasterFiles/CreateDataSet.ui
 	Interface/LoadRasterFiles/CutSet.ui
 	Interface/LoadRasterFiles/LoadFiles.ui
@@ -518,6 +522,8 @@ SET (qrap_MOC_HDRS
 	Prediction/cLink.h
 	Prediction/cLoadFile.h
 	Prediction/cMeasImportSpace.h
+	Prediction/cMeasImportCSV.h
+	Prediction/cMeasAnalysisCalc.h
 
 	Interface/cPlaceSite.h
 	Interface/cConfirmLink.h
@@ -535,7 +541,7 @@ SET (qrap_MOC_HDRS
 	Interface/cUpdateToServer.h
 	Interface/cCreateUpdateFile.h
 	Interface/cImportUpdateFile.h
-
+	Interface/cMeasurementAnalysis.h
 	Interface/cLoadMeasurements.h
 	Interface/LoadRasterFiles/cLoadRasterFiles.h
 	Interface/LoadRasterFiles/cLoadThread.h

@@ -41,7 +41,7 @@ RapTab::RapTab (QWidget* parent) : QTabWidget(parent)
 	mLinks = new cRapLinks(this);
 	mServedKeyLocations = new cRapServedKeyLocations(this);
 	mRasterFiles = new cRapRasterFiles(this);
-//	mMeasurements = new cRapMeasurements(this);
+	mMeasurements = new cRapMeasurements(this);
 	
 	// Add the mSites to the tab widget
 	addTab(mSites,"Sites");
@@ -51,7 +51,7 @@ RapTab::RapTab (QWidget* parent) : QTabWidget(parent)
 	addTab(mLinks,"Links");
 	addTab(mServedKeyLocations,"Served Key Locations");
 	addTab(mRasterFiles,"Raster Files");
-//	addTab(mMeasurements,"Measurements");
+	addTab(mMeasurements,"Measurements");
 	
 	//Customize the tab widget
 	setTabPosition(QTabWidget::North);
@@ -60,7 +60,6 @@ RapTab::RapTab (QWidget* parent) : QTabWidget(parent)
     	sizePolicy.setVerticalStretch(200);	
 	setSizePolicy(sizePolicy);
 	// Add to the tab widget
-//	setMinimumSize(600,450);
 	setGeometry(QRect(0,0,900,400));
 	
 	cout << "RapTab::RapTab connecting TabIndexChanged" << endl;
@@ -205,7 +204,7 @@ void RapTab::TabIndexChanged (int index)
 			deleteAct->setEnabled(true);
 			break;
 
-/*		case 7:
+		case 7:
 			// Make the necessary connections for the mMeasurements object
 			connect(insertAct,SIGNAL(triggered()),mMeasurements,SLOT(InsertRow()));
 			connect(deleteAct,SIGNAL(triggered()),mMeasurements,SLOT(DeleteRows()));
@@ -218,5 +217,5 @@ void RapTab::TabIndexChanged (int index)
 			insertAct->setEnabled(true);
 			deleteAct->setEnabled(true);
 			break;
-*/	} // switch
+	} // switch
 }

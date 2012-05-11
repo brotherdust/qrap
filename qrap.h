@@ -98,6 +98,7 @@ using namespace std;
 #include "Interface/cColourManager.h"
 #include "Interface/cFilterDialog.h"
 #include "DataBase/PreferencesDialog.h"
+#include "Interface/cMeasurementAnalysis.h"
 #include "Interface/cBackup.h"
 #include "Interface/cImportExportMenu.h"
 #include "Interface/cUpdateToServer.h"
@@ -192,6 +193,7 @@ public slots:
   	void SelectArea();
 	void MoveSiteClicked();
   	void Preferences();
+	void Measurements();
   	void SpectralAnalysis();
   	void ColourManager();
   	void DeleteLink();
@@ -256,6 +258,7 @@ private:
   	QAction *mSpectralAction;
   	QAction *mImportExportAction;
   	QAction *mHelpAction;
+	QAction *mMeasAnalysisAction;
 //  	QAction *mColourManagerAction;
 
   

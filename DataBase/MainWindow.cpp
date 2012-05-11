@@ -313,10 +313,10 @@ void MainWindow::CreateActions ()
 	rasterImportAct->setStatusTip(tr("Import raster files."));
 	connect(rasterImportAct,SIGNAL(triggered()),this,SLOT(ImportRasters()));
 
-/*	measImportAct = new QAction(tr("Measurements"),this);
+	measImportAct = new QAction(tr("Measurements"),this);
 	measImportAct->setStatusTip(tr("Import Measurements in various formats to the database"));
 	connect(measImportAct,SIGNAL(triggered()),this,SLOT(ImportMeasurements()));
-*/	
+	
 	searchAct = new QAction(QIcon(":images/find.png"),tr("Search"),this);
 	searchAct->setStatusTip(tr("Search for values in the current table"));
 	searchAct->setShortcut(tr("Ctrl+F"));
@@ -348,7 +348,7 @@ void MainWindow::CreateMenus ()
 	importMenu->addAction(antennaImportAct);
 	importMenu->addAction(rasterImportAct);
 	importMenu->addAction(csvImportAct);
-//	importMenu->addAction(measImportAct);
+	importMenu->addAction(measImportAct);
 	
 	exportMenu = fileMenu->addMenu(tr("&Export"));
 	exportMenu->addAction(csvExportAct);

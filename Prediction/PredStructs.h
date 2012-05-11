@@ -158,5 +158,7 @@ namespace Qrap
 		dBWm2Hz,	///< Description	
 		dBWm2		///< Description
 	};
+
+	
 }
 #endif

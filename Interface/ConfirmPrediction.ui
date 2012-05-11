@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>989</width>
+    <width>1011</width>
     <height>607</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Confirm Prediction Information</string>
+   <string>Q-Rap Prediction Request Form</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../DataBase/application.qrc">
@@ -28,7 +28,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>971</width>
+     <width>991</width>
      <height>241</height>
     </rect>
    </property>
@@ -86,7 +86,7 @@
     <rect>
      <x>10</x>
      <y>260</y>
-     <width>974</width>
+     <width>993</width>
      <height>305</height>
     </rect>
    </property>
@@ -492,7 +492,7 @@
   <widget class="QWidget" name="horizontalLayout">
    <property name="geometry">
     <rect>
-     <x>610</x>
+     <x>630</x>
      <y>570</y>
      <width>373</width>
      <height>31</height>
@@ -534,7 +534,7 @@
     <rect>
      <x>10</x>
      <y>570</y>
-     <width>474</width>
+     <width>487</width>
      <height>25</height>
     </rect>
    </property>

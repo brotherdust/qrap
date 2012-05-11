@@ -47,7 +47,7 @@ cPathLossPredictor::cPathLossPredictor(double k, double f, double txh, double rx
 	m_peakwidth = new int[MAXPEAK];
 	m_aboveEarth = new double[MAXPEAK];
 
-	m_tempIPD = 200;
+	m_tempIPD = 90;
 	m_slope = 0;
 	m_counter=0;
 	m_SmoothWidth=1;
@@ -163,7 +163,7 @@ return (*this);
 
 //************************************************************************
 int cPathLossPredictor::setParameters(double k, double f,
-						double TxHeight, double RxHeight, bool UseClutter)
+					double TxHeight, double RxHeight, bool UseClutter)
 {
 #ifndef NO_DEBUG
 //	cout << " Entering setParameters" << endl;
@@ -175,10 +175,14 @@ int cPathLossPredictor::setParameters(double k, double f,
 	m_counter=0;
 //	cout << "Freq: " << m_freq << endl;
 
-	m_SeekWidth = (int)(1.5*400.0/m_interPixelDist*sqrt(400.0/m_freq)+0.5);
- 	m_SmoothWidth = (int)(1.5*400.0/m_interPixelDist*sqrt(m_freq/400.0)+0.5) - 1;
+        m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/90+1);
+        m_SmoothWidth = (int)(m_c/m_freq/m_interPixelDist/90);
+//	m_SeekWidth = (int)(1.5*400.0/m_interPixelDist*sqrt(400.0/m_freq)+0.5);
+//	m_SmoothWidth = (int)(1.5*400.0/m_interPixelDist*sqrt(m_freq/400.0)+0.5) - 1;
 	if (m_SeekWidth<1) m_SeekWidth = 1;
+	if (m_SeekWidth>36) m_SeekWidth = 36;
 	if (m_SmoothWidth<1) m_SmoothWidth=1;
+	if (m_SmoothWidth>35) m_SmoothWidth=35;
 	mUseClutter = UseClutter;
 
 return 1;
@@ -189,9 +193,9 @@ return 1;
 //************************************************************************
 // Calculates the Total Path Loss
 float cPathLossPredictor::TotPathLoss(cProfile &InputProfile, 
-										float &ElevAngleTX,
-										bool UseClutter,
-										cProfile &ClutterProfile)
+					float &ElevAngleTX,
+					bool UseClutter,
+					cProfile &ClutterProfile)
 {
 	double LinkLength=0.0;
 	double MinClearance=DBL_MAX;
@@ -220,7 +224,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		{
 			radius = SetPeakRadius(PeakIndex);
 			m_Loss += CalcDiffLoss(m_markers[0],m_markers[1],PeakIndex,
-							ReffHeight,sqrtD1D2,radius,IfTooManyPeaks,
+							ReffHeight,sqrtD1D2,radius,true,IfTooManyPeaks,
 							KnifeEdge, RoundHill);
 			m_peakwidth[0]=m_peakwidth[2]=2;
 			i=0;
@@ -234,14 +238,14 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 					radius= SetPeakRadius(PeakIndex);
 					m_Loss += CalcDiffLoss(m_markers[i],m_markers[i+1],
 								PeakIndex,ReffHeight,
-								sqrtD1D2,radius,IfTooManyPeaks,
+								sqrtD1D2,radius,false,IfTooManyPeaks,
 								KnifeEdge, RoundHill);
 					if (IfTooManyPeaks) i++;
 				}
 				else i++;
 				if ((i+1)==MAXPEAK)
 				{
- //           		cout << "MAXPEAK limit reached" << endl;
+//            				cout << "MAXPEAK limit reached	" ;
 					break;
 				}
 			}
@@ -343,7 +347,7 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile)
 	{
 		centre = ((double)m_size)/2.0;
 		Reff_2 = 2.0 * m_kFactor * m_reR;	// Reference:
-		for(i=0;i<m_size;i++)				// Radio Wave Propagation
+		for(i=0;i<m_size;i++)			// Radio Wave Propagation
 		{                                 	// A.Picquenard, p.17
 		   offset = (centre-(double)i-1) * m_interPixelDist;
 		   *(m_CurvedProfile+i) = *(m_profile+i)-(float)(offset*offset/(Reff_2));
@@ -414,7 +418,7 @@ void cPathLossPredictor::FindElevAngles(float &ElevAngleTX, float &ElevAngleRX)
 		temp = yHeight*yHeight + xDist*xDist;
 		y0 = yHeight/2.0 - xDist * sqrt(4.0*R*R/temp -1.0) /2.0;
 		x0 = (temp - 2.0*y0*yHeight) / (2.0*xDist);
-		yHeight = sqrt(R*R-(m_interPixelDist-x0)*(m_interPixelDist-x0)) + y0;
+		yHeight = sqrt(R*R-(xDist-x0)*(xDist-x0)) + y0;
 	}
    // else R is infinite and yHeight does not change. (earth is already flat)
 
@@ -441,15 +445,15 @@ void cPathLossPredictor::FindElevAngles(float &ElevAngleTX, float &ElevAngleRX)
 	yHeight=(double)*(m_profile+Index)-offset*offset/(2.0*m_reR) - yReff;
 	if (Index == 0) yHeight += m_htx;
 
-   if (m_kFactor!=1.0)
-   {
-	   R = m_reR/((1.0-1.0/m_kFactor)*cos(atan(yHeight/xDist)));
-	   temp = yHeight*yHeight + xDist*xDist;
-	   y0 = yHeight/2.0 - xDist * sqrt(4.0*R*R/temp -1.0) /2.0;
-	   x0 = (temp - 2.0*y0*yHeight) / (2.0*xDist);
-	   yHeight = sqrt(R*R-(m_interPixelDist-x0)*(m_interPixelDist-x0)) + y0;
-   }
-   //else R is infinite and yHeight does not change. (earth is already flat)
+   	if (m_kFactor!=1.0)
+   	{
+		R = m_reR/((1.0-1.0/m_kFactor)*cos(atan(yHeight/xDist)));
+	   	temp = yHeight*yHeight + xDist*xDist;
+	   	y0 = yHeight/2.0 - xDist * sqrt(4.0*R*R/temp -1.0) /2.0;
+	   	x0 = (temp - 2.0*y0*yHeight) / (2.0*xDist);
+	   	yHeight = sqrt(R*R-(xDist-x0)*(xDist-x0)) + y0;
+   	}
+   	//else R is infinite and yHeight does not change. (earth is already flat)
 
 	ElevSlopeRX = yHeight/xDist;
 	ElevAngleRX = 180.0*atan(ElevSlopeRX)/PI;
@@ -646,6 +650,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 					const int EndIndex, int PeakIndex,
 					const double ReffHeight,
 					const double SQd1d2, double radius,
+					bool MainEdge, 
 					int &TooManyPeaks, double &KnifeEdge, double &RoundHill, 
 					const double Er, const double Sigma,
 					const int Vertical)
@@ -679,6 +684,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 			||((radius<5.0e7)&&(temp>radius))))
 	{
 // Lee
+//		cout << "Lee	" << endl;
 		if (mhu<-0.8) KnifeEdge = 0.85;	// equivalent to -1.5dB
 		else if (mhu < 0.0) KnifeEdge = 0.5 - 0.62*mhu;
 		else if (mhu <1.0)  KnifeEdge = 0.5*exp(-0.95*mhu);
@@ -686,6 +692,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 					   KnifeEdge = 0.4 - sqrt(0.1184 - temp*temp);}
 		else KnifeEdge = 0.225/mhu;
 		KnifeEdge = -20.0*log10(KnifeEdge);
+		
 
 		if (!Vertical)
 		{
@@ -727,11 +734,12 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 //		else Surface = 17.0*xhi - 6.0 -20.0*log10(xhi);
 //
 	}
-	else
+	else if (MainEdge)
 	{
 		
 		if ((radius>0.0)&&(radius<5.0e6))
 		{
+			cout << "REarth	" << endl;
 // CCIR 1990 spherical earth diffraction 
 			temp = (double)(EndIndex-BeginIndex)*m_interPixelDist/2.0;
 			Y1=Y2=ReffHeight-m_TempProfile[PeakIndex]+radius -
@@ -755,6 +763,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 // Flat earth (reflection) 
 		else
 		{
+			cout << "FEarth	";
 			Y1=Y2=ReffHeight-m_TempProfile[PeakIndex];
 			if (Y1<0.1) Y1 =Y2 = 0.1;
 			// The 0.7 is to account for the fact that some absorbtion
@@ -775,11 +784,11 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 	DiffLoss = KnifeEdge + RoundHill + Surface;
 
 #ifndef NO_DEBUG
-/*	cout << " KnifeEdge=" << KnifeEdge;
-	cout << " RoundHill=" << RoundHill;
-	cout << " Surface=" << Surface << endl ;
-	cout << PeakIndex << "   Diffraction Loss=" << DiffLoss << endl;
-*/
+//	cout << " KnifeEdge=" << KnifeEdge;
+//	cout << " RoundHill=" << RoundHill;
+//	cout << " Surface=" << Surface;
+//	cout << PeakIndex << "   Diffraction Loss=" << DiffLoss << endl;
+
 #endif
 
 	int i,j;

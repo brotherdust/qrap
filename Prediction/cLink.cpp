@@ -316,32 +316,26 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	cPathLossPredictor PathLoss;
 	bool AfterReceiver = (mUnits!=dBWm2Hz) && (mUnits!=dBWm2);	
 
-	mTxBearing = mTxInst.sSitePos.Bearing(mRxInst.sSitePos);
-	if (mTxBearing < 180.0)
-		mRxBearing = mTxBearing + 180.0;
-	else	
-		mRxBearing = mTxBearing - 180.0;
-	
 	if (mDownlink)
 	{
-		TxAntValue = mTxAnt.SetAntennaPattern(mTxInst.sTxPatternKey, mTxInst.sTxAzimuth,  mTxInst.sTxMechTilt);
-		RxAntValue = mRxAnt.SetAntennaPattern(mRxInst.sRxPatternKey, mRxInst.sRxAzimuth,  mRxInst.sRxMechTilt);
-		EIRP = 30.0 + mTxInst.sTxPower - mTxInst.sTxSysLoss + TxAntValue;
+		mTxAnt.SetAntennaPattern(mTxInst.sTxPatternKey, mTxInst.sTxAzimuth,  mTxInst.sTxMechTilt);
+		mRxAnt.SetAntennaPattern(mRxInst.sRxPatternKey, mRxInst.sRxAzimuth,  mRxInst.sRxMechTilt);
+		EIRP = mTxInst.sTxPower - mTxInst.sTxSysLoss + mTxAnt.mGain;
 	}
 	else
 	{
-		TxAntValue = mTxAnt.SetAntennaPattern(mTxInst.sRxPatternKey, mTxInst.sRxAzimuth,  mTxInst.sRxMechTilt);
-		RxAntValue = mRxAnt.SetAntennaPattern(mRxInst.sTxPatternKey, mRxInst.sTxAzimuth,  mRxInst.sTxMechTilt);
-		EIRP = 30.0 + mRxInst.sTxPower - mRxInst.sTxSysLoss + TxAntValue;
+		mTxAnt.SetAntennaPattern(mTxInst.sRxPatternKey, mTxInst.sRxAzimuth,  mTxInst.sRxMechTilt);
+		mRxAnt.SetAntennaPattern(mRxInst.sTxPatternKey, mRxInst.sTxAzimuth,  mRxInst.sTxMechTilt);
+		EIRP = mRxInst.sTxPower - mRxInst.sTxSysLoss + mRxAnt.mGain;
 	}
 	
 	AfterReceiver = (mUnits==dBW)||(mUnits==dBm)||(mUnits==dBuV);
 	if (AfterReceiver)
 	{
 		if (mDownlink)
-			LinkOtherGain = EIRP + RxAntValue -  mRxInst.sRxSysLoss;
+			LinkOtherGain = EIRP -  mRxInst.sRxSysLoss + mRxAnt.mGain;
 		else
-			LinkOtherGain = EIRP + TxAntValue - mTxInst.sRxSysLoss;
+			LinkOtherGain = EIRP - mTxInst.sRxSysLoss + mTxAnt.mGain;
 	}
 	else LinkOtherGain = EIRP;
 	
@@ -362,6 +356,11 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	PathLoss.setParameters(mkFactor,mFrequency,mTxInst.sTxHeight,mRxInst.sRxHeight);
 	j=(Length-1);
 	mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],mUseClutter,Clutter);
+	mTxBearing = mTxInst.sSitePos.Bearing(mRxInst.sSitePos);
+	if (mTxBearing < 180.0)
+		mRxBearing = mTxBearing + 180.0;
+	else	
+		mRxBearing = mTxBearing - 180.0;
 	PathLoss.FindElevAngles(mTxTilt,mRxTilt);
 	for (j=(Length-1); j>0 ; j--)
 	{

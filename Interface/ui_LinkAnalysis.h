@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'LinkAnalysis.ui'
 **
-** Created: Sun Nov 14 14:10:24 2010
-**      by: Qt User Interface Compiler version 4.6.2
+** Created: Wed May 9 18:27:50 2012
+**      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -110,7 +110,7 @@ public:
         qwtLinkPlot->setLayoutDirection(Qt::LeftToRight);
         gridLayout = new QWidget(LinkAnalysis);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        gridLayout->setGeometry(QRect(20, 310, 241, 203));
+        gridLayout->setGeometry(QRect(20, 310, 241, 206));
         TxInfo = new QGridLayout(gridLayout);
         TxInfo->setObjectName(QString::fromUtf8("TxInfo"));
         TxInfo->setVerticalSpacing(6);
@@ -318,7 +318,7 @@ public:
         qwtBTLPlot->setGeometry(QRect(20, 520, 941, 131));
         gridLayout_2 = new QWidget(LinkAnalysis);
         gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
-        gridLayout_2->setGeometry(QRect(590, 310, 246, 203));
+        gridLayout_2->setGeometry(QRect(590, 310, 246, 206));
         RxInfo = new QGridLayout(gridLayout_2);
         RxInfo->setObjectName(QString::fromUtf8("RxInfo"));
         RxInfo->setContentsMargins(0, 0, 0, 0);
@@ -446,7 +446,7 @@ public:
 
     void retranslateUi(QDialog *LinkAnalysis)
     {
-        LinkAnalysis->setWindowTitle(QApplication::translate("LinkAnalysis", "Link Analysis", 0, QApplication::UnicodeUTF8));
+        LinkAnalysis->setWindowTitle(QApplication::translate("LinkAnalysis", "Q-Rap Link Analysis Results", 0, QApplication::UnicodeUTF8));
         TxLat->setText(QApplication::translate("LinkAnalysis", "Latitude:", 0, QApplication::UnicodeUTF8));
         TxLon->setText(QApplication::translate("LinkAnalysis", "Longitude:", 0, QApplication::UnicodeUTF8));
         TxBearing->setText(QApplication::translate("LinkAnalysis", "Bearing:", 0, QApplication::UnicodeUTF8));

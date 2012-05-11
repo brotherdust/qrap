@@ -1,10 +1,11 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>BackupDialog</class>
- <widget class="QDialog" name="BackupDialog" >
-  <property name="windowModality" >
+ <widget class="QDialog" name="BackupDialog">
+  <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
-  <property name="geometry" >
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -12,32 +13,32 @@
     <height>122</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>1</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="minimumSize" >
+  <property name="minimumSize">
    <size>
     <width>513</width>
     <height>0</height>
    </size>
   </property>
-  <property name="maximumSize" >
+  <property name="maximumSize">
    <size>
     <width>513</width>
     <height>122</height>
    </size>
   </property>
-  <property name="windowTitle" >
-   <string>Backup </string>
+  <property name="windowTitle">
+   <string>Q-Rap Backup </string>
   </property>
-  <property name="modal" >
+  <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox" >
-   <property name="geometry" >
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
     <rect>
      <x>280</x>
      <y>70</y>
@@ -45,15 +46,15 @@
      <height>32</height>
     </rect>
    </property>
-   <property name="orientation" >
+   <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
-   <property name="standardButtons" >
+   <property name="standardButtons">
     <set>QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="backupLineEdit" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="backupLineEdit">
+   <property name="geometry">
     <rect>
      <x>80</x>
      <y>10</y>
@@ -61,15 +62,15 @@
      <height>27</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>/</string>
    </property>
-   <property name="readOnly" >
+   <property name="readOnly">
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="backupPushButton" >
-   <property name="geometry" >
+  <widget class="QPushButton" name="backupPushButton">
+   <property name="geometry">
     <rect>
      <x>10</x>
      <y>50</y>
@@ -77,12 +78,12 @@
      <height>28</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Backup</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label">
+   <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
@@ -90,12 +91,12 @@
      <height>18</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Backup</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="backupChooseFilePushButton" >
-   <property name="geometry" >
+  <widget class="QPushButton" name="backupChooseFilePushButton">
+   <property name="geometry">
     <rect>
      <x>410</x>
      <y>10</y>
@@ -103,7 +104,7 @@
      <height>27</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>...</string>
    </property>
   </widget>
@@ -116,11 +117,11 @@
    <receiver>BackupDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -132,11 +133,11 @@
    <receiver>BackupDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

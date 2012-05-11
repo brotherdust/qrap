@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'DeleteObject.ui'
+** Form generated from reading UI file 'DeleteObject.ui'
 **
-** Created: Sat Oct 3 12:14:09 2009
-**      by: Qt User Interface Compiler version 4.5.0
+** Created: Wed May 9 18:26:17 2012
+**      by: Qt User Interface Compiler version 4.8.1
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_DELETEOBJECT_H
@@ -39,7 +39,8 @@ public:
         if (deleteDialog->objectName().isEmpty())
             deleteDialog->setObjectName(QString::fromUtf8("deleteDialog"));
         deleteDialog->resize(400, 94);
-        const QIcon icon = QIcon(QString::fromUtf8(":/images/logo_icon.png"));
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/images/logo_icon.png"), QSize(), QIcon::Normal, QIcon::Off);
         deleteDialog->setWindowIcon(icon);
         label = new QLabel(deleteDialog);
         label->setObjectName(QString::fromUtf8("label"));
@@ -72,11 +73,10 @@ public:
 
     void retranslateUi(QDialog *deleteDialog)
     {
-        deleteDialog->setWindowTitle(QApplication::translate("deleteDialog", "Delete an Object", 0, QApplication::UnicodeUTF8));
+        deleteDialog->setWindowTitle(QApplication::translate("deleteDialog", "Q-Rap Delete an Object", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("deleteDialog", "TextLabel", 0, QApplication::UnicodeUTF8));
         btnCancel->setText(QApplication::translate("deleteDialog", "Cancel", 0, QApplication::UnicodeUTF8));
         btnOk->setText(QApplication::translate("deleteDialog", "Delete", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(deleteDialog);
     } // retranslateUi
 
 };

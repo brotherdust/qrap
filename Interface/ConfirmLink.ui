@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Confirm Link Analysis</string>
+   <string>Q-Rap Link Analysis Input</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../DataBase/application.qrc">
@@ -251,7 +251,7 @@
     <rect>
      <x>24</x>
      <y>354</y>
-     <width>292</width>
+     <width>305</width>
      <height>25</height>
     </rect>
    </property>

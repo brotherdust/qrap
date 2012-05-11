@@ -280,7 +280,7 @@ void cConfirmPrediction::LoadDefaults()
 	else
 		upLinkRadio->setChecked(true);
 		
-	string query = "SELECT id,description FROM mobile";
+	string query = "SELECT id,name FROM mobile";
 	pqxx::result Mobiles;
 	if (!gDb.PerformRawSql(query))
 	{
@@ -297,7 +297,7 @@ void cConfirmPrediction::LoadDefaults()
 		{
 			Mob = Mobiles[i]["id"].c_str();
 			Mob += ":";
-			Mob += Mobiles[i]["description"].c_str();
+			Mob += Mobiles[i]["name"].c_str();
 			mobileCombo->addItem(Mob);
 		}
 	}

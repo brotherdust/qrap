@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'ConfirmMultiLink.ui'
+** Form generated from reading UI file 'ConfirmMultiLink.ui'
 **
-** Created: Tue May 11 09:34:44 2010
-**      by: Qt User Interface Compiler version 4.5.2
+** Created: Thu May 10 14:09:51 2012
+**      by: Qt User Interface Compiler version 4.8.1
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_CONFIRMMULTILINK_H
@@ -56,13 +56,13 @@ public:
     {
         if (ConfirmMultiLink->objectName().isEmpty())
             ConfirmMultiLink->setObjectName(QString::fromUtf8("ConfirmMultiLink"));
-        ConfirmMultiLink->resize(644, 397);
+        ConfirmMultiLink->resize(798, 407);
         QIcon icon;
         icon.addFile(QString::fromUtf8("../MultiLink.png"), QSize(), QIcon::Normal, QIcon::Off);
         ConfirmMultiLink->setWindowIcon(icon);
         gridLayout_2 = new QWidget(ConfirmMultiLink);
         gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
-        gridLayout_2->setGeometry(QRect(445, 353, 178, 36));
+        gridLayout_2->setGeometry(QRect(600, 360, 178, 36));
         gridlayAccept = new QGridLayout(gridLayout_2);
         gridlayAccept->setObjectName(QString::fromUtf8("gridlayAccept"));
         gridlayAccept->setContentsMargins(0, 0, 0, 0);
@@ -86,57 +86,58 @@ public:
         QTableWidgetItem *__qtablewidgetitem2 = new QTableWidgetItem();
         tableInstallations->setHorizontalHeaderItem(2, __qtablewidgetitem2);
         tableInstallations->setObjectName(QString::fromUtf8("tableInstallations"));
-        tableInstallations->setGeometry(QRect(10, 5, 361, 386));
+        tableInstallations->setGeometry(QRect(5, 12, 521, 386));
         lblTechnology = new QLabel(ConfirmMultiLink);
         lblTechnology->setObjectName(QString::fromUtf8("lblTechnology"));
-        lblTechnology->setGeometry(QRect(380, 35, 81, 27));
+        lblTechnology->setGeometry(QRect(535, 42, 81, 27));
         cbMinClear = new QComboBox(ConfirmMultiLink);
         cbMinClear->setObjectName(QString::fromUtf8("cbMinClear"));
-        cbMinClear->setGeometry(QRect(540, 175, 96, 27));
+        cbMinClear->setGeometry(QRect(695, 182, 96, 27));
         lblMaxPath = new QLabel(ConfirmMultiLink);
         lblMaxPath->setObjectName(QString::fromUtf8("lblMaxPath"));
-        lblMaxPath->setGeometry(QRect(380, 115, 171, 16));
+        lblMaxPath->setGeometry(QRect(535, 122, 171, 16));
         cbTechnology = new QComboBox(ConfirmMultiLink);
         cbTechnology->setObjectName(QString::fromUtf8("cbTechnology"));
-        cbTechnology->setGeometry(QRect(480, 35, 156, 27));
+        cbTechnology->setGeometry(QRect(635, 42, 156, 27));
         lblMinClear = new QLabel(ConfirmMultiLink);
         lblMinClear->setObjectName(QString::fromUtf8("lblMinClear"));
-        lblMinClear->setGeometry(QRect(380, 175, 136, 27));
+        lblMinClear->setGeometry(QRect(535, 182, 136, 27));
         dsbMaxPath = new QDoubleSpinBox(ConfirmMultiLink);
         dsbMaxPath->setObjectName(QString::fromUtf8("dsbMaxPath"));
-        dsbMaxPath->setGeometry(QRect(550, 105, 86, 28));
+        dsbMaxPath->setGeometry(QRect(705, 112, 86, 28));
         dsbMaxPath->setMaximum(300);
         lblMaxDist = new QLabel(ConfirmMultiLink);
         lblMaxDist->setObjectName(QString::fromUtf8("lblMaxDist"));
-        lblMaxDist->setGeometry(QRect(380, 140, 171, 27));
+        lblMaxDist->setGeometry(QRect(535, 147, 171, 27));
         dsbMaxDist = new QDoubleSpinBox(ConfirmMultiLink);
         dsbMaxDist->setObjectName(QString::fromUtf8("dsbMaxDist"));
-        dsbMaxDist->setGeometry(QRect(550, 140, 86, 28));
+        dsbMaxDist->setGeometry(QRect(705, 147, 86, 28));
         dsbMaxDist->setMaximum(1000);
         lblProject = new QLabel(ConfirmMultiLink);
         lblProject->setObjectName(QString::fromUtf8("lblProject"));
-        lblProject->setGeometry(QRect(380, 70, 76, 27));
+        lblProject->setGeometry(QRect(535, 77, 76, 27));
         cbProject = new QComboBox(ConfirmMultiLink);
         cbProject->setObjectName(QString::fromUtf8("cbProject"));
-        cbProject->setGeometry(QRect(480, 70, 156, 27));
+        cbProject->setGeometry(QRect(635, 77, 156, 27));
         dsbKfactor = new QDoubleSpinBox(ConfirmMultiLink);
         dsbKfactor->setObjectName(QString::fromUtf8("dsbKfactor"));
-        dsbKfactor->setGeometry(QRect(565, 210, 71, 28));
+        dsbKfactor->setGeometry(QRect(720, 217, 71, 28));
         dsbKfactor->setMaximum(10);
         dsbKfactor->setSingleStep(0.01);
         dsbKfactor->setValue(1);
         lblKfactor = new QLabel(ConfirmMultiLink);
         lblKfactor->setObjectName(QString::fromUtf8("lblKfactor"));
-        lblKfactor->setGeometry(QRect(480, 210, 61, 27));
+        lblKfactor->setGeometry(QRect(635, 217, 61, 27));
         checkBox = new QCheckBox(ConfirmMultiLink);
         checkBox->setObjectName(QString::fromUtf8("checkBox"));
-        checkBox->setGeometry(QRect(380, 267, 221, 16));
+        checkBox->setGeometry(QRect(535, 274, 221, 16));
+        checkBox->setChecked(true);
         lineEdit = new QLineEdit(ConfirmMultiLink);
         lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
-        lineEdit->setGeometry(QRect(385, 315, 246, 26));
+        lineEdit->setGeometry(QRect(540, 322, 246, 26));
         lblPath = new QLabel(ConfirmMultiLink);
         lblPath->setObjectName(QString::fromUtf8("lblPath"));
-        lblPath->setGeometry(QRect(385, 290, 181, 18));
+        lblPath->setGeometry(QRect(540, 297, 181, 18));
 
         retranslateUi(ConfirmMultiLink);
 
@@ -145,7 +146,7 @@ public:
 
     void retranslateUi(QDialog *ConfirmMultiLink)
     {
-        ConfirmMultiLink->setWindowTitle(QApplication::translate("ConfirmMultiLink", "Multi Link Identification Dialog", 0, QApplication::UnicodeUTF8));
+        ConfirmMultiLink->setWindowTitle(QApplication::translate("ConfirmMultiLink", "Q-Rap Multi Link Identification Request", 0, QApplication::UnicodeUTF8));
         pushOk->setText(QApplication::translate("ConfirmMultiLink", "OK", 0, QApplication::UnicodeUTF8));
         pushCancel->setText(QApplication::translate("ConfirmMultiLink", "Cancel", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem = tableInstallations->horizontalHeaderItem(0);
@@ -174,7 +175,6 @@ public:
         lblKfactor->setText(QApplication::translate("ConfirmMultiLink", "k-Factor : ", 0, QApplication::UnicodeUTF8));
         checkBox->setText(QApplication::translate("ConfirmMultiLink", "Save working links pdf files?", 0, QApplication::UnicodeUTF8));
         lblPath->setText(QApplication::translate("ConfirmMultiLink", "Directory to save pdf files:", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(ConfirmMultiLink);
     } // retranslateUi
 
 };

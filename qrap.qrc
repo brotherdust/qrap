@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/qrap" >
+    <qresource prefix="/qrap">
         <file>Data.png</file>
         <file>Site.png</file>
         <file>SiteSelect.png</file>
@@ -7,11 +7,12 @@
         <file>Link.png</file>
         <file>LinkSelect.png</file>
         <file>LinkDelete.png</file>
-	<file>MultiLink.png</file>
+        <file>MultiLink.png</file>
         <file>Coverage.png</file>
         <file>Spectral.png</file>
         <file>Preferences.png</file>
-	<file>ImportExport.png</file>
-	<file>Help.png</file>
+        <file>ImportExport.png</file>
+        <file>Help.png</file>
+        <file>Measurements.png</file>
     </qresource>
 </RCC>

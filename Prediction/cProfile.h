@@ -58,7 +58,7 @@ namespace Qrap
 			 * @param interPixDist Description
 			 */
 			cProfile (const int size,
-				  const double interPixDist = 200.0);
+				  const double interPixDist = 90.0);
 			
 			/**
 			 * Overloaded constructor
@@ -67,7 +67,7 @@ namespace Qrap
 			 * @param profile Description
 			 * @param interPixDist Description
 			 */
-			cProfile (const int size, float *&profile, double interPixDist = 200.0);
+			cProfile (const int size, float *&profile, double interPixDist = 90.0);
 			
 			/**
 			 * Destructor

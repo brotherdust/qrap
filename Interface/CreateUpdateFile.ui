@@ -1,83 +1,84 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>CreateUpdateFileDialog</class>
- <widget class="QDialog" name="CreateUpdateFileDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="CreateUpdateFileDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>520</width>
-    <height>136</height>
+    <height>87</height>
    </rect>
   </property>
-  <property name="minimumSize" >
+  <property name="minimumSize">
    <size>
-    <width>520</width>
-    <height>136</height>
+    <width>400</width>
+    <height>50</height>
    </size>
   </property>
-  <property name="maximumSize" >
+  <property name="maximumSize">
    <size>
-    <width>520</width>
-    <height>136</height>
+    <width>1000</width>
+    <height>200</height>
    </size>
   </property>
-  <property name="windowTitle" >
-   <string>Create Updqate File</string>
+  <property name="windowTitle">
+   <string>Q-Rap Create Update File</string>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox" >
-   <property name="geometry" >
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>90</y>
-     <width>341</width>
+     <x>430</x>
+     <y>50</y>
+     <width>81</width>
      <height>32</height>
     </rect>
    </property>
-   <property name="orientation" >
+   <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
-   <property name="standardButtons" >
+   <property name="standardButtons">
     <set>QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="updateFileLineEdit" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="updateFileLineEdit">
+   <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>80</x>
      <y>10</y>
      <width>341</width>
      <height>27</height>
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="selectFileNamePushButton" >
-   <property name="geometry" >
+  <widget class="QPushButton" name="selectFileNamePushButton">
+   <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>430</x>
      <y>10</y>
      <width>80</width>
      <height>27</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>...</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label">
+   <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>15</y>
+     <x>10</x>
+     <y>20</y>
      <width>81</width>
      <height>18</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>File Name:</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="createUpdateFilePushButton" >
-   <property name="geometry" >
+  <widget class="QPushButton" name="createUpdateFilePushButton">
+   <property name="geometry">
     <rect>
      <x>160</x>
      <y>50</y>
@@ -85,12 +86,12 @@
      <height>27</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Create Update File</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="fullUpdateFileCheckBox" >
-   <property name="geometry" >
+  <widget class="QCheckBox" name="fullUpdateFileCheckBox">
+   <property name="geometry">
     <rect>
      <x>10</x>
      <y>50</y>
@@ -98,7 +99,7 @@
      <height>23</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Full update file</string>
    </property>
   </widget>
@@ -111,11 +112,11 @@
    <receiver>CreateUpdateFileDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -127,11 +128,11 @@
    <receiver>CreateUpdateFileDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

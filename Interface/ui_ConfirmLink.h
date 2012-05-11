@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'ConfirmLink.ui'
+** Form generated from reading UI file 'ConfirmLink.ui'
 **
-** Created: Wed Apr 21 12:08:39 2010
-**      by: Qt User Interface Compiler version 4.5.2
+** Created: Wed May 9 18:24:53 2012
+**      by: Qt User Interface Compiler version 4.8.1
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_CONFIRMLINK_H
@@ -125,7 +125,7 @@ public:
         label_21->setGeometry(QRect(375, 310, 101, 18));
         layoutWidget = new QWidget(ConfirmLink);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(24, 354, 292, 25));
+        layoutWidget->setGeometry(QRect(24, 354, 305, 25));
         UpDown = new QHBoxLayout(layoutWidget);
         UpDown->setObjectName(QString::fromUtf8("UpDown"));
         UpDown->setContentsMargins(0, 0, 0, 0);
@@ -195,7 +195,7 @@ public:
 
     void retranslateUi(QDialog *ConfirmLink)
     {
-        ConfirmLink->setWindowTitle(QApplication::translate("ConfirmLink", "Confirm Link Analysis", 0, QApplication::UnicodeUTF8));
+        ConfirmLink->setWindowTitle(QApplication::translate("ConfirmLink", "Q-Rap Link Analysis Input", 0, QApplication::UnicodeUTF8));
         btnOk->setText(QApplication::translate("ConfirmLink", "Ok", 0, QApplication::UnicodeUTF8));
         btnCancel->setText(QApplication::translate("ConfirmLink", "Cancel", 0, QApplication::UnicodeUTF8));
         nameEdit->setText(QApplication::translate("ConfirmLink", "Link", 0, QApplication::UnicodeUTF8));
@@ -231,7 +231,6 @@ public:
         ___qtablewidgetitem4->setText(QApplication::translate("ConfirmLink", "Technology", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem5 = RxIDTable->horizontalHeaderItem(2);
         ___qtablewidgetitem5->setText(QApplication::translate("ConfirmLink", "Rad Inst", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(ConfirmLink);
     } // retranslateUi
 
 };

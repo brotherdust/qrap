@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'ConfirmPrediction.ui'
+** Form generated from reading UI file 'ConfirmPrediction.ui'
 **
-** Created: Tue May 4 22:12:49 2010
-**      by: Qt User Interface Compiler version 4.5.2
+** Created: Thu May 10 14:01:13 2012
+**      by: Qt User Interface Compiler version 4.8.1
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_CONFIRMPREDICTION_H
@@ -89,7 +89,7 @@ public:
     {
         if (ConfirmPrediction->objectName().isEmpty())
             ConfirmPrediction->setObjectName(QString::fromUtf8("ConfirmPrediction"));
-        ConfirmPrediction->resize(989, 607);
+        ConfirmPrediction->resize(1011, 607);
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -120,11 +120,11 @@ public:
         QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
         tableWidget->setHorizontalHeaderItem(8, __qtablewidgetitem8);
         tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
-        tableWidget->setGeometry(QRect(10, 10, 971, 241));
+        tableWidget->setGeometry(QRect(10, 10, 991, 241));
         tableWidget->setSortingEnabled(true);
         gridLayout = new QWidget(ConfirmPrediction);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        gridLayout->setGeometry(QRect(10, 260, 972, 300));
+        gridLayout->setGeometry(QRect(10, 260, 993, 305));
         PlotInput = new QGridLayout(gridLayout);
         PlotInput->setObjectName(QString::fromUtf8("PlotInput"));
         PlotInput->setContentsMargins(0, 0, 0, 0);
@@ -342,7 +342,7 @@ public:
 
         horizontalLayout = new QWidget(ConfirmPrediction);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        horizontalLayout->setGeometry(QRect(610, 570, 373, 31));
+        horizontalLayout->setGeometry(QRect(630, 570, 373, 31));
         hboxLayout = new QHBoxLayout(horizontalLayout);
         hboxLayout->setObjectName(QString::fromUtf8("hboxLayout"));
         hboxLayout->setContentsMargins(0, 0, 0, 0);
@@ -368,7 +368,7 @@ public:
 
         horizontalLayout_2 = new QWidget(ConfirmPrediction);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        horizontalLayout_2->setGeometry(QRect(10, 570, 473, 25));
+        horizontalLayout_2->setGeometry(QRect(10, 570, 487, 25));
         hboxLayout1 = new QHBoxLayout(horizontalLayout_2);
         hboxLayout1->setObjectName(QString::fromUtf8("hboxLayout1"));
         hboxLayout1->setContentsMargins(0, 0, 0, 0);
@@ -396,7 +396,7 @@ public:
 
     void retranslateUi(QDialog *ConfirmPrediction)
     {
-        ConfirmPrediction->setWindowTitle(QApplication::translate("ConfirmPrediction", "Confirm Prediction Information", 0, QApplication::UnicodeUTF8));
+        ConfirmPrediction->setWindowTitle(QApplication::translate("ConfirmPrediction", "Q-Rap Prediction Request Form", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem = tableWidget->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("ConfirmPrediction", "Site", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem1 = tableWidget->horizontalHeaderItem(1);
@@ -444,8 +444,8 @@ public:
          << QApplication::translate("ConfirmPrediction", "Primary Server", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("ConfirmPrediction", "Secondary Server", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("ConfirmPrediction", "Number of Servers", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("ConfirmPrediction", "Carrier to Co-channel Interference Ratio: ", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("ConfirmPrediction", "Carrier to Adjacent-channel Interf Ratio:", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ConfirmPrediction", "Carrier to Co-channel Interference Ratio", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ConfirmPrediction", "Carrier to Adjacent-channel Interf Ratio", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("ConfirmPrediction", "Interfered Areas", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("ConfirmPrediction", "Number of Interferers", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("ConfirmPrediction", "Primary Co-channel Interferers", 0, QApplication::UnicodeUTF8)
@@ -473,7 +473,6 @@ public:
         btnDo->setText(QApplication::translate("ConfirmPrediction", "Do", 0, QApplication::UnicodeUTF8));
         radioArea->setText(QApplication::translate("ConfirmPrediction", "Predict selected area", 0, QApplication::UnicodeUTF8));
         radioRadius->setText(QApplication::translate("ConfirmPrediction", "Predict selected area with radius included", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(ConfirmPrediction);
     } // retranslateUi
 
 };

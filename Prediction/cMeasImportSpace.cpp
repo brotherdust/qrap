@@ -223,7 +223,7 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
         	// get latitude and longitude
         	DataFile >> Lat >> Lon >> Meas; // skip the point number
 		dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
-		if ((Meas > mSensitivity) && (dist>2.0e-8))
+		if ((Meas > mSensitivity) && (dist>1.0e-5)&& ((dist<2)||(prevLat==0)))
 		{
 			mLastTestPoint++;
 			mLastMeas++;

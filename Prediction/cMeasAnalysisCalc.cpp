@@ -31,15 +31,24 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 {
 	mMeasPoints = new tMeasPoint[2];
 	mNumMeas = 0;	
+	double kS, kI;
 	mUnits = dBm;
 	string setting;
 	setting = gDb.GetSetting("kFactorServer");
 	if(setting!="")
-		mkFactor=atof(setting.c_str());
-	else mkFactor = 1.25;
+		kS=atof(setting.c_str());
+	else kS = 1.25;
+	setting = gDb.GetSetting("kFactorInt");
+	if(setting!="")
+		kI=atof(setting.c_str());
+	else kI = 1.25;
+	mkFactor = min((kI+2*kS)/3.0,1.33);
+
 	setting = gDb.GetSetting("PlotResolution");
 	if(setting!="")
+	{
 		mPlotResolution = atof(setting.c_str());
+	}
 	else mPlotResolution = 90;
 	setting = gDb.GetSetting("UseClutter");
 	if (setting=="true")
@@ -319,19 +328,16 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &StDev, double &Corr
 				AntValue = FixedAnt.GetPatternValue(mMeasPoints[i].sAzimuth, mMeasPoints[i].sTilt)
 						+ MobileAnt.GetPatternValue(0, -mMeasPoints[i].sTilt);
 				mMeasPoints[i].sPredValue = -mMeasPoints[i].sPathLoss + EIRP - AntValue;
-				cout << mMeasPoints[i].sMeasValue << "	" << mMeasPoints[i].sPredValue << endl;
-//				if (mMeasPoints[i].sPredValue > -115)
-//				{
-					TotalError +=  - mMeasPoints[i].sMeasValue + mMeasPoints[i].sPredValue; 
-					TotalSError += (mMeasPoints[i].sMeasValue - mMeasPoints[i].sPredValue)*
+//				cout << endl << mMeasPoints[i].sMeasValue << "	" << mMeasPoints[i].sPredValue << endl << endl;
+
+				TotalError +=  - mMeasPoints[i].sMeasValue + mMeasPoints[i].sPredValue; 
+				TotalSError += (mMeasPoints[i].sMeasValue - mMeasPoints[i].sPredValue)*
 							(mMeasPoints[i].sMeasValue - mMeasPoints[i].sPredValue);
-					TotalMeas += mMeasPoints[i].sMeasValue; 
-					TotalSMeas += mMeasPoints[i].sMeasValue*mMeasPoints[i].sMeasValue, 
-					TotalPred += mMeasPoints[i].sPredValue;
-					TotalSPred += mMeasPoints[i].sPredValue*mMeasPoints[i].sPredValue;				
-					TotalMeasPred+= mMeasPoints[i].sPredValue*mMeasPoints[i].sMeasValue;
-//				}
-//				else NumUsed--;
+				TotalMeas += mMeasPoints[i].sMeasValue; 
+				TotalSMeas += mMeasPoints[i].sMeasValue*mMeasPoints[i].sMeasValue, 
+				TotalPred += mMeasPoints[i].sPredValue;
+				TotalSPred += mMeasPoints[i].sPredValue*mMeasPoints[i].sPredValue;				
+				TotalMeasPred+= mMeasPoints[i].sPredValue*mMeasPoints[i].sMeasValue;
 			}
 			else NumUsed--;
 
@@ -345,5 +351,72 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &StDev, double &Corr
 	CorrC = (TotalMeasPred - TotalMeas*TotalPred/NumUsed) / ((NumUsed-1)*StDevMeas*StDevPred);
 
 	return NumUsed;
+}
+
+
+//************************************************************************************************************************************
+int cMeasAnalysisCalc::SaveResults()
+{
+	int i;
+	string query;
+	string queryM = "UPDATE measurement SET predictvalue=";
+	char * temp;
+	temp = new char[33];
+
+    	string line, TimeS, LonS, LatS, RSSIS, MERS;
+	QString PosString;
+
+	for (i=0; i<mNumMeas; i++)
+	{
+		query = queryM;
+		gcvt(mMeasPoints[i].sPredValue,9,temp);
+		query += temp;
+		query += ", tilt=";
+		gcvt(mMeasPoints[i].sTilt,9,temp);
+		query += temp;
+		query += ", azimuth=";
+		gcvt(mMeasPoints[i].sAzimuth,9,temp);
+		query += temp;
+		query += ", pathloss=";
+		gcvt(mMeasPoints[i].sPathLoss,9,temp);
+		query += temp;
+		query += ", distance=";
+		gcvt(mMeasPoints[i].sDistance,9,temp);
+		query += temp;
+		query += " where id=";
+		gcvt(mMeasPoints[i].sID,9,temp);
+		query += temp;
+		query += ";";
+		if (!gDb.PerformRawSql(query))
+		{
+			cout << "cMeasImportCSV::LoadMeasurement: Error inserting the Measurement!: " << endl;
+			cout << query << endl;
+			string err = "Error inserting Measurement by running query: ";
+			err += query;
+			QRAP_WARN(err.c_str());
+			return 0;
+		}
+	}
+	delete [] temp;
+
+	query = "create view meas_view as select measurement.id, location, measvalue, predictvalue, ";
+	query += "(measvalue-predictvalue) as error, pathloss, ci, distance, azimuth, tilt, frequency ";
+	query += "from measurement cross join testpoint where tp=testpoint.id;";
+		
+	if (gDb.ViewExists("meas_view"))
+	{
+		string drop = "drop view meas_view cascade";
+		if (!gDb.PerformRawSql(drop))
+		{
+			cout << "Error dropping meas_view in cMeasAnalysisCalc::SaveResults()" << endl;
+			QRAP_ERROR("Error dropping meas_view in cMeasAnalysisCalc::SaveResults()");
+		}
+	}
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error creating meas_view in cMeasAnalysisCalc::SaveResults()" << endl;
+		QRAP_ERROR("Error creating meas_view in cMeasAnalysisCalc::SaveResults()");
+	}
+	cout << " leaving cMeasAnalysisCalc::SaveResults()" << endl;
 }
 

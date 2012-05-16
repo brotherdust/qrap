@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'LoadMeasurements.ui'
 **
-** Created: Thu May 10 15:36:34 2012
+** Created: Mon May 14 12:30:03 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -46,12 +46,12 @@ public:
     QPushButton *pButtonClose;
     QWidget *layoutWidget;
     QGridLayout *gridLayout;
-    QLabel *lTxCell;
     QComboBox *cBoxCell;
     QLabel *lFrequency;
     QDoubleSpinBox *dSpinBoxFreq;
     QLabel *lSensitivity;
     QDoubleSpinBox *dSpinBoxSensitivity;
+    QLabel *lTxCell;
     QComboBox *cBoxFileType;
     QLabel *lFileFormat;
 
@@ -123,17 +123,10 @@ public:
         pButtonClose->setGeometry(QRect(170, 540, 151, 27));
         layoutWidget = new QWidget(LoadMeasurements);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(30, 190, 271, 101));
+        layoutWidget->setGeometry(QRect(10, 190, 321, 101));
         gridLayout = new QGridLayout(layoutWidget);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
-        lTxCell = new QLabel(layoutWidget);
-        lTxCell->setObjectName(QString::fromUtf8("lTxCell"));
-        lTxCell->setEnabled(false);
-        lTxCell->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-
-        gridLayout->addWidget(lTxCell, 0, 0, 1, 1);
-
         cBoxCell = new QComboBox(layoutWidget);
         cBoxCell->setObjectName(QString::fromUtf8("cBoxCell"));
         cBoxCell->setEnabled(false);
@@ -172,6 +165,13 @@ public:
 
         gridLayout->addWidget(dSpinBoxSensitivity, 2, 1, 1, 1);
 
+        lTxCell = new QLabel(layoutWidget);
+        lTxCell->setObjectName(QString::fromUtf8("lTxCell"));
+        lTxCell->setEnabled(false);
+        lTxCell->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        gridLayout->addWidget(lTxCell, 0, 0, 1, 1);
+
         cBoxFileType = new QComboBox(LoadMeasurements);
         cBoxFileType->setObjectName(QString::fromUtf8("cBoxFileType"));
         cBoxFileType->setGeometry(QRect(10, 150, 325, 27));
@@ -195,9 +195,9 @@ public:
         lMeasSource->setText(QApplication::translate("LoadMeasurements", "Measurement Source:", 0, QApplication::UnicodeUTF8));
         lPosSource->setText(QApplication::translate("LoadMeasurements", "Position Source:", 0, QApplication::UnicodeUTF8));
         pButtonClose->setText(QApplication::translate("LoadMeasurements", "Close / Cancel", 0, QApplication::UnicodeUTF8));
-        lTxCell->setText(QApplication::translate("LoadMeasurements", "Transmitting Cell:", 0, QApplication::UnicodeUTF8));
         lFrequency->setText(QApplication::translate("LoadMeasurements", "Transmitting Frequency:", 0, QApplication::UnicodeUTF8));
         lSensitivity->setText(QApplication::translate("LoadMeasurements", "Sensitivity:", 0, QApplication::UnicodeUTF8));
+        lTxCell->setText(QApplication::translate("LoadMeasurements", "Transmitting Cell:", 0, QApplication::UnicodeUTF8));
         cBoxFileType->clear();
         cBoxFileType->insertItems(0, QStringList()
          << QApplication::translate("LoadMeasurements", "GSM Drivetest", 0, QApplication::UnicodeUTF8)

@@ -42,7 +42,7 @@ cRapCells::cRapCells (QWidget* parent) : QWidget(parent)
 	
 	// Setup the mTableList
 	mTableList->setMinimumSize(140,400);
-	mTableList->setMaximumWidth(160);
+	mTableList->setMaximumWidth(200);
 	
 	// create the mProgress bar
 	mProgress = new QProgressBar(this);

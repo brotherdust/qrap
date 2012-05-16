@@ -80,7 +80,7 @@ LoginDialog::LoginDialog (QWidget *parent) : QDialog(parent)
 	
 	// Setup the dialog window
 	setLayout(mainLayout);
-	setWindowTitle(tr("QRAP Login (GNU GPL v3)"));
+	setWindowTitle(tr("Q-Rap Login"));
 	setModal(true);
 	
 	//Move this dialog to the center of the screen

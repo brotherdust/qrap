@@ -221,7 +221,7 @@ namespace Qrap
 			 * 
 			 * @return A double
 			 */
-			double SetPeakRadius(int PeakIndex);
+			double SetPeakRadius(int PeakIndex, double &alpha);
 			
 			/**
 			 *  Calculates the diffraction losses.
@@ -243,7 +243,7 @@ namespace Qrap
 			 */
 			double CalcDiffLoss(const int BeginIndex, const int EndIndex,
 						int PeakIndex, const double ReffHeight,
-						const double SQd1d2, double radius,
+						const double SQd1d2, double radius, double alpha,
 						bool MainEdge,
 						int &TooManyPeaks, double &KnifeEdge, double & RoundHill, 
 						const double GroundPermittivity = 12.0,

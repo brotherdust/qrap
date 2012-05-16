@@ -56,6 +56,11 @@ void cMeasurementAnalysis::on_pushCancel_clicked()
 //****************************************************************************
 void cMeasurementAnalysis::on_pushOk_clicked()
 {
+	cBoxPosSource->setEnabled(false);
+	cBoxMeasSource->setEnabled(false);
+	cBoxMeasType->setEnabled(false);
+	pushOk->setEnabled(false);
+	pushCancel->setEnabled(false);
 
 	QStringList parts;
 	cout << " In cMeasurementAnalysis::on_pButtonLoad_clicked()" << endl;
@@ -72,12 +77,6 @@ void cMeasurementAnalysis::on_pushOk_clicked()
 	cMeasAnalysisCalc MeasSet;
 	double Mean,StDev,CorrC;
 
-	cBoxPosSource->setEnabled(false);
-	cBoxMeasSource->setEnabled(false);
-	cBoxMeasType->setEnabled(false);
-	pushOk->setEnabled(false);
-	pushCancel->setEnabled(false);
-	
 	if (MeasSet.LoadMeasurements(MeasType,PosSource,MeasSource))
 	{
 		if (MeasSet.PerformAnalysis(Mean, StDev, CorrC))
@@ -85,6 +84,7 @@ void cMeasurementAnalysis::on_pushOk_clicked()
 			ValueMeanError->setText(QString("%1").arg(Mean));
                		ValueStdDev->setText(QString("%1").arg(StDev));
             		ValueCorrCoef->setText(QString("%1").arg(CorrC));
+			MeasSet.SaveResults();
 			ValueMeanError->setEnabled(true);
                		ValueStdDev->setEnabled(true);
             		ValueCorrCoef->setEnabled(true);
@@ -94,7 +94,7 @@ void cMeasurementAnalysis::on_pushOk_clicked()
 		}
 		else
 		{
-			cout << "cMeasurementAnalysis::on_pushOK_clicked(); error performing measurement analysis" << endl;
+			cout << "cMeasurementAnalysis::on_pushOK_clicked(); error performing measurement analysis" << endl;	
 		}
 	}
 	else

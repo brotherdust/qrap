@@ -209,7 +209,7 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 	if (mMeasType>0)
 		queryP += mMeasTypeS;
 	else queryP += "NULL"; 
-//	queryP+=",GeomFromText('POINT(";
+
 	string queryM = "INSERT INTO measurement (ci,frequency,id,tp,measvalue) VALUES(";
 	queryM += mCIS;
 	queryM += ",";
@@ -233,15 +233,25 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 	        	istringstream linestream(line);
         		getline (linestream, TimeS, ',');
   			getline (linestream, LatS, ',');
-			Lat = atof((LatS.substr(1,LatS.size()-2)).c_str());
 			getline (linestream, LonS, ',');
-			Lon = atof((LonS.substr(1,LonS.size()-2)).c_str());
 			getline (linestream, RSSIS, ',');
-			Meas = atof((RSSIS.substr(1,RSSIS.size()-2)).c_str());
 			getline (linestream, MERS);
+			if (LatS.substr(0,1)=="\"")
+			{
+				Lat = atof((LatS.substr(1,LatS.size()-2)).c_str());
+				Lon = atof((LonS.substr(1,LonS.size()-2)).c_str());
+				Meas = atof((RSSIS.substr(1,RSSIS.size()-2)).c_str());
+			}
+			else
+			{
+				Lat = atof(LatS.c_str());
+				Lon = atof(LonS.c_str());
+				Meas = atof(RSSIS.c_str());
+			}
+			
 
 			dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
-			if ((Meas > mSensitivity) && (dist>2.0e-7) && (fabs(Lat)>2.0e-7)&&(fabs(Lon)>1.0e-7))
+			if ((Meas > mSensitivity) && (dist>1.0e-5) && (fabs(Lat)>1.0e-5)&&(fabs(Lon)>1.0e-5)&&((dist<2)||(prevLat==0)))
 			{
 				
 				mLastTestPoint++;
@@ -250,13 +260,7 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 				query = queryP;
 				PosString=QString(",GeomFromText('POINT(%1 %2)',4326),").arg(Lon).arg(Lat);
 				query += PosString.toStdString();
-/*				gcvt(Lon,9,temp);
-				gcvt(Lat,9,temp2);
-				query += temp2;
-				query += " ";
-				query += temp;
-				query += ")',4326),"; 
-*/				query += TPID;
+				query += TPID;
 				query += ");";
 
 				if (!gDb.PerformRawSql(query))

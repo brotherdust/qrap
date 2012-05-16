@@ -207,6 +207,7 @@ void QRap::unload()
 		mQGisIface->removePluginMenu("&QRap",mMultiLinkAction);
 		mQGisIface->removePluginMenu("&QRap",mSpectralAction);
 		mQGisIface->removePluginMenu("&QRap",mPreferencesAction);
+		mQGisIface->removePluginMenu("&QRap",mMeasAnalysisAction);
 	  	mQGisIface->removePluginMenu("&QRap",mQActionPointer);
 	  
 	  	mQGisIface->removeToolBarIcon(mSiteAction);
@@ -219,6 +220,7 @@ void QRap::unload()
 		mQGisIface->removeToolBarIcon(mMultiLinkAction);
 	  	mQGisIface->removeToolBarIcon(mSpectralAction);
 		mQGisIface->removeToolBarIcon(mPreferencesAction);
+		mQGisIface->removeToolBarIcon(mMeasAnalysisAction);
 	  	mQGisIface->removeToolBarIcon(mQActionPointer);
 
 	  	delete mQActionPointer;
@@ -232,6 +234,7 @@ void QRap::unload()
 	  	delete mSpectralAction;
 		delete mMultiLinkAction;
 	  	delete mPreferencesAction;
+		delete mMeasAnalysisAction;
 	//  	delete mImportExportAction;
 	//  	delete mHelpAction;
 
@@ -298,7 +301,7 @@ QGISEXTERN QString version()
 // Delete ourself
 QGISEXTERN void unload( QgisPlugin * thePluginPointer )
 {
-//  	delete thePluginPointer;
+  	delete thePluginPointer;
 }
 
 //*****************************************************************************

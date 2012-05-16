@@ -78,6 +78,8 @@ class cMeasAnalysisCalc
 	int PerformAnalysis(double &Mean, double &StDev, double &CorrC, 
 				unsigned Clutterfilter=0);
 
+	int SaveResults();
+
 
    private:
 
@@ -85,12 +87,12 @@ class cMeasAnalysisCalc
 	unsigned mNumMeas;
 	double mkFactor;
 	bool mUseClutter;
-	bool mPlotResolution;
+	double mPlotResolution;
 	eOutputUnits mUnits;
 	short int mDEMsource;
 	short int mClutterSource;
-	cRasterFileHandler 	mDEM;
-	cRasterFileHandler 	mClutter;
+	cRasterFileHandler mDEM;
+	cRasterFileHandler mClutter;
 	vector<tFixed>	mFixedInsts;	///< Inforamtion on the fixed installations
 	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
 

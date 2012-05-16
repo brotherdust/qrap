@@ -70,7 +70,7 @@ MainWindow::MainWindow (QWidget* parent, Qt::WFlags fl)
 	clipboard = QApplication::clipboard();
 	
 	// Set the window title
-	setWindowTitle("QRAP Database Interface 0.1    (GNU GPL v.3)   see  www.QRap.org.za ");
+	setWindowTitle("Q-Rap Database Interface");
 	setWindowIcon(QIcon(":images/logo_icon.png"));
 	
 	// Check if there are any system preferences

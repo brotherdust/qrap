@@ -1767,6 +1767,7 @@ short int cDatabase::getsetMachineID()
 	char* HostID;
 	 
 	bool found = false;
+	bool HostIDnew = false;
 	HostID = getenv("QRAPINST");
 	if (HostID==NULL)
 		HostID = getenv("HOSTID");
@@ -1780,6 +1781,7 @@ short int cDatabase::getsetMachineID()
 	{
 		HostID = new char[10];
 		strcpy(HostID,"LOCAL");
+		HostIDnew = true;
 	}
 	string query = "select id from machine where qrapinst='";
 	query += HostID;
@@ -1817,6 +1819,7 @@ short int cDatabase::getsetMachineID()
 		globalMachineID = (short int) Insert(values, tableName);
 	}
 	cout << "Verlaat cDataBase::getsetMachineID():  globalMachineID=" << globalMachineID << endl;
+	if ((HostID!=NULL)&&(HostIDnew)) delete [] HostID;
 	return globalMachineID;
 }
 

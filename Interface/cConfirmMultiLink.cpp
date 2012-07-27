@@ -185,9 +185,12 @@ bool cConfirmMultiLink::SetPoints(QList<QgsPoint> Points)
  		       	South = min(South,Points[i].y());
  		       	East = max(East,Points[i].x());
  		       	West = min(West,Points[i].x());
+//			sprintf (text, "%f", Points[i].x());
+//			cout << text << endl;
 			gcvt(Points[i].x(),10,text);
   		      	query += text;
   		      	query += " ";
+//			sprintf (text, "%f", Points[i].y());
 			gcvt(Points[i].y(),10,text);
         		query += text;
         		query += ",";
@@ -200,9 +203,10 @@ bool cConfirmMultiLink::SetPoints(QList<QgsPoint> Points)
         	query += "))',4326);";	
 		if (!gDb.PerformRawSql(query))
 		{
-			cout << "Database Select on sites table failed"<< endl;
+			cout << "Database Select on sites table failed in cConfirmMultiLink::SetPoints"<< endl;
 			string err = "Database Select on sites table failed"; 
 			QRAP_WARN(err.c_str());
+			delete [] text;
 			return false;
 		}
 		gDb.GetLastResult(SitesIn);
@@ -222,8 +226,10 @@ bool cConfirmMultiLink::SetPoints(QList<QgsPoint> Points)
 		{
 			string err = "No Sites in selected area! ";
 			QRAP_WARN(err.c_str());
+			delete [] text;
 			return false;
 		}
+		delete [] text;
 		return true;
 	}
 	delete [] text;

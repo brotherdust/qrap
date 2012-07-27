@@ -73,10 +73,12 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 	{
 		poSRS = OGRSpatialReference(poDataset->GetProjectionRef());
 		static char *pszProjWKT[] = {NULL};
-		poSRS.exportToProj4( pszProjWKT );
+
+		poSRS.exportToProj4( pszProjWKT ); 
+
 		if ((Proj4=pj_init(sizeof(pszProjWKT)/sizeof(char*),pszProjWKT)))
 		{
-			printf("Initialised Proj4: %s\n",pj_get_def(Proj4,0));	
+//			printf("Initialised Proj4: %s\n",pj_get_def(Proj4,0));	
 			Proj =NDEF;
 		}
 		else
@@ -86,11 +88,12 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 			static char *pszProjWKT1[] = {"proj=latlong"};
 			if ((Proj4=pj_init(sizeof(pszProjWKT1)/sizeof(char*),pszProjWKT1)))
 			{
-				printf("Initialised Proj4: %s\n",pj_get_def(Proj4,0));	
+//				printf("Initialised Proj4: %s\n",pj_get_def(Proj4,0));	
 				Proj = DEG;
 			}
 			else printf("Error in: %s",*pszProjWKT);
 		}
+		//CPLFree(pszProjWKT);		
 	}
 	else Proj = DEG;
 
@@ -165,7 +168,11 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 	delete [] pafScanline;
     	ns_res = fabs(ns_res); 	// MS added fabs 2008-04-16
     	ew_res = fabs(ew_res);	// MS added fabs 2008-04-16
+
+//	if (poDataset!=NULL) delete poDataset;
+
 	printf("Read GDAL\n");
+
 	return true;
 }
 

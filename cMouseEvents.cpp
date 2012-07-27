@@ -39,7 +39,7 @@ MouseEvents::MouseEvents(QgsMapCanvas* canvas)
 
 MouseEvents::~MouseEvents()
 {
-	delete mToolEmitPoint;
+//	delete mToolEmitPoint;
 }
 
 void MouseEvents::canvasReleaseEvent(QMouseEvent * e)

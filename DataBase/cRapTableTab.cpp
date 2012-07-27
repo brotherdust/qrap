@@ -111,8 +111,8 @@ void cRapTableTab::TabIndexChanged (int index)
 			{
 				mInserting = true;
 			}
-			
-			
+			else mInserting = false;
+						
 			// Create the form
 //			if(mInserting)
 			{

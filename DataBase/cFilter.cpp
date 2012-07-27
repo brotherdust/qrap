@@ -735,7 +735,7 @@ void cFilter::CreateViews()
 		query = " create view antenna_view as select sitename,";
 		query += " antenna.* from antenna, radioinstallation_view"; 
 		query += " where antenna.rikey=radioinstallation_view.id;";
-			
+	
 		if (gDb.ViewExists("antenna_view"))
 			gDb.RemoveView("antenna_view");
 		
@@ -753,7 +753,15 @@ void cFilter::CreateViews()
 		query += " equipment.installationdate as installationdate ";
 		query += " from equipment, radioinstallation_view "; 
 		query += " where equipment.rikey=radioinstallation_view.id;";
-		
+/*		query += " union ";
+		query += " select equipment.id as id, ";
+		query += " null as sitename, ";
+		query += " equipment.serialnumber as serialnumber,";
+		query += " equipment.rikey as rikey,";
+		query += " equipment.equipkey as equipkey,";
+		query += " equipment.installationdate as installationdate";
+		query += " from equipment where equipment.rikey is null;";
+*/		
 		if (gDb.ViewExists("equipment_view"))
 			gDb.RemoveView("equipment_view");
 		
@@ -763,7 +771,7 @@ void cFilter::CreateViews()
 			QRAP_ERROR("Error creating equipment_view in cFilter::CreateViews");
 		}
 		radinvolved=false;
-												
+					
 	}
 	
 	mChangeInsts=false;

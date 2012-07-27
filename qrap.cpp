@@ -195,7 +195,7 @@ void QRap::unload()
 {
 	if (mLoaded)
 	{
-	  	// remove the GUI  
+/*	  	// remove the GUI  
 		cout << "QRap::unload(): removing pulgin menu's" << endl;
 	  	mQGisIface->removePluginMenu("&QRap",mSiteAction);
 		mQGisIface->removePluginMenu("&QRap",mSelectSiteAction);
@@ -241,6 +241,7 @@ void QRap::unload()
 		disconnect(Mouse);
 	//	delete Mouse;
 		mLoaded =false;
+*/
 	}
 	cout << "QRap::unload(): leaving" << endl;
 }

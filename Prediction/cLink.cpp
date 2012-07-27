@@ -303,7 +303,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	int Length;
 	DEM = mDEM.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution);
 	Length = DEM.GetSize();
-	mLength = DEM.GetSize();
+	mLength = Length;
 	
 	if (Length < 2)
 		return false;
@@ -345,8 +345,16 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	delete [] mPropLoss;
 	mPropLoss = new float[Length];
 
+	for (j=0;j<Length; j++)
+	{
+		Tilt[j]=0;
+		mRxLev[j]=0;
+		mPropLoss[j]=0;
+	}
+
 	if (mUseClutter)
 		Clutter=mClutter.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution);
+	else Clutter = DEM;
 
 	Initialize(DEM,Clutter);
 	SetEffProfile();	//Calculates the effective profile
@@ -368,7 +376,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 		TxAntValue = mTxAnt.GetPatternValue(mTxBearing, Tilt[j])
 					+ mRxAnt.GetPatternValue(mRxBearing, -Tilt[j]);
 		mRxLev[j] = -mPropLoss[j] + LinkOtherGain - TxAntValue;
-		if (mUseClutter) Clutter.ReduceSize();
+		Clutter.ReduceSize();
 		DEM.ReduceSize();
 	}
 	mRxLev[0]=mRxLev[1];
@@ -646,7 +654,8 @@ bool cLink::GetDBinfo(tFixed &Inst)
 {
 	pqxx::result r;
 	string query, PointString;
-	char temp[33];
+	char *temp;
+	temp = new char[33];
 	double longitude, latitude;
 	int spacePos;
 	// Populate the rest of the fixed installation information from the database.
@@ -678,6 +687,7 @@ bool cLink::GetDBinfo(tFixed &Inst)
 		string err = "In cLink: Database Select on tables radioinstallation and frequencyallocation failed: Query:";
 		err+=query; 
 		QRAP_ERROR(err.c_str());
+		delete [] temp;
 		return false;
 	} // if
 	else
@@ -719,10 +729,12 @@ bool cLink::GetDBinfo(tFixed &Inst)
 			// \TODO: exceptions and messages
 			gcvt(mTxInst.sInstKey,8,temp);
 			cout << query << endl;
+			delete [] temp;
 			cout << "Warning, radio installation " << mTxInst.sInstKey<< + " does not exist in the database." << endl;
 			return false;
 		} // else
 	} // else
+	delete [] temp;
 	return true;
 }
 
@@ -731,7 +743,8 @@ bool cLink::GetDBinfoS(tFixed &Inst)
 {
 	pqxx::result r;
 	string query, PointString;
-	char temp[33];
+	char *temp;
+	temp = new char[33];
 	double longitude, latitude;
 	int spacePos, i;
 	// Populate the site information from the database. The rest of the info is already in Inst
@@ -746,6 +759,7 @@ bool cLink::GetDBinfoS(tFixed &Inst)
 		string err = "In cLink: Database Select on tables radioinstallation and frequencyallocation failed: Query:";
 		err+=query; 
 		QRAP_ERROR(err.c_str());
+		delete [] temp;
 		return false;
 	} // if
 	else
@@ -768,10 +782,12 @@ bool cLink::GetDBinfoS(tFixed &Inst)
 			gcvt(mTxInst.sSiteID,8,temp);
 			cout << query << endl;
 			cout << "Warning, radio installation " << mTxInst.sInstKey<< + " does not exist in the database." << endl;
+			delete [] temp;
 			return false;
 		} // else
 	} // else
-
+	delete [] temp;
+	return true;
 }
 
 //****************************************************************************************

@@ -40,6 +40,7 @@ cPathLossPredictor::cPathLossPredictor(double k, double f, double txh, double rx
 	m_htx = txh;
 	m_hrx = rxh;
 	m_Loss = 0;
+	m_size = 2;
 
 	m_TempProfile = new float[m_size];
 	m_CurvedProfile = new float[m_size];
@@ -244,7 +245,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 								sqrtD1D2,radius,alpha,
 								false,IfTooManyPeaks,
 								KnifeEdge, RoundHill);
-					if ((MinClearance<0)&&(OldMinClear<0))
+					if ((MinClearance<0)&&(OldMinClear<0)&&(i<MAXPEAK-3))
 					{
 //						cout << endl << " CLEAR CORRECT ";
 						if (MinClearance<OldMinClear)
@@ -275,7 +276,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 					if (IfTooManyPeaks) i++;
 				}
 				else i++;
-				if ((i+1)==MAXPEAK)
+				if ((i+1)>=MAXPEAK)
 				{
 //            				cout << "  MAXPEAK limit reached	";
 					break;
@@ -284,9 +285,10 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		}
 		}
 	
-	if (mUseClutter)
+/*	if (mUseClutter)
 	{
 	}
+*/
 /*
 #ifndef NO_DEBUG
 	m_counter++;

@@ -1589,10 +1589,10 @@ www.QRap.org.za
 		      label = "Line"
 			description="The geographical line that is used to display the link visually."
 		      postgis="true" />
-		<view name = "links_view" as = 'select * from links'>
+<!--		<view name = "links_view" as = 'select * from links'>
 		</view>
-
-<!--		<view name = "links_view" as = 'select linkname, 
+-->
+		<view name = "links_view" as = 'select linkname, 
 			site1.sitename||rad1.sector as txsite,
 			radioinstallation1 as r1,
 			site2.sitename||rad2.sector as rxsite,
@@ -1611,7 +1611,7 @@ www.QRap.org.za
 			<field name="r2" label="Rx Radio" />
 			<field name="clear" label="Clearance" />
 		</view>
--->
+
 	</table> <!-- links -->
 
 <!-- *************************************************************************************************************************** -->

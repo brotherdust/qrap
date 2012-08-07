@@ -214,7 +214,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //	InputProfile.Display();
 	LinkLength = CalcDist(InputProfile);
 	m_Loss = CalcFreeSpaceLoss(LinkLength);
-	if (InputProfile.GetSize()>1)
+	if (InputProfile.GetSize()>2)
 	{
 		InitEffectEarth(InputProfile);
 		FindElevAngles(ElevAngleTX,ElevAngleRX);

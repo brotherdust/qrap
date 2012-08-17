@@ -79,6 +79,8 @@ namespace Qrap
 			}
 			
 			bool DirectChangeSetToUse(int OriginalSet);
+
+			unsigned GetClutterClassGroup();
 			
 			/**
 			 * Description of GetForLink
@@ -90,8 +92,8 @@ namespace Qrap
 			 * @return cProfile Description
 			 */
 			cProfile GetForLink(	cGeoP TxLoc,
-					    			cGeoP RxLoc,
-					    			double DistRes);
+			    			cGeoP RxLoc,
+			    			double DistRes);
 			
 			/**
 			 * Description of GetForCoverage

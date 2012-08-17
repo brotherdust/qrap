@@ -33,7 +33,9 @@ double cPathLossPredictor::m_reR = 6370000.0;    // real earth Radius in m
 //## Constructors (implementation)
 // CPathLossPredictor:: Default Constructor
 //************************************************************************
-cPathLossPredictor::cPathLossPredictor(double k, double f, double txh, double rxh)
+cPathLossPredictor::cPathLossPredictor(	double k, double f, 
+					double txh, double rxh,
+					bool UseClutter, unsigned ClutterClassGroup)
 {
 	m_kFactor = k;
 	m_freq = f;
@@ -44,6 +46,7 @@ cPathLossPredictor::cPathLossPredictor(double k, double f, double txh, double rx
 
 	m_TempProfile = new float[m_size];
 	m_CurvedProfile = new float[m_size];
+	mClutterProfile = new int[m_size];
 	m_markers = new int[MAXPEAK];
 	m_peakwidth = new int[MAXPEAK];
 	m_aboveEarth = new double[MAXPEAK];
@@ -53,6 +56,9 @@ cPathLossPredictor::cPathLossPredictor(double k, double f, double txh, double rx
 	m_counter=0;
 	m_SmoothWidth=1;
 	m_SeekWidth=2;
+	mUseClutter = UseClutter;
+
+	if (mUseClutter) mUseClutter=mClutter.Reset(ClutterClassGroup);
 
 }/* end CPathLossPredictor:: Default Constructor */
 
@@ -62,6 +68,9 @@ cPathLossPredictor::cPathLossPredictor(double k, double f, double txh, double rx
 cPathLossPredictor::cPathLossPredictor(const cPathLossPredictor &right)
 {
 	int i;
+
+	mUseClutter = right.mUseClutter ;
+	if (mUseClutter) mClutter = right.mClutter;
 
 	m_kFactor = right.m_kFactor;
 	m_freq = right.m_freq;
@@ -82,12 +91,14 @@ cPathLossPredictor::cPathLossPredictor(const cPathLossPredictor &right)
 	m_CurvedProfile = new float[m_size];
 	m_TempProfile = new float[m_size];
 	m_profile = new float[m_size];
+	mClutterProfile = new int[m_size];
 
 	for (i=0; i<m_size; i++)
         {
 		m_CurvedProfile[i] = right.m_CurvedProfile[i];
                 m_TempProfile[i]=  right.m_TempProfile[i];
 		m_profile[i] = right.m_profile[i];
+		mClutterProfile[i] = right.mClutterProfile[i];	
         }
 
 	m_markers = new int[MAXPEAK];
@@ -111,6 +122,7 @@ cPathLossPredictor::~cPathLossPredictor()
 	delete [] m_aboveEarth;
 	delete [] m_TempProfile;
 	delete [] m_CurvedProfile;
+	delete [] mClutterProfile;
 }/* end CPathLossPredictor:: Destructor */
 
 
@@ -123,6 +135,9 @@ const cPathLossPredictor & cPathLossPredictor::operator=
 
 	if (this == &right)
 		return (*this);
+
+	mUseClutter = right.mUseClutter ;
+	if (mUseClutter) mClutter = right.mClutter;
 
 	m_kFactor = right.m_kFactor;
 	m_freq = right.m_freq;
@@ -142,14 +157,17 @@ const cPathLossPredictor & cPathLossPredictor::operator=
 	delete [] m_CurvedProfile;
 	delete [] m_TempProfile;
 	delete [] m_profile;
+	delete [] mClutterProfile;
 	m_CurvedProfile = new float [m_size];
 	m_TempProfile = new float[m_size];
 	m_profile = new float[m_size];
+	mClutterProfile = new int[m_size];
 	for (i=0; i<m_size; i++)
 	{
 		*(m_CurvedProfile+i) = *(right.m_CurvedProfile+i);
 		*(m_TempProfile+i) = *(right.m_TempProfile+i);
 		*(m_profile+i) = *(right.m_profile+i);
+		*(mClutterProfile+i) = *(right.mClutterProfile+i);
 	}
 
 	for (i=0; i<MAXPEAK; i++)
@@ -164,7 +182,8 @@ return (*this);
 
 //************************************************************************
 int cPathLossPredictor::setParameters(double k, double f,
-					double TxHeight, double RxHeight, bool UseClutter)
+					double TxHeight, double RxHeight, 
+					bool &UseClutter, unsigned ClutterClassGroup)
 {
 #ifndef NO_DEBUG
 //	cout << " Entering setParameters" << endl;
@@ -182,6 +201,9 @@ int cPathLossPredictor::setParameters(double k, double f,
 	if (m_SeekWidth<3) m_SeekWidth = 3;
 //	if (m_SmoothWidth<1) m_SmoothWidth=1;
 	mUseClutter = UseClutter;
+	
+	if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
+	UseClutter = mUseClutter;
 
 return 1;
 
@@ -189,13 +211,19 @@ return 1;
 
 
 //************************************************************************
+void cPathLossPredictor::set_Clutter(bool UseClutter, unsigned ClutterClassGroup)
+{
+	mUseClutter = UseClutter;
+	if (mUseClutter) mUseClutter=mClutter.Reset(ClutterClassGroup);
+}
+
+//************************************************************************
 // Calculates the Total Path Loss
 float cPathLossPredictor::TotPathLoss(cProfile &InputProfile, 
 					float &ElevAngleTX,
-					bool UseClutter,
 					cProfile &ClutterProfile)
 {
-	double LinkLength=0.0;
+	mLinkLength=0.0;
 	double MinClearance=DBL_MAX;
 	double OldMinClear=DBL_MAX;
 	float ElevAngleRX=0.0;
@@ -212,11 +240,11 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	m_counter=0;
 
 //	InputProfile.Display();
-	LinkLength = CalcDist(InputProfile);
-	m_Loss = CalcFreeSpaceLoss(LinkLength);
+	mLinkLength = CalcDist(InputProfile);
+	m_Loss = CalcFreeSpaceLoss(mLinkLength);
 	if (InputProfile.GetSize()>2)
 	{
-		InitEffectEarth(InputProfile);
+		InitEffectEarth(InputProfile, ClutterProfile);
 		FindElevAngles(ElevAngleTX,ElevAngleRX);
 		
 		ReffHeight = Horizontalize(0,1);
@@ -283,12 +311,23 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 				}
 			}
 		}
-		}
-	
-/*	if (mUseClutter)
-	{
 	}
-*/
+	
+	if (mUseClutter)
+	{
+		double Cheight = mClutter.mClutterTypes[mClutterProfile[i]].sHeight;
+		double Cwidth = mClutter.mClutterTypes[mClutterProfile[i]].sWidth;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[0]*TERM0;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[1]*TERM1;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[2]*TERM2;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[3]*TERM3;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[4]*TERM4;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[5]*TERM5;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[6]*TERM6;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[7]*TERM7;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[8]*TERM8;
+	}
+
 /*
 #ifndef NO_DEBUG
 	m_counter++;
@@ -309,7 +348,7 @@ inline double cPathLossPredictor::CalcDist(cProfile& InputProfile)
 	float* Profile;
 	cGeoP start, end;
 
-	Profile = new float[1];
+	Profile = new float[2];
 	m_interPixelDist = InputProfile.GetInterPixelDist();
 	InputProfile.GetProfile(SizeOfProfile,Profile);
 //	start = InputProfile.GetStartLoc();
@@ -342,7 +381,8 @@ return  FreeLoss;
 //**************************************************************************
 // Initialize and calculate the effective earth profile, taking the m_kFactor
 // into account.
-void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile)
+void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile, 
+					const cProfile &ClutterProfile)
 {
 	int i;
 	double centre;
@@ -377,6 +417,15 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile)
 	m_profile = new float[m_size];
 	InputProfile.GetProfile(m_size,m_profile);
 
+	if (mUseClutter)
+	{
+		ClutterProfile.GetProfile(m_size,m_TempProfile);
+		delete [] mClutterProfile;
+		mClutterProfile = new int[m_size];
+		for (i=0; i<m_size; i++)
+			mClutterProfile[i] = (int)m_TempProfile[i];
+	}
+
 	if (m_kFactor!=1.0)
 	{
 		centre = ((double)m_size)/2.0;
@@ -387,7 +436,7 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile)
 		   *(m_CurvedProfile+i) = *(m_profile+i)-(float)(offset*offset/(Reff_2));
 		   *(m_TempProfile+i) = *(m_CurvedProfile+i);
 		}
-	}
+	}// end if k
 	else
 	{
 		for (i=0; i<m_size;i++)
@@ -396,6 +445,15 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile)
 			*(m_TempProfile+i) = *(m_CurvedProfile+i);
 		}
 	}/*endif else*/
+
+	if (mUseClutter)
+	{
+		for (i=0; i<m_size;i++)
+		{
+			*(m_CurvedProfile+i) += mClutter.mClutterTypes[mClutterProfile[i]].sHeight;
+			*(m_TempProfile+i) += mClutter.mClutterTypes[mClutterProfile[i]].sHeight;
+		}
+	}
 	
 /*	cout << "PathProfile: ";  
 	for (i=0; i<m_size;i++)

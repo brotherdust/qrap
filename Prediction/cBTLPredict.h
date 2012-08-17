@@ -103,6 +103,7 @@ namespace Qrap
 							double DistanceRes,
 							Float2DArray DTM,
 							bool UseClutter,
+							unsigned ClutterClassGroup,
 							Float2DArray Clutter);
 			
 			/**

@@ -7,8 +7,8 @@
  *    File        : cMeasAnalysisCalc.h
  *    Copyright   : (c) University of Pretoria
  *    Author      : Magdaleen Ballot (magdaleen.ballot@up.ac.za)
- *    Description : This class allows for the importing of CW measurements 
- *                  in a *.val format
+ *    Description : This class does the analysis of the measurements in the 
+ *			the database
  *
  **************************************************************************
  *                                                                         *
@@ -35,13 +35,17 @@
 #include "cPthlssp.h"
 #include "cProfile.h"
 #include "cAntpatn.h"
+#include "cMemmngr.h"
 #include "cRasterFileHandler.h"
-
 #include "../Interface/ui_MeasurementAnalysis.h"
 #include "cGeoP.h"
-#include <QMessageBox>
+
+#include <iostream>
+#include <Eigen/Dense>
+
 
 using namespace std;
+using namespace Eigen;
 using namespace Qrap;
 
 struct tMeasPoint
@@ -75,11 +79,12 @@ class cMeasAnalysisCalc
 				unsigned MeasSource, unsigned Cell=0);
 
 
-	int PerformAnalysis(double &Mean, double &StDev, double &CorrC, 
-				unsigned Clutterfilter=0);
+	int PerformAnalysis(double &Mean, double &MeanSquareError,
+				double &StDev, double &CorrC, unsigned Clutterfilter=0);
 
 	int SaveResults();
 
+	bool Optimiser(bool ChangeHeights);
 
    private:
 
@@ -87,6 +92,8 @@ class cMeasAnalysisCalc
 	unsigned mNumMeas;
 	double mkFactor;
 	bool mUseClutter;
+	unsigned mClutterClassGroup;
+	unsigned mClutterFilter;
 	double mPlotResolution;
 	eOutputUnits mUnits;
 	short int mDEMsource;
@@ -95,7 +102,15 @@ class cMeasAnalysisCalc
 	cRasterFileHandler mClutter;
 	vector<tFixed>	mFixedInsts;	///< Inforamtion on the fixed installations
 	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
-
+	MatrixXd mSolveCoefMatrix;	// matrix representing the set of linear equations to be solved
+	VectorXd mLeftSide;
+	RowVectorXd mDeltaCoeff;
+	cPathLossPredictor mPathLoss;	// we need to access the clutter coefficients of mClutter of PathLoss 
+					// ... hence mPathLoss needs to be a member/class global variable
+	double *mMinTerm;		// The minimum and maximum values of a specific term is used to identify 
+	double *mMaxTerm;		// whether or not the coefficients of these terms are relavent or whether 
+					// the term will be constant.
+	double *mMidTerm;
 };
 }
 #endif

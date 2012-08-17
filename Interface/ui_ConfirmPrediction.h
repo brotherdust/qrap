@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ConfirmPrediction.ui'
 **
-** Created: Thu May 10 14:01:13 2012
+** Created: Wed Aug 15 16:41:07 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -320,7 +320,7 @@ public:
 
         useClutterCheckBox = new QCheckBox(gridLayout);
         useClutterCheckBox->setObjectName(QString::fromUtf8("useClutterCheckBox"));
-        useClutterCheckBox->setEnabled(false);
+        useClutterCheckBox->setEnabled(true);
 
         PlotInput->addWidget(useClutterCheckBox, 0, 3, 1, 1);
 

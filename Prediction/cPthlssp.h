@@ -37,9 +37,10 @@
 #include "cMemmngr.h"
 #include "cGeoP.h"
 #include "cProfile.h"
+#include "cClutter.h"
 
 // local defines
-#define MAXPEAK 4
+#define MAXPEAK 5
 
 namespace Qrap
 {
@@ -57,17 +58,23 @@ namespace Qrap
 	
 		public:
 			/**
-			 * Constructor
-			 * 
-			 * @param k Description
-			 * @param f Description
-			 * @param txh Description
-			 * @param rxh Description
-			 */
-			cPathLossPredictor (double k=1.33,
-					    double f=400.0,
-					    double txh=18.0,
-					    double rxh=1.5);
+			* Constructor
+			* 
+			* @param k k-factor that determines the effective earth radius
+			* @param f is the frequency in MHz
+			* @param txh is the transmitter height above local ground
+			* @param rxh is the receiver height above local ground
+			* @param UseClutter is a boolean variable indicating whether Clutter is 
+			* to be used in the path loss predictions
+			* @param ClutterClassGroup indicates the Clutter Classification Group 
+			* of the Clutter files that is used in the predictions
+			*/
+			cPathLossPredictor (	double k=1.33,
+					    	double f=400.0,
+					    	double txh=18.0,
+					    	double rxh=1.5,
+						bool UseClutter=false,
+						unsigned ClutterClassGroup=9999);
 			
 			
 			/**
@@ -94,7 +101,6 @@ namespace Qrap
 			 */
 			float TotPathLoss (cProfile &DTMProfile, 
 						float &Tilt,
-						bool UseClutter,
 						cProfile &ClutterProfile);
 			
 /**
@@ -109,26 +115,20 @@ namespace Qrap
 			/**
 			 * Setting the parameters
 			 * 
-			 * @param k Description
-			 * @param f Description
-			 * @param TxHeight Description
-			 * @param RxHeight Description
-			 * 
-			 * @return An integer
-			 */
-			int setParameters (double k,
-					   			double f,
-					   			double TxHeight,
-					   			double RxHeight,
-								bool UseClutter=false);
-			/**
-			 * Setting the Clutter coefficients 
-			 * 
-			 * @return An integer
-			 */
-
-//			void setClutterCoefficients (double *kc);
-			
+			* @param k k-factor that determines the effective earth radius
+			* @param f is the frequency in MHz
+			* @param TxHeight is the transmitter height above local ground
+			* @param RxHeight is the receiver height above local ground
+			* @param UseClutter is a boolean variable indicating whether Clutter is 
+			* to be used in the path loss predictions
+			* @param ClutterClassGroup indicates the Clutter Classification Group 
+			* of the Clutter files that is used in the predictions
+			* 
+			* @return An integer
+			*/
+			int setParameters (double k, double f,
+					  	double TxHeight, double RxHeight,
+						bool &UseClutter,unsigned ClutterClassGroup);
 
 			/**
 			 * Description of set_kFactor
@@ -160,6 +160,16 @@ namespace Qrap
 			void set_hrx(const double value) {m_hrx = value;}
 			
 			/**
+			 * Description set_Clutter
+			 * 
+			* @param UseClutter is a boolean variable indicating whether Clutter is 
+			* to be used in the path loss predictions
+			* @param ClutterClassGroup indicates the Clutter Classification Group 
+			* of the Clutter files that is used in the predictions
+			 */
+			void set_Clutter(bool UseClutter=false, unsigned ClutterClassGroup=9999); 
+
+			/**
 			 * Overloaded operator
 			 */
 			const cPathLossPredictor & operator=(const cPathLossPredictor &right);
@@ -186,7 +196,7 @@ namespace Qrap
 			/**
 			 * Initializes the object of type CPathLossPredictor, setting the effective profile, and the other members.
 			 */
-			void InitEffectEarth (const cProfile &InputProfile);
+			void InitEffectEarth (const cProfile &InputProfile, const cProfile &ClutterProfile);
 			
 
 			/**
@@ -266,11 +276,13 @@ namespace Qrap
 			static double m_reR;		///< real earth Radius in meter.
 			double m_Loss;			///< The path loss in dB.
 			double m_kFactor;		///< The k_factor used to calculate the effect earth curviture.
+			double mLinkLength;		///< Distance between transmitter and receiver.
 			double m_freq;			///< The operating frequency in MHz.
 			double m_htx;			///< The height of the transmitter antenna in meter.
 			double m_hrx;			///< The height of the receiver antenna in meter.
-			float *m_TempProfile;	///< Temporary (horizontilized profile).
-			float *m_CurvedProfile;	///< Storage for original profile.
+			float *m_TempProfile;		///< Temporary (horizontilized profile).
+			float *m_CurvedProfile;		///< Storage for original profile.
+			int *mClutterProfile;
 			double m_tempIPD;		///< Temporary InterPixelDist used to "flatten" the profile in meter
 			double m_slope;			///< (temporary) slope of the profile.
 			int *m_markers;			///< Indexes of markers
@@ -280,6 +292,8 @@ namespace Qrap
 			int m_SmoothWidth;		///< Used to Smooth the profile when calculating the radii of the peaks
 			int m_SeekWidth;		///< Use to seek the inflection points when calculating the peak radii
 			bool mUseClutter;		///< indicates whether clutter dependancies should be included. 
+		public:
+			cClutter mClutter;		///< 'container' class that has the coefficients and heights to be used in the pathloss calculations. It must be public for the optimiser to see it. 
 	};
 }
 

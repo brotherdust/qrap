@@ -143,6 +143,7 @@ const cLink & cLink::operator=(const cLink &right)
 	delete [] mTrueHeightGrid2;
 	delete [] mTrueHeightGrid3;
 
+	mClutterset		= right.mClutterset;
 	mLength			= right.mLength;
 	mSlope 			= right.mSlope;
 	mPlotResolution	= right.mPlotResolution;
@@ -227,6 +228,10 @@ void cLink::SetLink(eOutputUnits	Units,
 		mUseClutter = mClutter.SetRasterFileRules(mClutterSource);
 	else
 		mClutterSource = 1;
+	if (mUseClutter) 
+		mClutterClassGroup = mClutter.GetClutterClassGroup();
+	if (mUseClutter) mClutterset.Reset(mClutterClassGroup);
+
 	if (mTrial)
 	{
 		mTxInst.sSiteID = TxInst;
@@ -311,7 +316,6 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	int j;
 	float *Tilt;
 	double EIRP, LinkOtherGain, TxAntValue=0.0, RxAntValue=0.0;
-	cProfile Clutter;
 
 	cPathLossPredictor PathLoss;
 	bool AfterReceiver = (mUnits!=dBWm2Hz) && (mUnits!=dBWm2);	
@@ -352,18 +356,19 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 		mPropLoss[j]=0;
 	}
 
+	cProfile Clutter;
 	if (mUseClutter)
 		Clutter=mClutter.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution);
-	else Clutter = DEM;
 
 	Initialize(DEM,Clutter);
 	SetEffProfile();	//Calculates the effective profile
 	SetLineOfSight();
 	SetFresnelClear();
 		
-	PathLoss.setParameters(mkFactor,mFrequency,mTxInst.sTxHeight,mRxInst.sRxHeight);
+	PathLoss.setParameters(mkFactor,mFrequency,mTxInst.sTxHeight,mRxInst.sRxHeight,
+				mUseClutter,mClutterClassGroup);
 	j=(Length-1);
-	mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],mUseClutter,Clutter);
+	mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter);
 	mTxBearing = mTxInst.sSitePos.Bearing(mRxInst.sSitePos);
 	if (mTxBearing < 180.0)
 		mRxBearing = mTxBearing + 180.0;
@@ -372,23 +377,16 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	PathLoss.FindElevAngles(mTxTilt,mRxTilt);
 	for (j=(Length-1); j>0 ; j--)
 	{
-		mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],mUseClutter,Clutter);
+		mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter);
 		TxAntValue = mTxAnt.GetPatternValue(mTxBearing, Tilt[j])
 					+ mRxAnt.GetPatternValue(mRxBearing, -Tilt[j]);
 		mRxLev[j] = -mPropLoss[j] + LinkOtherGain - TxAntValue;
-		Clutter.ReduceSize();
+		if (mUseClutter) Clutter.ReduceSize();
 		DEM.ReduceSize();
 	}
 	mRxLev[0]=mRxLev[1];
 
 	mPathLossEnd = mPropLoss[mLength-1];
-
-	mMinClearance = 6000.0;
-	int i;
-	for(i=0;i<mLength;i++)
-		if (mClearance[i]<mMinClearance)
-			mMinClearance = mClearance[i];
-
 	delete [] Tilt;
 	return true;
 }
@@ -398,8 +396,8 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 // rest.
 void cLink::Initialize(const cProfile &DEMProfile,const cProfile &ClutterProfile)
 {
+	unsigned i;
 	DEMProfile.GetProfile(mLength,mFlatProfile);
-	// \ TODO :effect Clutterheights on profile
 /*	for (int j=0;j<mLength;j++)
 		cout << mFlatProfile[j] << " ";
 	cout << endl;
@@ -407,6 +405,19 @@ void cLink::Initialize(const cProfile &DEMProfile,const cProfile &ClutterProfile
 	mPlotResolution = DEMProfile.GetInterPixelDist();
 	mTxElevation = mFlatProfile[0];
 	mRxElevation = mFlatProfile[mLength-1];
+
+	if (mUseClutter)
+	{
+		delete [] mClearance;		//Just temporary (mis)using mClearance
+		mClearance = new float[mLength];
+		delete [] mClutterProfile;
+		mClutterProfile = new int[mLength];
+		ClutterProfile.GetProfile(mLength,mClearance);
+		for (i=0; i<mLength; i++)
+			mClutterProfile[i] = (int)mClearance[i];
+		for (i=0; i<mLength; i++)
+			mFlatProfile[i] += mClutterset.mClutterTypes[mClutterProfile[i]].sHeight;
+	}
 
 	delete [] mRxLev;
 	delete [] mPropLoss;
@@ -421,20 +432,19 @@ void cLink::Initialize(const cProfile &DEMProfile,const cProfile &ClutterProfile
 	delete [] mTrueHeightGrid2;
 	delete [] mTrueHeightGrid3;
 
-	mPropLoss    = new float[mLength];
+	mPropLoss    	= new float[mLength];
 	mRxLev    	= new float[mLength];
-	mEffProfile  = new float[mLength];
-	mLineOfSight = new float[mLength];
-	mFresnelH    = new float[mLength];
-	mFresnelL    = new float[mLength];
-	mFresnelSH   = new float[mLength];
-	mFresnelSL   = new float[mLength];
-	mClearance   = new float[mLength];
+	mEffProfile  	= new float[mLength];
+	mLineOfSight 	= new float[mLength];
+	mFresnelH    	= new float[mLength];
+	mFresnelL    	= new float[mLength];
+	mFresnelSH   	= new float[mLength];
+	mFresnelSL   	= new float[mLength];
+	mClearance   	= new float[mLength];
 	mTrueHeightGrid1	= new float[mLength];
 	mTrueHeightGrid2	= new float[mLength];
 	mTrueHeightGrid3	= new float[mLength];
 
-	int i;
 	for(i=0;i<mLength;i++)
 	{
 		mPropLoss[i]   = 0.0;
@@ -504,9 +514,9 @@ void cLink::SetFresnelClear()
 					// positive upwards
 	double sinA;		// sinus of 'angle'
 	double cosA;		// cosinus of 'angle'
-	double FRadius;		// Fresnel radius
+	double FRadius=1;		// Fresnel radius
 	double delta;		// temporary value
-	double temp;		// temporary value
+	double temp=0;		// temporary value
 
 	wavelength = c/(mFrequency*1000000.0);
 	angle = atan(mSlope);
@@ -536,7 +546,8 @@ void cLink::SetFresnelClear()
 			mClearance[i] = (float)(delta/FRadius);
 		else
 			mClearance[i] = 3.402823e+38;
-
+		
+		mMinClearance = 3.402823e+38;
 		if (mMinClearance > mClearance[i])
 			mMinClearance= mClearance[i];
 

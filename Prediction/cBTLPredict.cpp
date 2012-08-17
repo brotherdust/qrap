@@ -403,8 +403,8 @@ int cBTLPredict::StoreBTL()
 
 //*********************************************************************
 int cBTLPredict::PredictBTL(unsigned NumAngles, unsigned NumDistance, 
-							double DistanceRes,	Float2DArray DTM, 
-							bool UseClutter = false, Float2DArray Clutter= NULL)
+				double DistanceRes, Float2DArray DTM, 
+				bool UseClutter, unsigned ClutterClassGroup, Float2DArray Clutter)
 {
 	
 	int MaxRadialP=0;
@@ -431,7 +431,7 @@ int cBTLPredict::PredictBTL(unsigned NumAngles, unsigned NumDistance,
 	cout << "k: " << mkFactor << endl;
 	cout << "F_height: " << mFixedHeight << endl;
 	cout << "M_height: " << mMobileHeight << endl;
-	PathLoss.setParameters(mkFactor,mFrequency,mFixedHeight,mMobileHeight);
+	PathLoss.setParameters(mkFactor,mFrequency,mFixedHeight,mMobileHeight,UseClutter,ClutterClassGroup);
 	for (i=0; i<NumAngles; i++)
 	{
 		DTMProfile.SetProfile(mNumRadialPoints, DTM[i]);
@@ -439,8 +439,7 @@ int cBTLPredict::PredictBTL(unsigned NumAngles, unsigned NumDistance,
 			ClutterProfile.SetProfile(mNumRadialPoints, Clutter[i]);
 		for (j=(NumDistance-1); j>0 ; j--)
 		{
-			mBTL[i][j] = PathLoss.TotPathLoss(DTMProfile, mTilt[i][j], 
-												UseClutter,ClutterProfile);
+			mBTL[i][j] = PathLoss.TotPathLoss(DTMProfile, mTilt[i][j], ClutterProfile);
 			if ((mBTL[i][j]<-mMaxPathLoss)&&(j>MaxRadialP))
 			{
 				MaxRadialP = j;

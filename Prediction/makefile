@@ -1,6 +1,6 @@
-CC = g++ -g -Wall -W -D_REENTRANT -c -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore  -I/usr/include/armadillo_bits
+CC = g++ -g -Wall -W -D_REENTRANT -c -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore
 
-OBJECTS = cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cORT.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o main.o
+OBJECTS = cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cClutter.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o main.o
 
 all: rap makefile
 
@@ -9,7 +9,8 @@ all: rap makefile
 #	$(CC) main.cpp 
 
 rap: $(OBJECTS) makefile
-	g++ -O1 -g -o rap $(OBJECTS) -L/usr/local/pgsql/lib -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal1.7.0 -lproj  -lssl -lPocoXML  -lQtCore -larmadillo
+	g++ -g -o rap $(OBJECTS) -L/usr/local/pgsql/lib -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal -lproj  -lssl -lPocoXML  -lPocoFoundation -lQtCore
+
 
 main.o: ../DataBase/Config.h main.cpp makefile
 	$(CC) main.cpp
@@ -38,10 +39,13 @@ cRasterFileHandler.o: cRasterFileHandler.h ../DataBase/Config.h cDatabase.o cMem
 cProfile.o:  cProfile.h cGeoP.o cProfile.cpp makefile 
 	$(CC) cProfile.cpp
 	
-cLink.o:  cLink.h cLink.cpp makefile 
+cLink.o:  cLink.h cClutter.o cLink.cpp makefile  
 	$(CC) cLink.cpp
 
-cPthlssp.o:  cPthlssp.h cMemmngr.o cGeoP.o cProfile.o cPthlssp.cpp makefile
+cClutter.o:  cClutter.h ../DataBase/Config.h cClutter.cpp makefile
+	$(CC) cClutter.cpp
+
+cPthlssp.o:  cPthlssp.h cClutter.o cMemmngr.o cGeoP.o cProfile.o cPthlssp.cpp makefile
 	$(CC) cPthlssp.cpp
 
 cGDAL.o: cGDAL.h cMemmngr.o cGDAL.cpp makefile

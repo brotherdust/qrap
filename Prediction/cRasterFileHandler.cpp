@@ -30,7 +30,6 @@ using namespace Qrap;
 //*********************************************************************
 cRasterFileHandler::cRasterFileHandler()
 {
-
 	mSampleMethod=2;
 }
 
@@ -94,12 +93,12 @@ bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
    			{
    				temp = 0;
    				while ((QueryResult[i]!=',')&&(QueryResult[i]!='}'))
-			    {
+			    	{
 				 	temp =  temp*10 + (QueryResult[i]-'0');
    					i++;
    				}
-			    i++;
-			    mFileSetOrder.push_back(temp);
+			    	i++;
+			    	mFileSetOrder.push_back(temp);
 			}// end while i<NumBytes
    			Type = r[0]["type"].c_str();
    			if (Type=="DEM") mSampleMethod = 2;
@@ -118,6 +117,41 @@ bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
 } //end SetRasterFileRules.
 
 
+//************************************************************************
+unsigned cRasterFileHandler::GetClutterClassGroup()
+{
+	unsigned ClassGroup;
+	char *temp;
+	temp = new char[33];	
+	pqxx::result CC;
+	gcvt(mFileSetOrder[0],9,temp);
+	string query = "SELECT classgroup from filesets WHERE ID="; 
+	query += temp;	
+	query += ";";
+
+	if(!gDb.PerformRawSql(query))
+	{
+		string err = "Getting the Clutter Classification Group to use failed. Query: ";
+		err += query;
+		QRAP_WARN(err.c_str());
+		ClassGroup = 0;
+	}
+	else
+	{
+		gDb.GetLastResult(CC);
+		if(CC.size()!=0)
+			ClassGroup = atoi(CC[0]["classgroup"].c_str());
+		else
+		{
+			string err = "The query for the Clutter Classification Group is empty. Query: ";
+			err += query;
+			QRAP_WARN(err.c_str());
+			ClassGroup = 0;	
+		}//end else CC.size
+	}
+	delete [] temp;	
+	return ClassGroup;
+};
 //**********************************************************************
 cProfile cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes)
 {
@@ -146,7 +180,7 @@ cProfile cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes
 		AddRaster(RxLoc);	
 	if (mCurrentRasters.size()==0)
 	{
-		string err = "No raster files could be found. Confirm that file-set order exist. ";
+		string err = "No raster files could be found. Confirm that File-Set Order exist. ";
 		cout << err << endl;
 		QRAP_ERROR(err.c_str());
 		return false;
@@ -287,7 +321,7 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 
 	if (mCurrentRasters.size()==0)
 	{
-		string err = "No raster files could be found.";
+		string err = "No raster files could be found. Confirm that File-Set Order exist.";
 		cout << err << endl;
 		QRAP_ERROR(err.c_str());
 		return false;

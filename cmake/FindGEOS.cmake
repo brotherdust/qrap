@@ -7,9 +7,10 @@
 #    GEOS_LIBRARY
 
 
-FIND_PATH(GEOS_INCLUDE_DIR geos.h 
+FIND_PATH(GEOS_INCLUDE_DIR geos_c.h 
   /usr/local/include 
-  /usr/include 
+  /usr/include
+  /usr/include/geos 
   #MSVC
   "$ENV{LIB_DIR}/include"
   #mingw
@@ -29,6 +30,8 @@ IF (GEOS_INCLUDE_DIR AND GEOS_LIBRARY)
    SET(GEOS_FOUND TRUE)
 ENDIF (GEOS_INCLUDE_DIR AND GEOS_LIBRARY)
 
+MESSAGE(STATUS "GEOS Library: ${GEOS_LIBRARY}")
+MESSAGE(STATUS "GEOS Include: ${GEOS_INCLUDE_DIR}")
 
 IF (GEOS_FOUND)
 

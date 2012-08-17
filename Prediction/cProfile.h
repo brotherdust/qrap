@@ -116,6 +116,13 @@ namespace Qrap
 			 */
 			void GetProfile(int &size, float *&profile) const;
 			
+
+			/**
+			 * Description of GetLastValue
+			 */
+			double GetLastValue() { return (double)m_profile[m_size-1]; };
+
+
 			/**
 			 * Description MoveOneUp
 			 */

@@ -247,10 +247,7 @@ void cConfirmMultiLink::on_pushCancel_clicked()
 //***********************************************************************************************
 void cConfirmMultiLink::on_pushOk_clicked()
 {
-	pushOk->setEnabled(false);
-	pushCancel->setEnabled(false);
-	pushOk->setText("wait");
-	pushCancel->setText("wait");
+	bool Success = true;
 	pqxx::result r;
 	QList<string> SiteNames;
 	bool SavePDF=false;
@@ -292,14 +289,12 @@ void cConfirmMultiLink::on_pushOk_clicked()
 	mInst.sSiteID=0;
 	if(!gDb.PerformRawSql(query))
 	{
+		Success = false;
 		QString err = "There seem to be an error with the query to get the default";
 		err+= "radio installation  for the technology.";
 		cout << "Query Failed: " << query.c_str() << endl;
 		QRAP_ERROR(err.toStdString().c_str());
 		QMessageBox::information(this, "QRap", err);
-		pushOk->setEnabled(true);
-		pushCancel->setEnabled(true);
-		return;
 	} // if
 	else
 	{
@@ -330,8 +325,7 @@ void cConfirmMultiLink::on_pushOk_clicked()
 			QRAP_WARN(err.toStdString().c_str());
 			cout << "Query Empty: " << query.c_str() << endl;
 			QMessageBox::information(this, "QRap", err);
-			pushOk->setEnabled(true);
-			pushCancel->setEnabled(true);			
+			Success=false;
 			return;
 
 		} // else
@@ -370,99 +364,115 @@ void cConfirmMultiLink::on_pushOk_clicked()
 	if (Clutter=="true")
 		UseClutter = true;
 	else UseClutter = false;
-	short int ClutterSource = atoi(gDb.GetSetting("ClutterSource").c_str());
-	short int DEMsource = atoi(gDb.GetSetting("DEMsource").c_str());
 
-	// Go through all possible links and evaluate them, if good save.
-	int size = mSiteList.size();
-	int i,j;
-	double Distance, PathLoss, MinClearance;
-	bool Work=true;
-	int TxRadID, RxRadID;
-	char * temp = new char[33];
-	cLink Link;
-	string LinkName="Link";
-	QString Linkname = "Link";
-	int LinkID=0;
-	Link.SetLink(Units, DownLink, mInst.sFrequency, mkFactor, PlotResolution,
-			DEMsource, ClutterSource, UseClutter, 0, 0, true);
-	for (i=0; i<size; i++)
+	if (Success)
 	{
-		if (Link.SetTxSite(mSiteList[i],mInst))
+		pushOk->setEnabled(false);
+		pushCancel->setEnabled(false);
+		pushOk->setText("wait");
+		pushCancel->setText("wait");
+		short int ClutterSource = atoi(gDb.GetSetting("ClutterSource").c_str());
+		short int DEMsource = atoi(gDb.GetSetting("DEMsource").c_str());
+
+		// Go through all possible links and evaluate them, if good save.
+		int size = mSiteList.size();
+		int i,j;
+		double Distance, PathLoss, MinClearance;
+		bool Work=true;
+		int TxRadID, RxRadID;
+		char * temp = new char[33];
+		cLink Link;
+		string LinkName="Link";
+		QString Linkname = "Link";
+		int LinkID=0;
+		Link.SetLink(Units, DownLink, mInst.sFrequency, mkFactor, PlotResolution,
+				DEMsource, ClutterSource, UseClutter, 0, 0, true);
+
+		for (i=0; i<size; i++)
 		{
-			for (j=i+1; j<size; j++)
+			if (Link.SetTxSite(mSiteList[i],mInst))
 			{
-				if (Link.SetRxSite(mSiteList[j],mInst))
+				for (j=i+1; j<size; j++)
 				{
-					cout <<i << " x " << j << "  of " << size << " : ";
-					if (Link.DoLink(true,mMaxDist*1000))
+					if (Link.SetRxSite(mSiteList[j],mInst))
 					{
-		    				MinClearance = Link.GetMinClearance();
-						PathLoss = Link.GetPathLoss();	
-						Work = (MinClearance>=mMinClear)
-							&&(PathLoss<=mMaxPath);
-						if (Work)
+						cout <<i << " x " << j << "  of " << size << " : ";
+						if (Link.DoLink(true,mMaxDist*1000))
 						{
-							TxRadID=InsertRadInst(mSiteList[i], j, Link.GetTxBearing(), Link.GetTxTilt());
-							RxRadID=InsertRadInst(mSiteList[j], i, Link.GetRxBearing(), Link.GetRxTilt());
-							Link.SetTxInst(TxRadID);
-							Link.SetRxInst(RxRadID);
-							LinkName="Link";
-							LinkID=0;
-							Link.SaveLink(LinkName,LinkID);
-							if (SavePDF)
+			    				MinClearance = Link.GetMinClearance();
+							PathLoss = Link.GetPathLoss();	
+							Work = (MinClearance>=mMinClear)
+								&&(PathLoss<=mMaxPath);
+							if (Work)
 							{
-								cLinkAnalysis * LinkDisplay = new cLinkAnalysis(mParent,mFL);
-								Linkname = LinkName.c_str();
-								Transmitter = "Site:";
-								gcvt(mSiteList[i],8,temp);
-								Transmitter += temp;
-								Transmitter += "_Radio:";
-								gcvt(TxRadID,8,temp);
-								Transmitter += temp;
-								gcvt(mSiteList[j],8,temp);
-								Receiver = "Site:";
-								Receiver += temp;
-								Receiver += "_Radio:";
-								gcvt(RxRadID,8,temp);
-								Receiver += temp;
-								LinkDisplay->DoAndSetUpDisplay(Units, DownLink, mInst.sFrequency, mkFactor, PlotResolution,
-											DEMsource, ClutterSource, UseClutter, TxRadID, RxRadID,
-											Linkname, Transmitter, Receiver, LinkID);
-								LinkDisplay->SetPath(path);
-								LinkDisplay->SetAutoName(true);
-								LinkDisplay->MakePDF();
-								LinkDisplay->OKClose();
-								LinkDisplay->exec();
-								delete LinkDisplay;
+								TxRadID=InsertRadInst(mSiteList[i], j, 
+											Link.GetTxBearing(), 
+											Link.GetTxTilt());
+								RxRadID=InsertRadInst(mSiteList[j], i, 
+											Link.GetRxBearing(), 
+											Link.GetRxTilt());
+								Link.SetTxInst(TxRadID);
+								Link.SetRxInst(RxRadID);
+								LinkName="Link";
+								LinkID=0;
+								Link.SaveLink(LinkName,LinkID);
+								if (SavePDF)
+								{
+									cLinkAnalysis * LinkDisplay = new cLinkAnalysis(mParent,mFL);
+									Linkname = LinkName.c_str();
+									Transmitter = "Site:";
+									gcvt(mSiteList[i],8,temp);
+									Transmitter += temp;
+									Transmitter += "_Radio:";
+									gcvt(TxRadID,8,temp);
+									Transmitter += temp;
+									gcvt(mSiteList[j],8,temp);
+									Receiver = "Site:";
+									Receiver += temp;
+									Receiver += "_Radio:";
+									gcvt(RxRadID,8,temp);
+									Receiver += temp;
+									LinkDisplay->DoAndSetUpDisplay(Units, DownLink, 
+													mInst.sFrequency, 
+													mkFactor, PlotResolution,
+													DEMsource, ClutterSource, 
+													UseClutter, TxRadID, RxRadID,
+													Linkname, Transmitter, 
+													Receiver, LinkID);
+									LinkDisplay->SetPath(path);
+									LinkDisplay->SetAutoName(true);
+									LinkDisplay->MakePDF();
+									LinkDisplay->OKClose();
+									LinkDisplay->exec();
+									delete LinkDisplay;
+								}
+								cout << mSiteList[i] << " to " << mSiteList[j] << " saved." << endl;
 							}
-							cout << mSiteList[i] << " to " << mSiteList[j] << " saved." << endl;
+							else
+							{
+								cout << mSiteList[i] << " to " << mSiteList[j] << " does not work." << endl;
+							}
 						}
 						else
 						{
-							cout << mSiteList[i] << " to " << mSiteList[j] << " does not work." << endl;
+							cout << mSiteList[i] << " to " << mSiteList[j] << " skipped."<< endl; 
 						}
 					}
 					else
 					{
-						cout << mSiteList[i] << " to " << mSiteList[j] << " skipped."<< endl; 
+						cout << "Problem with site: " <<mSiteList[j] <<  endl;
 					}
 				}
-				else
-				{
-					cout << "Problem with site: " <<mSiteList[j] <<  endl;
-				}
+			}
+			else
+			{
+				cout << "Problem with site: " <<mSiteList[i] <<  endl;
 			}
 		}
-		else
-		{
-			cout << "Problem with site: " <<mSiteList[i] <<  endl;
-		}
+		accept();
+		close();
+		delete [] temp;
 	}
-	delete [] temp;
-	accept();
-	close();
-
 }
 
 //***********************************************************************************

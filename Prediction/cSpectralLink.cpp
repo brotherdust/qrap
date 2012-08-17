@@ -228,7 +228,7 @@ bool cSpectralLink::DoLink()
 	if (mUseClutter)
 		Clutter=mClutter.GetForLink(mTxInst.sSitePos, mRxInst.sSitePos,	mPlotResolution);
 	cout<<"PrePathloss"<<endl;
-	mPropLoss = PathLoss.TotPathLoss(DEM, Tilt, mUseClutter, Clutter);
+	mPropLoss = PathLoss.TotPathLoss(DEM, Tilt, Clutter);
 	cout<<"PostPathloss"<<endl;
 	AntValue = mTxAnt.GetPatternValue(mTxBearing, Tilt)
 			+mRxAnt.GetPatternValue(mRxBearing, -Tilt);

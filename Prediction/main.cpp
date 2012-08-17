@@ -40,7 +40,7 @@ int main (int argc, char **argv)
 //	bool error = false;
 	cout << "Main 1" << endl;
 	
-	if (!gSettings.LoadFromFile("/usr/lib/qgis/settings.xml"))
+	if (!gSettings.LoadFromFile("/usr/lib/qgis/plugins/settings.xml"))
 		return 0;
 
 	if(!gDb.Connect ("postgres", "postqrap"))
@@ -50,6 +50,11 @@ int main (int argc, char **argv)
 	}
 	
 	cout << "Hier" << endl;
+//	To cut clutter set
+	string dir="/home/maggie/GISdata/SRTM/BIN";
+	cLoadFile Files(5,6,dir);
+	Files.CutCurrentSet(5,6, true, 0);
+
 	// For Arc Grid
 /*	string dir="/home/maggie/Data/RasterData/BIN";
 	cLoadFile Files(1,2,dir);
@@ -80,13 +85,13 @@ int main (int argc, char **argv)
 		cout << "Database Update on filesets table failed"<< endl;
 		return false;
 	}
-*/	string dir="/home/maggie/DEM/SRTM/BIN/";
+*///	string dir="/home/maggie/DEM/SRTM/BIN/";
 	//	string dir="/home/anita/SRTM/BIN/";
-	cLoadFile Files(3,4,dir);
+//	cLoadFile Files(3,4,dir);
 //	Files.LoadFile("../Data/SRTM/srtm_40_19/","srtm_40_19.asc",GDALFILE,DEG);
 //	Files.WriteDB();
 //	delete [] text;
-	Files.CutCurrentSet(3,4);
+//	Files.CutCurrentSet(3,4);
 
 // For Ort files for general loads
 /*	cLoadFile Files;

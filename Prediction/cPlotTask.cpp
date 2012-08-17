@@ -117,7 +117,7 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 	mkFactorServ= kFactorForServers;						
 	mkFactorInt	= kFactorForInterferers;							
 	mDEMsource	= DEMsourceList;				
-	mClutterSource= ClutterSourceList;					
+	mClutterSource  = ClutterSourceList;					
 	mUseClutter	= UseClutterDataInPathLossCalculations;							
 	mNorthWest	= NorthWestCorner;				
 	mSouthEast	= SouthEastCorner;
@@ -198,21 +198,30 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 		string err = "Trouble getting DEM list. Using default";
 		QRAP_WARN(err.c_str());
 	}
-	FoundRasterSet = mClutter.SetRasterFileRules(mClutterSource);
-	mUseClutter = (FoundRasterSet)&&(UseClutterDataInPathLossCalculations);
-	if (!FoundRasterSet)
+	if (mUseClutter)
 	{
-		string err ="  Trouble getting Clutter list. Using default.";
-		QRAP_WARN(err.c_str());
+		FoundRasterSet = mClutter.SetRasterFileRules(mClutterSource);
+		mUseClutter = (FoundRasterSet)&&(UseClutterDataInPathLossCalculations);
+		if (!FoundRasterSet)
+		{
+			string err ="  Trouble getting Clutter list. Not using clutter.";
+			QRAP_WARN(err.c_str());
+		}
 	}
+	if (mUseClutter)
+		mClutterClassGroup = mClutter.GetClutterClassGroup();
+	mUseClutter = (mUseClutter) && (mClutterClassGroup>0);
+	
 
 	cout << "North West corner: " << endl;
 	NorthWestCorner.Display();
 	cout << "South East corner: " << endl;
 	SouthEastCorner.Display();
 
+
 	// \TODO: Remove at some stage
 	//DEBUGGING !!!!!!!!!!!!!
+	// This does not write Clutter related stuff
 	bool WriteFile = true;
 	if (WriteFile)
 	{
@@ -279,7 +288,8 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 bool cPlotTask::ReadPlotRequest(const char *filename)
 {
 	
-	char temp[NAME_MAX+1];
+	char *temp;
+	temp = new char[NAME_MAX+1];
 	unsigned i;
 	bool FoundRasterSet = TRUE;
 	
@@ -518,18 +528,19 @@ bool cPlotTask::ReadPlotRequest(const char *filename)
 		mNorthEast.Set(N, E, DEG);
 
 		double Lat,Lon;
-		char temp[33];
+		char* temp2;
+		temp2 = new char[33];
 		string PointString;
 		unsigned spacePos; 
 		pqxx::result SiteLoc;
 		for (unsigned ii=0; ii<mFixedInsts.size(); ii++)
 		{
-			gcvt(mFixedInsts[ii].sInstKey,8,temp);
+			gcvt(mFixedInsts[ii].sInstKey,9,temp2);
 			string query = "SELECT AsText(location) AS location"; 
 			query += " FROM radioinstallation cross join site WHERE ";
 			query += " siteid =site.id AND ";
 			query += "radioinstallation.id  = ";
-			query += temp;	
+			query += temp2;	
 			if (!gDb.PerformRawSql(query))
 			{
 				cout << "Database Select on sites table failed"<< endl;
@@ -605,6 +616,7 @@ bool cPlotTask::ReadPlotRequest(const char *filename)
 			mNorthWest.Get(mCurrentEdge, dummy);
 		else 
 			mNorthWest.Get(dummy, mCurrentEdge);
+	
 	}
 	if (!strcasecmp(temp, "DEM"))
 	{
@@ -640,6 +652,7 @@ bool cPlotTask::ReadPlotRequest(const char *filename)
 	if (!strcasecmp(temp, "OutputFile"))
 		infile >> mOutputFile;
 	bool ReturnValue = GetDBinfo();
+	delete [] temp;
 	return ReturnValue;
 }// end cPlotTask::ReadPlotRequest
 
@@ -1271,8 +1284,8 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 					if (mUseClutter)
 					{
 						mClutter.GetForCoverage(true, mFixedInsts[i].sSitePos, 
-											mFixedInsts[i].sRange, tempPlotRes, tempAngRes,
-											tempNumAngles, tempNumDist, Clutter);
+										mFixedInsts[i].sRange, tempPlotRes, tempAngRes,
+										tempNumAngles, tempNumDist, Clutter);
 					}
 					err = "Performing Basic Transmission Loss Calculations for Site: ";
 					gcvt(mFixedInsts[i].sSiteID,8,dummyS);
@@ -1288,8 +1301,8 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 //					QRAP_INFO(err.c_str());
 					cout << err << endl;
 					Prediction.mBTLPredict.SetMaxPathLoss(mMaxPathLoss);
-					BTLkey = Prediction.mBTLPredict.PredictBTL(tempNumAngles, tempNumDist, 
-													tempPlotRes, DTM, mUseClutter, Clutter);
+					BTLkey = Prediction.mBTLPredict.PredictBTL(tempNumAngles, tempNumDist, tempPlotRes, 
+										DTM, mUseClutter, mClutterClassGroup, Clutter);
 					mFixedInsts[i].sRange = Prediction.mBTLPredict.GetRange();
 //					cout << endl<< endl<< endl<< endl<< endl<< endl<< endl<< "BTL" << endl << endl;
 /*					for (unsigned ii = 0; ii< tempNumAngles; ii++)
@@ -1384,7 +1397,7 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 				}
 				newRaster.sRaster = new_Float2DArray(newRaster.sNSsize,newRaster.sEWsize);
 				Prediction.InterpolateToSquare(mFixedInsts[i].sSitePos, Corner, newRaster.sRaster, 
-												mPlotResolution, newRaster.sNSsize,newRaster.sEWsize);
+							mPlotResolution, newRaster.sNSsize,newRaster.sEWsize);
 /*				for (unsigned ii = 0; ii< newRaster.sNSsize; ii++)
 				{
 					for (unsigned jj=0; jj<newRaster.sEWsize; jj++)

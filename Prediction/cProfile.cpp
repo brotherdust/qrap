@@ -36,10 +36,11 @@ using namespace Qrap;
 // Default constructor
 cProfile::cProfile()
 {
-	m_size = 1;
-	m_interPixelDist = 200;
+	m_size = 2;
+	m_interPixelDist = 90;
 	m_profile = new float[m_size];
 	m_profile[0] = 0.0;
+	m_profile[1] = 0.0;
 
 }/*end CProfile Default Constructor */
 
@@ -49,13 +50,13 @@ cProfile::cProfile()
 cProfile::cProfile(const cProfile &right)
 {
 	int i=0;
-  m_size = right.m_size;
-  m_startLoc = right.m_startLoc;
-  m_endLoc = right.m_endLoc;
-  m_profile = new float[m_size];
-  for(i=0; i<m_size; i++)
-  	m_profile[i] = right.m_profile[i];
-  m_interPixelDist = right.m_interPixelDist;
+  	m_size = right.m_size;
+  	m_startLoc = right.m_startLoc;
+  	m_endLoc = right.m_endLoc;
+  	m_profile = new float[m_size];
+  	for(i=0; i<m_size; i++)
+  		m_profile[i] = right.m_profile[i];
+  	m_interPixelDist = right.m_interPixelDist;
 }/* end CProfile Copy Constructor */
 
 
@@ -78,13 +79,13 @@ cProfile::cProfile(const int size, const double interPixDist)
 cProfile::cProfile(int size, float *&profile, double interPixDist)
 {
 	int i;
-  m_size = size;
-  m_interPixelDist = interPixDist;
-  m_profile = new float[m_size];
-  for (i=0; i<m_size; i++)
-  {
-  		if (profile[i] <-7777.0) m_profile[i]=0.0;
-      else m_profile[i] = profile[i];
+  	m_size = size;
+  	m_interPixelDist = interPixDist;
+  	m_profile = new float[m_size];
+  	for (i=0; i<m_size; i++)
+  	{
+  		if (profile[i] <-5000.0) m_profile[i]=0.0;
+      		else m_profile[i] = profile[i];
   }
 }/* CProfile Constructor */
 
@@ -113,7 +114,7 @@ const cProfile & cProfile::operator=(const cProfile &right)
 
 	m_profile = new float[m_size];
 
-   for (i=0; i<m_size; i++)
+   	for (i=0; i<m_size; i++)
 		m_profile[i] = right.m_profile[i];
 
 	m_interPixelDist = right.m_interPixelDist;
@@ -137,11 +138,11 @@ void cProfile::SetProfile(int size, float *&profile)
 	m_size = size;
 	delete [] m_profile;
 	m_profile = new float[m_size];
-   for (i=0; i<m_size; i++)
-   {
-   	if (profile[i] < -7777.0) m_profile[i] = 0.0;
-		else m_profile[i] = profile[i];
-   }
+   	for (i=0; i<m_size; i++)
+   	{
+   		if (profile[i] < -5000.0) m_profile[i] = 0.0;
+			else m_profile[i] = profile[i];
+   	}
 
 }/*end CProfile::SetProfile */
 
@@ -166,6 +167,7 @@ void cProfile::MoveOneUp()
 	int i;
 	for (i=0; i<m_size-1; i++)
 		m_profile[i] = m_profile[i+1];
+	m_size--;
 
 }/* end CProfile::MoveOneUp */
 

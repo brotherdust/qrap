@@ -7,8 +7,8 @@
  *    File        : cMeasAnalysisCalc.cpp
  *    Copyright   : (c) University of Pretoria
  *    Author      : Magdaleen Ballot (magdaleen.ballot@up.ac.za)
- *    Description : This class allows for the impoting of CW measurements 
- *                  in a space delimited format
+ *    Description : This class does the analysis of the measurements in the 
+ *			the database
  *
  **************************************************************************
  *                                                                         *
@@ -30,6 +30,22 @@
 cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 {
 	mMeasPoints = new tMeasPoint[2];
+	mMinTerm = new double[NUMTERMS];
+	mMaxTerm = new double[NUMTERMS];
+	mMidTerm = new double[NUMTERMS];
+
+	unsigned i,j;
+	for(i=0; i<NUMTERMS; i++)
+	{
+		mMinTerm[i] =   MAXDOUBLE;
+		mMaxTerm[i] = - MAXDOUBLE;
+		mMidTerm[i] =   MAXDOUBLE;		
+		mLeftSide(i) = 0.0;
+		mDeltaCoeff(i) = 0.0;
+		for (j=0; j<NUMTERMS; j++)
+			mSolveCoefMatrix(i,j) = 0.0;
+	}
+
 	mNumMeas = 0;	
 	double kS, kI;
 	mUnits = dBm;
@@ -56,7 +72,11 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 	else mUseClutter = false;
 	mClutterSource = atoi(gDb.GetSetting("ClutterSource").c_str());
 	if (mUseClutter)
-		mClutter.SetRasterFileRules(mClutterSource);	
+		mUseClutter = mClutter.SetRasterFileRules(mClutterSource);
+	if (mUseClutter)
+		mClutterClassGroup = mClutter.GetClutterClassGroup();
+	mUseClutter = (mUseClutter)&&(mClutterClassGroup>0);
+
 	mDEMsource = atoi(gDb.GetSetting("DEMsource").c_str());
 	mDEM.SetRasterFileRules(mDEMsource);
 }
@@ -65,6 +85,9 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 cMeasAnalysisCalc::~cMeasAnalysisCalc() // destructor
 {
 	delete [] mMeasPoints;		
+	delete [] mMaxTerm;
+	delete [] mMinTerm;
+	delete [] mMidTerm;
 }
 
 
@@ -260,26 +283,51 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 
 
 //******************************************************************************
-int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &StDev, double &CorrC, unsigned Clutterfilter)
+int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
+					double &StDev, double &CorrC, unsigned Clutterfilter)
 {
-	int i=0, MobileNum=0, FixedNum=0 ,NumUsed = 0;
-	double TotalError=0, TotalSError=0, TotalMeas=0, TotalPred=0, TotalSMeas=0, TotalSPred=0, TotalMeasPred=0;
-	int currentInst=0;
-	int currentMobile=0;
+
+	mClutterFilter = Clutterfilter;
+	unsigned i=0, j=0, MobileNum=0, FixedNum=0 ,NumUsed = 0;
+	double Error=0, TotalError=0, TotalSError=0, TotalMeas=0;
+	double TotalPred=0, TotalSMeas=0, TotalSPred=0, TotalMeasPred=0;
+	unsigned currentInst=0;
+	unsigned currentMobile=0;
 	cAntennaPattern FixedAnt, MobileAnt;
 	
-	int Length;
+	unsigned Length;
 	cProfile Clutter;
 	cProfile DEM;
-	cPathLossPredictor PathLoss;
 	double bearing=0, AntValue=0, EIRP=0;
-	
+
+	//These varaibles are local and are such that they can be used with the TERMs defined in cClutter.h
+	double mLinkLength, m_freq, m_htx, Cheight;
+
+	mSolveCoefMatrix.resize(NUMTERMS,NUMTERMS);
+	mLeftSide.resize(NUMTERMS);
+	mDeltaCoeff.resize(NUMTERMS);
+	if ((Clutterfilter>0)&&(mUseClutter))
+	{
+		for (i=0;i<NUMTERMS;i++)
+		{
+			mMinTerm[i] =   MAXDOUBLE;
+			mMaxTerm[i] = - MAXDOUBLE;
+			mMaxTerm[i] =   MAXDOUBLE;
+			mLeftSide(i) = 0.0;
+			mDeltaCoeff(i) = 0.0;
+			for (j=0; j<NUMTERMS; j++)
+				mSolveCoefMatrix(i,j)=0.0;
+		}
+		
+	}
+
 	for (i=0;i<mNumMeas;i++)
 	{
 		if ((0==Clutterfilter)||(0==mMeasPoints[i].sClutter)||(Clutterfilter==mMeasPoints[i].sClutter))
 		{
 			NumUsed++;
-			
+
+			//Change settings if the mobile installation changed
 			if (mMeasPoints[i].sInstKeyMobile!=currentMobile)
 			{
 				currentMobile = mMeasPoints[i].sInstKeyMobile;
@@ -288,11 +336,13 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &StDev, double &Corr
 				if (MobileNum == mMobiles.size())
 					return 0;
 				MobileAnt.SetAntennaPattern(mMobiles[MobileNum].sPatternKey, 0, 0);
-				PathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
+				mPathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
 								mFixedInsts[FixedNum].sTxHeight,
-								mMobiles[MobileNum].sMobileHeight);
+								mMobiles[MobileNum].sMobileHeight,
+								mUseClutter, mClutterClassGroup);
 			}
 
+			//Change settings if the Fixed Installation changed
 			if (mMeasPoints[i].sInstKeyFixed!=currentInst)
 			{
 				currentInst = mMeasPoints[i].sInstKeyFixed;
@@ -305,32 +355,103 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &StDev, double &Corr
 								mFixedInsts[FixedNum].sTxMechTilt);
 				EIRP = mFixedInsts[FixedNum].sTxPower 
 					- mFixedInsts[FixedNum].sTxSysLoss + FixedAnt.mGain + MobileAnt.mGain;
-				PathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
+				mPathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
 								mFixedInsts[FixedNum].sTxHeight,
-								mMobiles[MobileNum].sMobileHeight);
+								mMobiles[MobileNum].sMobileHeight,
+								mUseClutter, mClutterClassGroup);
+				if ((Clutterfilter>0)&&(mUseClutter))
+				{
+					m_freq = mFixedInsts[FixedNum].sFrequency;
+					m_htx = mFixedInsts[FixedNum].sTxHeight;
+
+					if (TERM2 < mMinTerm[2])
+					{
+						if ((mMidTerm[2]-TERM2) > (mMaxTerm[2]-mMidTerm[2]))
+							mMidTerm[2] = mMinTerm[2];
+						mMinTerm[2] = TERM2;
+					}
+					else if (TERM2 > mMaxTerm[2])
+					{
+						if ((mMidTerm[2]-TERM2) < (mMaxTerm[2]-mMidTerm[2]))
+							mMidTerm[2] = mMaxTerm[2];
+						mMaxTerm[2] = TERM2;
+					}
+
+					if (TERM3 < mMinTerm[3])
+					{
+						if ((mMidTerm[3]-TERM3) > (mMaxTerm[3]-mMidTerm[3]))
+							mMidTerm[3] = mMinTerm[3];
+						mMinTerm[3] = TERM3;
+					}
+					else if (TERM3 > mMaxTerm[3])
+					{
+						if ((mMidTerm[3]-TERM3) < (mMaxTerm[3]-mMidTerm[3]))
+							mMidTerm[3] = mMaxTerm[3];
+						mMaxTerm[3] = TERM3;
+					}
+
+					if (TERM5 < mMinTerm[5])
+					{
+						if ((mMidTerm[5]-TERM5) > (mMaxTerm[5]-mMidTerm[5]))
+							mMidTerm[5] = mMinTerm[5];
+						mMinTerm[5] = TERM5;
+					}
+					else if (TERM5 > mMaxTerm[5])
+					{
+						if ((mMidTerm[5]-TERM5) < (mMaxTerm[5]-mMidTerm[5]))
+							mMidTerm[5] = mMaxTerm[5];
+						mMaxTerm[5] = TERM5;
+					}
+
+					if (TERM6 < mMinTerm[6])
+					{
+						if ((mMidTerm[6]-TERM6) > (mMaxTerm[6]-mMidTerm[6]))
+							mMidTerm[6] = mMinTerm[6];
+						mMinTerm[6] = TERM6;
+					}
+					else if (TERM6 > mMaxTerm[6])
+					{
+						if ((mMidTerm[6]-TERM6) < (mMaxTerm[6]-mMidTerm[6]))
+							mMidTerm[6] = mMaxTerm[6];
+						mMaxTerm[6] = TERM6;
+					}
+
+					if (TERM7 < mMinTerm[7])
+					{
+						if ((mMidTerm[7]-TERM7) > (mMaxTerm[7]-mMidTerm[7]))
+							mMidTerm[7] = mMinTerm[7];
+						mMinTerm[7] = TERM7;
+					}
+					else if (TERM7 > mMaxTerm[7])
+					{
+						if ((mMidTerm[7]-TERM7) < (mMaxTerm[7]-mMidTerm[7]))
+							mMidTerm[7] = mMaxTerm[7];
+						mMaxTerm[7] = TERM7;
+					}
+				}
 			}
 			
 
-			if (mUseClutter)
-			{
-				Clutter=mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);
-//				mMeasPoints[i].sClutter = Clutter[Clutter.GetSize()-1];
-			}
 			DEM = mDEM.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);
 			mMeasPoints[i].sDistance = mFixedInsts[FixedNum].sSitePos.Distance(mMeasPoints[i].sPoint);
 			Length = DEM.GetSize();
-
 	
-			if (Length > 1)
+			if (Length > 2)
 			{
-				mMeasPoints[i].sPathLoss = PathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,mUseClutter,Clutter);
+				if (mUseClutter)
+				{
+					Clutter=mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);
+					mMeasPoints[i].sClutter = (int)Clutter.GetLastValue();
+				}
+				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter);
 				mMeasPoints[i].sAzimuth = mFixedInsts[FixedNum].sSitePos.Bearing(mMeasPoints[i].sPoint);
 				AntValue = FixedAnt.GetPatternValue(mMeasPoints[i].sAzimuth, mMeasPoints[i].sTilt)
 						+ MobileAnt.GetPatternValue(0, -mMeasPoints[i].sTilt);
 				mMeasPoints[i].sPredValue = -mMeasPoints[i].sPathLoss + EIRP - AntValue;
 //				cout << endl << mMeasPoints[i].sMeasValue << "	" << mMeasPoints[i].sPredValue << endl << endl;
 
-				TotalError +=  - mMeasPoints[i].sMeasValue + mMeasPoints[i].sPredValue; 
+				Error = - mMeasPoints[i].sMeasValue + mMeasPoints[i].sPredValue;
+				TotalError += Error;  
 				TotalSError += (mMeasPoints[i].sMeasValue - mMeasPoints[i].sPredValue)*
 							(mMeasPoints[i].sMeasValue - mMeasPoints[i].sPredValue);
 				TotalMeas += mMeasPoints[i].sMeasValue; 
@@ -338,6 +459,152 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &StDev, double &Corr
 				TotalPred += mMeasPoints[i].sPredValue;
 				TotalSPred += mMeasPoints[i].sPredValue*mMeasPoints[i].sPredValue;				
 				TotalMeasPred+= mMeasPoints[i].sPredValue*mMeasPoints[i].sMeasValue;
+				
+				if ((Clutterfilter > 0)&&(mUseClutter))
+				{
+					mLinkLength = mMeasPoints[i].sDistance;
+					Cheight = mPathLoss.mClutter.mClutterTypes[mMeasPoints[i].sClutter].sHeight;
+					
+					if (TERM1 < mMinTerm[1])
+					{
+						if ((mMidTerm[1]-TERM1) > (mMaxTerm[1]-mMidTerm[1]))
+							mMidTerm[1] = mMinTerm[1];
+						mMinTerm[1] = TERM1;
+					}
+					else if (TERM1 > mMaxTerm[1])
+					{
+						if ((mMidTerm[1]-TERM1) < (mMaxTerm[1]-mMidTerm[1]))
+							mMidTerm[1] = mMaxTerm[1];
+						mMaxTerm[1] = TERM1;
+					}
+
+					if (TERM4 < mMinTerm[4])
+					{
+						if ((mMidTerm[4]-TERM4) > (mMaxTerm[4]-mMidTerm[4]))
+							mMidTerm[4] = mMinTerm[4];
+						mMinTerm[4] = TERM4;
+					}
+					else if (TERM4 > mMaxTerm[4])
+					{
+						if ((mMidTerm[4]-TERM4) < (mMaxTerm[4]-mMidTerm[4]))
+							mMidTerm[4] = mMaxTerm[4];
+						mMaxTerm[4] = TERM4;
+					}
+
+					if (TERM8 < mMinTerm[8])
+					{
+						if ((mMidTerm[8]-TERM8) > (mMaxTerm[8]-mMidTerm[8]))
+							mMidTerm[8] = mMinTerm[8];
+						mMinTerm[8] = TERM8;
+					}
+					else if (TERM8 > mMaxTerm[8])
+					{
+						if ((mMidTerm[8]-TERM8) < (mMaxTerm[8]-mMidTerm[8]))
+							mMidTerm[8] = mMaxTerm[8];
+						mMaxTerm[8] = TERM8;
+					}
+
+					mLeftSide(0) += Error;
+					mSolveCoefMatrix(0,0)++;
+					mSolveCoefMatrix(0,1)+=TERM1;
+					mSolveCoefMatrix(1,0)+=TERM1;
+					mSolveCoefMatrix(0,2)+=TERM2;
+					mSolveCoefMatrix(2,0)+=TERM2;
+					mSolveCoefMatrix(0,3)+=TERM3;
+					mSolveCoefMatrix(3,0)+=TERM3;
+					mSolveCoefMatrix(0,4)+=TERM4;
+					mSolveCoefMatrix(4,0)+=TERM4;
+					mSolveCoefMatrix(0,5)+=TERM5;
+					mSolveCoefMatrix(5,0)+=TERM5;
+					mSolveCoefMatrix(0,6)+=TERM6;
+					mSolveCoefMatrix(6,0)+=TERM6;
+					mSolveCoefMatrix(0,7)+=TERM7;
+					mSolveCoefMatrix(7,0)+=TERM7;
+					mSolveCoefMatrix(0,8)+=TERM8;
+					mSolveCoefMatrix(8,0)+=TERM8;
+
+					mLeftSide(1) += Error*TERM1;
+					mSolveCoefMatrix(1,1)+=TERM1*TERM1;
+					mSolveCoefMatrix(1,2)+=TERM1*TERM2;
+					mSolveCoefMatrix(2,1)+=TERM1*TERM2;
+					mSolveCoefMatrix(1,3)+=TERM1*TERM3;
+					mSolveCoefMatrix(3,1)+=TERM1*TERM3;
+					mSolveCoefMatrix(1,4)+=TERM1*TERM4;
+					mSolveCoefMatrix(4,1)+=TERM1*TERM4;
+					mSolveCoefMatrix(1,5)+=TERM1*TERM5;
+					mSolveCoefMatrix(5,1)+=TERM1*TERM5;
+					mSolveCoefMatrix(1,6)+=TERM1*TERM6;
+					mSolveCoefMatrix(6,1)+=TERM1*TERM6;
+					mSolveCoefMatrix(1,7)+=TERM1*TERM7;
+					mSolveCoefMatrix(7,1)+=TERM1*TERM7;
+					mSolveCoefMatrix(1,8)+=TERM1*TERM8;
+					mSolveCoefMatrix(8,1)+=TERM1*TERM8;
+
+					mLeftSide(2) += Error*TERM2;
+					mSolveCoefMatrix(2,2)+=TERM2*TERM2;
+					mSolveCoefMatrix(2,3)+=TERM2*TERM3;
+					mSolveCoefMatrix(3,2)+=TERM2*TERM3;
+					mSolveCoefMatrix(2,4)+=TERM2*TERM4;
+					mSolveCoefMatrix(4,2)+=TERM2*TERM4;
+					mSolveCoefMatrix(2,5)+=TERM2*TERM5;
+					mSolveCoefMatrix(5,2)+=TERM2*TERM5;
+					mSolveCoefMatrix(2,6)+=TERM2*TERM6;
+					mSolveCoefMatrix(6,2)+=TERM2*TERM6;
+					mSolveCoefMatrix(2,7)+=TERM2*TERM7;
+					mSolveCoefMatrix(7,2)+=TERM2*TERM7;
+					mSolveCoefMatrix(2,8)+=TERM2*TERM8;
+					mSolveCoefMatrix(8,2)+=TERM2*TERM8;
+
+					mLeftSide(3) += Error*TERM3;
+					mSolveCoefMatrix(3,3)+=TERM3*TERM3;
+					mSolveCoefMatrix(3,4)+=TERM3*TERM4;
+					mSolveCoefMatrix(4,3)+=TERM3*TERM4;
+					mSolveCoefMatrix(3,5)+=TERM3*TERM5;
+					mSolveCoefMatrix(5,3)+=TERM3*TERM5;
+					mSolveCoefMatrix(3,6)+=TERM3*TERM6;
+					mSolveCoefMatrix(6,3)+=TERM3*TERM6;
+					mSolveCoefMatrix(3,7)+=TERM3*TERM7;
+					mSolveCoefMatrix(7,3)+=TERM3*TERM7;
+					mSolveCoefMatrix(3,8)+=TERM3*TERM8;
+					mSolveCoefMatrix(8,3)+=TERM3*TERM8;
+
+					mLeftSide(4) += Error*TERM4;
+					mSolveCoefMatrix(4,4)+=TERM4*TERM4;
+					mSolveCoefMatrix(4,5)+=TERM4*TERM5;
+					mSolveCoefMatrix(5,4)+=TERM4*TERM5;
+					mSolveCoefMatrix(4,6)+=TERM4*TERM6;
+					mSolveCoefMatrix(6,4)+=TERM4*TERM6;
+					mSolveCoefMatrix(4,7)+=TERM4*TERM7;
+					mSolveCoefMatrix(7,4)+=TERM4*TERM7;
+					mSolveCoefMatrix(4,8)+=TERM4*TERM8;
+					mSolveCoefMatrix(8,4)+=TERM4*TERM8;
+
+					mLeftSide(5) += Error*TERM5;
+					mSolveCoefMatrix(5,5)+=TERM5*TERM5;
+					mSolveCoefMatrix(5,6)+=TERM5*TERM6;
+					mSolveCoefMatrix(6,5)+=TERM5*TERM6;
+					mSolveCoefMatrix(5,7)+=TERM5*TERM7;
+					mSolveCoefMatrix(7,5)+=TERM5*TERM7;
+					mSolveCoefMatrix(5,8)+=TERM5*TERM8;
+					mSolveCoefMatrix(8,5)+=TERM5*TERM8;
+
+					mLeftSide(6) += Error*TERM6;
+					mSolveCoefMatrix(6,6)+=TERM6*TERM6;
+					mSolveCoefMatrix(6,7)+=TERM6*TERM7;
+					mSolveCoefMatrix(7,6)+=TERM6*TERM7;
+					mSolveCoefMatrix(6,8)+=TERM6*TERM8;
+					mSolveCoefMatrix(8,6)+=TERM6*TERM8;
+
+					mLeftSide(7) += Error*TERM7;
+					mSolveCoefMatrix(7,7)+=TERM7*TERM7;
+					mSolveCoefMatrix(7,8)+=TERM7*TERM8;
+					mSolveCoefMatrix(8,7)+=TERM7*TERM8;
+					
+					mLeftSide(8) += Error*TERM8;
+					mSolveCoefMatrix(8,8)+=TERM8*TERM8;
+				}
+				
+
 			}
 			else NumUsed--;
 
@@ -345,7 +612,9 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &StDev, double &Corr
 	}//for all measurements
 
 	Mean = TotalError/NumUsed;
-	StDev = sqrt(TotalSError/NumUsed-Mean*Mean);
+	MeanSquareError = TotalSError/NumUsed;
+	StDev = sqrt(MeanSquareError-Mean*Mean);
+	
 	double StDevMeas = sqrt(TotalSMeas/NumUsed-TotalMeas*TotalMeas/(NumUsed*NumUsed));
 	double StDevPred = sqrt(TotalSPred/NumUsed-TotalPred*TotalPred/(NumUsed*NumUsed));
 	CorrC = (TotalMeasPred - TotalMeas*TotalPred/NumUsed) / ((NumUsed-1)*StDevMeas*StDevPred);
@@ -419,4 +688,28 @@ int cMeasAnalysisCalc::SaveResults()
 	}
 	cout << " leaving cMeasAnalysisCalc::SaveResults()" << endl;
 }
+
+
+//*************************************************************************************************
+//*
+bool cMeasAnalysisCalc::Optimiser(bool ChangeHeights)
+{
+	unsigned i;
+	for (i=0; i<NUMTERMS; i++)
+		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] = ((mMaxTerm[i]-mMinTerm[i]) > 0.1*fabs(mMidTerm[i]));
+
+	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5] = ((mMaxTerm[5] - mMidTerm[5]) > 0.1*fabs(mMidTerm[5])) &&
+								((mMidTerm[5] - mMinTerm[5]) > 0.1*fabs(mMidTerm[5]));
+	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[7] = ((mMaxTerm[7] - mMidTerm[7]) > 0.1*fabs(mMidTerm[7])) &&
+								((mMidTerm[7] - mMinTerm[7]) > 0.1*fabs(mMidTerm[7]));
+
+	for (i=0; i<NUMTERMS; i++)
+	{
+		if (!mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
+		{
+// skuif ry en kolom een op
+		}
+	} 
+}
+
 

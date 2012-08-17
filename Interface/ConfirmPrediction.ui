@@ -459,7 +459,7 @@
     <item row="0" column="3">
      <widget class="QCheckBox" name="useClutterCheckBox">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="text">
        <string>Use Clutter </string>

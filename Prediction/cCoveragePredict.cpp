@@ -113,9 +113,9 @@ int cCoveragePredict::SetCommunicationLink(	int		SiteID,
 	cout << "F_height: " << FixedHeight << endl;
 	cout << "M_height: " << MobileHeight << endl;
 	int rValue = mBTLPredict.Check_and_SetBTL
-									(SiteID, Radius, mDistRes, mNumAngles,
-									Frequency, FixedHeight, MobileHeight, 
-									kFactor, DTMsource,	ClutterSource);
+					(SiteID, Radius, mDistRes, mNumAngles,
+					Frequency, FixedHeight, MobileHeight, 
+					kFactor, DTMsource,	ClutterSource);
 	return rValue;
 }
 

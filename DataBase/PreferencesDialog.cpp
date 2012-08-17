@@ -922,8 +922,8 @@ void PreferencesDialog::SetupUi ()
 	useClutterCheckBox->setObjectName(QString::fromUtf8("useClutterCheckBox"));
 	sizePolicy2.setHeightForWidth(useClutterCheckBox->sizePolicy().hasHeightForWidth());
 	useClutterCheckBox->setSizePolicy(sizePolicy2);
-	useClutterCheckBox->setEnabled(false);
-	useClutterLabel->setEnabled(false);
+//	useClutterCheckBox->setEnabled(false);
+//	useClutterLabel->setEnabled(false);
 
 	gridLayout2->addWidget(useClutterCheckBox, 2, 3, 1, 1);
 

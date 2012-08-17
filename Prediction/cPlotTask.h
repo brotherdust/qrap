@@ -117,30 +117,30 @@ enum ePlotType
 			 * 
 			 */
 			bool SetPlotTask(	ePlotType PlotType,
-								eOutputUnits DisplayUnits,
-								bool Downlink,
-								double RequiredSignalToNoise,
-								double RequiredMinimumReceiverLevel,
-								double FadeMargin,
-								double RequiredCoChannelCarrierToInterference,
-								double RequiredAdjacentCarrierToInterference,
-								double RequiredEnergyPerBitToNoiseRatio,
-								double NoiseLevel,
-								double kFactorForServers,
-								double kFactorForInterferers,
-								short int DEMsourceList,
-								short int ClutterSourceList,
-								bool UseClutterDataInPathLossCalculations,
-								cGeoP NorthWestCorner,
-								cGeoP SouthWestCorner,
-								double PlotResolution,
-								double MinimumAngularResolution,
-								unsigned MobileInstallationKey,
-								unsigned NumberOfFixedInstallations,
-								unsigned *FixedInstallationKeys,
-								double *CoverangeRanges, // In Kilometer
-								string DirectoryToStoreResult,
-								string OutputFileForResult);
+						eOutputUnits DisplayUnits,
+						bool Downlink,
+						double RequiredSignalToNoise,
+						double RequiredMinimumReceiverLevel,
+						double FadeMargin,
+						double RequiredCoChannelCarrierToInterference,
+						double RequiredAdjacentCarrierToInterference,
+						double RequiredEnergyPerBitToNoiseRatio,
+						double NoiseLevel,
+						double kFactorForServers,
+						double kFactorForInterferers,
+						short int DEMsourceList,
+						short int ClutterSourceList,
+						bool UseClutterDataInPathLossCalculations,
+						cGeoP NorthWestCorner,
+						cGeoP SouthWestCorner,
+						double PlotResolution,
+						double MinimumAngularResolution,
+						unsigned MobileInstallationKey,
+						unsigned NumberOfFixedInstallations,
+						unsigned *FixedInstallationKeys,
+						double *CoverangeRanges, // In Kilometer
+						string DirectoryToStoreResult,
+						string OutputFileForResult);
 		
 		private:
 			
@@ -181,9 +181,10 @@ enum ePlotType
 			double			mkFactorInt;	///< kFactor used in effective earth model for interference calculations
 			short int		mDEMsource;		///< the primary key to the FILESETSUSED table for selection of the DEM data 
 			short int		mClutterSource;	///< the primary key to the FILESETSUSED table for selection of the Clutter data
-			cRasterFileHandler 	mDEM;		///< Raster containing the DEM for the upcoming prediction Radials at different angels 
+			cRasterFileHandler 	mDEM;		///< RasterfileHandler to get the rasters containing the DEM for the upcoming prediction Radials at different angels 
 			bool			mUseClutter;	///< Is clutter data used in the calculations?
-			cRasterFileHandler 	mClutter;	///< Raster containing the Clutter for the upcoming prediction Radials at different angels 
+			unsigned		mClutterClassGroup; ///< The classification used for the clutter ... it depends on the file-set. 
+			cRasterFileHandler 	mClutter;	///< RasterFileHandler to get the rasters containing the Clutter for the upcoming prediction Radials at different angels 
 			cGeoP			mNorthWest;		///< North-Western corner of plot area
 			cGeoP			mSouthWest;		///< South-Western corner of plot area
 			cGeoP			mNorthEast;		///< North-Eastern corner of plot area

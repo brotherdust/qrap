@@ -935,11 +935,11 @@ bool cDatabase::TableExists (const string& tableName, bool Spatial)
 	
 	if (!Spatial)
 	{
-		string query= "SELECT setval(";
+		string query= "SELECT setval('";
 		query += mName;
 		query +=".";
 		query +=tableName;
-		query +="_id_seq, (select max(id) from ";
+		query +="_id_seq', (select max(id) from ";
 		query += mName;
 		query +=".";
 		query +=tableName;

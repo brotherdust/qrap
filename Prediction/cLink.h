@@ -33,6 +33,7 @@
 #include "cGeoP.h"
 #include "cProfile.h"
 #include "cPthlssp.h"
+#include "cClutter.h"
 #include "cAntpatn.h"
 #include "cRasterFileHandler.h"
 
@@ -169,16 +170,18 @@ namespace Qrap
 			double			mFrequency;	///< Operating frequency of Link
 			double			mkFactor;	///< k Factor used to calculate Effective earth radio(vs. real earth)
 			double			mPlotResolution;///< Requested plot resolution in meter
+			cRasterFileHandler 	mDEM;		///< Rasterfile handler to get height data
 			short int		mDEMsource;	///< Key to file-set-order array for height data
 			short int		mClutterSource;	///< Key to file-set-order array for clutter
-			cRasterFileHandler 	mDEM;		///< Rasterfile handler to get height data
 			bool			mUseClutter;	///< Do we use clutter information?
+			unsigned		mClutterClassGroup;
 			cRasterFileHandler 	mClutter;	///< Rasterfile handler to get Clutter
+			cClutter		mClutterset;
 			bool			mTrial;		///< Is this only a trail link (true) or actual (false)?
 			tFixed			mTxInst;	///< Transmitting Radio Installation
 			tFixed			mRxInst;	///< Receiving Radio Installation
-			cAntennaPattern mTxAnt;			///< AntennaPattern of Transmitting Radio installation
-			cAntennaPattern mRxAnt;			///< AntennaPattern of Receiving Radio installation
+			cAntennaPattern 	mTxAnt;		///< AntennaPattern of Transmitting Radio installation
+			cAntennaPattern 	mRxAnt;		///< AntennaPattern of Receiving Radio installation
 			int 			mLength;	///< Size of the arrays/profiles
 			double 			mSlope;		///< Slope of LineOfSight
 			double 			mEffRadius;	///< Effective earth radius
@@ -192,8 +195,9 @@ namespace Qrap
 			double 			mRxElevation;	///< True height of Rx site
 			float 			*mFlatProfile;	///< The flat earth profile not taking the true earth radius into account
 			float 			*mClearance;	///< Clearance at each point
-			double mMinimum;
-			double mMaximum;
+			int 			*mClutterProfile;
+			double 			mMinimum;
+			double 			mMaximum;
 	};
 }
 #endif 

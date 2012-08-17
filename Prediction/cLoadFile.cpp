@@ -232,7 +232,7 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 		{
 			OrigRes = atof(r[0]["resolution"].c_str());
 			Type = r[0]["fileformat"].c_str();
-			if 		(Type=="BINFILE") 	Ofiletype=BINFILE;
+			if 	(Type=="BINFILE") 	Ofiletype=BINFILE;
 			else if (Type=="NESFILE") 	Ofiletype=NESFILE;
 			else if (Type=="GRASSFILE")	Ofiletype=GRASSFILE;
 			else if (Type=="GDALFILE")	Ofiletype=GDALFILE;

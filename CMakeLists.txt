@@ -75,6 +75,10 @@ ENDIF (NOT BISON_EXECUTABLE)
 # required
 FIND_PACKAGE(Proj)
 
+FIND_PACKAGE(Eigen3)
+INCLUDE( ${EIGEN3_INCLUDE_DIR} )
+ MESSAGE ( "  Found Eigen Include:" ${EIGEN3_INCLUDE_DIR})
+
 #optional since we can use internal sqlite
 IF (NOT WITH_INTERNAL_SQLITE3)
   FIND_PACKAGE(Sqlite3)
@@ -106,9 +110,15 @@ IF (WITH_BINDINGS)
 ENDIF (WITH_BINDINGS)
 
 
-IF (NOT PROJ_FOUND OR NOT GEOS_FOUND OR NOT GDAL_FOUND)
-  MESSAGE (SEND_ERROR "Some dependencies were not found!")
-ENDIF (NOT PROJ_FOUND OR NOT GEOS_FOUND OR NOT GDAL_FOUND)
+IF (NOT PROJ_FOUND)
+ 	MESSAGE (SEND_ERROR "PROJ were not found!")
+ENDIF(NOT PROJ_FOUND)
+IF (NOT GEOS_FOUND)
+	 MESSAGE (SEND_ERROR "GEOS were not found!")
+ENDIF (NOT GEOS_FOUND)
+IF (NOT GDAL_FOUND)
+  MESSAGE (SEND_ERROR "GDAL were not found!")
+ENDIF (NOT GDAL_FOUND)
 
 IF (POSTGRES_FOUND)
   # following variable is used in qgsconfig.h
@@ -399,6 +409,7 @@ SET (qrap_SRCS
      	Prediction/cGeoP.cpp
 	Prediction/cPlotTask.cpp
 	Prediction/cProfile.cpp
+	Prediction/cClutter.cpp
 	Prediction/cPthlssp.cpp
 	Prediction/cRaster.cpp
 	Prediction/cRasterFileHandler.cpp
@@ -514,6 +525,7 @@ SET (qrap_MOC_HDRS
 	Prediction/cGeoP.h
 	Prediction/cPlotTask.h
 	Prediction/cProfile.h
+	Prediction/cClutter.h
 	Prediction/cPthlssp.h
 	Prediction/cRaster.h
 	Prediction/cRasterFileHandler.h
@@ -596,6 +608,7 @@ INCLUDE_DIRECTORIES(
 	${QT_INCLUDES}
 	/usr/include
 	/usr/include/qgis
+	/usr/include/eigen3
 	/usr/include/gdal
      	/usr/include/Poco/
 	/usr/include/qwt-qt4

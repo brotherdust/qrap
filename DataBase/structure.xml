@@ -1854,7 +1854,9 @@ www.QRap.org.za
 	</table> <!-- cluttertype  -->
 
 <!-- *************************************************************************************************************************** -->	
-<!-- This "clutterterms" table should rather not be edited unless you change the code too -->
+<!-- This "clutterterms" table should rather not be edited unless you change the code too. The clutter terms should be reflected 
+in #define statements in qrap/Prediction/cClutter.h -->
+
 	<table name="clutterterms" label="Clutter Tuning Terms" fulldownload="true"
 	description="This table presents the different terms for which the coefficients or parameters needs to be tuned. It should not be altered unless you change the propagation prediction code." >
 		<field name="id"

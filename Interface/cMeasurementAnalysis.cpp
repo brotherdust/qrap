@@ -75,11 +75,11 @@ void cMeasurementAnalysis::on_pushOk_clicked()
 	unsigned PosSource = (unsigned) parts[0].toInt();
 
 	cMeasAnalysisCalc MeasSet;
-	double Mean,StDev,CorrC;
+	double Mean, MeanSquareError, StDev,CorrC;
 
 	if (MeasSet.LoadMeasurements(MeasType,PosSource,MeasSource))
 	{
-		if (MeasSet.PerformAnalysis(Mean, StDev, CorrC))
+		if (MeasSet.PerformAnalysis(Mean, MeanSquareError, StDev, CorrC))
 		{
 			ValueMeanError->setText(QString("%1").arg(Mean));
                		ValueStdDev->setText(QString("%1").arg(StDev));

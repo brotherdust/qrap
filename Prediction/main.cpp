@@ -30,6 +30,7 @@
 #include "cLoadFile.h"
 #include "cLink.h"
 #include "cRasterFileHandler.h"
+#include "cMeasAnalysisCalc.h"
 
 using namespace std;
 using namespace Qrap;
@@ -49,12 +50,13 @@ int main (int argc, char **argv)
 		return 0;
 	}
 	
-	cout << "Hier" << endl;
-//	To cut clutter set
-	string dir="/home/maggie/GISdata/SRTM/BIN";
+	cMeasAnalysisCalc Meas;
+	Meas.OptimiseModel();
+
+/*	string dir="/home/maggie/GISdata/SRTM/BIN";
 	cLoadFile Files(5,6,dir);
 	Files.CutCurrentSet(5,6, true, 0);
-
+*/
 	// For Arc Grid
 /*	string dir="/home/maggie/Data/RasterData/BIN";
 	cLoadFile Files(1,2,dir);
@@ -674,7 +676,7 @@ Files.LoadOrt("/media/STORAGEBIRD/DEMS/50M_W_DEM1/3228ac",dir,"3228ac50m.bin",4,
 	fclose(fp);
 */
 /*	cPlotTask prediction;	
-	// Get the test data to run a prediction
+	// This is to test getting the DEM data
 	prediction.ReadPlotRequest("ExamplePlotRequest");
  	cRaster Output;
 	cRasterFileHandler DEM(1);
@@ -696,6 +698,7 @@ Files.LoadOrt("/media/STORAGEBIRD/DEMS/50M_W_DEM1/3228ac",dir,"3228ac50m.bin",4,
 					Dir,OutputFile,HFA,DEG,DEG,central);
 	delete_Float2DArray(Data);
 */
+
 	return 0;
 }
 

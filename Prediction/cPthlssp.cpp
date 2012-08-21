@@ -201,9 +201,12 @@ int cPathLossPredictor::setParameters(double k, double f,
 	if (m_SeekWidth<3) m_SeekWidth = 3;
 //	if (m_SmoothWidth<1) m_SmoothWidth=1;
 	mUseClutter = UseClutter;
-	
-	if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
-	UseClutter = mUseClutter;
+	if (ClutterClassGroup!=mClutter.mClassificationGroup)
+	{
+		if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
+		UseClutter = mUseClutter;
+		mClutter.mClassificationGroup = ClutterClassGroup;
+	}
 
 return 1;
 
@@ -315,17 +318,17 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	
 	if (mUseClutter)
 	{
-		double Cheight = mClutter.mClutterTypes[mClutterProfile[i]].sHeight;
-		double Cwidth = mClutter.mClutterTypes[mClutterProfile[i]].sWidth;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[0]*TERM0;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[1]*TERM1;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[2]*TERM2;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[3]*TERM3;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[4]*TERM4;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[5]*TERM5;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[6]*TERM6;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[7]*TERM7;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[i]].sCoefficients[8]*TERM8;
+		double Cheight = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sHeight;
+		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[0]*TERM0;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[1]*TERM1;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[2]*TERM2;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[3]*TERM3;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[4]*TERM4;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[5]*TERM5;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[6]*TERM6;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[7]*TERM7;
+		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[8]*TERM8;
 	}
 
 /*

@@ -1060,6 +1060,7 @@ void PreferencesDialog::SetupUi ()
 } // SetupUi
 
 
+//**********************************************************************************************
 void PreferencesDialog::RetranslateUi ()
 {
 	setWindowTitle(QApplication::translate("PreferencesDialog", "QRAP Preferences", 0, QApplication::UnicodeUTF8));

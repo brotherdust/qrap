@@ -284,7 +284,7 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 		}// if there are measurements
 	} // else ... hence the query was successful
 	
-	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving ";
+	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
 }
 
 
@@ -349,19 +349,21 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			if (mMeasPoints[i].sInstKeyFixed!=currentInst)
 			{
 				currentInst = mMeasPoints[i].sInstKeyFixed;
-				cout << "mClutterFilter = " << mClutterFilter << "	currentInst = " << currentInst 
-					<< "	which is " << FixedNum << "	of " << mFixedInsts.size() << endl;
 
 				while ((mFixedInsts[FixedNum].sInstKey!=currentInst)&&(FixedNum < mFixedInsts.size()))
 					FixedNum++;
+
+				cout << "mClutterFilter = " << mClutterFilter << "	currentInst = " << currentInst 
+					<< "	which is " << FixedNum << "	of " << mFixedInsts.size() << endl;
 		
 				if (FixedNum == mFixedInsts.size())
 				{
-					FixedNum = 0;
+/*					FixedNum = 0;
 					while ((mFixedInsts[FixedNum].sInstKey!=currentInst)&&(FixedNum < mFixedInsts.size()))
 						FixedNum++;
 					if (FixedNum == mFixedInsts.size())
-						return 0;
+*/					cout << "FixedNum reached limit ... ending measurement analysis" <<endl;			
+					return 0;
 				}
 				FixedAnt.SetAntennaPattern(mFixedInsts[FixedNum].sTxPatternKey, 
 								mFixedInsts[FixedNum].sTxAzimuth,  
@@ -459,7 +461,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			
 
 			DEM = mDEM.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);
-			mMeasPoints[i].sDistance = mFixedInsts[FixedNum].sSitePos.Distance(mMeasPoints[i].sPoint);
+			mMeasPoints[i].sDistance = mFixedInsts[FixedNum].sSitePos.Distance(mMeasPoints[i].sPoint)/1000.0;
 			Length = DEM.GetSize();
 	
 			if (Length > 2)
@@ -629,9 +631,9 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	MeanSquareError = TotalSError/NumUsed;
 	StDev = sqrt(MeanSquareError-Mean*Mean);
 	
-	double StDevMeas = sqrt(TotalSMeas/NumUsed-TotalMeas*TotalMeas/(NumUsed*NumUsed));
-	double StDevPred = sqrt(TotalSPred/NumUsed-TotalPred*TotalPred/(NumUsed*NumUsed));
-	CorrC = (TotalMeasPred - TotalMeas*TotalPred/NumUsed) / ((NumUsed-1)*StDevMeas*StDevPred);
+	double TempMeas = sqrt(NumUsed*TotalSMeas-TotalMeas*TotalMeas);
+	double TempPred = sqrt(NumUsed*TotalSPred-TotalPred*TotalPred);
+	CorrC = (NumUsed*TotalMeasPred - TotalMeas*TotalPred) / (TempMeas*TempPred);
 
 	return NumUsed;
 }
@@ -713,6 +715,7 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 	MatrixXd SolveCoefMatrix;	//Declare local matrixes of reduced size
 	MatrixXd LeftSide;
 	MatrixXd DeltaCoeff;
+	int NumUsed;
 
 	mUseClutter = true;
 
@@ -721,16 +724,19 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 	// First Update all clutter types
 	for(mClutterFilter=0; mClutterFilter< mPathLoss.mClutter.mNumber; mClutterFilter++)
 	{
-		cout << "clutterType = " << mClutterFilter << endl;
-		PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, mClutterFilter);
+		NumUsed = PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, mClutterFilter);
+		cout << "clutterType = " << mClutterFilter;
+		cout << "	#Used: " << NumUsed << "	Mean: " << Mean 
+			<< "	MeanSquare: " << MeanSquareError << "	StDev: " << StDev
+			<< "	CorrC: " << CorrC << endl;
 
 //		for (i=0; i<3; i++)
 //			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i]=true;
 
 		for (i=0; i<NUMTERMS; i++)
 		{
-			cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
-				<< "	Min=" << mMinTerm[i] << endl;
+//			cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
+//				<< "	Min=" << mMinTerm[i] << endl;
 			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
 						= ((mMaxTerm[i]-mMinTerm[i]) > 0.06*fabs(mMidTerm[i]));
 		}
@@ -779,8 +785,8 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 
 
 			cout << "cMeasAnalysisCalc::OptimiseModel. Voor oplossing. Size = " << Size << endl; 
-			cout << SolveCoefMatrix << endl << endl;
-			cout << LeftSide << endl << endl;
+//			cout << SolveCoefMatrix << endl << endl;
+//			cout << LeftSide << endl << endl;
 
 			DeltaCoeff = SolveCoefMatrix.fullPivLu().solve(LeftSide);
 
@@ -790,12 +796,12 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 			for (i=0; i<Size; i++)
 			{
 				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] += DeltaCoeff(i);
-				cout << (int)mDeltaCoeff(i) << "	" 
-					<< mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] << endl;
+//				cout << (int)mDeltaCoeff(i) << "	" 
+//					<< mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] << endl;
 			}
 
 			for(i=0;i<NUMTERMS; i++)
-				cout << mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[i] << endl;
+				cout << i<< "	" << mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[i] << endl;
 
 			if (!mPathLoss.mClutter.UpdateCoefficients(mClutterFilter))
 				cout << "Updating clutter Coefficients failed" << endl;

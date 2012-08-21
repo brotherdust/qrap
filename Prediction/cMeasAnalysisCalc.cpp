@@ -34,11 +34,15 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 	mMaxTerm = new double[NUMTERMS];
 	mMidTerm = new double[NUMTERMS];
 
+	mSolveCoefMatrix.resize(NUMTERMS,NUMTERMS);
+	mLeftSide.resize(NUMTERMS);
+	mDeltaCoeff.resize(NUMTERMS);
+
 	unsigned i,j;
 	for(i=0; i<NUMTERMS; i++)
 	{
 		mMinTerm[i] =   MAXDOUBLE;
-		mMaxTerm[i] = - MAXDOUBLE;
+		mMaxTerm[i] =  - (MAXDOUBLE/2);
 		mMidTerm[i] =   MAXDOUBLE;		
 		mLeftSide(i) = 0.0;
 		mDeltaCoeff(i) = 0.0;
@@ -71,6 +75,7 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 		mUseClutter = true;
 	else mUseClutter = false;
 	mClutterSource = atoi(gDb.GetSetting("ClutterSource").c_str());
+	cout << "mClutterSource = " << mClutterSource << endl;
 	if (mUseClutter)
 		mUseClutter = mClutter.SetRasterFileRules(mClutterSource);
 	if (mUseClutter)
@@ -96,10 +101,9 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 					unsigned MeasSource, unsigned CI)
 {
 
+	cout << " In cMeasAnalysisCalc::LoadMeasurements " << endl;
 	char * text = new char[10];		
-	unsigned MeasCount=0;	
 	pqxx::result r, rMobile, rFixed;
-	double Lat, Lon, prevLat, prevLon, Meas, dist;
 
 	string query ="SELECT mobile, ci, frequency, AsText(location) as location, ";
 	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth ";
@@ -157,7 +161,7 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 		{
 			delete [] mMeasPoints;
 			mMeasPoints = new tMeasPoint[mNumMeas];
-			int i;
+			unsigned i;
 			for (i=0;i<mNumMeas;i++)
 			{		
 				mMeasPoints[i].sCell = atoi(r[i]["ci"].c_str());	
@@ -218,6 +222,7 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 					mMeasPoints[i].sInstKeyFixed = currentFixedInst;
 				else
 				{
+					cout << "New Cell = " << mMeasPoints[i].sCell << endl;
 					gcvt(mMeasPoints[i].sCell,8,text);
 					query = "SELECT risector, siteid, AsText(location) as location, eirp,";
 					query += "radioinstallation.txpower as txpower,txlosses,rxlosses";
@@ -229,6 +234,7 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 					query += text;
 					query += ";";
 				
+					cout << query << endl;
 					// Perform a Raw SQL query
 					if(!gDb.PerformRawSql(query))
 					{
@@ -243,7 +249,7 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 						gDb.GetLastResult(rFixed);
 						if(rFixed.size()!=0)
 						{
-							
+							currentCI = mMeasPoints[i].sCell;
 							currentFixedInst = atoi(rFixed[0]["risector"].c_str());
 							mMeasPoints[i].sInstKeyFixed = currentFixedInst;
 							tempInst.sFrequency = atof(r[i]["frequency"].c_str());
@@ -288,7 +294,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 {
 
 	mClutterFilter = Clutterfilter;
-	unsigned i=0, j=0, MobileNum=0, FixedNum=0 ,NumUsed = 0;
+	unsigned i=0, j=0, NumUsed = 0;
+	unsigned MobileNum=0, FixedNum=0;
 	double Error=0, TotalError=0, TotalSError=0, TotalMeas=0;
 	double TotalPred=0, TotalSMeas=0, TotalSPred=0, TotalMeasPred=0;
 	unsigned currentInst=0;
@@ -298,30 +305,26 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	unsigned Length;
 	cProfile Clutter;
 	cProfile DEM;
-	double bearing=0, AntValue=0, EIRP=0;
+	double AntValue=0, EIRP=0;
 
 	//These varaibles are local and are such that they can be used with the TERMs defined in cClutter.h
 	double mLinkLength, m_freq, m_htx, Cheight;
 
-	mSolveCoefMatrix.resize(NUMTERMS,NUMTERMS);
-	mLeftSide.resize(NUMTERMS);
-	mDeltaCoeff.resize(NUMTERMS);
 	if ((Clutterfilter>0)&&(mUseClutter))
 	{
-		for (i=0;i<NUMTERMS;i++)
+		for(i=0; i<NUMTERMS; i++)
 		{
 			mMinTerm[i] =   MAXDOUBLE;
-			mMaxTerm[i] = - MAXDOUBLE;
-			mMaxTerm[i] =   MAXDOUBLE;
+			mMaxTerm[i] =   -(MAXDOUBLE/2);
+			mMidTerm[i] =   MAXDOUBLE;		
 			mLeftSide(i) = 0.0;
 			mDeltaCoeff(i) = 0.0;
 			for (j=0; j<NUMTERMS; j++)
-				mSolveCoefMatrix(i,j)=0.0;
+				mSolveCoefMatrix(i,j) = 0.0;
 		}
-		
 	}
 
-	for (i=0;i<mNumMeas;i++)
+	for (i=0; i<mNumMeas; i++) 
 	{
 		if ((0==Clutterfilter)||(0==mMeasPoints[i].sClutter)||(Clutterfilter==mMeasPoints[i].sClutter))
 		{
@@ -346,10 +349,20 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			if (mMeasPoints[i].sInstKeyFixed!=currentInst)
 			{
 				currentInst = mMeasPoints[i].sInstKeyFixed;
+				cout << "mClutterFilter = " << mClutterFilter << "	currentInst = " << currentInst 
+					<< "	which is " << FixedNum << "	of " << mFixedInsts.size() << endl;
+
 				while ((mFixedInsts[FixedNum].sInstKey!=currentInst)&&(FixedNum < mFixedInsts.size()))
 					FixedNum++;
+		
 				if (FixedNum == mFixedInsts.size())
-					return 0;
+				{
+					FixedNum = 0;
+					while ((mFixedInsts[FixedNum].sInstKey!=currentInst)&&(FixedNum < mFixedInsts.size()))
+						FixedNum++;
+					if (FixedNum == mFixedInsts.size())
+						return 0;
+				}
 				FixedAnt.SetAntennaPattern(mFixedInsts[FixedNum].sTxPatternKey, 
 								mFixedInsts[FixedNum].sTxAzimuth,  
 								mFixedInsts[FixedNum].sTxMechTilt);
@@ -363,19 +376,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				{
 					m_freq = mFixedInsts[FixedNum].sFrequency;
 					m_htx = mFixedInsts[FixedNum].sTxHeight;
-
-					if (TERM2 < mMinTerm[2])
-					{
-						if ((mMidTerm[2]-TERM2) > (mMaxTerm[2]-mMidTerm[2]))
-							mMidTerm[2] = mMinTerm[2];
-						mMinTerm[2] = TERM2;
-					}
-					else if (TERM2 > mMaxTerm[2])
-					{
-						if ((mMidTerm[2]-TERM2) < (mMaxTerm[2]-mMidTerm[2]))
-							mMidTerm[2] = mMaxTerm[2];
-						mMaxTerm[2] = TERM2;
-					}
+					Cheight = mPathLoss.mClutter.mClutterTypes[mMeasPoints[i].sClutter].sHeight;
 
 					if (TERM3 < mMinTerm[3])
 					{
@@ -390,6 +391,18 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 						mMaxTerm[3] = TERM3;
 					}
 
+					if (TERM4 < mMinTerm[4])
+					{
+						if ((mMidTerm[4]-TERM4) > (mMaxTerm[4]-mMidTerm[4]))
+							mMidTerm[4] = mMinTerm[4];
+						mMinTerm[4] = TERM4;
+					}
+					else if (TERM4 > mMaxTerm[4])
+					{
+						if ((mMidTerm[4]-TERM4) < (mMaxTerm[4]-mMidTerm[4]))
+							mMidTerm[4] = mMaxTerm[4];
+						mMaxTerm[4] = TERM4;
+					}
 					if (TERM5 < mMinTerm[5])
 					{
 						if ((mMidTerm[5]-TERM5) > (mMaxTerm[5]-mMidTerm[5]))
@@ -428,6 +441,19 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 							mMidTerm[7] = mMaxTerm[7];
 						mMaxTerm[7] = TERM7;
 					}
+
+					if (TERM8 < mMinTerm[8])
+					{
+						if ((mMidTerm[8]-TERM8) > (mMaxTerm[8]-mMidTerm[8]))
+							mMidTerm[8] = mMinTerm[8];
+						mMinTerm[8] = TERM8;
+					}
+					else if (TERM8 > mMaxTerm[8])
+					{
+						if ((mMidTerm[8]-TERM8) < (mMaxTerm[8]-mMidTerm[8]))
+							mMidTerm[8] = mMaxTerm[8];
+						mMaxTerm[8] = TERM8;
+					}
 				}
 			}
 			
@@ -438,6 +464,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	
 			if (Length > 2)
 			{
+//				cout << "Meas " << i << " of " <<  mNumMeas;
 				if (mUseClutter)
 				{
 					Clutter=mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);
@@ -448,7 +475,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				AntValue = FixedAnt.GetPatternValue(mMeasPoints[i].sAzimuth, mMeasPoints[i].sTilt)
 						+ MobileAnt.GetPatternValue(0, -mMeasPoints[i].sTilt);
 				mMeasPoints[i].sPredValue = -mMeasPoints[i].sPathLoss + EIRP - AntValue;
-//				cout << endl << mMeasPoints[i].sMeasValue << "	" << mMeasPoints[i].sPredValue << endl << endl;
+//				cout << "	M: "<< mMeasPoints[i].sMeasValue << "	P:" << mMeasPoints[i].sPredValue;
 
 				Error = - mMeasPoints[i].sMeasValue + mMeasPoints[i].sPredValue;
 				TotalError += Error;  
@@ -460,11 +487,10 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				TotalSPred += mMeasPoints[i].sPredValue*mMeasPoints[i].sPredValue;				
 				TotalMeasPred+= mMeasPoints[i].sPredValue*mMeasPoints[i].sMeasValue;
 				
+				mLinkLength = mMeasPoints[i].sDistance;
+//				cout << "	d = " << mLinkLength << endl;
 				if ((Clutterfilter > 0)&&(mUseClutter))
 				{
-					mLinkLength = mMeasPoints[i].sDistance;
-					Cheight = mPathLoss.mClutter.mClutterTypes[mMeasPoints[i].sClutter].sHeight;
-					
 					if (TERM1 < mMinTerm[1])
 					{
 						if ((mMidTerm[1]-TERM1) > (mMaxTerm[1]-mMidTerm[1]))
@@ -478,30 +504,17 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 						mMaxTerm[1] = TERM1;
 					}
 
-					if (TERM4 < mMinTerm[4])
+					if (TERM2 < mMinTerm[2])
 					{
-						if ((mMidTerm[4]-TERM4) > (mMaxTerm[4]-mMidTerm[4]))
-							mMidTerm[4] = mMinTerm[4];
-						mMinTerm[4] = TERM4;
+						if ((mMidTerm[2]-TERM2) > (mMaxTerm[2]-mMidTerm[2]))
+							mMidTerm[2] = mMinTerm[2];
+						mMinTerm[2] = TERM2;
 					}
-					else if (TERM4 > mMaxTerm[4])
+					else if (TERM2 > mMaxTerm[2])
 					{
-						if ((mMidTerm[4]-TERM4) < (mMaxTerm[4]-mMidTerm[4]))
-							mMidTerm[4] = mMaxTerm[4];
-						mMaxTerm[4] = TERM4;
-					}
-
-					if (TERM8 < mMinTerm[8])
-					{
-						if ((mMidTerm[8]-TERM8) > (mMaxTerm[8]-mMidTerm[8]))
-							mMidTerm[8] = mMinTerm[8];
-						mMinTerm[8] = TERM8;
-					}
-					else if (TERM8 > mMaxTerm[8])
-					{
-						if ((mMidTerm[8]-TERM8) < (mMaxTerm[8]-mMidTerm[8]))
-							mMidTerm[8] = mMaxTerm[8];
-						mMaxTerm[8] = TERM8;
+						if ((mMidTerm[2]-TERM2) < (mMaxTerm[2]-mMidTerm[2]))
+							mMidTerm[2] = mMaxTerm[2];
+						mMaxTerm[2] = TERM2;
 					}
 
 					mLeftSide(0) += Error;
@@ -602,6 +615,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					
 					mLeftSide(8) += Error*TERM8;
 					mSolveCoefMatrix(8,8)+=TERM8*TERM8;
+					
 				}
 				
 
@@ -626,7 +640,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 //************************************************************************************************************************************
 int cMeasAnalysisCalc::SaveResults()
 {
-	int i;
+	unsigned i;
 	string query;
 	string queryM = "UPDATE measurement SET predictvalue=";
 	char * temp;
@@ -692,24 +706,106 @@ int cMeasAnalysisCalc::SaveResults()
 
 //*************************************************************************************************
 //*
-bool cMeasAnalysisCalc::Optimiser(bool ChangeHeights)
+bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 {
-	unsigned i;
-	for (i=0; i<NUMTERMS; i++)
-		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] = ((mMaxTerm[i]-mMinTerm[i]) > 0.1*fabs(mMidTerm[i]));
+	unsigned i,j,Size = 0, Index = 0, Index2=0;
+	double Mean, MeanSquareError, StDev, CorrC;
+	MatrixXd SolveCoefMatrix;	//Declare local matrixes of reduced size
+	MatrixXd LeftSide;
+	MatrixXd DeltaCoeff;
 
-	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5] = ((mMaxTerm[5] - mMidTerm[5]) > 0.1*fabs(mMidTerm[5])) &&
-								((mMidTerm[5] - mMinTerm[5]) > 0.1*fabs(mMidTerm[5]));
-	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[7] = ((mMaxTerm[7] - mMidTerm[7]) > 0.1*fabs(mMidTerm[7])) &&
-								((mMidTerm[7] - mMinTerm[7]) > 0.1*fabs(mMidTerm[7]));
+	mUseClutter = true;
 
-	for (i=0; i<NUMTERMS; i++)
+	LoadMeasurements();
+	
+	// First Update all clutter types
+	for(mClutterFilter=0; mClutterFilter< mPathLoss.mClutter.mNumber; mClutterFilter++)
 	{
-		if (!mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
+		cout << "clutterType = " << mClutterFilter << endl;
+		PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, mClutterFilter);
+
+//		for (i=0; i<3; i++)
+//			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i]=true;
+
+		for (i=0; i<NUMTERMS; i++)
 		{
-// skuif ry en kolom een op
+			cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
+				<< "	Min=" << mMinTerm[i] << endl;
+			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
+						= ((mMaxTerm[i]-mMinTerm[i]) > 0.06*fabs(mMidTerm[i]));
 		}
-	} 
+
+		for (i=5; i<7; i++) 
+			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
+					= ((mMaxTerm[i] - mMidTerm[i]) > 0.03*fabs(mMidTerm[i]))
+					&& ((mMidTerm[i] - mMinTerm[i]) > 0.03*fabs(mMidTerm[i]));
+		
+		Size = 0;
+		for (i=0; i<NUMTERMS; i++)
+			if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
+				Size++;
+
+		if (Size > 0)
+		{
+			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[0]=true;
+			Size++;
+//			cout << "cMeasAnalysisCalc::OptimiseModel. Voor resizing van die plaaslike veranderlikes. Size = " << Size << endl; 
+			SolveCoefMatrix.resize(Size,Size);	//Declare local matrixes of reduced size
+			LeftSide.resize(Size,1);
+
+//			cout << mSolveCoefMatrix << endl << endl;
+//			cout << mLeftSide << endl;
+//			cout << "cMeasAnalysisCalc::OptimiseModel. Voor lus. Size = " << Size << endl; 
+			Index =0;
+			for (i=0; i<NUMTERMS; i++)
+			{
+				if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
+				{
+					LeftSide(Index,0) = mLeftSide(i);
+					mDeltaCoeff(i) = Index;
+					Index2=0;	
+					for(j=0; j<NUMTERMS; j++)
+					{
+						if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[j])
+						{
+							SolveCoefMatrix(Index,Index2) = mSolveCoefMatrix(i,j);
+							SolveCoefMatrix(Index2,Index) = mSolveCoefMatrix(j,i);
+							Index2++;
+						}
+					}
+					Index++;
+				}
+			}
+
+
+			cout << "cMeasAnalysisCalc::OptimiseModel. Voor oplossing. Size = " << Size << endl; 
+			cout << SolveCoefMatrix << endl << endl;
+			cout << LeftSide << endl << endl;
+
+			DeltaCoeff = SolveCoefMatrix.fullPivLu().solve(LeftSide);
+
+			cout << DeltaCoeff << endl;
+		
+			cout << "cMeasAnalysisCalc::OptimiseModel. Voor terugskryf lus. Size = " << Size << endl;
+			for (i=0; i<Size; i++)
+			{
+				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] += DeltaCoeff(i);
+				cout << (int)mDeltaCoeff(i) << "	" 
+					<< mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] << endl;
+			}
+
+			for(i=0;i<NUMTERMS; i++)
+				cout << mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[i] << endl;
+
+			if (!mPathLoss.mClutter.UpdateCoefficients(mClutterFilter))
+				cout << "Updating clutter Coefficients failed" << endl;
+		}
+	}
+
+	//if (ChangeHeights)
+	// write search algorithm for optimum heights. And then again change the coefficients until no further improvement. 
+
+	return true;
 }
 
 

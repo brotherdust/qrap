@@ -1,6 +1,6 @@
-CC = g++ -g -Wall -W -D_REENTRANT -c -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore
+CC = g++ -g -Wall -W -D_REENTRANT -c -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/eigen3
 
-OBJECTS = cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cClutter.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o main.o
+OBJECTS = cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cClutter.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o cMeasAnalysisCalc.o main.o
 
 all: rap makefile
 
@@ -44,6 +44,9 @@ cLink.o:  cLink.h cClutter.o cLink.cpp makefile
 
 cClutter.o:  cClutter.h ../DataBase/Config.h cClutter.cpp makefile
 	$(CC) cClutter.cpp
+
+cMeasAnalysisCalc.o:  cMeasAnalysisCalc.h cMeasAnalysisCalc.cpp makefile
+	$(CC) cMeasAnalysisCalc.cpp
 
 cPthlssp.o:  cPthlssp.h cClutter.o cMemmngr.o cGeoP.o cProfile.o cPthlssp.cpp makefile
 	$(CC) cPthlssp.cpp

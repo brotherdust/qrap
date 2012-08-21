@@ -674,6 +674,12 @@ bool cDatabase::Create (const string& username, const string& password)
 	gDb.SetSetting("DownLink","true");
 	gDb.SetSetting("BTLDir","Data/BTL");
 	gDb.SetSetting("OutputDir","Data/Output");
+	gDb.SetSetting("UseClutter","true");
+	gDb.SetSetting("ClutterSource","2");
+	gDb.SetSetting("DEMsource","1");
+	gDb.SetSetting("PlotResolution","90");
+	gDb.SetSetting("kFactorServer","1");
+	gDb.SetSetting("kFactorInt","1.33");
 
 	// disconnect
 	if (!Disconnect())

@@ -52,8 +52,8 @@ struct tMeasPoint
 {
 	unsigned	sID;
 	unsigned	sCell;
-	int		sInstKeyMobile;
-	int 		sInstKeyFixed;
+	unsigned	sInstKeyMobile;
+	unsigned	sInstKeyFixed;
 	cGeoP 		sPoint;
 	double 		sMeasValue;
 	double		sPathLoss;
@@ -75,8 +75,8 @@ class cMeasAnalysisCalc
 	cMeasAnalysisCalc(); // default constructor
 	~cMeasAnalysisCalc(); // destructor
 
-	int LoadMeasurements(unsigned MeasType, unsigned PosSource, 
-				unsigned MeasSource, unsigned Cell=0);
+	int LoadMeasurements(unsigned MeasType=0, unsigned PosSource=0, 
+				unsigned MeasSource=0, unsigned Cell=0);
 
 
 	int PerformAnalysis(double &Mean, double &MeanSquareError,
@@ -84,7 +84,7 @@ class cMeasAnalysisCalc
 
 	int SaveResults();
 
-	bool Optimiser(bool ChangeHeights);
+	bool OptimiseModel(bool ChangeHeights=false);
 
    private:
 

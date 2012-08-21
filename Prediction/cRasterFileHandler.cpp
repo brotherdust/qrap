@@ -72,7 +72,7 @@ bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
 	CmdStr += RuleStr;  
 	CmdStr +=";";
 	
-//	cout << CmdStr << endl;
+	cout << CmdStr << endl;
 	if(!gDb.PerformRawSql(CmdStr))
 	{
 		string err = "Getting the fileset to use failed. Query: ";
@@ -129,6 +129,7 @@ unsigned cRasterFileHandler::GetClutterClassGroup()
 	query += temp;	
 	query += ";";
 
+	cout << query << endl; 
 	if(!gDb.PerformRawSql(query))
 	{
 		string err = "Getting the Clutter Classification Group to use failed. Query: ";

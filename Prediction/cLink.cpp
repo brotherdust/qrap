@@ -305,7 +305,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 		return false;
 
 	cProfile DEM;
-	int Length;
+	unsigned Length;
 	DEM = mDEM.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution);
 	Length = DEM.GetSize();
 	mLength = Length;
@@ -757,7 +757,7 @@ bool cLink::GetDBinfoS(tFixed &Inst)
 	char *temp;
 	temp = new char[33];
 	double longitude, latitude;
-	int spacePos, i;
+	int spacePos;
 	// Populate the site information from the database. The rest of the info is already in Inst
 		
 	gcvt(Inst.sSiteID,8,temp);

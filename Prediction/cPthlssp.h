@@ -292,6 +292,7 @@ namespace Qrap
 			int m_SmoothWidth;		///< Used to Smooth the profile when calculating the radii of the peaks
 			int m_SeekWidth;		///< Use to seek the inflection points when calculating the peak radii
 			bool mUseClutter;		///< indicates whether clutter dependancies should be included. 
+			double *mCterms;		///< values of the clutter terms
 		public:
 			cClutter mClutter;		///< 'container' class that has the coefficients and heights to be used in the pathloss calculations. It must be public for the optimiser to see it. 
 	};

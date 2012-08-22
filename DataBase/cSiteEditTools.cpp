@@ -36,7 +36,7 @@ using namespace Qrap;
 //****************************************************************
 QString Qrap::FindLatLon(QString lat,QString lon)
 {
-	Qrap::DegreeFormat locationFormat;
+//	Qrap::DegreeFormat locationFormat;
 	string setting = Qrap::gDb.GetSetting("location");
 			
 	QString format;
@@ -48,7 +48,7 @@ QString Qrap::FindLatLon(QString lat,QString lon)
 	// if the degrees minutes seconds radio is checked then do the relevant conversion
 	if(setting=="DD:MM:SS" )
 	{				
-		locationFormat = dfDegMinSec;
+//		locationFormat = dfDegMinSec;
 				
 		// Get the latitude value
 		latInput = lat;
@@ -68,7 +68,7 @@ QString Qrap::FindLatLon(QString lat,QString lon)
 		// if the degrees minutes decimals radio button is checked then do the relevant conversion
 		if(setting=="DD:MM.mm")
 		{
-			locationFormat = dfDegMin;
+//			locationFormat = dfDegMin;
 			latInput = lat;
 			if( (latitude = QString::fromStdString(ExtractDecimalDegrees(latInput.toStdString(),dfDegMin,true)))=="")
 				return "";
@@ -84,7 +84,7 @@ QString Qrap::FindLatLon(QString lat,QString lon)
 			// if the Degrees decimals radio is checked then do the relevant conversion
 			if(setting=="DD.dddd")
 			{
-				locationFormat = dfDeg;
+//				locationFormat = dfDeg;
 				latitude = lat;
 				longitude = lon;
 				
@@ -258,6 +258,7 @@ int Qrap::GetGroundHeight(double lat, double lon)
 //***********************************************************
 bool Qrap::InsertDefaultRadioInsts(int SiteId)
 {
+	unsigned i;
 	char * siteID;
 	siteID = new char[33];
 	char * machineID;
@@ -314,9 +315,8 @@ bool Qrap::InsertDefaultRadioInsts(int SiteId)
 		{
 			cout << "In cSiteEditTools::InsertDefaultRadios() Inst Size =" << radinst.size() << endl; 
 			cout << "In cSiteEditTools::InsertDefaultRadios(): SiteId=" << SiteId << endl;		
-			for (int i = 0; i < radinst.size(); i++)
+			for (i=0; i<radinst.size(); i++)
 			{
-
 				gcvt(SiteId,20,siteID);
 //				string ID = siteID;
 //				ID +=radinst[i]["sector"].c_str();
@@ -449,6 +449,7 @@ bool Qrap::InsertDefaultRadioInsts(int SiteId)
 //***********************************************************
 bool Qrap::DeleteBTL(int SiteId)
 {
+	unsigned i;
 	char * siteID;
 	siteID = new char[33];
 	gcvt(SiteId,20,siteID);
@@ -476,7 +477,7 @@ bool Qrap::DeleteBTL(int SiteId)
 		return false;
 	
 	string filename="";
-	for (int i = 0; i < btlfiles.size(); i++)
+	for (i=0; i < btlfiles.size(); i++)
 	{
 		filename = btlfiles[i]["btlplot"].c_str();
 		file = path +filename;

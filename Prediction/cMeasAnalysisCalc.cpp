@@ -735,8 +735,8 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 
 		for (i=0; i<NUMTERMS; i++)
 		{
-//			cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
-//				<< "	Min=" << mMinTerm[i] << endl;
+			cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
+				<< "	Min=" << mMinTerm[i] << endl;
 			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
 						= ((mMaxTerm[i]-mMinTerm[i]) > 0.06*fabs(mMidTerm[i]));
 		}
@@ -768,7 +768,7 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 				if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
 				{
 					LeftSide(Index,0) = mLeftSide(i);
-					mDeltaCoeff(i) = Index;
+					mDeltaCoeff(Index) = i;
 					Index2=0;	
 					for(j=0; j<NUMTERMS; j++)
 					{
@@ -796,10 +796,11 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 			for (i=0; i<Size; i++)
 			{
 				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] += DeltaCoeff(i);
-//				cout << (int)mDeltaCoeff(i) << "	" 
-//					<< mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] << endl;
+				cout << (int)mDeltaCoeff(i) << "	" 
+					<< mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] << endl;
 			}
 
+			cout << "for NUMTERMS" << endl;
 			for(i=0;i<NUMTERMS; i++)
 				cout << i<< "	" << mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[i] << endl;
 

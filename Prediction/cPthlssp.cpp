@@ -50,6 +50,7 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	m_markers = new int[MAXPEAK];
 	m_peakwidth = new int[MAXPEAK];
 	m_aboveEarth = new double[MAXPEAK];
+	mCterms = new double[NUMTERMS];
 
 	m_tempIPD = 90;
 	m_slope = 0;
@@ -110,6 +111,11 @@ cPathLossPredictor::cPathLossPredictor(const cPathLossPredictor &right)
 		*(m_peakwidth+i) = *(right.m_peakwidth+i);
 		*(m_aboveEarth+i) = *(right.m_aboveEarth+i);
 	}
+
+	mCterms = new double[NUMTERMS];
+	for (i=0;i<NUMTERMS;i++)
+		mCterms[i] = right.mCterms[i];
+
 }/* end CPathLossPredictor Copy Constructor */
 
 
@@ -123,6 +129,7 @@ cPathLossPredictor::~cPathLossPredictor()
 	delete [] m_TempProfile;
 	delete [] m_CurvedProfile;
 	delete [] mClutterProfile;
+	delete [] mCterms;
 }/* end CPathLossPredictor:: Destructor */
 
 
@@ -176,6 +183,10 @@ const cPathLossPredictor & cPathLossPredictor::operator=
 		*(m_peakwidth+i) = *(right.m_peakwidth+i);
 		*(m_aboveEarth+i) = *(right.m_aboveEarth+i);
 	}
+
+	for (i=0;i<NUMTERMS;i++)
+		mCterms[i] = right.mCterms[i];
+
 return (*this);
 }/* end CPathLossPredictor assignment */
 
@@ -207,6 +218,13 @@ int cPathLossPredictor::setParameters(double k, double f,
 		UseClutter = mUseClutter;
 		mClutter.mClassificationGroup = ClutterClassGroup;
 	}
+
+	mCterms[0] = 1;
+	mCterms[3] = TERM3;
+	mCterms[4] = TERM4;
+	mCterms[5] = TERM5;
+	mCterms[6] = TERM6;
+	mCterms[7] = TERM7;
 
 return 1;
 
@@ -318,17 +336,14 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	
 	if (mUseClutter)
 	{
+//		cout <<mClutterProfile[m_size-1] <<"."; 
 		double Cheight = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sHeight;
-		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[0]*TERM0;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[1]*TERM1;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[2]*TERM2;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[3]*TERM3;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[4]*TERM4;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[5]*TERM5;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[6]*TERM6;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[7]*TERM7;
-		m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[8]*TERM8;
+//		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
+		mCterms[1] = TERM1;
+		mCterms[2] = TERM2;
+		mCterms[8] = TERM8;
+		for (i=0; i<NUMTERMS; i++)
+			m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[i]*mCterms[i];
 	}
 
 /*

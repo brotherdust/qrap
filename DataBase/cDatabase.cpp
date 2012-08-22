@@ -2087,7 +2087,7 @@ bool cDatabase::ImportFromCsv (const string& fileName, const string& tableName, 
 	char        buf[cCsvLineBufferSize];
 	StringArray lineArr, headers, multiDim;
 	StringMap   vals;
-	int         line = 1, i, colCount;
+	unsigned         line = 1, i, colCount;
 	string      fieldName, temp, foreignField;
 	
 	

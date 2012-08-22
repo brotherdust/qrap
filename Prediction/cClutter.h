@@ -119,7 +119,7 @@ namespace Qrap
 			/**
 			 * Destroy content: called by destructor and reset
 			 */
-			bool Destroy();
+			void Destroy();
 			
 		
 		public:

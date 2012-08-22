@@ -663,7 +663,7 @@ bool cPlotTask::CombineCov()
 	// Some temporary variables
 	unsigned i,j,k,Prows,Pcols;
 	int ki,kj;
-	int Advance = 10;
+	unsigned Advance = 10;
 //	cout << "In cPlotTask::CombineCov()" << endl;
 	string err = "Starting requested Prediction.";
 	cout << err<< endl;
@@ -860,7 +860,7 @@ bool cPlotTask::InterferencePlot()
 	// Some temporary variables
 	unsigned i,j,k,Prows,Pcols;
 	int ki,kj;
-	int Advance = 10;
+	unsigned Advance = 10;
 //	cout << "In cPlotTask::CombineCov()" << endl;
 	string err = "Starting requested Interference Prediction.";
 	cout << err<< endl;

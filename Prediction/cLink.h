@@ -182,7 +182,7 @@ namespace Qrap
 			tFixed			mRxInst;	///< Receiving Radio Installation
 			cAntennaPattern 	mTxAnt;		///< AntennaPattern of Transmitting Radio installation
 			cAntennaPattern 	mRxAnt;		///< AntennaPattern of Receiving Radio installation
-			int 			mLength;	///< Size of the arrays/profiles
+			int			mLength;	///< Size of the arrays/profiles
 			double 			mSlope;		///< Slope of LineOfSight
 			double 			mEffRadius;	///< Effective earth radius
 			double 			mMinClearance;	///< Minimum fresnel clearance

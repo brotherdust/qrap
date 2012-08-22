@@ -73,12 +73,12 @@ namespace Qrap
 			 */
 			bool SetRasterFileRules(short int Source);
 	
-			bool SetSampleMethod(int SampleMethod)
+			void SetSampleMethod(int SampleMethod)
 			{
 				mSampleMethod=SampleMethod;
 			}
 			
-			bool DirectChangeSetToUse(int OriginalSet);
+			void DirectChangeSetToUse(int OriginalSet);
 
 			unsigned GetClutterClassGroup();
 			

@@ -127,12 +127,14 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 	queryC += " and coefficients.cluttertype = standard.id ";
 	queryC += " and this.landcoverid = ";
 
-	queryU = "SELECT term, coefficient from coefficients ";
+	queryU = "Select distinct term, coefficient from (";
+	queryU += "SELECT term, coefficient from coefficients ";
 	queryU += " cross join cluttertype";
 	queryU += " where standardtype is NULL ";
-	queryU += " and coefficients.cluttertype = ";
+	queryU += " and cluttertype = ";
 	
-	query = "SELECT this.id, this.landcoverid as landcoverid, standard.height as height, standard.width as width";
+	query = "Select distinct id, landcoverid, height, width from (";
+	query += "SELECT this.id as id, this.landcoverid as landcoverid, standard.height as height, standard.width as width";
 	query += " FROM cluttertype as this CROSS JOIN cluttertype standard ";
 	query += " WHERE standard.id=this.standardtype ";
 	if (ClassGroup<9000)
@@ -150,6 +152,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 		gcvt(ClassGroup,9,temp);
 		query += temp; 
 	}
+	query += " ) as alles order by landcoverid;";
 					
 	if(!gDb.PerformRawSql(query))
 	{
@@ -196,10 +199,10 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 				gcvt(atoi(r[j]["id"].c_str()),9,idnr);
 				gcvt(landcoverid,9,type);
 				queryCC = queryU;
-				queryCC += type;
+				queryCC += idnr;
 				queryCC += queryC;
 				queryCC += type;
-				queryCC += " order by term;";
+				queryCC += ") as alles order by term;";
 				if(!gDb.PerformRawSql(queryCC))
 				{
 					string err = "Database Select for Clutter Coefficients failed. Query: ";
@@ -210,18 +213,24 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 				{
 					gDb.GetLastResult(CC);
 					
+//					cout << j << " " << landcoverid << endl;
 					if (CC.size()>0)
 					{
-						if (CC.size()==NUMTERMS)
+//						cout << queryCC << endl;
+//						cout << CC.size() << endl;
+//						if (CC.size()==NUMTERMS)
+//						{
+						for (jj=0; jj<CC.size(); jj++)
 						{
-							for (jj=0; jj<CC.size(); jj++)
-							{
-								CoefIndex = atoi(CC[jj]["term"].c_str());
-								if (CoefIndex<NUMTERMS)
-									mClutterTypes[landcoverid].sCoefficients[CoefIndex]
+							CoefIndex = atoi(CC[jj]["term"].c_str());
+							if (CoefIndex<NUMTERMS)
+								mClutterTypes[landcoverid].sCoefficients[CoefIndex]
 										=atof(CC[jj]["coefficient"].c_str());
-							}
+//							cout << "lid=" << landcoverid << "	c=" << CoefIndex << "	" 
+//								<< mClutterTypes[landcoverid].sCoefficients[CoefIndex] 
+//								<< endl;
 						}
+/*						}
 						else
 						{
 							for (jj=0; jj<NUMTERMS; jj++)
@@ -241,9 +250,11 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 								}
 							}
 						}
+*/
 					}
-					else
+					else if (landcoverid>0)
 					{
+//						cout << "Empty query: " << queryCC << endl;
 						for (jj=0; jj<NUMTERMS; jj++)
 						{
 							queryI = "INSERT INTO coefficients (term, cluttertype, coefficient) values (";
@@ -292,6 +303,14 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 		}
 	}
 	
+/*	query = "commit;";
+	if(!gDb.PerformRawSql(query))
+	{
+		string err = "Failing to commit in cClutter::GetFromDatabase. Query: ";
+		err += query;
+		QRAP_WARN(err.c_str());
+	}
+*/
 	mNumber = MaxLandCoverID+1;
 	delete [] type;
 	delete [] temp;
@@ -301,7 +320,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 
 //**************************************************************************************
 //* Delete the content of the class
-bool cClutter::Destroy()
+void cClutter::Destroy()
 {
 	unsigned i;
 	for (i=0; i<mNumber; i++)
@@ -357,6 +376,7 @@ bool cClutter::UpdateCoefficients(unsigned ClutterType)
 		query += term;
 		query += queryA;
 
+//		cout << query << endl;
 		if(!gDb.PerformRawSql(query))
 		{
 			string err = "Failure updating the coefficients. Query: ";

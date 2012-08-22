@@ -100,17 +100,17 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	string Result;
 	unsigned NumBytes;
 	unsigned i,k,l;
-	int DeviceKey;
+//	int DeviceKey;
 	char Temp[33];
 	int pp, ss, sign; 	//point position
 	float *TempAziAngles;
 	float *TempElevAngles;
 	float *TempAgterAngles;
 	float *TempAgterValues;
-	int *TempAgterRef;
-	int *TempRef_mAzi;
-	int *TempRef_mElev;
-	int I_swap;
+	unsigned *TempAgterRef;
+	unsigned *TempRef_mAzi;
+	unsigned *TempRef_mElev;
+	unsigned I_swap;
 	float A_swap, V_swap; 
 	float Value;
 	
@@ -135,7 +135,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 		gDb.GetLastResult(r);
 		if(r.size()!=0)
 		{
-			DeviceKey = atoi(r[0]["antdevicekey"].c_str());
+//			DeviceKey = atoi(r[0]["antdevicekey"].c_str());
 			mFreq = atof(r[0]["frequency"].c_str());
 			mGain = atof(r[0]["gain"].c_str());
 			mBeamW = atof(r[0]["azibeamwidth"].c_str());
@@ -304,7 +304,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	
 	// Prepare angular values for mask
 	TempAziAngles = new float[mNAA+3];
-	TempRef_mAzi = new int[mNAA+3];
+	TempRef_mAzi = new unsigned[mNAA+3];
 	for (k=0;k<mNAA+3;k++)
 	{
 		TempRef_mAzi[k]=9999;
@@ -383,10 +383,10 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	cout << endl;
 */
 	TempElevAngles = new float[mNEA+3];
-	TempRef_mElev = new int[mNEA+3];
+	TempRef_mElev = new unsigned[mNEA+3];
 	TempAgterAngles = new float[mNEA+3]; 
 	TempAgterValues = new float[mNEA+3];
-	TempAgterRef = new int[mNEA+3];
+	TempAgterRef = new unsigned[mNEA+3];
 	for (k=0;k<mNEA+3;k++)
 	{
 		TempRef_mElev[k]=9999;
@@ -675,6 +675,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 				}
 				else
 					tydelik = exp10(-mAntPattern[mRef180az][l]/10.0);
+		
 
 				if (l<mRef0el)
 				{
@@ -694,6 +695,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 				}
 				else
 					Value = exp10(-mAntPattern[k][mRef0el]/10.0); 
+				
 					
 				mAntPattern[k][l] = min(Value,tydelik);
 				mAntPattern[k][l]= -10.0*log10(mAntPattern[k][l]);

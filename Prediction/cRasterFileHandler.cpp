@@ -34,11 +34,10 @@ cRasterFileHandler::cRasterFileHandler()
 }
 
 //*********************************************************************
-bool cRasterFileHandler::DirectChangeSetToUse(int OriginalSet)
+void cRasterFileHandler::DirectChangeSetToUse(int OriginalSet)
 {
 	mFileSetOrder.clear();
 	mFileSetOrder.push_back(OriginalSet);
-	return true;
 }
 
 //*********************************************************************

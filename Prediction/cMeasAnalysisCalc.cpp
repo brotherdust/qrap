@@ -294,14 +294,16 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 {
 
 	mClutterFilter = Clutterfilter;
-	unsigned i=0, j=0, NumUsed = 0;
+	unsigned i=0, j=0, jj=0, NumUsed = 0;
 	unsigned MobileNum=0, FixedNum=0;
 	double Error=0, TotalError=0, TotalSError=0, TotalMeas=0;
 	double TotalPred=0, TotalSMeas=0, TotalSPred=0, TotalMeasPred=0;
 	unsigned currentInst=0;
 	unsigned currentMobile=0;
 	cAntennaPattern FixedAnt, MobileAnt;
-	
+	double *terms;
+	terms = new double[NUMTERMS];
+
 	unsigned Length;
 	cProfile Clutter;
 	cProfile DEM;
@@ -312,15 +314,16 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 
 	if ((Clutterfilter>0)&&(mUseClutter))
 	{
-		for(i=0; i<NUMTERMS; i++)
+		for(j=0; j<NUMTERMS; j++)
 		{
-			mMinTerm[i] =   MAXDOUBLE;
-			mMaxTerm[i] =   -(MAXDOUBLE/2);
-			mMidTerm[i] =   MAXDOUBLE;		
-			mLeftSide(i) = 0.0;
-			mDeltaCoeff(i) = 0.0;
-			for (j=0; j<NUMTERMS; j++)
-				mSolveCoefMatrix(i,j) = 0.0;
+			terms[j]=0;
+			mMinTerm[j] =   MAXDOUBLE;
+			mMaxTerm[j] =   -(MAXDOUBLE/2);
+			mMidTerm[j] =   MAXDOUBLE;		
+			mLeftSide(j) = 0.0;
+			mDeltaCoeff(j) = 0.0;
+			for (jj=0; jj<NUMTERMS; jj++)
+				mSolveCoefMatrix(j,jj) = 0.0;
 		}
 	}
 
@@ -379,82 +382,28 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					m_freq = mFixedInsts[FixedNum].sFrequency;
 					m_htx = mFixedInsts[FixedNum].sTxHeight;
 					Cheight = mPathLoss.mClutter.mClutterTypes[mMeasPoints[i].sClutter].sHeight;
+					
+					terms[3] = TERM3;
+					terms[4] = TERM4;
+					terms[5] = TERM5;
+					terms[6] = TERM6;
+					terms[7] = TERM7;
+					terms[8] = TERM8;
 
-					if (TERM3 < mMinTerm[3])
+					for (j=3; j<NUMTERMS; j++)
 					{
-						if ((mMidTerm[3]-TERM3) > (mMaxTerm[3]-mMidTerm[3]))
-							mMidTerm[3] = mMinTerm[3];
-						mMinTerm[3] = TERM3;
-					}
-					else if (TERM3 > mMaxTerm[3])
-					{
-						if ((mMidTerm[3]-TERM3) < (mMaxTerm[3]-mMidTerm[3]))
-							mMidTerm[3] = mMaxTerm[3];
-						mMaxTerm[3] = TERM3;
-					}
-
-					if (TERM4 < mMinTerm[4])
-					{
-						if ((mMidTerm[4]-TERM4) > (mMaxTerm[4]-mMidTerm[4]))
-							mMidTerm[4] = mMinTerm[4];
-						mMinTerm[4] = TERM4;
-					}
-					else if (TERM4 > mMaxTerm[4])
-					{
-						if ((mMidTerm[4]-TERM4) < (mMaxTerm[4]-mMidTerm[4]))
-							mMidTerm[4] = mMaxTerm[4];
-						mMaxTerm[4] = TERM4;
-					}
-					if (TERM5 < mMinTerm[5])
-					{
-						if ((mMidTerm[5]-TERM5) > (mMaxTerm[5]-mMidTerm[5]))
-							mMidTerm[5] = mMinTerm[5];
-						mMinTerm[5] = TERM5;
-					}
-					else if (TERM5 > mMaxTerm[5])
-					{
-						if ((mMidTerm[5]-TERM5) < (mMaxTerm[5]-mMidTerm[5]))
-							mMidTerm[5] = mMaxTerm[5];
-						mMaxTerm[5] = TERM5;
-					}
-
-					if (TERM6 < mMinTerm[6])
-					{
-						if ((mMidTerm[6]-TERM6) > (mMaxTerm[6]-mMidTerm[6]))
-							mMidTerm[6] = mMinTerm[6];
-						mMinTerm[6] = TERM6;
-					}
-					else if (TERM6 > mMaxTerm[6])
-					{
-						if ((mMidTerm[6]-TERM6) < (mMaxTerm[6]-mMidTerm[6]))
-							mMidTerm[6] = mMaxTerm[6];
-						mMaxTerm[6] = TERM6;
-					}
-
-					if (TERM7 < mMinTerm[7])
-					{
-						if ((mMidTerm[7]-TERM7) > (mMaxTerm[7]-mMidTerm[7]))
-							mMidTerm[7] = mMinTerm[7];
-						mMinTerm[7] = TERM7;
-					}
-					else if (TERM7 > mMaxTerm[7])
-					{
-						if ((mMidTerm[7]-TERM7) < (mMaxTerm[7]-mMidTerm[7]))
-							mMidTerm[7] = mMaxTerm[7];
-						mMaxTerm[7] = TERM7;
-					}
-
-					if (TERM8 < mMinTerm[8])
-					{
-						if ((mMidTerm[8]-TERM8) > (mMaxTerm[8]-mMidTerm[8]))
-							mMidTerm[8] = mMinTerm[8];
-						mMinTerm[8] = TERM8;
-					}
-					else if (TERM8 > mMaxTerm[8])
-					{
-						if ((mMidTerm[8]-TERM8) < (mMaxTerm[8]-mMidTerm[8]))
-							mMidTerm[8] = mMaxTerm[8];
-						mMaxTerm[8] = TERM8;
+						if (terms[j] < mMinTerm[j])
+						{
+							if ((mMidTerm[j]-terms[j]) > (mMaxTerm[j]-mMidTerm[j]))
+								mMidTerm[j] = mMinTerm[j];
+							mMinTerm[j] = terms[j];
+						}
+						else if (terms[j] > mMaxTerm[j])
+						{
+							if ((mMidTerm[j]-terms[j]) < (mMaxTerm[j]-mMidTerm[j]))
+								mMidTerm[j] = mMaxTerm[j];
+							mMaxTerm[j] = terms[j];
+						}
 					}
 				}
 			}
@@ -469,7 +418,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 //				cout << "Meas " << i << " of " <<  mNumMeas;
 				if (mUseClutter)
 				{
-					Clutter=mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);
+					Clutter = mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);
 					mMeasPoints[i].sClutter = (int)Clutter.GetLastValue();
 				}
 				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter);
@@ -481,8 +430,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 
 				Error = - mMeasPoints[i].sMeasValue + mMeasPoints[i].sPredValue;
 				TotalError += Error;  
-				TotalSError += (mMeasPoints[i].sMeasValue - mMeasPoints[i].sPredValue)*
-							(mMeasPoints[i].sMeasValue - mMeasPoints[i].sPredValue);
+				TotalSError += Error*Error;
 				TotalMeas += mMeasPoints[i].sMeasValue; 
 				TotalSMeas += mMeasPoints[i].sMeasValue*mMeasPoints[i].sMeasValue, 
 				TotalPred += mMeasPoints[i].sPredValue;
@@ -493,134 +441,37 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 //				cout << "	d = " << mLinkLength << endl;
 				if ((Clutterfilter > 0)&&(mUseClutter))
 				{
-					if (TERM1 < mMinTerm[1])
-					{
-						if ((mMidTerm[1]-TERM1) > (mMaxTerm[1]-mMidTerm[1]))
-							mMidTerm[1] = mMinTerm[1];
-						mMinTerm[1] = TERM1;
-					}
-					else if (TERM1 > mMaxTerm[1])
-					{
-						if ((mMidTerm[1]-TERM1) < (mMaxTerm[1]-mMidTerm[1]))
-							mMidTerm[1] = mMaxTerm[1];
-						mMaxTerm[1] = TERM1;
-					}
+					terms[0] = TERM0;
+					terms[1] = TERM1;
+					terms[2] = TERM2;
 
-					if (TERM2 < mMinTerm[2])
+					for (j=0; j<3; j++)
 					{
-						if ((mMidTerm[2]-TERM2) > (mMaxTerm[2]-mMidTerm[2]))
-							mMidTerm[2] = mMinTerm[2];
-						mMinTerm[2] = TERM2;
-					}
-					else if (TERM2 > mMaxTerm[2])
-					{
-						if ((mMidTerm[2]-TERM2) < (mMaxTerm[2]-mMidTerm[2]))
-							mMidTerm[2] = mMaxTerm[2];
-						mMaxTerm[2] = TERM2;
+						if (terms[j] < mMinTerm[j])
+						{
+							if ((mMidTerm[j]-terms[j]) > (mMaxTerm[j]-mMidTerm[j]))
+								mMidTerm[j] = mMinTerm[j];
+							mMinTerm[j] = terms[j];
+						}
+						else if (terms[j] > mMaxTerm[j])
+						{
+							if ((mMidTerm[j]-terms[j]) < (mMaxTerm[j]-mMidTerm[j]))
+								mMidTerm[j] = mMaxTerm[j];
+							mMaxTerm[j] = terms[j];
+						}
 					}
 
-					mLeftSide(0) += Error;
-					mSolveCoefMatrix(0,0)++;
-					mSolveCoefMatrix(0,1)+=TERM1;
-					mSolveCoefMatrix(1,0)+=TERM1;
-					mSolveCoefMatrix(0,2)+=TERM2;
-					mSolveCoefMatrix(2,0)+=TERM2;
-					mSolveCoefMatrix(0,3)+=TERM3;
-					mSolveCoefMatrix(3,0)+=TERM3;
-					mSolveCoefMatrix(0,4)+=TERM4;
-					mSolveCoefMatrix(4,0)+=TERM4;
-					mSolveCoefMatrix(0,5)+=TERM5;
-					mSolveCoefMatrix(5,0)+=TERM5;
-					mSolveCoefMatrix(0,6)+=TERM6;
-					mSolveCoefMatrix(6,0)+=TERM6;
-					mSolveCoefMatrix(0,7)+=TERM7;
-					mSolveCoefMatrix(7,0)+=TERM7;
-					mSolveCoefMatrix(0,8)+=TERM8;
-					mSolveCoefMatrix(8,0)+=TERM8;
-
-					mLeftSide(1) += Error*TERM1;
-					mSolveCoefMatrix(1,1)+=TERM1*TERM1;
-					mSolveCoefMatrix(1,2)+=TERM1*TERM2;
-					mSolveCoefMatrix(2,1)+=TERM1*TERM2;
-					mSolveCoefMatrix(1,3)+=TERM1*TERM3;
-					mSolveCoefMatrix(3,1)+=TERM1*TERM3;
-					mSolveCoefMatrix(1,4)+=TERM1*TERM4;
-					mSolveCoefMatrix(4,1)+=TERM1*TERM4;
-					mSolveCoefMatrix(1,5)+=TERM1*TERM5;
-					mSolveCoefMatrix(5,1)+=TERM1*TERM5;
-					mSolveCoefMatrix(1,6)+=TERM1*TERM6;
-					mSolveCoefMatrix(6,1)+=TERM1*TERM6;
-					mSolveCoefMatrix(1,7)+=TERM1*TERM7;
-					mSolveCoefMatrix(7,1)+=TERM1*TERM7;
-					mSolveCoefMatrix(1,8)+=TERM1*TERM8;
-					mSolveCoefMatrix(8,1)+=TERM1*TERM8;
-
-					mLeftSide(2) += Error*TERM2;
-					mSolveCoefMatrix(2,2)+=TERM2*TERM2;
-					mSolveCoefMatrix(2,3)+=TERM2*TERM3;
-					mSolveCoefMatrix(3,2)+=TERM2*TERM3;
-					mSolveCoefMatrix(2,4)+=TERM2*TERM4;
-					mSolveCoefMatrix(4,2)+=TERM2*TERM4;
-					mSolveCoefMatrix(2,5)+=TERM2*TERM5;
-					mSolveCoefMatrix(5,2)+=TERM2*TERM5;
-					mSolveCoefMatrix(2,6)+=TERM2*TERM6;
-					mSolveCoefMatrix(6,2)+=TERM2*TERM6;
-					mSolveCoefMatrix(2,7)+=TERM2*TERM7;
-					mSolveCoefMatrix(7,2)+=TERM2*TERM7;
-					mSolveCoefMatrix(2,8)+=TERM2*TERM8;
-					mSolveCoefMatrix(8,2)+=TERM2*TERM8;
-
-					mLeftSide(3) += Error*TERM3;
-					mSolveCoefMatrix(3,3)+=TERM3*TERM3;
-					mSolveCoefMatrix(3,4)+=TERM3*TERM4;
-					mSolveCoefMatrix(4,3)+=TERM3*TERM4;
-					mSolveCoefMatrix(3,5)+=TERM3*TERM5;
-					mSolveCoefMatrix(5,3)+=TERM3*TERM5;
-					mSolveCoefMatrix(3,6)+=TERM3*TERM6;
-					mSolveCoefMatrix(6,3)+=TERM3*TERM6;
-					mSolveCoefMatrix(3,7)+=TERM3*TERM7;
-					mSolveCoefMatrix(7,3)+=TERM3*TERM7;
-					mSolveCoefMatrix(3,8)+=TERM3*TERM8;
-					mSolveCoefMatrix(8,3)+=TERM3*TERM8;
-
-					mLeftSide(4) += Error*TERM4;
-					mSolveCoefMatrix(4,4)+=TERM4*TERM4;
-					mSolveCoefMatrix(4,5)+=TERM4*TERM5;
-					mSolveCoefMatrix(5,4)+=TERM4*TERM5;
-					mSolveCoefMatrix(4,6)+=TERM4*TERM6;
-					mSolveCoefMatrix(6,4)+=TERM4*TERM6;
-					mSolveCoefMatrix(4,7)+=TERM4*TERM7;
-					mSolveCoefMatrix(7,4)+=TERM4*TERM7;
-					mSolveCoefMatrix(4,8)+=TERM4*TERM8;
-					mSolveCoefMatrix(8,4)+=TERM4*TERM8;
-
-					mLeftSide(5) += Error*TERM5;
-					mSolveCoefMatrix(5,5)+=TERM5*TERM5;
-					mSolveCoefMatrix(5,6)+=TERM5*TERM6;
-					mSolveCoefMatrix(6,5)+=TERM5*TERM6;
-					mSolveCoefMatrix(5,7)+=TERM5*TERM7;
-					mSolveCoefMatrix(7,5)+=TERM5*TERM7;
-					mSolveCoefMatrix(5,8)+=TERM5*TERM8;
-					mSolveCoefMatrix(8,5)+=TERM5*TERM8;
-
-					mLeftSide(6) += Error*TERM6;
-					mSolveCoefMatrix(6,6)+=TERM6*TERM6;
-					mSolveCoefMatrix(6,7)+=TERM6*TERM7;
-					mSolveCoefMatrix(7,6)+=TERM6*TERM7;
-					mSolveCoefMatrix(6,8)+=TERM6*TERM8;
-					mSolveCoefMatrix(8,6)+=TERM6*TERM8;
-
-					mLeftSide(7) += Error*TERM7;
-					mSolveCoefMatrix(7,7)+=TERM7*TERM7;
-					mSolveCoefMatrix(7,8)+=TERM7*TERM8;
-					mSolveCoefMatrix(8,7)+=TERM7*TERM8;
-					
-					mLeftSide(8) += Error*TERM8;
-					mSolveCoefMatrix(8,8)+=TERM8*TERM8;
+					for (j=0; j<NUMTERMS; j++)
+					{
+						mLeftSide(j) += Error*terms[j];
+						for (jj=j; jj<NUMTERMS; jj++)
+						{
+							mSolveCoefMatrix(j,jj) = terms[j]*terms[jj];
+							mSolveCoefMatrix(jj,j) = terms[j]*terms[jj];
+						}
+					}
 					
 				}
-				
-
 			}
 			else NumUsed--;
 
@@ -635,6 +486,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	double TempPred = sqrt(NumUsed*TotalSPred-TotalPred*TotalPred);
 	CorrC = (NumUsed*TotalMeasPred - TotalMeas*TotalPred) / (TempMeas*TempPred);
 
+	delete [] terms;
 	return NumUsed;
 }
 
@@ -730,82 +582,98 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 			<< "	MeanSquare: " << MeanSquareError << "	StDev: " << StDev
 			<< "	CorrC: " << CorrC << endl;
 
-//		for (i=0; i<3; i++)
-//			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i]=true;
-
-		for (i=0; i<NUMTERMS; i++)
+		// Only optimise if enough points are involved
+		if (NumUsed > 100)
 		{
-			cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
-				<< "	Min=" << mMinTerm[i] << endl;
-			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
-						= ((mMaxTerm[i]-mMinTerm[i]) > 0.06*fabs(mMidTerm[i]));
-		}
+//			for (i=0; i<2; i++)
+//				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i]=true;
 
-		for (i=5; i<7; i++) 
-			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
+			for (i=0; i<NUMTERMS; i++)
+			{
+				cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
+					<< "	Min=" << mMinTerm[i] << endl;
+				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
+							= ((mMaxTerm[i]-mMinTerm[i]) > 0.06*fabs(mMidTerm[i]));
+			}
+
+			for (i=5; i<7; i++) 
+				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
 					= ((mMaxTerm[i] - mMidTerm[i]) > 0.03*fabs(mMidTerm[i]))
 					&& ((mMidTerm[i] - mMinTerm[i]) > 0.03*fabs(mMidTerm[i]));
 		
-		Size = 0;
-		for (i=0; i<NUMTERMS; i++)
-			if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
-				Size++;
-
-		if (Size > 0)
-		{
-			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[0]=true;
-			Size++;
-//			cout << "cMeasAnalysisCalc::OptimiseModel. Voor resizing van die plaaslike veranderlikes. Size = " << Size << endl; 
-			SolveCoefMatrix.resize(Size,Size);	//Declare local matrixes of reduced size
-			LeftSide.resize(Size,1);
-
-//			cout << mSolveCoefMatrix << endl << endl;
-//			cout << mLeftSide << endl;
-//			cout << "cMeasAnalysisCalc::OptimiseModel. Voor lus. Size = " << Size << endl; 
-			Index =0;
+			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[2] = 
+				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[2] &&
+				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[7];
+	
+			Size = 0;
 			for (i=0; i<NUMTERMS; i++)
-			{
 				if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
-				{
-					LeftSide(Index,0) = mLeftSide(i);
-					mDeltaCoeff(Index) = i;
-					Index2=0;	
-					for(j=0; j<NUMTERMS; j++)
-					{
-						if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[j])
-						{
-							SolveCoefMatrix(Index,Index2) = mSolveCoefMatrix(i,j);
-							SolveCoefMatrix(Index2,Index) = mSolveCoefMatrix(j,i);
-							Index2++;
-						}
-					}
-					Index++;
-				}
-			}
-
-
-			cout << "cMeasAnalysisCalc::OptimiseModel. Voor oplossing. Size = " << Size << endl; 
-//			cout << SolveCoefMatrix << endl << endl;
-//			cout << LeftSide << endl << endl;
-
-			DeltaCoeff = SolveCoefMatrix.fullPivLu().solve(LeftSide);
-
-			cout << DeltaCoeff << endl;
-		
-			cout << "cMeasAnalysisCalc::OptimiseModel. Voor terugskryf lus. Size = " << Size << endl;
-			for (i=0; i<Size; i++)
+					Size++;
+	
+			if (Size > 0)
 			{
-				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] += DeltaCoeff(i);
-				cout << (int)mDeltaCoeff(i) << "	" 
-					<< mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] << endl;
+				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[0]=true;
+				Size++;
+//				cout << "cMeasAnalysisCalc::OptimiseModel. " 
+//					<< "Voor resizing van die plaaslike veranderlikes. Size = " << Size << endl; 
+
+				SolveCoefMatrix.resize(Size,Size);	//Declare local matrixes of reduced size
+				LeftSide.resize(Size,1);
+
+//				cout << mSolveCoefMatrix << endl << endl;
+//				cout << mLeftSide << endl;
+//				cout << "cMeasAnalysisCalc::OptimiseModel. Voor lus. Size = " << Size << endl; 
+				Index =0;
+				for (i=0; i<NUMTERMS; i++)
+				{
+					if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
+					{
+						LeftSide(Index,0) = mLeftSide(i);
+						mDeltaCoeff(Index) = i;
+						Index2=0;	
+						for(j=0; j<NUMTERMS; j++)
+						{
+							if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[j])
+							{
+								SolveCoefMatrix(Index,Index2) = mSolveCoefMatrix(i,j);
+								SolveCoefMatrix(Index2,Index) = mSolveCoefMatrix(j,i);
+								Index2++;
+							}
+						}
+						Index++;
+					}
+				}
+	
+
+				cout << "cMeasAnalysisCalc::OptimiseModel. Voor oplossing. Size = " << Size << endl; 
+//				cout << SolveCoefMatrix << endl << endl;
+//				cout << LeftSide << endl << endl;
+
+				DeltaCoeff = SolveCoefMatrix.fullPivLu().solve(LeftSide);
+
+				cout << DeltaCoeff << endl;
+		
+				cout << "cMeasAnalysisCalc::OptimiseModel. Voor terugskryf lus. Size = " << Size << endl;
+				for (i=0; i<Size; i++)
+				{
+					mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] += DeltaCoeff(i);
+					cout << (int)mDeltaCoeff(i) << "	" 
+						<< mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] 
+						<< endl;
+				}
+
+				cout << "for NUMTERMS" << endl;
+				for(i=0;i<NUMTERMS; i++)
+					cout << i<< "	" << mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[i] << endl;
+
 			}
-
-			cout << "for NUMTERMS" << endl;
-			for(i=0;i<NUMTERMS; i++)
-				cout << i<< "	" << mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[i] << endl;
-
+			else
+			{
+				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[0] += Mean;
+			}
 			if (!mPathLoss.mClutter.UpdateCoefficients(mClutterFilter))
 				cout << "Updating clutter Coefficients failed" << endl;
+
 		}
 	}
 

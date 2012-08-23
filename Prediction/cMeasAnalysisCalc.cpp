@@ -136,7 +136,7 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 		gcvt(CI,9,text);
 		query += text;
 	}
-	query+=" order by mobile, ci asc, id asc;";
+	query+=" order by mobile, ci desc, id desc;";
 
 	string PointString;
 	double longitude, latitude; 
@@ -426,9 +426,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				{
 					cout << "Meas " << i << " of " <<  mNumMeas << " ID=" << mMeasPoints[i].sID << "	";
 					cout << mMeasPoints[i].sPathLoss << " P " << tPathLoss <<"	";
-					mMeasPoints[i].sPoint.Display();
+//					mMeasPoints[i].sPoint.Display();
+//					DEM.Display();
 				}
-*/				mMeasPoints[i].sAzimuth = mFixedInsts[FixedNum].sSitePos.Bearing(mMeasPoints[i].sPoint);
+*/
+				mMeasPoints[i].sAzimuth = mFixedInsts[FixedNum].sSitePos.Bearing(mMeasPoints[i].sPoint);
 				AntValue = FixedAnt.GetPatternValue(mMeasPoints[i].sAzimuth, mMeasPoints[i].sTilt)
 						+ MobileAnt.GetPatternValue(0, -mMeasPoints[i].sTilt);
 				mMeasPoints[i].sPredValue = -mMeasPoints[i].sPathLoss + EIRP - AntValue;

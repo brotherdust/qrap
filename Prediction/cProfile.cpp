@@ -174,12 +174,11 @@ void cProfile::Display()
 {
    #ifndef NO_DEBUG
    int i;
-
-   cout << "Profile: ";
+   cout << " m_size=" << m_size;
+   cout << " iPD=" << m_interPixelDist;
+   cout << "	Profile: ";
    for (i=0; i<m_size; i++)
-   {
 	cout << m_profile[i] << " ";
-   }
    cout << endl;
    #endif
    return;

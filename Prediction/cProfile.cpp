@@ -83,10 +83,7 @@ cProfile::cProfile(int size, float *&profile, double interPixDist)
   	m_interPixelDist = interPixDist;
   	m_profile = new float[m_size];
   	for (i=0; i<m_size; i++)
-  	{
-  		if (profile[i] <-5000.0) m_profile[i]=0.0;
-      		else m_profile[i] = profile[i];
-  }
+  		m_profile[i] = profile[i];
 }/* CProfile Constructor */
 
 //*************************************************************************

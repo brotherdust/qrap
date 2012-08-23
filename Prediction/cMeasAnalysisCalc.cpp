@@ -69,7 +69,10 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 	{
 		mPlotResolution = atof(setting.c_str());
 	}
-	else mPlotResolution = 90;
+	else mPlotResolution = 30;
+
+	mPlotResolution = 30;
+
 	setting = gDb.GetSetting("UseClutter");
 	if (setting=="true")
 		mUseClutter = true;
@@ -133,7 +136,7 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 		gcvt(CI,9,text);
 		query += text;
 	}
-	query+=" order by mobile, ci;";
+	query+=" order by mobile, ci asc, id asc;";
 
 	string PointString;
 	double longitude, latitude; 
@@ -275,8 +278,7 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 							tempInst.sRxHeight = atof(rFixed[0]["rxantennaheight"].c_str());
 
 							mFixedInsts.push_back(tempInst);
-						} // if the query was not empty
-							
+						} // if the query was not empty	
 					}// else ... hence the query was successful
 				}// else ... hence new installation that must be loaded.
 			}//for all measurements
@@ -307,6 +309,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	cProfile Clutter;
 	cProfile DEM;
 	double AntValue=0, EIRP=0;
+	double tPathLoss =0;
 
 	//These varaibles are local and are such that they can be used with the TERMs defined in cClutter.h
 	double mLinkLength, m_freq, m_htx, Cheight;
@@ -356,15 +359,12 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					FixedNum++;
 
 				cout << "mClutterFilter = " << mClutterFilter << "	currentInst = " << currentInst 
+					<< "	FixedInst=" << mFixedInsts[FixedNum].sInstKey
 					<< "	which is " << FixedNum << "	of " << mFixedInsts.size() << endl;
 		
 				if (FixedNum == mFixedInsts.size())
 				{
-/*					FixedNum = 0;
-					while ((mFixedInsts[FixedNum].sInstKey!=currentInst)&&(FixedNum < mFixedInsts.size()))
-						FixedNum++;
-					if (FixedNum == mFixedInsts.size())
-*/					cout << "FixedNum reached limit ... ending measurement analysis" <<endl;			
+					cout << "FixedNum reached limit ... ending measurement analysis" <<endl;			
 					return 0;
 				}
 				FixedAnt.SetAntennaPattern(mFixedInsts[FixedNum].sTxPatternKey, 
@@ -407,21 +407,28 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				}
 			}
 			
-
 			DEM = mDEM.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);
 			mMeasPoints[i].sDistance = mFixedInsts[FixedNum].sSitePos.Distance(mMeasPoints[i].sPoint)/1000.0;
 			Length = DEM.GetSize();
-	
+
 			if (Length > 2)
 			{
-//				cout << "Meas " << i << " of " <<  mNumMeas;
+//				cout << mMeasPoints[i].sClutter << " C ";
 				if (mUseClutter)
 				{
 					Clutter = mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);
 					mMeasPoints[i].sClutter = (int)Clutter.GetLastValue();
 				}
+//				cout << mMeasPoints[i].sClutter << "	";
+				tPathLoss = mMeasPoints[i].sPathLoss;
 				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter);
-				mMeasPoints[i].sAzimuth = mFixedInsts[FixedNum].sSitePos.Bearing(mMeasPoints[i].sPoint);
+/*				if (fabs(tPathLoss - mMeasPoints[i].sPathLoss) > 5.5)
+				{
+					cout << "Meas " << i << " of " <<  mNumMeas << " ID=" << mMeasPoints[i].sID << "	";
+					cout << mMeasPoints[i].sPathLoss << " P " << tPathLoss <<"	";
+					mMeasPoints[i].sPoint.Display();
+				}
+*/				mMeasPoints[i].sAzimuth = mFixedInsts[FixedNum].sSitePos.Bearing(mMeasPoints[i].sPoint);
 				AntValue = FixedAnt.GetPatternValue(mMeasPoints[i].sAzimuth, mMeasPoints[i].sTilt)
 						+ MobileAnt.GetPatternValue(0, -mMeasPoints[i].sTilt);
 				mMeasPoints[i].sPredValue = -mMeasPoints[i].sPathLoss + EIRP - AntValue;
@@ -589,7 +596,7 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 			<< "	CorrC: " << CorrC << endl;
 
 		// Only optimise if enough points are involved
-		if (NumUsed > 100)
+		if (NumUsed > 9)
 		{
 			
 			for (i=0; i<NUMTERMS; i++)

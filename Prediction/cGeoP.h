@@ -157,7 +157,7 @@ namespace Qrap
 			 *
 			 * @return A double
 			 */
-			double Distance (const cGeoP &right);
+			double Distance (const cGeoP right);
 			
 			/**
 			 * Description of Bearing
@@ -166,7 +166,7 @@ namespace Qrap
 			 *
 			 * @return A double
 			 */
-			double Bearing (const cGeoP &right);
+			double Bearing (const cGeoP right);
 			
 			/**
 			 * Description of FromHere

@@ -257,6 +257,10 @@ namespace Qrap
 									bool South, 
 									projPJ &Proj);
 			FileType mFileType;
+			double 		mMapLat;
+			double		mMapLon;
+			int		mMapCM;
+			GeoType		mMapType;
 	};
 }
 #endif

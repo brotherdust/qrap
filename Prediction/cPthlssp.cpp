@@ -54,7 +54,7 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 
 	m_tempIPD = 90;
 	m_slope = 0;
-	m_counter=0;
+//	m_counter=0;
 	m_SmoothWidth=1;
 	m_SeekWidth=2;
 	mUseClutter = UseClutter;
@@ -200,10 +200,14 @@ int cPathLossPredictor::setParameters(double k, double f,
 //	cout << " Entering setParameters" << endl;
 #endif
 	m_kFactor = k;
+//	cout << " k=" << m_kFactor;
 	m_freq = f;
+//	cout << " f=" << m_freq;
 	m_htx = TxHeight;
+//	cout << " hTx=" << TxHeight;
 	m_hrx = RxHeight;
-	m_counter=0;
+//	cout << " hRx=" << RxHeight << endl;
+//	m_counter=0;
 
         m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/80+1);
         m_SmoothWidth = (int)(m_c/m_freq/m_interPixelDist/18000);
@@ -248,6 +252,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	double MinClearance=DBL_MAX;
 	double OldMinClear=DBL_MAX;
 	float ElevAngleRX=0.0;
+	ElevAngleTX=0.0;
 	double KnifeEdge=0.0;
 	double RoundHill=0.0;
 	double ReffHeight=0.0;
@@ -258,7 +263,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	int OldPeakIndex = 0;
 	int IfTooManyPeaks = 0;
 	int i;
-	m_counter=0;
+//	m_counter=0;
 
 //	InputProfile.Display();
 	mLinkLength = CalcDist(InputProfile);
@@ -336,7 +341,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	
 	if (mUseClutter)
 	{
-//		cout <<mClutterProfile[m_size-1] <<"."; 
+//		cout << mClutterProfile[m_size-1] <<"."; 
 		double Cheight = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sHeight;
 //		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
 		mCterms[1] = TERM1;
@@ -387,7 +392,6 @@ return Length;
 inline double cPathLossPredictor::CalcFreeSpaceLoss(const double pathLength)
 {
 	double FreeLoss;
-//	cout << "  F: " << m_freq;
 	if (pathLength >0)
 		FreeLoss = 32.44778 + 20.0*log10(m_freq)
 						+ 20.0*log10(pathLength/1000.0);
@@ -612,13 +616,13 @@ int cPathLossPredictor::FindMainPeak(const int BeginMarkerIndex,
 	int i;
 	int begin, end;
 	double sqrtd1d2;
-	double temp;
+	double rootLambda;
 	double Clear;		// Clearance
 	MinClear=DBL_MAX;
 
 	begin = m_markers[BeginMarkerIndex];
 	end = m_markers[EndMarkerIndex];
-	temp = sqrt(m_c/(1000000.0*m_freq));
+	rootLambda = sqrt(m_c/(1000000.0*m_freq));
 	if ((begin+m_peakwidth[BeginMarkerIndex])<=(end-m_peakwidth[EndMarkerIndex]))
 	{
 		for (i=max(0,begin+m_peakwidth[BeginMarkerIndex]);
@@ -626,7 +630,7 @@ int cPathLossPredictor::FindMainPeak(const int BeginMarkerIndex,
 		{
 			sqrtd1d2 = sqrt((double)((i-begin)*(end-i))*m_tempIPD
 						/ (double)(end-begin));
-			Clear = (ReffHeight-(double)m_TempProfile[i])/(temp*sqrtd1d2);
+			Clear = (ReffHeight-(double)m_TempProfile[i])/(rootLambda*sqrtd1d2);
 			if (Clear<MinClear)
 			{
 				MinClear = Clear;

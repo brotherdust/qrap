@@ -161,8 +161,8 @@ cProfile cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes
 	bool AllFound=false;
 	unsigned j,k,Current;
 	float *profile;
-	TxLoc.SetGeoType(DEG);
-	RxLoc.SetGeoType(DEG);
+//	TxLoc.SetGeoType(DEG);
+//	RxLoc.SetGeoType(DEG);
 	TxLoc.SetGeoType(WGS84GC);
 	RxLoc.SetGeoType(WGS84GC);
 	Distance = TxLoc.Distance(RxLoc);
@@ -212,14 +212,14 @@ cProfile cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes
 	{
 		Current = k;
 		profile[0] = mCurrentRasters[Current]->GetValue(TxLoc,mSampleMethod);
-		mCurrentRasters[Current]->mUsed=true;
+		mCurrentRasters[Current]->mUsed = true;
 	}
 	else
 	{
+		Current = 0;
 		profile[0]=0;
 		AllFound = false;
 	}
-	mCurrentRasters[Current]->mUsed = true;
 	
 	for(j=1; j<NumPoints; j++)
 	{
@@ -264,8 +264,9 @@ cProfile cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes
 				profile[j]=0;
 				AllFound = false;
 			}
-			if (profile[j]==OUTOFRASTER) 
+			if ((profile[j] <-440.0)||(profile[j] >8880)||(profile[j]==OUTOFRASTER))
 				profile[j]=0;
+	
 		}
 		else mCurrentRasters[Current]->mUsed = true;
 	}
@@ -369,7 +370,7 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 	if ((Data[0][0]<-440.0)||(Data[0][0]>8880.0)) 
 		Data[0][0] = 0;
 	// At distance zero the values at all angles will be the same
-	// Strictly speaking if the distance is zero the angle is not defines ;-) 
+	// Strictly speaking if the distance is zero the angle is not defined ;-) 
 	for (i=1;i<NumAngles;i++)
 		Data[i][0]=Data[0][0];
 	LoadedRastersList="'";
@@ -677,7 +678,6 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 			{
 				RasterFound = true;
 				FileName = r[j]["filename"].c_str();
-				cout << FileName <<  endl;
 				Directory = r[j]["location"].c_str();
 				Type = r[j]["fileformat"].c_str();
 				if (Type=="BINFILE") 		filetype=BINFILE;
@@ -692,7 +692,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 				else if (projection=="WGS84GC") GeoProj=WGS84GC;
 				else if (projection=="UTM")	GeoProj=UTM;
 				else GeoProj=NDEF;
-				cout << FileName <<  endl;
+//				cout << FileName <<  endl;
 				cRaster* New = new cRaster(Directory, FileName, filetype, GeoProj,proj4string, centmer);
 				New->mUsed=true;
 				mCurrentRasters.push_back(New);

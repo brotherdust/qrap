@@ -288,7 +288,7 @@ namespace Qrap
 			int *m_markers;			///< Indexes of markers
 			int *m_peakwidth;		///< number of pixel from peak not to seek the next peak.
 			double *m_aboveEarth;		///< array to store the mast heights and the height of the line of sigth above the earth at each marker.
-			int m_counter;			///< for debuging purpses
+//			int m_counter;			///< for debuging purpses
 			int m_SmoothWidth;		///< Used to Smooth the profile when calculating the radii of the peaks
 			int m_SeekWidth;		///< Use to seek the inflection points when calculating the peak radii
 			bool mUseClutter;		///< indicates whether clutter dependancies should be included. 

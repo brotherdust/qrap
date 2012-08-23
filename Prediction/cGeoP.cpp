@@ -231,7 +231,7 @@ bool cGeoP::SetGeoType(GeoType type, int central)
 {
 	if (mType==type)
 	{
-		if (mType==DEG) 			return true;
+		if (mType==DEG) return true;
 		else if (mCentMer==central) return true;
 	}
 	switch (mType)
@@ -266,7 +266,7 @@ bool cGeoP::SetGeoType(GeoType type, int central)
 			switch (type)
 			{
 				case DEG:			return UTMtoDEG();
-				case WGS84GC:		return UTMtoWGS84GC(central);
+				case WGS84GC:			return UTMtoWGS84GC(central);
 				case UTM:			return UTMtoUTM(central);
 				case NDEF:
 				{
@@ -281,7 +281,7 @@ bool cGeoP::SetGeoType(GeoType type, int central)
 			switch (type)
 			{
 				case DEG: 			return true;
-				case WGS84GC: 		return DEGtoWGS84GC(central);
+				case WGS84GC: 			return DEGtoWGS84GC(central);
 				case UTM:			return DEGtoUTM(central);
 				case NDEF:
 				{
@@ -322,7 +322,7 @@ void cGeoP::Display()
 }
 
 //************************************************************************
-double cGeoP::Distance(const cGeoP &right)
+double cGeoP::Distance(const cGeoP right)
 {
 	double s=0.0;
 	cGeoP tempR(right);
@@ -419,7 +419,7 @@ double cGeoP::Distance(const cGeoP &right)
 // Formula: θ = atan2(sin(Δlong).cos(lat2), cos(lat1).sin(lat2) − sin(lat1).cos(lat2).cos(Δlong))
 // Answer in degrees
 //
-double cGeoP::Bearing(const cGeoP &right)
+double cGeoP::Bearing(const cGeoP right)
 {
 	double bearing;
 	cGeoP tempR(right);

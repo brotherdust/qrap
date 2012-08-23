@@ -72,8 +72,19 @@ cRaster::cRaster(string Directory,
 	mRaster = new_Float2DArray(mRows,mCols);	
 	ReadFile(Directory, FileName,filetype,mProjType,
 							Proj4String,CentMer,mSouth,
-							mMin,mMax); 
-	cout << "Constructer Raster" << endl;
+							mMin,mMax);
+	if (mSouth)
+	{
+		mNW.SetGeoType(mProjType,mCentMer);
+		mNW.Get(mMapLat,mMapLon,mMapType,mMapCM,Hem);
+	}
+	else
+	{
+		mNW.SetGeoType(mProjType,mCentMer);
+		mNW.Get(mMapLat,mMapLon,mMapType,mMapCM,Hem);
+	}
+	cout << endl;
+	cout << "Constructer Raster: " << mFilename << endl;
 	cout << "mSouth = ";
 	if (mSouth) cout << " true" << endl;
 	else cout << " false" << endl;
@@ -172,7 +183,7 @@ bool cRaster::WriteFile(Float2DArray &Raster,
 		string TypeString;
 		switch (filetype)
 		{
-//			case GEOTIFF:		TypeString = "GTiff";		break;
+			case GEOTIFF:		TypeString = "GTiff";		break;
 			case VRT:		TypeString = "VRT";		break;
 			case NITF:		TypeString = "NITF";		break;
 			case HFA:		TypeString = "HFA";		break;
@@ -251,7 +262,7 @@ bool cRaster::ReadFile(string Directory,
 
 	if (filetype == BINFILE) // binary file
 	{
-		cout << "In bool cRaster::ReadFile( ... filetype == BINFILE " << endl;
+		cout << endl << "In bool cRaster::ReadFile( ... filetype == BINFILE " << endl;
 		cBIN MyRaster;
 		msgs = MyRaster.openFile(mRaster, Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer);
@@ -259,7 +270,7 @@ bool cRaster::ReadFile(string Directory,
 	}
 	else if (filetype == GDALFILE) // GDAL file 
 	{
-		cout << "In bool cRaster::ReadFile( ... filetype == GDALFILE " << endl;
+		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE " << endl;
 		cGDAL MyRaster;
 		msgs = MyRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax);
@@ -282,7 +293,7 @@ bool cRaster::ReadFile(string Directory,
 */
 	if (!msgs)
 	{
-		cout << "In bool cRaster::ReadFile( ... !msgs " << endl;
+		cout << endl <<"In bool cRaster::ReadFile( ... !msgs " << endl;
 		cGDAL MyGDALRaster;
 		msgs = (MyGDALRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 			mProjType,mProj4, mRows, mCols, mNSres, mEWres,mMin,mMax));
@@ -291,7 +302,7 @@ bool cRaster::ReadFile(string Directory,
 		{
 			mSouth = mNW.Hemisphere();
 			mFileType = GDALFILE;
-			cout << "In bool cRaster::ReadFile( ... !msgs  GDALFILE " << endl;
+			cout << endl << "In bool cRaster::ReadFile( ... !msgs  GDALFILE " << endl;
 		}
 		else
 		{
@@ -303,7 +314,7 @@ bool cRaster::ReadFile(string Directory,
 				mFileType = BINFILE;
 				mProjType = WGS84GC;
 				mSouth = mNW.Hemisphere();
-				cout << "In bool cRaster::ReadFile( ... !msgs  BINFILE " << endl;
+				cout << endl << "In bool cRaster::ReadFile( ... !msgs  BINFILE " << endl;
 			}
 /*			else
 			{
@@ -323,6 +334,7 @@ bool cRaster::ReadFile(string Directory,
 			
 		}
 	}
+
 	if (msgs)
 	{	
 		cout << "In bool cRaster::ReadFile( ... msgs true " << endl;	
@@ -436,9 +448,9 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 		mUsed = true;
 		int row,col;
 		double drow, dcol;
-		GeoType PointType, MapType;
-		double MapLat,MapLon,PointLat,PointLon;
-		int MapCM,PointCM;
+		GeoType PointType;
+		double PointLat,PointLon;
+		int PointCM;
 		double dlat, dlon;                       // distance between point of interest
 	                                            // and closest point to NW
 		double h11, h12, h21, h22, h1dash, h2dash;   // heights at intermediary points (see diagram)
@@ -446,28 +458,19 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 
 		
 		// \TODO the following two line are only for debugging and need to be taken out
-		Point.SetGeoType(DEG); 
-		mNW.SetGeoType(DEG);
-		
+//		Point.SetGeoType(DEG); 
 		Point.SetGeoType(mProjType,mCentMer);
 		Point.Get(PointLat,PointLon,PointType,PointCM,Hem);
 		if (mSouth)
-		{
-			mNW.SetGeoType(mProjType,mCentMer);
-			mNW.Get(MapLat,MapLon,MapType,MapCM,Hem);
-			drow = (MapLat-PointLat)/mNSres;
-		}
+			drow = (mMapLat-PointLat)/mNSres;
 		else
-		{
-			mNW.SetGeoType(mProjType,mCentMer);
-			mNW.Get(MapLat,MapLon,MapType,MapCM,Hem);
-			drow = (MapLat-PointLat)/mNSres;
-		}
+			drow = (mMapLat-PointLat)/mNSres;
+
 		if (mProjType!=WGS84GC)
-			dcol = (PointLon - MapLon)/mEWres;
+			dcol = (PointLon - mMapLon)/mEWres;
 		else
-			dcol = (MapLon - PointLon)/mEWres;
-		
+			dcol = (mMapLon - PointLon)/mEWres;
+
 		if (Interpolation==2)
 		{
 			// interpolate between the surrounding 4 points
@@ -487,13 +490,13 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 			if (dcol<0.0) col = (int)(dcol+0.5);
 			else col = (int)(dcol);
 			if (mSouth)
-				dlat = MapLat - (double)row*mNSres - PointLat;
+				dlat = mMapLat - (double)row*mNSres - PointLat;
 			else
-				dlat = MapLat - (double)row*mNSres - PointLat;
+				dlat = mMapLat - (double)row*mNSres - PointLat;
 			if (mProjType!=WGS84GC)
-				dlon = PointLon - MapLon - (double)col*mEWres;
+				dlon = PointLon - mMapLon - (double)col*mEWres;
 			else
-				dlon = MapLon - PointLon - (double)col*mEWres;
+				dlon = mMapLon - PointLon - (double)col*mEWres;
 			
 			// get heights at each of surrounding points
 			if ((row>=0)&&(row<mRows)&&(col>=0)&&(col<mCols))
@@ -502,16 +505,17 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 				if (row+1 < mRows)   		
 					h21 = mRaster[row+1][col];
 				else h21 = h11;
+//				else h21 = OUTOFRASTER;
 				if (col+1 < mCols)
 					h12 = mRaster[row][col+1];
 				else h12 = h11;
+//				else h12 = OUTOFRASTER;
 			 	if ((row+1 < mRows) && (col+1<mCols))
 			 		h22 = mRaster[row+1][col+1];
-			 	else if (row+1 < mRows)
-			 		h22 = h21;
-			 	else if (col+1<mCols)
-			 	   h22 = h12;
+			 	else if (row+1 < mRows)	h22 = h21;
+			 	else if (col+1 < mCols) h22 = h12;
 			 	else h22 = h11;
+//				else h22 = OUTOFRASTER;
 			}
 			else return OUTOFRASTER;
 			
@@ -527,7 +531,7 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 			if ((h11!=OUTOFRASTER)&&(h12!=OUTOFRASTER)
 					&&(h21!=OUTOFRASTER)&&(h22!=OUTOFRASTER))
 			{
-				if ((value <-500)||(value>6000))
+				if ((value <-500)||(value>8880))
 				{
 				   		row = (int)(drow+0.5);
 						col = (int)(dcol+0.5);
@@ -557,7 +561,7 @@ bool cRaster::IsIn(cGeoP point)
 	if (point.Between(mNW,mSE))
 	{
 		double test = GetValue(point,2);
-		if ((test>-200)&&(test<6000))
+		if ((test>-500)&&(test<8880))
 			return true;
 		else return false;
 	}

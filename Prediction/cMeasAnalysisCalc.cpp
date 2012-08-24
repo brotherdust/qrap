@@ -413,7 +413,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 
 			if (Length > 2)
 			{
-				cout<<mMeasPoints[i].sClutter << ".";
+//				cout<<mMeasPoints[i].sClutter << ".";
 				if (mUseClutter)
 				{
 					Clutter = mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);

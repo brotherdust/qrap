@@ -314,7 +314,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	//These varaibles are local and are such that they can be used with the TERMs defined in cClutter.h
 	double mLinkLength, m_freq, m_htx, Cheight;
 
-	if ((Clutterfilter>0)&&(mUseClutter))
+	if (mUseClutter)
 	{
 		for(j=0; j<NUMTERMS; j++)
 		{
@@ -376,7 +376,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 								mFixedInsts[FixedNum].sTxHeight,
 								mMobiles[MobileNum].sMobileHeight,
 								mUseClutter, mClutterClassGroup);
-				if ((Clutterfilter>0)&&(mUseClutter))
+				if (mUseClutter)
 				{
 					m_freq = mFixedInsts[FixedNum].sFrequency;
 					m_htx = mFixedInsts[FixedNum].sTxHeight;
@@ -397,7 +397,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 								mMidTerm[j] = mMinTerm[j];
 							mMinTerm[j] = terms[j];
 						}
-						if (terms[j] > mMaxTerm[j])
+						else if (terms[j] > mMaxTerm[j])
 						{
 							if ((mMidTerm[j]-terms[j]) < (mMaxTerm[j]-mMidTerm[j]))
 								mMidTerm[j] = mMaxTerm[j];
@@ -413,20 +413,21 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 
 			if (Length > 2)
 			{
-//				cout << mMeasPoints[i].sClutter << " C ";
+				cout<<mMeasPoints[i].sClutter << ".";
 				if (mUseClutter)
 				{
 					Clutter = mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);
 					mMeasPoints[i].sClutter = (int)Clutter.GetLastValue();
-				}
-//				cout << mMeasPoints[i].sClutter << "	";
+				}			
 				tPathLoss = mMeasPoints[i].sPathLoss;
 				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter);
-/*				if (fabs(tPathLoss - mMeasPoints[i].sPathLoss) > 5.5)
+/*				if (fabs(tPathLoss - mMeasPoints[i].sPathLoss) > 6)
 				{
+					cout << endl; 
+					cout<<mMeasPoints[i].sClutter << "	l=" << mMeasPoints[i].sDistance <<"	";
 					cout << "Meas " << i << " of " <<  mNumMeas << " ID=" << mMeasPoints[i].sID << "	";
 					cout << mMeasPoints[i].sPathLoss << " P " << tPathLoss <<"	";
-//					mMeasPoints[i].sPoint.Display();
+					mMeasPoints[i].sPoint.Display();
 //					DEM.Display();
 				}
 */
@@ -447,7 +448,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				
 				mLinkLength = mMeasPoints[i].sDistance;
 //				cout << "	d = " << mLinkLength << endl;
-				if ((Clutterfilter > 0)&&(mUseClutter))
+				if (mUseClutter)
 				{
 					terms[0] = TERM0;
 					terms[1] = TERM1;
@@ -570,7 +571,7 @@ int cMeasAnalysisCalc::SaveResults()
 //*
 bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 {
-	unsigned i,j,Size = 0, Index = 0, Index2=0;
+	unsigned i,j,jj,Size = 0, Index = 0, Index2=0;
 	double Mean, MeanSquareError, StDev, CorrC;
 	MatrixXd SolveCoefMatrix;	//Declare local matrixes of reduced size
 	MatrixXd LeftSide;
@@ -591,6 +592,7 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 	// First Update all clutter types
 	for(mClutterFilter=1; mClutterFilter< mPathLoss.mClutter.mNumber; mClutterFilter++)
 	{
+
 		NumUsed = PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, mClutterFilter);
 		cout << "clutterType = " << mClutterFilter;
 		cout << "	#Used: " << NumUsed << "	Mean: " << Mean 
@@ -598,13 +600,13 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 			<< "	CorrC: " << CorrC << endl;
 
 		// Only optimise if enough points are involved
-		if (NumUsed > 9)
+		if (NumUsed > 10)
 		{
 			
 			for (i=0; i<NUMTERMS; i++)
 			{
-//				cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
-//					<< "	Min=" << mMinTerm[i] << endl;
+				cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
+					<< "	Min=" << mMinTerm[i] << endl;
 				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
 							= ((mMaxTerm[i]-mMinTerm[i]) > 0.06*fabs(mMidTerm[i]));
 			}
@@ -622,13 +624,14 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 			// Term 8 will be equivalent to term 7 if the clutter height is zero
 			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[8] = 
 				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[8] &&
-				(mPathLoss.mClutter.mClutterTypes[mClutterFilter].sHeight>2); 
+				(mPathLoss.mClutter.mClutterTypes[mClutterFilter].sHeight>1); 
 	
 			Size = 0;
 			for (i=0; i<NUMTERMS; i++)
 				if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
 					Size++;
-	
+			
+			cout <<"Size = " << Size << endl; 
 			if (Size > 0)
 			{
 				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[0]=true;

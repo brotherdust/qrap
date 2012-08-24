@@ -226,7 +226,6 @@ int cPathLossPredictor::setParameters(double k, double f,
 	m_freq = f;
 	m_htx = TxHeight;
 	m_hrx = RxHeight;
-//	m_counter=0;
 
 	mUseClutter = UseClutter;
 	if (ClutterClassGroup!=mClutter.mClassificationGroup)
@@ -236,7 +235,7 @@ int cPathLossPredictor::setParameters(double k, double f,
 		mClutter.mClassificationGroup = ClutterClassGroup;
 	}
 
-	mCterms[0] = 1;
+	mCterms[0] = TERM0;
 	mCterms[3] = TERM3;
 	mCterms[4] = TERM4;
 	mCterms[5] = TERM5;
@@ -275,7 +274,6 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	int OldPeakIndex = 0;
 	int IfTooManyPeaks = 0;
 	int i;
-//	m_counter=0;
 
 //	InputProfile.Display();
 	mLinkLength = CalcDist(InputProfile);
@@ -314,7 +312,8 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 								KnifeEdge, RoundHill);
 					if ((MinClearance<0)&&(OldMinClear<0)&&(i<MAXPEAK-3))
 					{
-//						cout << endl << " CLEAR CORRECT ";
+//						cout<<endl;
+//						cout<<"C.";
 						if (MinClearance<OldMinClear)
 						{
 							double store = OldMinClear;
@@ -461,7 +460,7 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 			mClutterProfile[i] = (int)m_TempProfile[i];
 	}
 
-        m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/8000+1);
+        m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/800+1);
 //	cout << " m_SeekWidth=" << m_SeekWidth;
         m_SmoothWidth = (int)(m_c/m_freq/m_interPixelDist/18000);
 //	cout << " m_SmoothWidth=" << m_SmoothWidth  << endl;

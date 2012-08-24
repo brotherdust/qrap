@@ -158,6 +158,22 @@ namespace Qrap
 			 * @param value Description
 			 */
 			void set_hrx(const double value) {m_hrx = value;}
+
+			/**
+			 * Description set_Seekwidth
+			 * 
+			 * @param value is the width in pixels that will be search for the 
+			 * inflection point of a hill.
+			 */
+			void setSeekwidth(const double value) { m_SeekWidth = value;}
+
+			/**
+			 * Description set_Smoothwidth
+			 * 
+			 * @param value is the number of points left and right that will be included  
+			 * in local smooting of the terrain profile. 
+			 */
+			void setSmoothwidth(const double value) { m_SmotthWidth = value;}
 			
 			/**
 			 * Description set_Clutter

@@ -358,10 +358,10 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				while ((mFixedInsts[FixedNum].sInstKey!=currentInst)&&(FixedNum < mFixedInsts.size()))
 					FixedNum++;
 
-				cout << "mClutterFilter = " << mClutterFilter << "	currentInst = " << currentInst 
+/*				cout << "mClutterFilter = " << mClutterFilter << "	currentInst = " << currentInst 
 					<< "	FixedInst=" << mFixedInsts[FixedNum].sInstKey
 					<< "	which is " << FixedNum << "	of " << mFixedInsts.size() << endl;
-		
+*/		
 				if (FixedNum == mFixedInsts.size())
 				{
 					cout << "FixedNum reached limit ... ending measurement analysis" <<endl;			
@@ -569,9 +569,9 @@ int cMeasAnalysisCalc::SaveResults()
 
 //*************************************************************************************************
 //*
-bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
+bool cMeasAnalysisCalc::OptimiseModelCoefD()
 {
-	unsigned i,j,jj,Size = 0, Index = 0, Index2=0;
+	unsigned i,j,Size = 0, Index = 0, Index2=0;
 	double Mean, MeanSquareError, StDev, CorrC;
 	MatrixXd SolveCoefMatrix;	//Declare local matrixes of reduced size
 	MatrixXd LeftSide;
@@ -708,4 +708,90 @@ bool cMeasAnalysisCalc::OptimiseModel(bool ChangeHeights)
 	return true;
 }
 
+
+//*************************************************************************************************
+//*
+bool cMeasAnalysisCalc::OptimiseModel()
+{
+	unsigned i;
+	double Mean, MeanSq, StDev, CorrC, Grad;
+	int NumUsed;
+	bool stop = false;
+	int SeekWidth, SeekWidthBest, SeekWidthOld;
+	double cost, costOld, costMin;
+	bool Up;
+	int DeltaSeek;
+	int NumStop = 20;
+
+	double *CHeightDiff;
+	CHeightDiff = new double[mPathLoss.mClutter.mNumber];
+	for (i=0; i<mPathLoss.mClutter.mNumber; i++)
+		CHeightDiff[i] = MAXDOUBLE;
+
+	mUseClutter = true;
+
+	LoadMeasurements();
+	
+	SeekWidth= 3.0e8/mFixedInsts[0].sFrequency/mPlotResolution/1800;
+	DeltaSeek = max(SeekWidth/2-1,1);
+	SeekWidthOld = SeekWidth;
+	SeekWidthBest = SeekWidth;
+	mPathLoss.setSeekWidth(SeekWidth);
+
+	NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+	cost = 100*(1-CorrC);
+	cout << "SeekWidth=" << SeekWidth <<  "	Cost=" << cost;
+	cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
+	cout << "	MeanSquare: " << MeanSq << "	StDev: " << StDev;
+	cout << "	CorrC: " << CorrC << endl;
+	costMin = cost;
+	SeekWidthBest = SeekWidth;
+	SeekWidthOld = SeekWidth;
+	SeekWidth = SeekWidth++;
+	Up = true;
+
+	while ((!stop)&&(NumStop>0))
+	{
+		NumStop --;
+		
+		mPathLoss.setSeekWidth(SeekWidth);
+		NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+		cost = 100*(1-CorrC);
+		cout << "SeekWidth=" << SeekWidth <<  "	Cost=" << cost;
+		cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
+		cout << "	MeanSquare: " << MeanSq << "	StDev: " << StDev;
+		cout << "	CorrC: " << CorrC << endl;
+		
+		if (cost < costMin)
+		{
+			costMin = cost;
+			SeekWidthBest = SeekWidth;
+		}
+		else if (fabs(cost - costMin)/costMin < 0.0001)
+			stop = true;
+
+		Grad = ((cost-costOld)/(SeekWidth-SeekWidthOld));
+		if (((Grad<0)&&(Up))||((Grad>0)&&(!Up)))
+			DeltaSeek--;
+		else if ((Grad>0)&&(Up))
+			DeltaSeek *=1.5;
+		Up = (Grad>=0);
+		
+		costOld = cost;
+		SeekWidthOld = SeekWidth;
+		SeekWidth = SeekWidth+ceil(DeltaSeek*Grad/fabs(Grad));
+		if ((SeekWidth<0)||(SeekWidth == SeekWidthOld)) 
+		{
+			Grad = ((costMin-costOld)/(SeekWidthBest-SeekWidthOld));
+			SeekWidth = SeekWidthOld+ceil(DeltaSeek*Grad/fabs(Grad));
+			if (SeekWidth<0)  SeekWidth = SeekWidthBest-1;
+			else if (SeekWidth == SeekWidthOld)
+				SeekWidth ++;
+		}
+
+	}
+	mPathLoss.setSeekWidth(SeekWidthBest);
+
+	return true;
+}
 

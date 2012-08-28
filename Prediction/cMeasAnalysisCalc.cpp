@@ -814,6 +814,7 @@ bool cMeasAnalysisCalc::OptimiseHeights()
 	double Mean, MeanSq, StDev, CorrC;
 	int NumUsed;
 	bool stop = false;
+	bool first = true;
 	double cost, costOld, costMin;
 	int NumStop = 50;
 	double SizeOfDiff, sumSquareDiff=0;
@@ -872,10 +873,19 @@ bool cMeasAnalysisCalc::OptimiseHeights()
 		
 				if (Change[i]) CHeightDiff[i] = ((cost-costOld)/DeltaH[i]);
 				else CHeightDiff[i] = 0.0;
-				if (fabs(CHeightDiff[i])<0.00001) Change[i] = false;
+				if (fabs(CHeightDiff[i])<0.00001)
+				{ 
+					if (first) Change[i] = false;
+					else
+					{
+						mPathLoss.mClutter.mClutterTypes[i].sHeight-=DeltaH[i]/2;
+						Change[i] = false;
+					}
+				}
+				else mPathLoss.mClutter.mClutterTypes[i].sHeight-=DeltaH[i];
 				sumSquareDiff += CHeightDiff[i]*CHeightDiff[i];
 				if (!Up[i]) CHeightDiff[i] *= -1.0;
-				mPathLoss.mClutter.mClutterTypes[i].sHeight-=DeltaH[i];
+				
 			}
 		}
 		SizeOfDiff = sqrt(sumSquareDiff);

@@ -216,18 +216,21 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 	query = "SELECT resolution, fileformat, projection, proj4string ";
 	query += "FROM filesets WHERE ID=";
 	query += OFSID;
-	
+
 	if(!gDb.PerformRawSql(query))
 	{
 		string err = "Database Select for Original FileSet failed. Query: ";
 		err += query;
+		cout << err << endl;
 		QRAP_WARN(err.c_str());
 		return false;
 	}
 	else
 	{
+		cout << "Voor get result original file set query" << endl;
 		gDb.GetLastResult(r);
 		
+		cout << "Got result original file set query" << endl;
 		if(r.size()!=0)
 		{
 			OrigRes = atof(r[0]["resolution"].c_str());
@@ -253,6 +256,7 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 		}
 	}
 
+	cout << "Na original file set query" << endl;
 	gcvt(ResultFileSet,9,RFSID);
 	query = "SELECT resolution, fileformat, projection, proj4string ";
 	query += "FROM filesets WHERE ID=";
@@ -396,7 +400,7 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 
 	cRasterFileHandler RastersSet;
 	bool RValue;
-        RastersSet.DirectChangeSetToUse(OriginalFileSet);
+//        RastersSet.DirectChangeSetToUse(OriginalFileSet);
         RastersSet.SetRasterFileRules(inFileType);
         if (!Interpolate) RastersSet.SetSampleMethod(1);
 	StructMetaData NewHeader;

@@ -51,11 +51,12 @@ int main (int argc, char **argv)
 	}
 	
 	cMeasAnalysisCalc Meas;
-	Meas.OptimiseModel();
+	Meas.OptimiseHeights();
 
 /*	string dir="/home/maggie/GISdata/SRTM/BIN";
-	cLoadFile Files(5,6,dir);
-	Files.CutCurrentSet(5,6, true, 0);
+	cLoadFile Files(8,9,dir);
+	cout << "Voor cut" << endl;
+	Files.CutCurrentSet(8,9, true, 1);
 */
 	// For Arc Grid
 /*	string dir="/home/maggie/Data/RasterData/BIN";

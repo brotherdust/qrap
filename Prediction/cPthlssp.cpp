@@ -82,7 +82,9 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	mCterms[5] = TERM5;
 	mCterms[6] = TERM6;
 	mCterms[7] = TERM7;
-	if (mUseClutter) mUseClutter=mClutter.Reset(ClutterClassGroup);
+
+	mUseClutter = true;
+	if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
 
 }/* end CPathLossPredictor:: Default Constructor */
 
@@ -355,10 +357,13 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	{
 //		cout << mClutterProfile[m_size-1] <<"."; 
 		double Cheight = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sHeight;
+		
 //		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
 		mCterms[1] = TERM1;
 		mCterms[2] = TERM2;
-		mCterms[8] = TERM8;
+		if (Cheight < (m_htx+0.1))
+			mCterms[8] = TERM8;
+		else mCterms[8] = 100;
 		for (i=0; i<NUMTERMS; i++)
 			m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[i]*mCterms[i];
 	}
@@ -460,13 +465,13 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 			mClutterProfile[i] = (int)m_TempProfile[i];
 	}
 
-//      m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/1500+1);
+      m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/1500+1);
 //	cout << " m_SeekWidth=" << m_SeekWidth;
-//      m_SmoothWidth = (int)(m_c/m_freq/m_interPixelDist/18000);
+      m_SmoothWidth = (int)(m_c/m_freq/m_interPixelDist/18000);
 //	cout << " m_SmoothWidth=" << m_SmoothWidth  << endl;
 //	m_SeekWidth = (int)(1.5*400.0/m_interPixelDist*sqrt(400.0/m_freq)+0.5);
 //	m_SmoothWidth = (int)(1.5*400.0/m_interPixelDist*sqrt(m_freq/400.0)+0.5) - 1;
-	if (m_SeekWidth<3) m_SeekWidth = 3;
+//	if (m_SeekWidth<3) m_SeekWidth = 3;
 //	if (m_SmoothWidth<1) m_SmoothWidth=1;
 
 	if (m_kFactor!=1.0)

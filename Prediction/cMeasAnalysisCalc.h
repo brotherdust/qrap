@@ -85,7 +85,8 @@ class cMeasAnalysisCalc
 	int SaveResults();
 
 	bool OptimiseModelCoefD();
-	bool OptimiseModel();
+	bool OptimiseSeekWidth();
+	bool OptimiseHeights();	
 
    private:
 

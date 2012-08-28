@@ -77,6 +77,9 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 	if (setting=="true")
 		mUseClutter = true;
 	else mUseClutter = false;
+
+	mUseClutter = true;
+
 	mClutterSource = atoi(gDb.GetSetting("ClutterSource").c_str());
 	cout << "mClutterSource = " << mClutterSource << endl;
 	if (mUseClutter)
@@ -304,6 +307,10 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	cAntennaPattern FixedAnt, MobileAnt;
 	double *terms;
 	terms = new double[NUMTERMS];
+	Mean = 0; 
+	MeanSquareError=0;
+	StDev = 0;
+	CorrC = 0;
 
 	unsigned Length;
 	cProfile Clutter;
@@ -329,11 +336,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		}
 	}
 
+	NumUsed = 0;
 	for (i=0; i<mNumMeas; i++) 
 	{
 		if ((0==Clutterfilter)||(0==mMeasPoints[i].sClutter)||(Clutterfilter==mMeasPoints[i].sClutter))
 		{
-			NumUsed++;
 
 			//Change settings if the mobile installation changed
 			if (mMeasPoints[i].sInstKeyMobile!=currentMobile)
@@ -342,7 +349,10 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				while ((mMobiles[MobileNum].sInstKey!=currentMobile)&&(MobileNum < mMobiles.size()))
 					MobileNum++;
 				if (MobileNum == mMobiles.size())
+				{
+					cout << "FixedNum reached limit ... ending measurement analysis" <<endl;
 					return 0;
+				}
 				MobileAnt.SetAntennaPattern(mMobiles[MobileNum].sPatternKey, 0, 0);
 				mPathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
 								mFixedInsts[FixedNum].sTxHeight,
@@ -414,6 +424,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			if (Length > 2)
 			{
 //				cout<<mMeasPoints[i].sClutter << ".";
+				NumUsed++;
 				if (mUseClutter)
 				{
 					Clutter = mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution);
@@ -421,7 +432,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				}			
 				tPathLoss = mMeasPoints[i].sPathLoss;
 				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter);
-/*				if (fabs(tPathLoss - mMeasPoints[i].sPathLoss) > 6)
+/*				if (fabs(mMeasPoints[i].sPathLoss) > 200)
 				{
 					cout << endl; 
 					cout<<mMeasPoints[i].sClutter << "	l=" << mMeasPoints[i].sDistance <<"	";
@@ -482,19 +493,20 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					
 				}
 			}
-			else NumUsed--;
-
 		}// if included in calculations
 	}//for all measurements
 
-	Mean = TotalError/NumUsed;
-	MeanSquareError = TotalSError/NumUsed;
-	StDev = sqrt(MeanSquareError-Mean*Mean);
+	if (NumUsed>0)
+	{
+		Mean = TotalError/NumUsed;
+		MeanSquareError = TotalSError/NumUsed;
+		StDev = sqrt(MeanSquareError-Mean*Mean);
 	
-	double TempMeas = sqrt(NumUsed*TotalSMeas-TotalMeas*TotalMeas);
-	double TempPred = sqrt(NumUsed*TotalSPred-TotalPred*TotalPred);
-	CorrC = (NumUsed*TotalMeasPred - TotalMeas*TotalPred) / (TempMeas*TempPred);
-
+		double TempMeas = sqrt(NumUsed*TotalSMeas-TotalMeas*TotalMeas);
+		double TempPred = sqrt(NumUsed*TotalSPred-TotalPred*TotalPred);
+		CorrC = (NumUsed*TotalMeasPred - TotalMeas*TotalPred) / (TempMeas*TempPred);
+	}
+	else cout << "No predictions done." << endl;
 	delete [] terms;
 	return NumUsed;
 }
@@ -711,9 +723,8 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD()
 
 //*************************************************************************************************
 //*
-bool cMeasAnalysisCalc::OptimiseModel()
+bool cMeasAnalysisCalc::OptimiseSeekWidth()
 {
-	unsigned i;
 	double Mean, MeanSq, StDev, CorrC, Grad;
 	int NumUsed;
 	bool stop = false;
@@ -722,11 +733,6 @@ bool cMeasAnalysisCalc::OptimiseModel()
 	bool Up;
 	int DeltaSeek;
 	int NumStop = 20;
-
-	double *CHeightDiff;
-	CHeightDiff = new double[mPathLoss.mClutter.mNumber];
-	for (i=0; i<mPathLoss.mClutter.mNumber; i++)
-		CHeightDiff[i] = MAXDOUBLE;
 
 	mUseClutter = true;
 
@@ -745,9 +751,10 @@ bool cMeasAnalysisCalc::OptimiseModel()
 	cout << "	MeanSquare: " << MeanSq << "	StDev: " << StDev;
 	cout << "	CorrC: " << CorrC << endl;
 	costMin = cost;
+	costOld = cost;
 	SeekWidthBest = SeekWidth;
 	SeekWidthOld = SeekWidth;
-	SeekWidth = SeekWidth++;
+	SeekWidth += DeltaSeek;
 	Up = true;
 
 	while ((!stop)&&(NumStop>0))
@@ -757,25 +764,29 @@ bool cMeasAnalysisCalc::OptimiseModel()
 		mPathLoss.setSeekWidth(SeekWidth);
 		NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
 		cost = 100*(1-CorrC);
-		cout << "SeekWidth=" << SeekWidth <<  "	Cost=" << cost;
+		cout << "SWO=" << SeekWidthOld << "	CostO=" << costOld;
+		cout << "	SW=" << SeekWidth <<  "	Cost=" << cost << "	Min=" << costMin;
 		cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
-		cout << "	MeanSquare: " << MeanSq << "	StDev: " << StDev;
+		cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
 		cout << "	CorrC: " << CorrC << endl;
 		
-		if (cost < costMin)
-		{
-			costMin = cost;
-			SeekWidthBest = SeekWidth;
-		}
-		else if (fabs(cost - costMin)/costMin < 0.0001)
-			stop = true;
-
 		Grad = ((cost-costOld)/(SeekWidth-SeekWidthOld));
 		if (((Grad<0)&&(Up))||((Grad>0)&&(!Up)))
 			DeltaSeek--;
 		else if ((Grad>0)&&(Up))
 			DeltaSeek *=1.5;
-		Up = (Grad>=0);
+		Up = (Grad>0);
+		
+
+		if ((100*fabs((cost - costMin)/costMin)) < 0.1)
+		{
+			stop = true;
+		}
+		else if (cost < costMin)
+		{
+			costMin = cost;
+			SeekWidthBest = SeekWidth;
+		}
 		
 		costOld = cost;
 		SeekWidthOld = SeekWidth;
@@ -794,4 +805,120 @@ bool cMeasAnalysisCalc::OptimiseModel()
 
 	return true;
 }
+
+//*************************************************************************************************
+//*
+bool cMeasAnalysisCalc::OptimiseHeights()
+{
+	unsigned i;
+	double Mean, MeanSq, StDev, CorrC;
+	int NumUsed;
+	bool stop = false;
+	double cost, costOld, costMin;
+	int NumStop = 50;
+	double SizeOfDiff, sumSquareDiff=0;
+
+	bool *Up;
+	bool *Change;
+	double *CHeightDiff;
+	double *DeltaH;
+	double *BestHeight;
+	CHeightDiff = new double[mPathLoss.mClutter.mNumber];
+	BestHeight = new double[mPathLoss.mClutter.mNumber];
+	DeltaH = new double[mPathLoss.mClutter.mNumber];
+	Up = new bool[mPathLoss.mClutter.mNumber];
+	Change = new bool[mPathLoss.mClutter.mNumber];
+	for (i=0; i<mPathLoss.mClutter.mNumber; i++)
+	{
+		Change[i] = true;
+		Up[i] = true;
+		CHeightDiff[i] = 1;
+		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
+		DeltaH[i] = 0.2;
+	}
+
+	mUseClutter = true;
+
+	LoadMeasurements();
+	
+	NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+	cost = 100*(1-CorrC);
+	cout <<   "	Cost=" << cost;
+	cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
+	cout << "	MeanSquare: " << MeanSq << "	StDev: " << StDev;
+	cout << "	CorrC: " << CorrC << endl;
+	costMin = cost;
+
+
+	cout << "Number of Clutter Types: " << mPathLoss.mClutter.mNumber << endl;
+	while ((!stop)&&(NumStop>0))
+	{
+		NumStop --;
+		costOld = cost;
+		sumSquareDiff = 0.0;
+		for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+		{
+			if (Change[i])
+			{
+				mPathLoss.mClutter.mClutterTypes[i].sHeight+=DeltaH[i];
+				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+				cost = 100*(1-CorrC);
+				cout << "C=" << mPathLoss.mClutter.mClutterTypes[i].sLandCoverID; 
+				cout << "	H=" << mPathLoss.mClutter.mClutterTypes[i].sHeight;
+				cout << "	dC=" << (costOld - cost);
+				cout << "	CostO=" << costOld << "	Cost=" << cost << "	Min=" << costMin;
+				cout << "	Mean: " << Mean << "	StDev: " << StDev;
+				cout << "	CorrC: " << CorrC << endl;
+		
+				if (Change[i]) CHeightDiff[i] = ((cost-costOld)/DeltaH[i]);
+				else CHeightDiff[i] = 0.0;
+				if (fabs(CHeightDiff[i])<0.00001) Change[i] = false;
+				sumSquareDiff += CHeightDiff[i]*CHeightDiff[i];
+				if (!Up[i]) CHeightDiff[i] *= -1.0;
+				mPathLoss.mClutter.mClutterTypes[i].sHeight-=DeltaH[i];
+			}
+		}
+		SizeOfDiff = sqrt(sumSquareDiff);
+		
+		cout << "SizeOfDiff " << SizeOfDiff << endl;
+		for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+		{
+			if (((CHeightDiff[i]<0)&&(Up[i]))||((CHeightDiff[i]>0)&&(!Up[i])))
+				DeltaH[i]/=2;
+			Up[i] = (CHeightDiff[i]>0);
+		
+			if ((fabs(CHeightDiff[i])>0.00001)&&(Change[i]))
+				mPathLoss.mClutter.mClutterTypes[i].sHeight 
+					-= 5.0*DeltaH[i]*CHeightDiff[i]/SizeOfDiff;
+			if (mPathLoss.mClutter.mClutterTypes[i].sHeight < 0)
+				mPathLoss.mClutter.mClutterTypes[i].sHeight = 0.0;
+		}
+
+		NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+		cost = 100*(1-CorrC);
+		cout << endl;
+		cout << NumStop <<"	CostO=" << costOld;
+		cout << "	Cost=" << cost << "	Min=" << costMin;
+		cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
+		cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
+		cout << "	CorrC: " << CorrC << endl;
+
+		if ((100*fabs((cost - costMin)/costMin)) < 0.01)
+		{
+//			stop = true;
+		}
+		else if (cost < costMin)
+		{
+			costMin = cost;
+			for (i=0; i<mPathLoss.mClutter.mNumber; i++)
+				BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
+		}
+	}
+	
+	for (i=0; i<mPathLoss.mClutter.mNumber; i++)
+		mPathLoss.mClutter.mClutterTypes[i].sHeight = BestHeight[i];
+
+	return true;
+}
+
 

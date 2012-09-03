@@ -899,7 +899,8 @@ bool cMeasAnalysisCalc::OptimiseHeights()
 		cout << "SizeOfDiff " << SizeOfDiff << endl;
 		for (i=1; i<mPathLoss.mClutter.mNumber; i++)
 		{
-			if (((CHeightDiff[i]<0)&&(Up[i]))||((CHeightDiff[i]>0)&&(!Up[i])))
+			if (((CHeightDiff[i]<0)&&(Up[i]))||((CHeightDiff[i]>0)&&(!Up[i]))
+				||((0==mPathLoss.mClutter.mClutterTypes[i].sHeight)&&(CHeightDiff[i]<0)))
 				if (DeltaH[i]>0.005)
 					DeltaH[i]*=0.5;
 			Up[i] = (CHeightDiff[i]>0);

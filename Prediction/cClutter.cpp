@@ -195,7 +195,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 				mClutterTypes[landcoverid].sLandCoverID = landcoverid;
 				mClutterTypes[landcoverid].sWidth = atof(r[j]["width"].c_str());
 				mClutterTypes[landcoverid].sHeight = atof(r[j]["height"].c_str());
-				cout << landcoverid << "	" << mClutterTypes[landcoverid].sHeight << endl;
+//				cout << landcoverid << "	" << mClutterTypes[landcoverid].sHeight << endl;
 				gcvt(atoi(r[j]["id"].c_str()),9,idnr);
 				gcvt(landcoverid,9,type);
 				queryCC = queryU;
@@ -312,7 +312,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 	}
 */
 	mNumber = MaxLandCoverID+1;
-	cout << "mNumber=" << mNumber << endl;
+//	cout << "mNumber=" << mNumber << endl;
 	delete [] type;
 	delete [] temp;
 	delete [] idnr; 
@@ -393,4 +393,58 @@ bool cClutter::UpdateCoefficients(unsigned ClutterType)
 	delete [] group;
 	return Success;
 }
+
+//*************************************************************************************************
+//*
+bool cClutter::UpdateHeightsWidths()
+{
+	bool Success=true;
+	string query, queryI;
+	char *width, *height, *type, *group;
+	width = new char[33];
+	height = new char[33];
+	type = new char[33];
+	group = new char[33];
+	unsigned j=0;
+
+
+	for (j=1; j<mNumber; j++)
+	{
+		gcvt(mClutterTypes[j].sLandCoverID,9,type);
+		gcvt(mClassificationGroup,9,group);
+
+		string queryA;
+		queryA = " WHERE ";
+		queryA += " classgroup = ";
+		queryA += group;
+		queryA += " and landcoverid = ";
+		queryA += type;
+		queryA += ";";
+
+		query = "UPDATE cluttertype set ( height, width ) = ( ";
+		gcvt(mClutterTypes[j].sHeight,9,height);	
+		query += height;
+		query += " , ";
+		gcvt(mClutterTypes[j].sWidth,9,width);	
+		query += width;
+		query += " ) ";		
+		query += queryA;
+
+//		cout << query << endl;
+		if(!gDb.PerformRawSql(query))
+		{
+			string err = "Failure updating the height. Query: ";
+			err += query;
+			QRAP_WARN(err.c_str());	
+			Success = false;
+		}
+	}
+
+	delete [] width;
+	delete [] type;
+	delete [] height;
+	delete [] group;
+	return Success;
+}
+
 

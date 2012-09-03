@@ -76,7 +76,7 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 		m_aboveEarth[i] = 0.0;
 	};
 
-	mCterms[0] = 1;
+	mCterms[0] = TERM0;
 	mCterms[3] = TERM3;
 	mCterms[4] = TERM4;
 	mCterms[5] = TERM5;
@@ -322,7 +322,8 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 							OldMinClear = MinClearance;
 							MinClearance = store;
 						}
-//						cout << endl << " i=" << i << " oldpeak: " << OldPeakIndex << " peak: " << PeakIndex << endl;;
+//						cout << endl << " i=" << i << " oldpeak: " << OldPeakIndex 
+//							<< " peak: " << PeakIndex << endl;;
 /*						for (int k=0;k<MAXPEAK; k++)
 						{
 							cout << k << " Peak: " << m_markers[k] << endl; 
@@ -359,11 +360,13 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		double Cheight = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sHeight;
 		
 //		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
+//		cout << "	" << mLinkLength << ".";
 		mCterms[1] = TERM1;
 		mCterms[2] = TERM2;
-		if (Cheight < (m_htx+0.1))
-			mCterms[8] = TERM8;
-		else mCterms[8] = 100;
+//		if (Cheight < (m_htx+0.1))
+//			mCterms[8] = TERM8;
+//		else mCterms[8] = 100;
+
 		for (i=0; i<NUMTERMS; i++)
 			m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[i]*mCterms[i];
 	}
@@ -465,14 +468,11 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 			mClutterProfile[i] = (int)m_TempProfile[i];
 	}
 
-      m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/1500+1);
+//      m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/1400+1);
 //	cout << " m_SeekWidth=" << m_SeekWidth;
-      m_SmoothWidth = (int)(m_c/m_freq/m_interPixelDist/18000);
+//      m_SmoothWidth = (int)(m_c/m_freq/m_interPixelDist/18000);
 //	cout << " m_SmoothWidth=" << m_SmoothWidth  << endl;
-//	m_SeekWidth = (int)(1.5*400.0/m_interPixelDist*sqrt(400.0/m_freq)+0.5);
-//	m_SmoothWidth = (int)(1.5*400.0/m_interPixelDist*sqrt(m_freq/400.0)+0.5) - 1;
 //	if (m_SeekWidth<3) m_SeekWidth = 3;
-//	if (m_SmoothWidth<1) m_SmoothWidth=1;
 
 	if (m_kFactor!=1.0)
 	{
@@ -496,7 +496,7 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 
 	if (mUseClutter)
 	{
-		for (i=0; i<m_size;i++)
+		for (i=1; i<m_size-1;i++)
 		{
 			*(m_CurvedProfile+i) += mClutter.mClutterTypes[mClutterProfile[i]].sHeight;
 			*(m_TempProfile+i) += mClutter.mClutterTypes[mClutterProfile[i]].sHeight;

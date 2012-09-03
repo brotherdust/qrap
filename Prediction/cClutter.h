@@ -35,7 +35,7 @@
 #include "../DataBase/cDatabase.h"
 
 //The following terms in used in the clutter dependant propagation Prediction
-#define NUMTERMS 9
+#define NUMTERMS 8
  
 #define TERM0	1		//Constant offset
 #define TERM1 log10(mLinkLength) // This term occur in virtually all models. Here it will refer loss over and above free-space. 
@@ -49,7 +49,7 @@
 						// ... depth through trees are assumed shallow and more or less constant
 #define TERM7 log10(m_htx)	// we assume a constant mobile/customer antenna height, hence this term is assumed to be incorporated 
 				// in the offset.
-#define TERM8 log10(m_htx-Cheight)		// Bertoni Walfish 
+//#define TERM8 log10(m_htx-Cheight)		// Bertoni Walfish, not used as it diffraction elements are already included. 
 
 
 
@@ -109,6 +109,11 @@ namespace Qrap
 			 * In this function the coeeficients of the specific ClutterType is updated.
 			 */
 			bool UpdateCoefficients(unsigned ClutterType);
+
+			/**
+			 * In this function the coeeficients of the specific ClutterType is updated.
+			 */
+			bool UpdateHeightsWidths();
 
 		private:
 			/**

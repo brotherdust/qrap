@@ -51,7 +51,9 @@ int main (int argc, char **argv)
 	}
 	
 	cMeasAnalysisCalc Meas;
+	Meas.OptimiseSeekWidth();
 	Meas.OptimiseHeights();
+	Meas.OptimiseModelCoefD();
 
 /*	string dir="/home/maggie/GISdata/SRTM/BIN";
 	cLoadFile Files(8,9,dir);

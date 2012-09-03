@@ -259,7 +259,7 @@ void cPathLossPredictor::set_Clutter(bool UseClutter, unsigned ClutterClassGroup
 //************************************************************************
 // Calculates the Total Path Loss
 float cPathLossPredictor::TotPathLoss(cProfile &InputProfile, 
-					float &ElevAngleTX,
+					float &ElevAngleTX,  
 					cProfile &ClutterProfile)
 {
 	double MinClearance=DBL_MAX;
@@ -273,6 +273,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	double radius = 0.0;
 	double alpha = 0.1;
 	int PeakIndex = 0;
+	int MainPeakIndex = 0;
 	int OldPeakIndex = 0;
 	int IfTooManyPeaks = 0;
 	int i;
@@ -287,6 +288,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		
 		ReffHeight = Horizontalize(0,1);
 		PeakIndex = FindMainPeak(0,1,ReffHeight, MinClearance,sqrtD1D2);
+		MainPeakIndex = PeakIndex;
 		if ((MinClearance<1.0)&&(PeakIndex!=0))
 		{
 			radius = SetPeakRadius(PeakIndex,alpha);
@@ -357,7 +359,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	if (mUseClutter)
 	{
 //		cout << mClutterProfile[m_size-1] <<"."; 
-		double Cheight = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sHeight;
+//		double Cheight = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sHeight;
 		
 //		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
 //		cout << "	" << mLinkLength << ".";
@@ -367,8 +369,9 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //			mCterms[8] = TERM8;
 //		else mCterms[8] = 100;
 
+		mClutterIndex = mClutterProfile[MainPeakIndex];
 		for (i=0; i<NUMTERMS; i++)
-			m_Loss += mClutter.mClutterTypes[mClutterProfile[m_size-1]].sCoefficients[i]*mCterms[i];
+			m_Loss += mClutter.mClutterTypes[mClutterProfile[MainPeakIndex]].sCoefficients[i]*mCterms[i];
 	}
 
 /*

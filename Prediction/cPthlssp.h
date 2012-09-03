@@ -100,10 +100,10 @@ namespace Qrap
 			 * @return The total pathloss.
 			 */
 			float TotPathLoss (cProfile &DTMProfile, 
-						float &Tilt,
+						float &Tilt, 
 						cProfile &ClutterProfile);
 			
-/**
+			/**
 			 * Find the elevation angle in which the main ray is directed.
 			 * 
 			 * @param TXElevAngle Description
@@ -175,6 +175,14 @@ namespace Qrap
 			 */
 			void setSmoothwidth(const int value) { m_SmoothWidth = value;}
 			
+			/**
+			 * Description get_Clutter
+			 * 
+			* The function returns the ClutterType of the MainPeak
+			* it is to be called directly after TotPathLoss if it is required
+			 */
+			int get_Clutter() { return mClutterIndex; } 
+
 			/**
 			 * Description set_Clutter
 			 * 
@@ -309,6 +317,7 @@ namespace Qrap
 			int m_SeekWidth;		///< Use to seek the inflection points when calculating the peak radii
 			bool mUseClutter;		///< indicates whether clutter dependancies should be included. 
 			double *mCterms;		///< values of the clutter terms
+			int mClutterIndex;		///< index to the clutter type where the profile has least clearance
 		public:
 			cClutter mClutter;		///< 'container' class that has the coefficients and heights to be used in the pathloss calculations. It must be public for the optimiser to see it. 
 	};

@@ -111,12 +111,10 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 		query = "hostaddr="+mHostAddr+" dbname="+mName+" port=";
 		query += text;
 		query += " user="+username+" password="+password;
-		cout << query << endl;
 		delete [] text;
 		cout << query << endl;
 //		pqxx::connection *mConnection;
 		mConnection = new pqxx::connection(query);
-		cout << "Connect 8" << endl;
 	} catch (pqxx::broken_connection& e)
 	{
 		mConnected=false;
@@ -324,7 +322,7 @@ bool cDatabase::Select (const string& columns, const string& tableName, const st
 		// otherwise, if we're compiling the client edition
 		#else
 		// and this field is meant for the server only
-		if (mStructure[tableName].mFields[cols[i]].mServerOnly)
+		if (mStructure[tableName].mFields[cols[i]].mServerOnly)	
 			continue;
 		#endif
 		
@@ -342,7 +340,7 @@ bool cDatabase::Select (const string& columns, const string& tableName, const st
 		else
 		// if it's a PostGIS field, it needs to be returned in a specific format
 		if (mStructure[tableName].mFields[cols[i]].mPostGis)
-			fixedCols += "AsText("+cols[i]+") as "+cols[i];
+			fixedCols += "ST_AsText("+cols[i]+") as "+cols[i];
 		else
 			fixedCols += cols[i];
 		if ((i+1) < count)
@@ -586,7 +584,7 @@ bool cDatabase::Create (const string& username, const string& password)
 	cout << "Connected" << endl;
 
 	// check that PostGIS has been installed
-	if ((!TableExists("geometry_columns",true)) || (!TableExists("spatial_ref_sys",true)))
+	if (((!ViewExists("geometry_columns"))&&(!TableExists("geometry_columns"))) || (!TableExists("spatial_ref_sys",true)))
 	{
 		QRAP_FATAL("Cannot find PostGIS. Please install PostGIS first - consult the user manual for details.");
 		return false;
@@ -1942,7 +1940,7 @@ bool cDatabase::ExportToCsv (const std::string& tableName, const std::string& fi
 	for (DbFieldMap::iterator field=fields.begin(); field != fields.end(); field++)
 	{
 		if (field->second.mPostGis)
-			query += "AsText("+field->first+") as "+field->first;
+			query += "ST_AsText("+field->first+") as "+field->first;
 		else
 			query += field->first;
 		i++;

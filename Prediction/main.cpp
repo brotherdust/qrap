@@ -50,16 +50,16 @@ int main (int argc, char **argv)
 		return 0;
 	}
 	
-	cMeasAnalysisCalc Meas;
+/*	cMeasAnalysisCalc Meas;
 	Meas.OptimiseSeekWidth();
 	Meas.OptimiseHeights();
 	Meas.OptimiseModelCoefD();
-
-/*	string dir="/home/maggie/GISdata/SRTM/BIN";
-	cLoadFile Files(8,9,dir);
-	cout << "Voor cut" << endl;
-	Files.CutCurrentSet(8,9, true, 1);
 */
+	string dir="/home/maggie/GISdata/SA National land cover 2001/BIN";
+	cLoadFile Files(5,7,dir);
+	cout << "Voor cut" << endl;
+	Files.CutCurrentSet(5,7, true, 2);
+
 	// For Arc Grid
 /*	string dir="/home/maggie/Data/RasterData/BIN";
 	cLoadFile Files(1,2,dir);

@@ -15,12 +15,13 @@ pause
 # PostGIS stuff
 echo "activiting postgis"
 # find the following *.sql files on your machine and change PostGISDir accordingly 
-PostGISDir=/usr/share/postgresql/9.1/contrib/postgis-1.5/
+PostGISDir=/usr/share/postgresql/9.1/contrib/postgis-2.0/
 createlang plpgsql -d qrap
-pause
+echo "running postgis.sql"
 psql qrap -f ${PostGISDir}postgis.sql
+echo "running spatial_ref_sys.sql"
 psql qrap -f ${PostGISDir}spatial_ref_sys.sql
-PostGISDir=/usr/share/postgresql/9.1/contrib/postgis-1.5/
+echo "running spatial_ref_sys.sql"
 psql qrap -f ${PostGISDir}postgis_comments.sql
 psql -c "ALTER DATABASE qrap OWNER TO postgres"
 

@@ -58,7 +58,7 @@ int main (int argc, char **argv)
 	string dir="/home/maggie/GISdata/SA National land cover 2001/BIN";
 	cLoadFile Files(5,7,dir);
 	cout << "Voor cut" << endl;
-	Files.CutCurrentSet(5,7, true, 2);
+	Files.CutCurrentSet(5,7, false, 2);
 
 	// For Arc Grid
 /*	string dir="/home/maggie/Data/RasterData/BIN";

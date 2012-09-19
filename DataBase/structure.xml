@@ -1817,9 +1817,9 @@ www.QRap.org.za
 		       label = "Land Cover ID" />
 
 		<field name = "cluttername"
-		       type = "varchar(30)"
+		       type = "varchar(50)"
 			description = "A short descriptive name to identify the clutter type"
-		       label = "Description" />
+		       label = "Name" />
 		
 		<field name = "description"
 		       type = "text"
@@ -1833,9 +1833,8 @@ www.QRap.org.za
 		
 		<field name = "width"
 		       type = "real"
-		       label = "Width" 
-			decription = "The width of the clutter e.g. the width of streets."
-			unittype ="height"/>
+		       label = "Reflection Coefficient" 
+			decription = "The effective reflection coefficient of the clutter - how smooth is it."/>
 
 		<field name = "classgroup"
 		       type = "integer references classificationgroup(id)"

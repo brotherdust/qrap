@@ -75,7 +75,7 @@ const cClutter & cClutter::operator=(const cClutter &right)
 	for (i=0; i<mNumber; i++)
 	{
 		mClutterTypes[i].sLandCoverID 	= 	right.mClutterTypes[i].sLandCoverID;
-		mClutterTypes[i].sWidth 	= 	right.mClutterTypes[i].sWidth;
+		mClutterTypes[i].sRho 		= 	right.mClutterTypes[i].sRho;
 		mClutterTypes[i].sHeight	= 	right.mClutterTypes[i].sHeight;
 		mClutterTypes[i].sCoefficients 	= 	new double[NUMTERMS];
 		mClutterTypes[i].sAllowCchange 	= 	new bool[NUMTERMS];
@@ -98,7 +98,7 @@ void cClutter::Display()
 	for (i=0; i<mNumber; i++)
 	{
 		cout << "ID: " << mClutterTypes[i].sLandCoverID;
-		cout << "	W: " << mClutterTypes[i].sWidth;
+		cout << "	rho: " << mClutterTypes[i].sRho;
 		cout << "	H: " << mClutterTypes[i].sHeight << endl;
 		for (j=0; j<NUMTERMS; j++)
 			cout << "TERM" << j<< "	" << mClutterTypes[i].sCoefficients[j] << endl;
@@ -180,7 +180,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 				mClutterTypes[j].sCoefficients = new double[NUMTERMS];
 				mClutterTypes[j].sAllowCchange = new bool[NUMTERMS];
 				mClutterTypes[j].sLandCoverID = 0;
-				mClutterTypes[j].sWidth = 0;
+				mClutterTypes[j].sRho = 0.8;
 				mClutterTypes[j].sHeight = 0;
 
 				for (jj=0; jj<NUMTERMS; jj++)
@@ -193,7 +193,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 			{
 				landcoverid = atoi(r[j]["landcoverid"].c_str());
 				mClutterTypes[landcoverid].sLandCoverID = landcoverid;
-				mClutterTypes[landcoverid].sWidth = atof(r[j]["width"].c_str());
+				mClutterTypes[landcoverid].sRho = atof(r[j]["width"].c_str());
 				mClutterTypes[landcoverid].sHeight = atof(r[j]["height"].c_str());
 //				cout << landcoverid << "	" << mClutterTypes[landcoverid].sHeight << endl;
 				gcvt(atoi(r[j]["id"].c_str()),9,idnr);
@@ -292,7 +292,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 			mClutterTypes[j].sCoefficients = new double[NUMTERMS];
 			mClutterTypes[j].sAllowCchange = new bool[NUMTERMS];
 			mClutterTypes[j].sLandCoverID = 0;
-			mClutterTypes[j].sWidth = 0;
+			mClutterTypes[j].sRho = 0.8;
 			mClutterTypes[j].sHeight = 0;
 
 			for (jj=0; jj<NUMTERMS; jj++)
@@ -425,7 +425,7 @@ bool cClutter::UpdateHeightsWidths()
 		gcvt(mClutterTypes[j].sHeight,9,height);	
 		query += height;
 		query += " , ";
-		gcvt(mClutterTypes[j].sWidth,9,width);	
+		gcvt(mClutterTypes[j].sRho,9,width);	
 		query += width;
 		query += " ) ";		
 		query += queryA;

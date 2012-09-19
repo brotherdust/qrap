@@ -631,6 +631,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 	unsigned i=0;
 	static bool NewFound;
 	cGeoP NotFoundPoint;
+	static int NotFoundCount;
 	
 	string Directory, FileName, PointString, Type, proj4string, projection;
 	FileType filetype;
@@ -689,6 +690,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 					cout << "Found point ... ";
 					point.Display();
 				}
+				NotFoundCount = 0;
 				RasterFound = true;
 				FileName = r[j]["filename"].c_str();
 				Directory = r[j]["location"].c_str();
@@ -713,13 +715,22 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 			} // if r.size()
 			else
 			{
+				NotFoundCount++;
 				if (NewFound)
 				{
 					cout << "Not finding point ... ";
 					point.Display();
+					NotFoundCount = 0;
 					NewFound = false;
 				}
 				else NotFoundPoint = point; 
+				if (NotFoundCount>100000)
+				{
+					cout << "Not finding point ... ";
+					point.Display();
+					NotFoundCount = 0;
+					NewFound = false;
+				}
 			}
 			
 		} // else !gDb->PerformRawSq	// Select filename  and Directory from files 

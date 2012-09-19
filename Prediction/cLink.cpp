@@ -523,6 +523,7 @@ void cLink::SetFresnelClear()
 	sinA = sin(angle);
 	cosA = cos(angle);
 
+	mMinClearance = MAXDOUBLE;
 	for (i=0; i<mLength; i++)
 	{
 		temp = wavelength*i*(mLength-1-i)*mPlotResolution/(cosA*(mLength-1));
@@ -545,9 +546,8 @@ void cLink::SetFresnelClear()
 		if (FRadius>0.0)
 			mClearance[i] = (float)(delta/FRadius);
 		else
-			mClearance[i] = 3.402823e+38;
+			mClearance[i] = MAXDOUBLE;
 		
-		mMinClearance = 3.402823e+38;
 		if (mMinClearance > mClearance[i])
 			mMinClearance= mClearance[i];
 

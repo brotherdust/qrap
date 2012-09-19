@@ -440,7 +440,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				AntValue = FixedAnt.GetPatternValue(mMeasPoints[i].sAzimuth, mMeasPoints[i].sTilt)
 						+ MobileAnt.GetPatternValue(0, -mMeasPoints[i].sTilt);
 				mMeasPoints[i].sPredValue = -mMeasPoints[i].sPathLoss + EIRP - AntValue;
-//				cout << "	M: "<< mMeasPoints[i].sMeasValue << "	P:" << mMeasPoints[i].sPredValue;
+//				cout << "	M="<< mMeasPoints[i].sMeasValue << "	P=" << mMeasPoints[i].sPredValue;
 
 				Error = - mMeasPoints[i].sMeasValue + mMeasPoints[i].sPredValue;
 				TotalError += Error;  
@@ -731,13 +731,15 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 	double cost, costOld, costMin;
 	bool Up;
 	int DeltaSeek;
-	int NumStop = 20;
+	int NumStop = 10;
 
 	mUseClutter = true;
 
 	LoadMeasurements();
 	
-	SeekWidth= 3.0e8/mFixedInsts[0].sFrequency/mPlotResolution/1800;
+	SeekWidth= 3.0e8/mFixedInsts[0].sFrequency/mPlotResolution/1300;
+//	SeekWidth = 19;
+
 	DeltaSeek = max(SeekWidth/2-1,1);
 	SeekWidthOld = SeekWidth;
 	SeekWidthBest = SeekWidth;
@@ -783,7 +785,7 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 		}
 		if (((100*fabs((cost - costMin)/costMin)) < 0.0001)&&(SeekWidth>1))
 		{
-//			stop = true;
+			stop = true;
 		}
 		
 		
@@ -834,7 +836,7 @@ bool cMeasAnalysisCalc::OptimiseHeights()
 		Up[i] = true;
 		CHeightDiff[i] = 1;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
-		DeltaH[i] = 0.5;
+		DeltaH[i] = 0.3;
 	}
 
 	mUseClutter = true;
@@ -878,7 +880,11 @@ bool cMeasAnalysisCalc::OptimiseHeights()
 				}
 				if (fabs(CHeightDiff[i])<0.0001)
 				{ 
-					if (first) Change[i] = false;
+					if (first)
+					{ 	
+						Change[i] = false;
+						mPathLoss.mClutter.mClutterTypes[i].sHeight-=DeltaH[i];
+					}
 					else if (cost <= costMin)
 					{
 						if (mPathLoss.mClutter.mClutterTypes[i].sHeight > 0.05)
@@ -889,7 +895,6 @@ bool cMeasAnalysisCalc::OptimiseHeights()
 				}
 				else mPathLoss.mClutter.mClutterTypes[i].sHeight-=DeltaH[i];
 				sumSquareDiff += CHeightDiff[i]*CHeightDiff[i];
-//				if (!Up[i]) CHeightDiff[i] *= -1.0;
 			}
 		}
 		SizeOfDiff = sqrt(sumSquareDiff);
@@ -899,7 +904,7 @@ bool cMeasAnalysisCalc::OptimiseHeights()
 		{
 			if (((CHeightDiff[i]<0)&&(Up[i]))||((CHeightDiff[i]>0)&&(!Up[i]))
 				||((0==mPathLoss.mClutter.mClutterTypes[i].sHeight)&&(CHeightDiff[i]>0)))
-//				if (DeltaH[i]>0.005)
+				if (DeltaH[i]>0.005)
 					DeltaH[i]*=0.5;
 			Up[i] = (CHeightDiff[i]>0);
 		
@@ -926,7 +931,7 @@ bool cMeasAnalysisCalc::OptimiseHeights()
 				BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
 			mPathLoss.mClutter.UpdateHeightsWidths(); 
 		}
-		if ((100*fabs((cost - costMin)/costMin)) < 0.00001)
+		if ((100*fabs((cost - costMin)/costMin)) < 0.0001)
 		{
 //			stop = true;
 		}

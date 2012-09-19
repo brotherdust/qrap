@@ -40,7 +40,7 @@
 #include "cClutter.h"
 
 // local defines
-#define MAXPEAK 5
+#define MAXPEAK 4
 
 namespace Qrap
 {
@@ -318,6 +318,7 @@ namespace Qrap
 			bool mUseClutter;		///< indicates whether clutter dependancies should be included. 
 			double *mCterms;		///< values of the clutter terms
 			int mClutterIndex;		///< index to the clutter type where the profile has least clearance
+			unsigned mCalcMarker;
 		public:
 			cClutter mClutter;		///< 'container' class that has the coefficients and heights to be used in the pathloss calculations. It must be public for the optimiser to see it. 
 	};

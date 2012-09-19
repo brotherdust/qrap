@@ -60,7 +60,7 @@ namespace Qrap
 	struct sClutter 
 	{
 		unsigned	sLandCoverID;
-		double  	sWidth;
+		double  	sRho;
 		double 		sHeight;
 		double*		sCoefficients;
 		bool*		sAllowCchange;		

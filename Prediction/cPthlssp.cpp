@@ -44,6 +44,7 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	m_hrx = rxh;
 	m_Loss = 0;
 	m_size = 2;
+	mCalcMarker = 0;
 
 	delete [] m_profile;
 	m_profile = new float[m_size];
@@ -63,16 +64,16 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	mUseClutter = UseClutter;
 
 	m_markers[0] = 0;
-	m_peakwidth[0] = 1;
+	m_peakwidth[0] = 2;
 	m_aboveEarth[0] = m_htx;
 	m_markers[1] = m_size - 1;
-	m_peakwidth[1] = 1;
+	m_peakwidth[1] = 2;
 	m_aboveEarth[1] = m_hrx;
 
 	for (i=2; i<MAXPEAK; i++)
 	{
 		m_markers[i] = -1;
-		m_peakwidth[i] =0;
+		m_peakwidth[i] =2;
 		m_aboveEarth[i] = 0.0;
 	};
 
@@ -278,6 +279,8 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	int IfTooManyPeaks = 0;
 	int i;
 
+	mCalcMarker++;
+//	cout << endl << mCalcMarker << "	";
 //	InputProfile.Display();
 	mLinkLength = CalcDist(InputProfile);
 	m_Loss = CalcFreeSpaceLoss(mLinkLength);
@@ -288,7 +291,9 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		
 		ReffHeight = Horizontalize(0,1);
 		PeakIndex = FindMainPeak(0,1,ReffHeight, MinClearance,sqrtD1D2);
-		MainPeakIndex = PeakIndex;
+
+		mClutterIndex = mClutterProfile[PeakIndex];
+
 		if ((MinClearance<1.0)&&(PeakIndex!=0))
 		{
 			radius = SetPeakRadius(PeakIndex,alpha);
@@ -314,35 +319,28 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 								sqrtD1D2,radius,alpha,
 								false,IfTooManyPeaks,
 								KnifeEdge, RoundHill);
-					if ((MinClearance<0)&&(OldMinClear<0)&&(i<MAXPEAK-3))
+					if ((MinClearance<=0)&&(OldMinClear<=-1)&&(i<MAXPEAK-3)&&(m_markers[i+3]>-1))
 					{
-//						cout<<endl;
-//						cout<<"C.";
-						if (MinClearance<OldMinClear)
-						{
-							double store = OldMinClear;
-							OldMinClear = MinClearance;
-							MinClearance = store;
-						}
-//						cout << endl << " i=" << i << " oldpeak: " << OldPeakIndex 
-//							<< " peak: " << PeakIndex << endl;;
-/*						for (int k=0;k<MAXPEAK; k++)
+/*						cout << endl << " i=" << i << " oldpeak: " << OldPeakIndex 
+/							<< " peak: " << PeakIndex << endl;;
+						for (int k=0;k<MAXPEAK; k++)
 						{
 							cout << k << " Peak: " << m_markers[k] << endl; 
 						}
 */
-						double d2 = abs(PeakIndex-OldPeakIndex);
+						double d2 = abs(m_markers[i+2]-m_markers[i+1]);
 						double d1 = abs(m_markers[i+1]-m_markers[i]);
 						double d3 = abs(m_markers[i+3]-m_markers[i+2]);
 //						cout << " d1=" << d1 << " d2=" << d2 << " d3=" << d3;
-						double cosecA = sqrt((d1+d2)*(d2+d3)/(d2*abs(m_markers[i+3]-m_markers[i])));
-						double cotA = 1/tan(asin(1/cosecA));
-						if ((-OldMinClear*cosecA+MinClearance*cotA)>0)
-						{
-							double L = 20*log10(cosecA*cosecA-MinClearance*cosecA*cotA/OldMinClear);
-//							cout << " L=" << L ;
-							m_Loss -= L;
-						}
+						double cotA = sqrt((d1+d2)*(d2+d3)/(d2*abs(m_markers[i+3]-m_markers[i])));
+						double cosecA = 1/sin(atan(1/cotA));
+//						cout << " cotA=" << cotA << " cosecA=" << cosecA 
+//							<< " MC=" << MinClearance << " OMC=" << OldMinClear;
+						double param = cosecA*cosecA-MinClearance*cotA/OldMinClear-cotA*cotA;
+						double L=0;
+						if (param>0) L=-20*log10(param);
+//						cout << endl << mCalcMarker << " L=" << L ;
+						m_Loss += L;
 					}
 					if (IfTooManyPeaks) i++;
 				}
@@ -369,7 +367,6 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //			mCterms[8] = TERM8;
 //		else mCterms[8] = 100;
 
-		mClutterIndex = mClutterProfile[MainPeakIndex];
 		for (i=0; i<NUMTERMS; i++)
 			m_Loss += mClutter.mClutterTypes[mClutterProfile[MainPeakIndex]].sCoefficients[i]*mCterms[i];
 	}
@@ -439,10 +436,10 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 	m_tempIPD = m_interPixelDist;
 	m_slope = 0.0;
 	m_markers[0] = 0;
-	m_peakwidth[0] = 1;
+	m_peakwidth[0] = 2;
 	m_aboveEarth[0] = m_htx;
 	m_markers[1] = m_size - 1;
-	m_peakwidth[1] = 1;
+	m_peakwidth[1] = 2;
 	m_aboveEarth[1] = m_hrx;
 
 	for (i=2; i<MAXPEAK; i++)
@@ -471,7 +468,7 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 			mClutterProfile[i] = (int)m_TempProfile[i];
 	}
 
-//      m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/1400+1);
+//      m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/1300+1);
 //	cout << " m_SeekWidth=" << m_SeekWidth;
 //      m_SmoothWidth = (int)(m_c/m_freq/m_interPixelDist/18000);
 //	cout << " m_SmoothWidth=" << m_SmoothWidth  << endl;
@@ -767,27 +764,47 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex, double &alpha)
 	yL = (double)(-*(SmoothProfile+leftInfl)+*(SmoothProfile+SPeakIndex));
 	yR = (double)(-*(SmoothProfile+rightInfl)+*(SmoothProfile+SPeakIndex));
 
+	alpha = atan2(yL,xL)+atan2(yR,xR);
 	tempL = xL*xL + yL*yL;
 	tempR = xR*xR + yR*yR;
+
 	if ((yR==0.0)&&(yL==0.0))
-		{radius=m_reR;}
+		{radius=3*m_reR;}
+	else if ((yR==0.0)&&(xL==0.0))
+		{radius = 3*m_reR;}
+	else if ((yL==0.0)&&(xR==0.0))
+		{radius = 3*m_reR;}
 	else if (xL==0.0)
 		{radius = tempR/(2.0*yR);}
 	else if (xR==0.0)
 		{radius = tempL/(2.0*yL);}
-	else if ((xR==xL)&&(yL==yR))
+	else if ((xR==-xL)&&(yL==-yR))
 		{radius = tempL/(2.0*yL);}
 	else	{x0 = (-yR*tempL+yL*tempR);
 		 y0 = (-xL*tempR-xR*tempL);
 		 radius=(sqrt(x0*x0+y0*y0)/(2.0*(xL*yR+xR*yL)));}
-	alpha = atan2(yL,xL)+atan2(yR,xR);
-/*	cout << endl<< "	r2:"<< radius;
 
-	radius = (2.0*(xL+xR)*xR*xL)/(alpha*(xL*xL+xR*xR)); 
-	cout << "	r1:"<< radius;
-        cout << "	xL=" << xL << "  xR=" << xR << "  yL=" << yL << "  yR=" << yR;
+	if (radius>MAXDOUBLE/1.2) radius = (2.0*(xL+xR)*xR*xL)/(alpha*(xL*xL+xR*xR));
+	else if (radius<-(MAXDOUBLE/1.2)) radius = (2.0*(xL+xR)*xR*xL)/(alpha*(xL*xL+xR*xR));
+
+	if (radius>MAXDOUBLE/1.2) radius = 3*m_reR;
+	else if (radius<-(MAXDOUBLE/1.2)) radius = 3*m_reR;
+
+/*	if (mCalcMarker==142423)
+	{
+	cout << endl<< "	r2:"<< radius;
+
+	double  r1 = (2.0*(xL+xR)*xR*xL)/(alpha*(xL*xL+xR*xR)); 
+	cout << "	r1:"<< r1;
+        cout << "	xL=" << xL << "  xR=" << xR << "  yL=" << yL << "  yR=" << yR << endl;
+	}
 */
 	delete [] SmoothProfile;
+	if (leftInfl>=rightInfl)
+	{
+		alpha = PI;
+ 		return 0.0;
+	}
 	return radius;
 }/*end SetPeakRadii*/
 
@@ -823,120 +840,134 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 			* sqrt(2.0/lambda)/SQd1d2;
 	MhuRho = mhu*rho;
 
+//	if (mCalcMarker==1358542) 
+//	cout << endl << mCalcMarker;
 #ifndef NO_DEBUG
 //	cout	<< " radius=" << radius << "  rho=" << rho
 //		<< "   mhu=" << mhu << "   MhuRho=" << MhuRho << endl;
 #endif
 
-	temp = (double)(EndIndex-BeginIndex)*m_interPixelDist/2.0;
-	if (mhu<-0.8) KnifeEdge = 0.85;	// equivalent to -1.5dB
+	if (mhu<-0.8) KnifeEdge = 1.0;	// equivalent to 0
 	else if (mhu < 0.0) KnifeEdge = 0.5 - 0.62*mhu;
-	else if (mhu <1.0)  KnifeEdge = 0.5*exp(-0.95*mhu);
-	else if (mhu <2.4) { temp = 0.38 - 0.1*mhu;
+	else if (mhu < 1.0)  KnifeEdge = 0.5*exp(-0.95*mhu);
+	else if (mhu < 2.4) { temp = 0.38 - 0.1*mhu;
 				   KnifeEdge = 0.4 - sqrt(0.1184 - temp*temp);}
 	else KnifeEdge = 0.225/mhu;
 	KnifeEdge = -20.0*log10(KnifeEdge);
 
-	if ((radius>0)&&(rho<=1.2)&&(radius<0.5*m_reR))
-	{
-		
-		if ((!Vertical)||(rho>1.0))
-		{
-//* Parsons */ /* if (rho<=1.4) */  /*For horizontal polirization */
-//			cout << endl << "C&D	";
-			RoundHill = 6.0 + 7.19*rho - 2.02*rho*rho
-					+ 3.63*rho*rho*rho - 0.75*rho*rho*rho*rho;
-			if (MhuRho<-0.95) Surface = -30.0;
-			else if (MhuRho<2.0)
-				Surface=(43.6+23.5*MhuRho)*log10(1.0+MhuRho) -
-						6.0 - 6.7*MhuRho;
-			else 	Surface=22.0*MhuRho-20.0*log10(MhuRho)-14.13;
-		}
-		else
-// /* Old RAP */	/* if (rho<=1.0) */
-		{
-//			cout << endl << "OldRap	";
-			RoundHill = 6.02 + 5.556*rho + 3.418*rho*rho +
-					0.256*rho*rho*rho;
-			if (MhuRho<-2.0) Surface =-20.0;
-			else if (MhuRho<=3.0)
-				Surface = 11.45*MhuRho + 2.19*MhuRho*MhuRho -
-						0.206*MhuRho*MhuRho*MhuRho - 6.02;
-			else if (MhuRho<=5.0)
-				Surface = 13.47*MhuRho + 1.058*MhuRho*MhuRho -
-						0.048*MhuRho*MhuRho*MhuRho - 6.02;
-			else Surface = 20.0*MhuRho -18.2;
-		}
-	}
-	else if ((radius>0)&&(radius<3*m_reR))
-	{	
-// /* CCIR 1990 */ /* no limit */
+	temp = (double)(EndIndex-BeginIndex)*m_interPixelDist/2.0;
 
-//		cout << endl << "CCIR ";
+	if ((!Vertical)&&(radius>0)&&(rho<=1.4)&&(radius<0.5*m_reR)&&(mhu>-0.6))
+	{
+		// Parsons  //if (rho<=1.4)   //For horizontal polirization 
+		// Dougherty & Maloney 1964 Radio Science Journal of Research
+//		cout << " D&M	";
+		RoundHill = 6.0 + 7.19*rho - 2.02*rho*rho
+				+ 3.63*rho*rho*rho - 0.75*rho*rho*rho*rho;
+		if (MhuRho<-0.95) Surface = -30.0;
+		else if (MhuRho<2.0)
+			Surface=(43.6+23.5*MhuRho)*log10(1.0+MhuRho) -
+					6.0 - 6.7*MhuRho;
+		else 	Surface=22.0*MhuRho-20.0*log10(MhuRho)-14.13;
+	}
+	else if ((radius>0)&&(rho<=1.2)&&(radius<=0.5*m_reR)&&(mhu>-0.6))
+	{
+		//  Old RAP 	// if (rho<=1.0) 
+//		if (mCalcMarker==142423) 
+//		cout << " OldRap		";
+		RoundHill = 6.02 + 5.556*rho + 3.418*rho*rho +
+				0.256*rho*rho*rho;
+		if (MhuRho<-2.0) Surface =-20.0;
+		else if (MhuRho<=3.0)
+			Surface = 11.45*MhuRho + 2.19*MhuRho*MhuRho -
+					0.206*MhuRho*MhuRho*MhuRho - 6.02;
+		else if (MhuRho<=5.0)
+			Surface = 13.47*MhuRho + 1.058*MhuRho*MhuRho -
+					0.048*MhuRho*MhuRho*MhuRho - 6.02;
+		else Surface = 20.0*MhuRho -18.2;
+	}
+	else if ((temp<radius)&&(radius>0.5*m_reR)&&(MainEdge)&&(mhu>0.0))
+	{
+		//  Rec. ITU-R P.526-12 Feb 2012 $3.1.1 
+		// Spherical earth
+//		temp = (double)(EndIndex-BeginIndex)*m_interPixelDist/2.0;
+		Y1=Y2=ReffHeight-m_TempProfile[PeakIndex]+radius -
+			sqrt(radius*radius-temp*temp);
+		temp = 60.0*60.0*lambda*lambda*Sigma*Sigma;
+		K = pow(2.0*M_PI*radius/lambda,-1.0/3.0)
+			* pow((Er-1.0)*(Er-1.0) + temp, -0.25);
+		if (Vertical) K *= sqrt(Er*Er +temp);
+		temp = K*K*K*K;
+		Betha = ( 1.0+1.6*K*K+0.67*temp)/(1.0+4.5*K*K+1.53*temp);
+		X = Betha*pow(M_PI/(lambda*radius*radius),1.0/3.0)*
+		    (m_interPixelDist*(double)(EndIndex-BeginIndex));
+		temp = 2.0*Betha*pow(M_PI*M_PI/(lambda*lambda*radius),1.0/3.0);
+		Y1 *= temp;
+		Y2 *= temp;
+		if (X>=6) Surface =  -(11.0 + 10.0*log10(X) -17.6*X);
+		else Surface = 20*log10(X) + 5.6488*pow(X,1.425);
+		Surface -=  (HeightGain(Y1,K) + HeightGain(Y2,K));
+		KnifeEdge = 0;
+//		Surface *= mClutter.mClutterTypes[mClutterProfile[PeakIndex]].sRho;
+//		if (mCalcMarker==142423) 
+//		cout << " SEarth	X=" << X;
+	}
+	else if (radius>0)
+	{
+		// according to Hacking BBC report Parsons p45	
+//		cout << " Hacking		";
+//		RoundHill = mClutter.mClutterTypes[mClutterProfile[PeakIndex]].sRho
+		RoundHill = 11.7*pow((PI*radius*m_freq*1000*1000/m_c),1/3)*alpha;
+
+//		double R2 = RoundHill;
+//		RoundHill = max(R1,R2);
+	}
+/*
+	else if ((radius>0)&&(radius<3*m_reR)&&(rho<1.3)&&(mhu>-0.6))
+	{
+		//  Rec. ITU-R P.526-12 Feb 2012 $4.2 
+//		if (mCalcMarker==142423) 
+		cout << " RoundHill	";
 		RoundHill = 7.2*rho - 2.0*rho*rho + 3.6*rho*rho*rho
-							- 0.8*rho*rho*rho*rho;
+						- 0.8*rho*rho*rho*rho;
 		double xhi;
 		xhi = MhuRho*sqrt(M_PI/2.0);
 		Surface = 0.0;
-		if ((xhi>=-rho)&&(xhi<0)) Surface = RoundHill*xhi/rho;
-		else if (xhi<4.0) Surface = 12.5*xhi;
-		else Surface = 17.0*xhi - 6.0 -20.0*log10(xhi);
-		double R1 = RoundHill + Surface;
-		Surface = 0.0;
-
-// according to Hacking BBC report
-		RoundHill = 0.9*11.7*pow((PI*radius*m_freq*1000*1000/m_c),1/3)*alpha;
-		double R2 = RoundHill;
-
-// CCIR 1990 spherical earth diffraction 
-		double R3=0;
-		temp = (double)(EndIndex-BeginIndex)*m_interPixelDist/2.0;
-		if (temp<radius)
-		{
-			Y1=Y2=ReffHeight-m_TempProfile[PeakIndex]+radius -
-				sqrt(radius*radius-temp*temp);
-			temp = 60.0*60.0*lambda*lambda*Sigma*Sigma;
-			K = pow(2.0*M_PI*radius/lambda,-1.0/3.0)
-				* pow((Er-1.0)*(Er-1.0) + temp, -0.25);
-			if (Vertical) K *= sqrt(Er*Er +temp);
-			temp = K*K*K*K;
-			Betha = ( 1.0+1.6*K*K+0.75*temp)/(1.0+4.5*K*K+1.35*temp);
-			X = Betha*pow(M_PI/(lambda*radius*radius),1.0/3.0)*
-			    (m_interPixelDist*(double)(EndIndex-BeginIndex));
-			temp = 2.0*Betha*pow(M_PI*M_PI/(lambda*lambda*radius),1.0/3.0);
-			Y1 *= temp;
-			Y2 *= temp;
-			Surface =  -(11.0 + 10.0*log10(X) -17.6*X);
-			Surface -=  (HeightGain(Y1,K) + HeightGain(Y2,K));
-			R3 = Surface;
-			Surface = 0.0;
-		}
-
-		RoundHill = max(R2,max(R1,R3));
+//		if ((xhi>=-rho)&&(xhi<0)) Surface = RoundHill*xhi/rho;
+		if (xhi<=4.0) Surface = 12.5*xhi;
+		else Surface = 17.0*xhi - 6.0 - 20.0*log10(xhi);
 		
-//		cout << " R1="<< R1 << " R2=" << R2 << " R3=" << R3;	
-
+//		double R1 = Surface + RoundHill;
+//		Surface = 0.0;
 	}
-	else if (MainEdge)
+
+*/
+/*	else if (MainEdge)
 	{
-//		cout << endl << "FEarth	";
+		// Adjustment to Flat earth model
+		cout << " FlatEarth	";
 		Y1=Y2=ReffHeight-m_TempProfile[PeakIndex];
 		if (Y1<0.1) Y1 =Y2 = 0.1;
-		// The 0.8 is to account for the fact that some absorbtion
-		// of the reflected wave will take place.
-		Surface = -0.8*20.0*log10(Y1*Y2*4.0*M_PI/(lambda*
-			(m_interPixelDist*(double)(EndIndex-BeginIndex))));
-
+		Surface = -mClutter.mClutterTypes[mClutterProfile[PeakIndex]].sRho
+				*20.0*log10(Y1*Y2*4.0*M_PI/(lambda*mLinkLength));
 	}
-//	else cout << endl;
-/*
+*/	else
+	{
+//		if (mCalcMarker==142423)
+//	 	cout << " Nothing		";
+	}
+
+//	if (mCalcMarker==142423)
+/*	{
 #ifndef NO_DEBUG
+	cout << " mhu=" << mhu;
 	cout << " radius=" << radius;
 	cout << " rho=" << rho;
 	cout << " KnifeEdge=" << KnifeEdge;
 	cout << " RoundHill=" << RoundHill;
 	cout << " Surface=" << Surface;
 #endif
+	}
 */
 	if ((RoundHill+Surface)<0.0)
 	{
@@ -945,7 +976,6 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 	}
 
 	DiffLoss = KnifeEdge + RoundHill + Surface;
-
 
 	int i,j;
 	for(i=0;(i<MAXPEAK)&&(m_markers[i]<PeakIndex)&&(m_markers[i]!=-1);i++);
@@ -964,10 +994,10 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 		temp = (double)m_TempProfile[PeakIndex]-
 			 (ReffHeight-sqrt(lambda)*SQd1d2);
 		if (radius<0.0) m_peakwidth[i] = m_size;
-		else if ((temp<0)||(temp>2.0*radius)) m_peakwidth[i] = 1;
+		else if ((temp<0)||(temp>2.0*radius)) m_peakwidth[i] = 2;
 		else 	m_peakwidth[i] = (int)(sqrt(temp*(2.0*radius-temp))
 							/m_interPixelDist+0.5);
-		if (m_peakwidth[i]==0) m_peakwidth[i]=1;
+		if (m_peakwidth[i]<2) m_peakwidth[i]=2;
 
 		if (mhu<0) m_aboveEarth[i]=(ReffHeight-m_TempProfile[PeakIndex]);
 		else m_aboveEarth[i] = 0.0;
@@ -985,15 +1015,16 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 //**************************************************************************
 inline double cPathLossPredictor::HeightGain(const double Y, const double K)
 {
-	double Gain;
-
+	double Gain,temp;
+	temp = 2.0 + 20.0*log10(K);
 	if (Y<(K/10.0))
-		Gain = 2.0 + 20.0*log10(K);
+		Gain = temp;
 	else if (Y<(10.0*K))
 		Gain = 2.0 + 20.0*log10(K) +9.0*log10(Y/K)*(log10(Y/K)+1.0);
 	else if (Y<2.0)
 		Gain = 20.0*log10(Y+0.1*Y*Y*Y);
 	else	Gain = 17.6*sqrt(Y-1.1) -5.0*log10(Y-1.1) -8.0;
+	if (Gain < temp) Gain = temp;  
 return Gain;
 }/* end CPathLossPredictor::HeightGain */
 

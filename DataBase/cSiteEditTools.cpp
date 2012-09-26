@@ -114,7 +114,7 @@ QString Qrap::FindLatLon(QString lat,QString lon)
 			} // if DDdddd
 		} // else DDMMmm
 	} // else DDMMSS
-	return QString("GeomFromText('POINT(%1 %2)',4326)").arg(longitude).arg(latitude);
+	return QString("ST_GeomFromText('POINT(%1 %2)',4326)").arg(longitude).arg(latitude);
 }
 
 

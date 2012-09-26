@@ -668,7 +668,8 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 		query += temp; 
 		query += " AND filename NOT IN ("+LoadedRastersNames;
 		query += ") AND "+ PointString + " <@"+"areasquare;";
-					
+	
+		cout << query << endl;				
 		if(!gDb.PerformRawSql(query))
 		{
 			string err = "Database Select for RasterFile failed. Query: ";

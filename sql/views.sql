@@ -1,3 +1,21 @@
+create view links_view as select links.id as id, linkname, 
+			site1.sitename||rad1.sector as txsite, txinst, rad1.txantennaheight as txheight, rad1.txbearing as txbearing,
+			site2.sitename||rad2.sector as rxsite, rxinst, rad2.rxantennaheight as rxheight, rad2.rxbearing as rxbearing,
+			minclearance as clear,
+			frequency, 
+			ST_Distance( site1.location::geography, site2.location::geography)/1000 as distance, 
+			pathloss, kfactor, line
+			from links cross join radioinstallation as rad1 cross join site_view_only as site1
+	 		cross join radioinstallation as rad2 cross join site_view_only as site2
+	 		where txinst=rad1.id
+			and rxinst=rad2.id
+			and rad1.siteid=site1.id
+			and rad2.siteid=site2.id;
+
+
+
+
+
 create view site_view as select * from site;
 create view site_view_only as select * from site;
 create view site_view_list as select * from site;
@@ -109,6 +127,23 @@ create view cell_view as select
 	frequencyallocationlist.carrier as carrier,
 	frequencyallocationlist.channel as channel
 	from frequencyallocationlist where frequencyallocationlist.ci is null;
+
+drop view links_view;
+	
+create view links_view as select links.id as id, linkname, 
+			site1.sitename||rad1.sector as txsite, txinst, rad1.txantennaheight as txheight, rad1.txbearing as txbearing,
+			site2.sitename||rad2.sector as rxsite, rxinst, rad2.rxantennaheight as rxheight, rad2.rxbearing as rxbearing,
+			minclearance as clear,
+			frequency, 
+			ST_Distance( site1.location::geography, site2.location::geography)/1000 as distance, 
+			pathloss, kfactor, line
+			from links cross join radioinstallation as rad1 cross join site_view_only as site1
+	 		cross join radioinstallation as rad2 cross join site_view_only as site2
+	 		where txinst=rad1.id
+			and rxinst=rad2.id
+			and rad1.siteid=site1.id
+			and rad2.siteid=site2.id;
+			
 
 	
 create view radioinstallation_view as select 

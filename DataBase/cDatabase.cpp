@@ -414,7 +414,7 @@ int cDatabase::Insert (const StringMap& values, const string& tableName)
 		colStr += it->first;
 		// if this column's a PostGIS field - insert it with the GeomFromText function
 		if (mStructure[tableName].mFields[it->first].mPostGis)
-			valStr += "GeomFromText('"+it->second+"', "+srid+")";
+			valStr += "ST_GeomFromText('"+it->second+"', "+srid+")";
 		else
 			valStr += it->second;
 		
@@ -485,7 +485,7 @@ bool cDatabase::Update (const StringMap& values, const string& tableName,
 		
 		// if this field's a PostGIS field
 		if (mStructure[tableName].mFields[it->first].mPostGis)
-			valStr += "GeomFromText('"+it->second+"', "+srid+")";
+			valStr += "ST_GeomFromText('"+it->second+"', "+srid+")";
 		else
 			valStr += it->second;
 		
@@ -1044,7 +1044,7 @@ bool cDatabase::SetDefaults (const string& tableName, const StringMap& defaults)
 			colStr += it->first;
 			// if this column's a PostGIS field
 			if (mStructure[tableName].mFields[it->first].mPostGis)
-				valStr += "GeomFromText('"+it->second+"', "+srid+")";
+				valStr += "ST_GeomFromText('"+it->second+"', "+srid+")";
 			else
 				valStr += it->second;
 			
@@ -1072,7 +1072,7 @@ bool cDatabase::SetDefaults (const string& tableName, const StringMap& defaults)
 		{
 			valStr += it->first+"=";
 			if (mStructure[tableName].mFields[it->first].mPostGis)
-				valStr += "GeomFromText('"+it->second+"', "+srid+")";
+				valStr += "ST_GeomFromText('"+it->second+"', "+srid+")";
 			else
 				valStr += it->second;
 			it++;
@@ -1823,7 +1823,7 @@ short int cDatabase::getsetMachineID()
 		globalMachineID = (short int) Insert(values, tableName);
 	}
 	cout << "Verlaat cDataBase::getsetMachineID():  globalMachineID=" << globalMachineID << endl;
-	if ((HostID!=NULL)&&(HostIDnew)) delete [] HostID;
+//	if (HostID!=NULL) delete [] HostID;
 	return globalMachineID;
 }
 

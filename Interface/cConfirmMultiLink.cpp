@@ -175,10 +175,10 @@ bool cConfirmMultiLink::SetPoints(QList<QgsPoint> Points)
 		double West = Points[0].x();
 		string query;
 		pqxx::result SitesIn;
-		query = "SELECT id,sitename, AsText(location) AS location,status";
+		query = "SELECT id,sitename, ST_AsText(location) AS location,status";
 		query += " FROM site_view_only ";
 		query += " WHERE  location ";
-        	query +="@ GeomFromText('POLYGON((";
+        	query +="@ ST_GeomFromText('POLYGON((";
 	        for (int i = 0 ; i < Points.size();i++)
  	       	{
  		       	North = max(North,Points[i].y());

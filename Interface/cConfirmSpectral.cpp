@@ -59,13 +59,13 @@ bool cConfirmSpectral::SetPoints(QList<QgsPoint> Points)
 		double West = Points[0].x();
 		string query;
 		pqxx::result SitesIn;
-		query = "SELECT siteid,sitename,AsText(location) AS location,status,";
+		query = "SELECT siteid,sitename,ST_AsText(location) AS location,status,";
 		query += " sector,radioinstallation.id AS radinst,"; 
 		query += " techkey, technologytype,groundheight,status,project,flagx,flagz, ";
 		query += " maxrange as radius";
 		query += " FROM radioinstallation cross join technology cross join site ";
 		query += " WHERE techkey=technology.id AND location ";
-        	query +="@ GeomFromText('POLYGON((";
+        	query +="@ ST_GeomFromText('POLYGON((";
 	        for (int i = 0 ; i < Points.size();i++)
  	       	{
  		       	North = max(North,Points[i].y());

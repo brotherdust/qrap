@@ -78,7 +78,7 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 		mUseClutter = true;
 	else mUseClutter = false;
 
-	mUseClutter = true;
+//	mUseClutter = true;
 
 	mClutterSource = atoi(gDb.GetSetting("ClutterSource").c_str());
 	cout << "mClutterSource = " << mClutterSource << endl;

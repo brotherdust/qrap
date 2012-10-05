@@ -674,7 +674,7 @@ bool cLink::GetDBinfo(tFixed &Inst)
 	gcvt(Inst.sInstKey,8,temp);
 	if (mFrequency>59999)
 	{ // Get frequency from database
-		query = "SELECT siteid,AsText(location) as location,eirp,txpower,txlosses,rxlosses,rxsensitivity,frequency ";
+		query = "SELECT siteid,ST_AsText(location) as location,eirp,txpower,txlosses,rxlosses,rxsensitivity,frequency ";
 		query += "txantpatternkey,txbearing,txmechtilt,txantennaheight, ";
 		query += "rxantpatternkey,rxbearing,rxmechtilt,rxantennaheight ";
 		query += "FROM radioinstallation cross join site cross join cell cross join frequencyallocationlist ";
@@ -685,7 +685,7 @@ bool cLink::GetDBinfo(tFixed &Inst)
 	}
 	else
 	{
-		query = "SELECT siteid,AsText(location) as location,eirp,txpower,txlosses,rxlosses,rxsensitivity,";
+		query = "SELECT siteid,ST_AsText(location) as location,eirp,txpower,txlosses,rxlosses,rxsensitivity,";
 		query += "txantpatternkey,txbearing,txmechtilt,txantennaheight,";
 		query += "rxantpatternkey,rxbearing,rxmechtilt,rxantennaheight ";
 		query += "FROM radioinstallation cross join site WHERE siteid=site.id AND radioinstallation.id =";
@@ -761,7 +761,7 @@ bool cLink::GetDBinfoS(tFixed &Inst)
 	// Populate the site information from the database. The rest of the info is already in Inst
 		
 	gcvt(Inst.sSiteID,8,temp);
-	query = "SELECT id,sitename,AsText(location) as location from site ";
+	query = "SELECT id,sitename,ST_AsText(location) as location from site ";
 	query += "WHERE id=";
 	query += temp; 
 	query += ";";

@@ -69,13 +69,13 @@ bool cConfirmPrediction::SetPoints(QList<QgsPoint> Points)
 		string query;
 		pqxx::result SitesIn;
 
-		query = "SELECT distinct siteid, site_view_only.sitename as sitename ,AsText(location) AS location,status,";
+		query = "SELECT distinct siteid, site_view_only.sitename as sitename ,ST_AsText(location) AS location,status,";
 		query += " sector,radioinstallation_view.id AS radinst,"; 
 		query += " groundheight, status, project, flagx, flagz, technologytype, techkey ";
 		query += "FROM radioinstallation_view LEFT OUTER JOIN technology  ";
 		query += " ON (radioinstallation_view.techkey=technology.id) cross join site_view_only ";
 		query += " WHERE (radioinstallation_view.siteid = site_view_only.id) and location ";
-        	query +="@ GeomFromText('POLYGON((";
+        	query +="@ ST_GeomFromText('POLYGON((";
 	        for (int i = 0 ; i < Points.size();i++)
 	        {
 	        	North = max(North,Points[i].y());
@@ -560,7 +560,7 @@ void cConfirmPrediction::on_btnDo_clicked()
 					string PointString;
 					unsigned spacePos; 
 					double Radius = tableWidget->item(i,2)->text().toDouble()*1000;
-					string query = "SELECT AsText(location) AS location"; 
+					string query = "SELECT ST_AsText(location) AS location"; 
 					query += " FROM radioinstallation cross join site WHERE ";
 					query += " siteid = site.id AND ";
 					query += "radioinstallation.id  = ";

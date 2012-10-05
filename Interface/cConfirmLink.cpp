@@ -310,7 +310,7 @@ void cConfirmLink::on_btnOk_clicked()
 		}
 	}
 	
-	//string query = "SELECT AsText(location) AS location,";
+	//string query = "SELECT ST_AsText(location) AS location,";
 	switch (displayUnitsCombo->currentIndex())
 	{
 		case 0:			Units = dB;		break;

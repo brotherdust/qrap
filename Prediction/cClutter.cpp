@@ -36,7 +36,10 @@ cClutter::cClutter()
 {
 	cout << "In cClutter Default constructor" << endl;
 	mNumber = 0;
-	GetFromDatabase();
+	mClutterTypes = NULL;
+	string setting = gDb.GetSetting("UseClutter");
+	if (setting=="true")
+		GetFromDatabase();
 }/*end cClutter Default Constructor */
 
 
@@ -47,7 +50,10 @@ cClutter::cClutter(unsigned ClassGroup)
 {
 	cout << "In cClutter Overlaod constructor" << endl;
 	mNumber = 0;
-	GetFromDatabase(ClassGroup);
+	mClutterTypes = NULL;
+	string setting = gDb.GetSetting("UseClutter");
+	if (setting=="true")
+		GetFromDatabase(ClassGroup);
 }/*end cClutter Default Constructor */
 
 
@@ -55,7 +61,7 @@ cClutter::cClutter(unsigned ClassGroup)
 //## Destructor 
 cClutter::~cClutter()
 {
-	Destroy();
+		Destroy();
 }
 
 
@@ -330,7 +336,7 @@ void cClutter::Destroy()
 		delete [] mClutterTypes[i].sAllowCchange;
 	}
 
-	delete [] mClutterTypes;
+	if (mClutterTypes!=NULL) delete [] mClutterTypes;
 }
 
 //**************************************************************************************

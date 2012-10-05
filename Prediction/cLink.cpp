@@ -843,7 +843,7 @@ void cLink::SaveLink(string &LinkName, int &LinkID)
 	query += ", ";	
 	gcvt(mkFactor,8,temp);
 	query += temp;
-	query += ", GeomFromText('LINESTRING(";
+	query += ", ST_GeomFromText('LINESTRING(";
 	double lat,lon;
 	mTxInst.sSitePos.SetGeoType(DEG);
 	mTxInst.sSitePos.Get(lat,lon);

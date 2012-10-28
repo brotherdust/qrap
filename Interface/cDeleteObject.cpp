@@ -70,8 +70,8 @@ bool cDeleteObject::SetParameters(QString Lat,QString Lon,bool site,double scale
 		There.FromHere(Here,(scale/atof(SiteSense.c_str())),135);
 		There.SetGeoType(DEG);
 		There.Get(South,East);
-		query = "SELECT id,sitename,AsText(location) AS location,groundheight,status FROM site WHERE location ";
-		query +="&& SetSRID('BOX3D(";
+		query = "SELECT id,sitename,ST_AsText(location) AS location,groundheight,status FROM site WHERE location ";
+		query +="&& ST_SetSRID('BOX3D(";
 		char text[12];
 		gcvt(West,10,text);
 		query += text;

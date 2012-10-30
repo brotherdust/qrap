@@ -258,7 +258,7 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 				mLastMeas++;
 				gcvt(mLastTestPoint,9,TPID);
 				query = queryP;
-				PosString=QString(",GeomFromText('POINT(%1 %2)',4326),").arg(Lon).arg(Lat);
+				PosString=QString(",ST_GeomFromText('POINT(%1 %2)',4326),").arg(Lon).arg(Lat);
 				query += PosString.toStdString();
 				query += TPID;
 				query += ");";

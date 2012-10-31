@@ -56,9 +56,9 @@ int main (int argc, char **argv)
 	Meas.OptimiseModelCoefD();
 */
 	string dir="/home/maggie/GISdata/SA National land cover 2001/BIN/";
-	cLoadFile Files(4,7,dir);
+	cLoadFile Files(5,8,dir);
 	cout << "Voor cut" << endl;
-	Files.CutCurrentSet(4,7, false, 2);
+	Files.CutCurrentSet(5,8, false, 2);
 
 	// For Arc Grid
 /*	string dir="/home/maggie/Data/RasterData/BIN";

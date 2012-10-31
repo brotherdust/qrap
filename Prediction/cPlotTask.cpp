@@ -536,7 +536,7 @@ bool cPlotTask::ReadPlotRequest(const char *filename)
 		for (unsigned ii=0; ii<mFixedInsts.size(); ii++)
 		{
 			gcvt(mFixedInsts[ii].sInstKey,9,temp2);
-			string query = "SELECT AsText(location) AS location"; 
+			string query = "SELECT ST_AsText(location) AS location"; 
 			query += " FROM radioinstallation cross join site WHERE ";
 			query += " siteid =site.id AND ";
 			query += "radioinstallation.id  = ";
@@ -1558,7 +1558,7 @@ bool cPlotTask::GetDBinfo()
 	for(i=0 ; i<mFixedInsts.size() ; i++)
 	{
 		gcvt(mFixedInsts[i].sInstKey,8,temp);
-		query = "SELECT siteid, AsText(location) as location, eirp,txpower,txlosses,rxlosses,rxsensitivity,";
+		query = "SELECT siteid, ST_AsText(location) as location, eirp,txpower,txlosses,rxlosses,rxsensitivity,";
 		query +="txantpatternkey,txbearing,txmechtilt,rxantpatternkey,rxbearing,rxmechtilt,txantennaheight,rxantennaheight, ";
 		query +="btlfreq, spacing, bandwidth, downlink, uplink ";
 		query += "FROM radioinstallation CROSS JOIN technology CROSS JOIN site ";

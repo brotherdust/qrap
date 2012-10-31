@@ -132,7 +132,7 @@ pqxx::result Qrap::FindClosebySites(cGeoP Here, int distance)
 	Here.SetGeoType(DEG,-1);
 	double North,South,East,West;
 	Here.Get(South,East);
-	query = "SELECT id,sitename,AsText(location) AS ligging,groundheight,status, ";
+	query = "SELECT id,sitename,ST_AsText(location) AS ligging,groundheight,status, ";
 	query += " ST_Distance(ST_GeomFromText('POINT(";
 	gcvt(South,10,text);
 	query += text;
@@ -141,7 +141,7 @@ pqxx::result Qrap::FindClosebySites(cGeoP Here, int distance)
 	query += text;
 	query +=")',4326)::geometry";
 	query +=", location::geometry) as distance ";
-       	query +=" FROM site WHERE location && SetSRID('BOX3D(";
+       	query +=" FROM site WHERE location && ST_SetSRID('BOX3D(";
 	double scale = distance*1.42; 
 	There.FromHere(Here,scale,315);
 	There.SetGeoType(DEG);

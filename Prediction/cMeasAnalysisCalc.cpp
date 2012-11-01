@@ -111,7 +111,7 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 	char * text = new char[10];		
 	pqxx::result r, rMobile, rFixed;
 
-	string query ="SELECT mobile, ci, frequency, AsText(location) as location, ";
+	string query ="SELECT mobile, ci, frequency, ST_AsText(location) as location, ";
 	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth ";
 	query += "from measurement cross join testpoint cross join measdatasource ";
 	query += "where tp=testpoint.id and measdatasource=measdatasource.id";
@@ -230,7 +230,7 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 				{
 					cout << "New Cell = " << mMeasPoints[i].sCell << endl;
 					gcvt(mMeasPoints[i].sCell,8,text);
-					query = "SELECT risector, siteid, AsText(location) as location, eirp,";
+					query = "SELECT risector, siteid, ST_AsText(location) as location, eirp,";
 					query += "radioinstallation.txpower as txpower,txlosses,rxlosses";
 					query +=",rxsensitivity,txantpatternkey,txbearing,txmechtilt,rxantpatternkey,";
 					query += "rxbearing,rxmechtilt,txantennaheight,rxantennaheight ";

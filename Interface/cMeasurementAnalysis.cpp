@@ -79,7 +79,7 @@ void cMeasurementAnalysis::on_pushOk_clicked()
 
 	if (MeasSet.LoadMeasurements(MeasType,PosSource,MeasSource))
 	{
-		if (MeasSet.PerformAnalysis(Mean, MeanSquareError, StDev, CorrC))
+		if (MeasSet.PerformAnalysis(Mean, MeanSquareError, StDev, CorrC)>0)
 		{
 			ValueMeanError->setText(QString("%1").arg(Mean));
                		ValueStdDev->setText(QString("%1").arg(StDev));

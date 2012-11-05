@@ -103,7 +103,7 @@ cMeasAnalysisCalc::~cMeasAnalysisCalc() // destructor
 
 
 //*********************************************************************
-int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource, 
+bool cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource, 
 					unsigned MeasSource, unsigned CI)
 {
 
@@ -149,6 +149,9 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 	int currentMobile=0;
 	tFixed tempInst;
 	tMobile tempMobile;
+
+	cout << "In cMeasAnalysisCalc::LoadMeasurements; QUERY:" << endl;
+	cout << query << endl; 
 	// Perform a Raw SQL query
 	if(!gDb.PerformRawSql(query))
 	{
@@ -289,6 +292,7 @@ int cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 	} // else ... hence the query was successful
 	
 	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
+	return true;
 }
 
 

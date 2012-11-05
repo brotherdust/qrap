@@ -81,7 +81,7 @@ bool cConfirmLink::SetPoints(QList<QgsPoint> Points,double scale)
 	query += "radioinstallation_view.techkey AS ttk ";
 	query += "FROM radioinstallation_view LEFT OUTER JOIN technology ON (radioinstallation_view.techkey=technology.id)  ";
 	query += "CROSS JOIN site WHERE (siteid = site.id) AND ";
-	query +="location && SetSRID('BOX3D(";
+	query +="location && ST_SetSRID('BOX3D(";
 	gcvt(West,10,text);
 	query += text;
 	query +=" ";
@@ -141,7 +141,7 @@ bool cConfirmLink::SetPoints(QList<QgsPoint> Points,double scale)
 	query += "radioinstallation_view.techkey AS ttk ";
 	query += "FROM radioinstallation_view LEFT OUTER JOIN technology ON (radioinstallation_view.techkey=technology.id)  ";
 	query += "CROSS JOIN site WHERE (siteid = site.id) AND ";
-	query +="location && SetSRID('BOX3D(";
+	query +="location && ST_SetSRID('BOX3D(";
 	gcvt(West,10,text);
 	query += text;
 	query +=" ";

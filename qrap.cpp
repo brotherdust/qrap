@@ -816,7 +816,7 @@ void QRap::GetLink(double lat, double lon)
 	gcvt(lat,8,Lat);
 	gcvt(lon,8,Lon);
 	string query = "SELECT id, txinst,rxinst, linkname, frequency, kfactor ";
-	query += "FROM links WHERE line && GeomFromText('POINT(";
+	query += "FROM links WHERE line && ST_GeomFromText('POINT(";
 	query +=  Lon;
 	query += " ";
 	query += Lat;

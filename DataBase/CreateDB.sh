@@ -21,8 +21,16 @@ echo "running postgis.sql"
 psql qrap -f ${PostGISDir}postgis.sql
 echo "running spatial_ref_sys.sql"
 psql qrap -f ${PostGISDir}spatial_ref_sys.sql
-echo "running spatial_ref_sys.sql"
+echo "running postgis_comments.sql"
 psql qrap -f ${PostGISDir}postgis_comments.sql
+echo "running rtpostgis.sql"
+psql qrap -f ${PostGISDir}rtpostgis.sql
+echo "running raster_comments.sql"
+psql qrap -f ${PostGISDir}raster_comments.sql
+echo "running topology.sql"
+psql qrap -f ${PostGISDir}topology/topology.sql
+echo "running topology_comments.sql"
+psql qrap -f ${PostGISDir}doc/topology_comments.sql
 psql -c "ALTER DATABASE qrap OWNER TO postgres"
 
 make

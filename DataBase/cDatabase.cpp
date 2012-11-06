@@ -340,7 +340,7 @@ bool cDatabase::Select (const string& columns, const string& tableName, const st
 		else
 		// if it's a PostGIS field, it needs to be returned in a specific format
 		if (mStructure[tableName].mFields[cols[i]].mPostGis)
-			fixedCols += "ST_AsText("+cols[i]+") as "+cols[i];
+			fixedCols += "ST_AsEWKT("+cols[i]+") as "+cols[i];
 		else
 			fixedCols += cols[i];
 		if ((i+1) < count)
@@ -1940,7 +1940,7 @@ bool cDatabase::ExportToCsv (const std::string& tableName, const std::string& fi
 	for (DbFieldMap::iterator field=fields.begin(); field != fields.end(); field++)
 	{
 		if (field->second.mPostGis)
-			query += "ST_AsText("+field->first+") as "+field->first;
+			query += "ST_AsEWKT("+field->first+") as "+field->first;
 		else
 			query += field->first;
 		i++;

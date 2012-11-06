@@ -508,13 +508,13 @@ void cFilter::CreateViews()
 			if (whereclause!="")
 				whereclause += " and ";
 			whereclause += "\""+table+"\".\""+column+"\"='"+area;
-			whereclause += "' and location @ the_geom";
+			whereclause += "' and location @ the_geom ";
 			query += " cross join \""+table+"\" ";
-			
+
 		}
 		if (((status!="")&&(status!="All"))||((table!="")&&(table!="Not Used")&&
 				(column!="")&&(column!="Not Used")&&(area!="")&&(area!="All")))
-			query +=" where "+whereclause+";";
+			query +=" where "+whereclause +";";
 		
 		queryB = "create view site_view as select distinct site.* from site "+query; 
 		if (gDb.ViewExists("site_view"))
@@ -526,6 +526,7 @@ void cFilter::CreateViews()
 				QRAP_ERROR("Error dropping site_view in cFilter::CreateViews");
 			}
 		}
+		cout << queryB << endl;
 		if (!gDb.PerformRawSql(queryB))
 		{
 			cout << "Error creating site_view in cFilter::CreateViews" << endl;

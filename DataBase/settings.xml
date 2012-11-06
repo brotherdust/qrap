@@ -5,7 +5,7 @@ www.QRap.org.za -->
 	<logfile location="./qrap.log" />
 	
 	<!-- Local (client) database settings -->
-	<database host="127.0.0.1" name="qrap" port="5432" />
+	<database host="127.0.0.1" name="qrap" port="5433" />
 	
 	<!-- PostGIS settings -->
 	<postgis srid="4326" />

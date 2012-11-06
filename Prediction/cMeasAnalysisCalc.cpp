@@ -301,16 +301,20 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double &StDev, double &CorrC, unsigned Clutterfilter)
 {
 
+	
 	mClutterFilter = Clutterfilter;
-	unsigned i=0, j=0, jj=0, NumUsed = 0;
+	unsigned i=0, j=0, jj=0, NumUsed = 0, CNumUsed =0;
 	unsigned MobileNum=0, FixedNum=0;
 	double Error=0, TotalError=0, TotalSError=0, TotalMeas=0;
 	double TotalPred=0, TotalSMeas=0, TotalSPred=0, TotalMeasPred=0;
+	double CError=0, CTotalError=0, CTotalSError=0, CTotalMeas=0;
+	double CTotalPred=0, CTotalSMeas=0, CTotalSPred=0, CTotalMeasPred=0;
 	unsigned currentInst=0;
 	unsigned currentMobile=0;
 	cAntennaPattern FixedAnt, MobileAnt;
 	double *terms;
 	terms = new double[NUMTERMS];
+	double CMean = 0, CMeanSquareError=0, CStDev = 0, CCorrC = 0;
 	Mean = 0; 
 	MeanSquareError=0;
 	StDev = 0;
@@ -368,6 +372,37 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			//Change settings if the Fixed Installation changed
 			if (mMeasPoints[i].sInstKeyFixed!=currentInst)
 			{
+
+				if (CNumUsed>0)
+				{
+					CMean = CTotalError/CNumUsed;
+					CMeanSquareError = CTotalSError/CNumUsed;
+					CStDev = sqrt(CMeanSquareError-CMean*CMean);
+	
+					double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
+					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
+					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
+
+					cout << "Inst: " << currentInst << "	M: " << CMean 
+						<< "	MSE: " << CMeanSquareError 
+						<< "	StDev: " << CStDev
+						<< "	Corr: " << CCorrC << endl;
+				}
+
+				CNumUsed = 0;
+				CError=0;
+				CTotalError=0; 
+				CTotalSError=0;
+				CTotalMeas=0;
+				CTotalPred=0;
+				CTotalSMeas=0;
+				CTotalSPred=0;
+				CTotalMeasPred=0;
+				CMean = 0;
+				CMeanSquareError=0; 
+				CStDev = 0;
+				CCorrC = 0;
+				
 				currentInst = mMeasPoints[i].sInstKeyFixed;
 
 				while ((mFixedInsts[FixedNum].sInstKey!=currentInst)&&(FixedNum < mFixedInsts.size()))
@@ -414,6 +449,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			if (Length > 2)
 			{
 				NumUsed ++ ;
+				CNumUsed ++;
 
 //				tClutter = mMeasPoints[i].sClutter;
 				if (mUseClutter)
@@ -454,6 +490,14 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				TotalPred += mMeasPoints[i].sPredValue;
 				TotalSPred += mMeasPoints[i].sPredValue*mMeasPoints[i].sPredValue;				
 				TotalMeasPred+= mMeasPoints[i].sPredValue*mMeasPoints[i].sMeasValue;
+
+				CTotalError += Error;  
+				CTotalSError += Error*Error;
+				CTotalMeas += mMeasPoints[i].sMeasValue; 
+				CTotalSMeas += mMeasPoints[i].sMeasValue*mMeasPoints[i].sMeasValue, 
+				CTotalPred += mMeasPoints[i].sPredValue;
+				CTotalSPred += mMeasPoints[i].sPredValue*mMeasPoints[i].sPredValue;				
+				CTotalMeasPred+= mMeasPoints[i].sPredValue*mMeasPoints[i].sMeasValue;
 				
 				if (mUseClutter)
 				{

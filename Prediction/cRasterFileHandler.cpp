@@ -183,7 +183,7 @@ cProfile cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes
 		AddRaster(RxLoc);	
 	if (mCurrentRasters.size()==0)
 	{
-		string err = "No raster files could be found. Confirm that File-Set Order exist. ";
+		string err = "cRasterFileHandler::GetForLink;  No raster files could be found. Confirm that File-Set Order exist. ";
 		cout << err << endl;
 		QRAP_ERROR(err.c_str());
 		return false;
@@ -325,7 +325,7 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 
 	if (mCurrentRasters.size()==0)
 	{
-		string err = "No raster files could be found. Confirm that File-Set Order exist.";
+		string err = "cRasterFileHandler::GetForCoverage; No raster files could be found. Confirm that File-Set Order exist.";
 		cout << err << endl;
 		QRAP_ERROR(err.c_str());
 		return false;

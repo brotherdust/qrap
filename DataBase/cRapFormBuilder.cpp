@@ -141,9 +141,11 @@ cRapFormBuilder::cRapFormBuilder (QWidget* parent, QString tableName, QTableWidg
 	if(mTableView->rowCount()<=0)
 		insert=true;
 	mLayoutRow++;	
+
 	if(insert)
 	{
 		// Get the default values for the mTable
+		cout << "cRapFormBuilder::cRapFormBuilder insert is TRUE" << endl;
 		if(!gDb.GetDefaults(mTable.toStdString(),mDefaults))
 		{
 			cout << "Could not load the mDefaults." << endl;
@@ -158,6 +160,7 @@ cRapFormBuilder::cRapFormBuilder (QWidget* parent, QString tableName, QTableWidg
 	} // if insert
 	else
 	{
+		cout << "cRapFormBuilder::cRapFormBuilder insert is FALSE" << endl;
 		cout << "cRapFormBuilder::cRapFormBuilder Voor GenericUpdate" << endl;
 		CreateGenericUpdateForm();
 		cout << "cRapFormBuilder::cRapFormBuilder Na GenericUpdate" << endl;
@@ -272,6 +275,8 @@ cRapFormBuilder::cRapFormBuilder (StringMap ref, QWidget* parent,
 	mLayoutRow++;	
 	if(insert)
 	{
+
+		cout << "cRapFormBuilder::cRapFormBuilder overloaded insert is TRUE" << endl;	
 		// Get the default values for the mTable
 		if(!gDb.GetDefaults(mTable.toStdString(),mDefaults))
 		{
@@ -286,6 +291,7 @@ cRapFormBuilder::cRapFormBuilder (StringMap ref, QWidget* parent,
 	} // if insert
 	else
 	{
+		cout << "cRapFormBuilder::cRapFormBuilder overloaded insert is FALSE" << endl;
 		CreateGenericUpdateForm();
 	} // else insert
 }
@@ -310,7 +316,7 @@ int cRapFormBuilder::InsertData (const QString& tableName, QMap<QString,QWidget*
 	char *text = new char[33];
 	int Int;
 	double Double;
-	cout<<"Data insert begin"<<endl;	
+	cout<<"cRapFormBuilder::InsertData ... Data insert begin"<<endl;	
 	while(it.hasNext())
 	{
 		it.next();
@@ -511,7 +517,7 @@ int cRapFormBuilder::InsertData (const QString& tableName, QMap<QString,QWidget*
 					type = cDatabase::dtString;
 				}
 				
-//				cout << "cRapFormBuilder::InsertData	type = "<< type << endl;
+				cout << "cRapFormBuilder::InsertData	type = "<< type << endl;
 				if(uiType == cDatabase::utNormal)
 				{
 					switch(type)
@@ -1169,7 +1175,7 @@ void cRapFormBuilder::InsertNext ()
 		// Create the new insert form
 		CreateGenericInsertForm();
 
-	} // if InserData
+	} // if InsertData
 }
 
 
@@ -1646,10 +1652,14 @@ void cRapFormBuilder::CreateFormWidget (QString fieldName,
 	string setting;
 	bool direction = true;
 	cout << " Entering cRapFormBuilder::CreateFormWidget" << endl;
+
+	if (mInserting) cout << "cRapFormBuilder::CreateFormWidget mInserting is true." << endl;
+	else cout << "cRapFormBuilder::CreateFormWidget mInserting is false." << endl;
+
 	switch(type)
 	{
 		case cDatabase::dtPostGisPoint:
-//				cout << " dtPostGisPoint in cRapFormBuilder::CreateFormWidget" << endl;
+				cout << " dtPostGisPoint in cRapFormBuilder::CreateFormWidget" << endl;
 			
 			// Add the radio buttons to the form
 			widgets.insert(fieldName+":DDMMSS",static_cast<QWidget*>(new QRadioButton("DD:MM:SS X",this)));
@@ -1958,10 +1968,10 @@ void cRapFormBuilder::CreateGenericInsertForm ()
 	font.setStrikeOut(false);
 	font.setKerning(true);
 */	
-//	mCommitButton->move(mButtonRow*mLayoutDelta,mButtonPosX0);
+	mCommitButton->move(mButtonRow*mLayoutDelta,mButtonPosX0);
 	mCommitButton->setVisible(true);
 	mCommitButton->setEnabled(true);
-//	mCommitAddNextButton->move(mButtonRow*mLayoutDelta,mButtonPosX1);
+	mCommitAddNextButton->move(mButtonRow*mLayoutDelta,mButtonPosX1);
 	mCommitAddNextButton->setVisible(true);
 	mCommitAddNextButton->setEnabled(true);
 	mUpdateButton->setVisible(false);

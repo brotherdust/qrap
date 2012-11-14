@@ -434,7 +434,7 @@ void RapDbCommunicator::PopulateTable (QTableWidget* table,
 				if(it->second.mUnitType!=utNone)
 					selectQuery += ConvertFromdBm(it->second.mUnitType,it->first);
 				else if (it->second.mPostGis)
-					selectQuery +="ST_AsEWKT("+it->first+") as "+it->first;
+					selectQuery +="ST_AsText("+it->first+") as "+it->first;
 				else
 					selectQuery += it->first;
 			} // if mVisible

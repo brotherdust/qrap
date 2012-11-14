@@ -58,9 +58,8 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 
 	m_tempIPD = 30;
 	m_slope = 0.0;
-//	m_counter=0;
 	m_SmoothWidth=1;
-	m_SeekWidth=2;
+	m_SeekWidth=19;
 	mUseClutter = UseClutter;
 
 	m_markers[0] = 0;
@@ -468,11 +467,11 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 			mClutterProfile[i] = (int)m_TempProfile[i];
 	}
 
-//      m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/1300+1);
+      	m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/1300+1);
 //	cout << " m_SeekWidth=" << m_SeekWidth;
 //      m_SmoothWidth = (int)(m_c/m_freq/m_interPixelDist/18000);
 //	cout << " m_SmoothWidth=" << m_SmoothWidth  << endl;
-//	if (m_SeekWidth<3) m_SeekWidth = 3;
+	if (m_SeekWidth<3) m_SeekWidth = 3;
 
 	if (m_kFactor!=1.0)
 	{

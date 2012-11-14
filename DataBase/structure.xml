@@ -78,10 +78,10 @@ www.QRap.org.za
 	description="The site table merely identifies a location for (potential) radio installations. It does not imply any installation" >
 	
 		<field name="id"
-		       type="serial primary key unique not null"
+		       type="integer primary key unique not null"
 		       label="ID"
 		       description="Primary key"
-		       readonly="true" />
+		       readonly="false" />
 		
 		<field name="lastmodified"
 		      type="timestamp without time zone"
@@ -811,10 +811,10 @@ www.QRap.org.za
 	<table name="radioinstallation" label="Radio Installation"
 	description = "A Radio Installation represents everything that is essential for the effective transmission and/or reception of radiowaves. A site could have many Radio Installations. Each Radio Installation must below to a site.">
 		<field name="id"
-		       type="serial primary key unique not null"
+		       type="integer primary key unique not null"
 		       label="ID"
 		       description="Primary key"
-		       readonly="true" />
+		       readonly="false" />
 		
 		<field name="lastmodified"
 		      type="timestamp without time zone"
@@ -1290,10 +1290,10 @@ www.QRap.org.za
 	<table name="cell" label="Cell" fulldownload="true"
 	description="A Cell is a logical entity typically representing traffic carried via a radio installation.">
 		<field name="id"
-		       type="serial primary key unique not null"
+		       type="integer primary key unique not null"
 		       label="ID"
 		       description="Primary key"
-		       readonly="true" />
+		       readonly="false" />
 		
 		<field name="lastmodified"
 		      type="timestamp without time zone"

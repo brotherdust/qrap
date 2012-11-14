@@ -78,7 +78,7 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 		mUseClutter = true;
 	else mUseClutter = false;
 
-//	mUseClutter = true;
+	mUseClutter = true;
 
 	mClutterSource = atoi(gDb.GetSetting("ClutterSource").c_str());
 	cout << "mClutterSource = " << mClutterSource << endl;
@@ -89,6 +89,7 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 	mUseClutter = (mUseClutter)&&(mClutterClassGroup>0);
 
 	mDEMsource = atoi(gDb.GetSetting("DEMsource").c_str());
+	cout << "mDEMsource = " << mDEMsource << endl;
 	mDEM.SetRasterFileRules(mDEMsource);
 }
 
@@ -383,11 +384,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
 
-					cout << "Inst: " << currentInst << "	M: " << CMean 
+/*					cout << "Inst: " << currentInst << "	M: " << CMean 
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-				}
+*/				}
 
 				CNumUsed = 0;
 				CError=0;
@@ -629,7 +630,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD()
 	MatrixXd SolveCoefMatrix;	//Declare local matrixes of reduced size
 	MatrixXd LeftSide;
 	MatrixXd DeltaCoeff;
-	int NumUsed;
+	int NumUsed, TotalNumUsed;
 
 	mUseClutter = true;
 
@@ -637,6 +638,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD()
 
 	// This first analysis is to update the clutter each pixel belongs to. 
 	NumUsed = PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, 0);
+	TotalNumUsed = NumUsed;
 	cout << "clutterType = " << mClutterFilter;
 	cout << "	#Used: " << NumUsed << "	Mean: " << Mean 
 		<< "	MeanSquare: " << MeanSquareError << "	StDev: " << StDev
@@ -653,7 +655,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD()
 			<< "	CorrC: " << CorrC << endl;
 
 		// Only optimise if enough points are involved
-		if (NumUsed > 100)
+		if (NumUsed > 0.5*TotalNumUsed/mPathLoss.mClutter.mNumber)
 		{
 			for (i=0; i<NUMTERMS; i++)
 			{
@@ -833,7 +835,7 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 		}
 		if (((100*fabs((cost - costMin)/costMin)) < 0.0001)&&(SeekWidth>1))
 		{
-			stop = true;
+//			stop = true;
 		}
 		
 		
@@ -865,7 +867,7 @@ bool cMeasAnalysisCalc::OptimiseHeights()
 	bool stop = false;
 	bool first = true;
 	double cost, costOld, costMin;
-	int NumStop = 20;
+	int NumStop = 30;
 	double SizeOfDiff, sumSquareDiff=0;
 
 	bool *Up;
@@ -947,7 +949,7 @@ bool cMeasAnalysisCalc::OptimiseHeights()
 		}
 		SizeOfDiff = sqrt(sumSquareDiff);
 		
-		cout << "SizeOfDiff " << SizeOfDiff << endl;
+//		cout << "SizeOfDiff " << SizeOfDiff << endl;
 		for (i=1; i<mPathLoss.mClutter.mNumber; i++)
 		{
 			if (((CHeightDiff[i]<0)&&(Up[i]))||((CHeightDiff[i]>0)&&(!Up[i]))

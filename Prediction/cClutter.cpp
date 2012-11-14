@@ -201,7 +201,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 				mClutterTypes[landcoverid].sLandCoverID = landcoverid;
 				mClutterTypes[landcoverid].sRho = atof(r[j]["width"].c_str());
 				mClutterTypes[landcoverid].sHeight = atof(r[j]["height"].c_str());
-//				cout << landcoverid << "	" << mClutterTypes[landcoverid].sHeight << endl;
+				cout << landcoverid << "	" << mClutterTypes[landcoverid].sHeight << endl;
 				gcvt(atoi(r[j]["id"].c_str()),9,idnr);
 				gcvt(landcoverid,9,type);
 				queryCC = queryU;
@@ -318,7 +318,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 	}
 */
 	mNumber = MaxLandCoverID+1;
-//	cout << "mNumber=" << mNumber << endl;
+	cout << "mNumber=" << mNumber << endl;
 	delete [] type;
 	delete [] temp;
 	delete [] idnr; 

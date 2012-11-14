@@ -63,6 +63,7 @@ cRapTableTab::cRapTableTab (QWidget* parent, QString table) : QTabWidget(parent)
 // Create the insert form
 void cRapTableTab::CreateInsertForm ()
 {
+	cout << " In cRapTableTab::CreateInsertForm () " << endl;
 	// First delete the existing form
 	TabIndexChanged(0);
 	
@@ -79,6 +80,7 @@ void cRapTableTab::CreateInsertForm ()
 //
 void cRapTableTab::CreateUpdateForm ()
 {
+	cout << " In cRapTableTab::CreateUpdateForm () " << endl;
 	// First delete the existing form
 	TabIndexChanged(0);
 	
@@ -94,7 +96,7 @@ void cRapTableTab::CreateUpdateForm ()
 void cRapTableTab::TabIndexChanged (int index)
 {
 	QWidget* formWidget;
-	
+	cout << "cRapTableTab::TabIndexChanged mTableView->rowCount()=" << mTableView->rowCount() << endl;	
 	switch (index)
 	{
 		case 0:
@@ -111,22 +113,21 @@ void cRapTableTab::TabIndexChanged (int index)
 			{
 				mInserting = true;
 			}
-			else mInserting = false;
 						
 			// Create the form
-//			if(mInserting)
+			if(mInserting)
 			{
 				cout << "cRapTableTab::TabIndexChanged:  Voor vorm ... inserting" << endl;
 				mForm = new cRapFormBuilder(mRef,this,mTableName,mTableView,mInserting);
 				mForm->SetReferences(mRef);
 			}
-/*			else
+			else
 			{
 				cout << "cRapTableTab::TabIndexChanged:  Voor vorm ... not inserting" << endl;
 				mForm = new cRapFormBuilder(this,mTableName,mTableView,mInserting);
-//				mForm->SetReferences(mRef);
+				mForm->SetReferences(mRef);
 			}
-*/			cout << "cRapTableTab::TabIndexChanged:  Na vorm." << endl;
+			cout << "cRapTableTab::TabIndexChanged:  Na vorm." << endl;
 			mScroller->setWidget(mForm);
 			*mTableViewSelected = false;
 			break;

@@ -249,7 +249,7 @@
    </item>
    <item>
     <property name="text">
-     <string>CW space delimited Lat, Lon and RxLev</string>
+     <string>CW space delimited Lon, Lat and RxLev</string>
     </property>
    </item>
    <item>

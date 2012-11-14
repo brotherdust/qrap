@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'LoadMeasurements.ui'
 **
-** Created: Mon May 14 12:30:03 2012
+** Created: Wed Nov 14 20:37:34 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -201,7 +201,7 @@ public:
         cBoxFileType->clear();
         cBoxFileType->insertItems(0, QStringList()
          << QApplication::translate("LoadMeasurements", "GSM Drivetest", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("LoadMeasurements", "CW space delimited Lat, Lon and RxLev", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("LoadMeasurements", "CW space delimited Lon, Lat and RxLev", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("LoadMeasurements", "CW *.csv with Timestamp, Lat, Lon, and RSSI ", 0, QApplication::UnicodeUTF8)
         );
         lFileFormat->setText(QApplication::translate("LoadMeasurements", "File Format to import:", 0, QApplication::UnicodeUTF8));

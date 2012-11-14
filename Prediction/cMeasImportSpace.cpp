@@ -221,7 +221,7 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
      	while (!DataFile.eof())
      	{
         	// get latitude and longitude
-        	DataFile >> Lat >> Lon >> Meas; // skip the point number
+        	DataFile >> Lon >> Lat >> Meas; // skip the point number
 		dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
 		if ((Meas > mSensitivity) && (dist>1.0e-5)&& ((dist<2)||(prevLat==0)))
 		{

@@ -63,12 +63,13 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 //	printf("The GDAL file is open");
 	/* Getting the meta data */
 
-	printf( "Driver: %s/%s\n",
+/*	printf( "Driver: %s/%s\n",
     	poDataset->GetDriver()->GetDescription(),
     	poDataset->GetDriver()->GetMetadataItem( GDAL_DMD_LONGNAME ) );
-	printf( "Size is %dx%dx%d\n",
+//	printf( "Size is %dx%dx%d\n",
     	poDataset->GetRasterXSize(), poDataset->GetRasterYSize(),
     	poDataset->GetRasterCount() );
+*/	
 	if( poDataset->GetProjectionRef() != NULL ) 
 	{
 		poSRS = OGRSpatialReference(poDataset->GetProjectionRef());
@@ -172,7 +173,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 
     	if( poDataset != NULL )
         	GDALClose( (GDALDatasetH) poDataset );
-	printf("Read GDAL\n");
+//	printf("Read GDAL\n");
 
 	return true;
 }

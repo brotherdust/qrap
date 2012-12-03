@@ -113,7 +113,7 @@ bool cBIN::openFile(Float2DArray &Raster,string Directory, string FileName,
 		for (j=0;j<cols;j++)
 			NESbinfile.read((char *)&Raster[i][j],sizeof(float));
 	}
-	cout << "Bin Done" << endl;
+//	cout << "Bin Done" << endl;
 	delete [] binfname;
 	delete [] QRap;
 	return true;

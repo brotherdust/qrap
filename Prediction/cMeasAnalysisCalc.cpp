@@ -384,11 +384,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
 
-/*					cout << "Inst: " << currentInst << "	M: " << CMean 
+					cout << "Inst: " << currentInst << "	M: " << CMean 
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-*/				}
+				}
 
 				CNumUsed = 0;
 				CError=0;
@@ -537,6 +537,20 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			}
 		}// if included in calculations
 	}//for all measurements
+
+	if (CNumUsed>0)
+	{
+		CMean = CTotalError/CNumUsed;
+		CMeanSquareError = CTotalSError/CNumUsed;
+		CStDev = sqrt(CMeanSquareError-CMean*CMean);
+		double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
+		double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
+		CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
+		cout << "Inst: " << currentInst << "	M: " << CMean 
+			<< "	MSE: " << CMeanSquareError 
+			<< "	StDev: " << CStDev
+			<< "	Corr: " << CCorrC << endl;
+	}
 
 	if (NumUsed>0)
 	{

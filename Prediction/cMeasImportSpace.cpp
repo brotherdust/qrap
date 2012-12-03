@@ -182,7 +182,7 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 	}
 
 	unsigned MeasCount=0;	
-	double Lat, Lon, prevLat, prevLon, Meas, dist;
+	double Lat, Lon, prevLat, prevLon, Meas, dist=0;
 
     	// reposition to the start of measurement data
      	DataFile.seekg(0L, ios::beg);  // go to beginning of file
@@ -217,13 +217,14 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 	queryM += ",";
 	QString PosString;
 
-	cout << "cMeasImportSpace::LoadMeasurement: before while ";
+	cout << "cMeasImportSpace::LoadMeasurement: before while " << endl;
      	while (!DataFile.eof())
      	{
-        	// get latitude and longitude
-        	DataFile >> Lon >> Lat >> Meas; // skip the point number
+//        	DataFile >> Lat >> Lon >> Meas; // For Planet Format
+        	DataFile >> Lon >> Lat >> Meas;
 		dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
-		if ((Meas > mSensitivity) && (dist>1.0e-5)&& ((dist<2)||(prevLat==0)))
+//		cout << dist << endl;
+		if ((Meas > mSensitivity) && (dist>1.0e-6)&& ((dist<2)||(prevLat==0)))
 		{
 			mLastTestPoint++;
 			mLastMeas++;
@@ -273,7 +274,7 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 	delete [] temp;
 	delete [] temp2;
 	delete [] TPID;
-	cout << "cMeasImportSpace::LoadMeasurement: leaving ";
+	cout << "cMeasImportSpace::LoadMeasurement: leaving " << endl;
 }
 
 

@@ -40,7 +40,7 @@ cRaster::cRaster()
 	mRaster = new_Float2DArray(mRows,mCols);	
 	mDirectory = "qrap/Data/SRTM/";
 	mFilename = "raster.bin";
-	cout << "Default constructer Raster" << endl;
+	cout << "Default constructor Raster" << endl;
 }
  
 //*************************************************************************
@@ -83,17 +83,18 @@ cRaster::cRaster(string Directory,
 		mNW.SetGeoType(mProjType,mCentMer);
 		mNW.Get(mMapLat,mMapLon,mMapType,mMapCM,Hem);
 	}
-	cout << endl;
+/*	cout << endl;
 	cout << "Constructer Raster: " << mFilename << endl;
 	cout << "mSouth = ";
 	if (mSouth) cout << " true" << endl;
 	else cout << " false" << endl;
+*/
 }
 
 //************************************************************************
 cRaster::~cRaster()
 {
-	cout << "cRaster Destructor" << endl;
+//	cout << "cRaster Destructor" << endl;
 	delete_Float2DArray(mRaster); 
 }
 
@@ -262,7 +263,7 @@ bool cRaster::ReadFile(string Directory,
 
 	if (filetype == BINFILE) // binary file
 	{
-		cout << endl << "In bool cRaster::ReadFile( ... filetype == BINFILE " << endl;
+//		cout << endl << "In bool cRaster::ReadFile( ... filetype == BINFILE " << endl;
 		cBIN MyRaster;
 		msgs = MyRaster.openFile(mRaster, Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer);
@@ -270,7 +271,7 @@ bool cRaster::ReadFile(string Directory,
 	}
 	else if (filetype == GDALFILE) // GDAL file 
 	{
-		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE " << endl;
+//		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE " << endl;
 		cGDAL MyRaster;
 		msgs = MyRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax);
@@ -293,7 +294,7 @@ bool cRaster::ReadFile(string Directory,
 */
 	if (!msgs)
 	{
-		cout << endl <<"In bool cRaster::ReadFile( ... !msgs " << endl;
+//		cout << endl <<"In bool cRaster::ReadFile( ... !msgs " << endl;
 		cGDAL MyGDALRaster;
 		msgs = (MyGDALRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 			mProjType,mProj4, mRows, mCols, mNSres, mEWres,mMin,mMax));
@@ -302,7 +303,7 @@ bool cRaster::ReadFile(string Directory,
 		{
 			mSouth = mNW.Hemisphere();
 			mFileType = GDALFILE;
-			cout << endl << "In bool cRaster::ReadFile( ... !msgs  GDALFILE " << endl;
+//			cout << endl << "In bool cRaster::ReadFile( ... !msgs  GDALFILE " << endl;
 		}
 		else
 		{
@@ -314,7 +315,7 @@ bool cRaster::ReadFile(string Directory,
 				mFileType = BINFILE;
 				mProjType = WGS84GC;
 				mSouth = mNW.Hemisphere();
-				cout << endl << "In bool cRaster::ReadFile( ... !msgs  BINFILE " << endl;
+//				cout << endl << "In bool cRaster::ReadFile( ... !msgs  BINFILE " << endl;
 			}
 /*			else
 			{
@@ -337,7 +338,7 @@ bool cRaster::ReadFile(string Directory,
 
 	if (msgs)
 	{	
-		cout << "In bool cRaster::ReadFile( ... msgs true " << endl;	
+//		cout << "In bool cRaster::ReadFile( ... msgs true " << endl;	
 		if (CentMer != -1 && CentMer != mCentMer)
 			mCentMer = CentMer;
 		if (Min > mMin)	mMin = Min;

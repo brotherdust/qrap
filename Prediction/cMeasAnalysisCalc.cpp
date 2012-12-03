@@ -384,11 +384,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
 
-					cout << "Inst: " << currentInst << "	M: " << CMean 
+/*					cout << "Inst: " << currentInst << "	M: " << CMean 
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-				}
+*/				}
 
 				CNumUsed = 0;
 				CError=0;
@@ -669,7 +669,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD()
 			<< "	CorrC: " << CorrC << endl;
 
 		// Only optimise if enough points are involved
-		if (NumUsed > 0.5*TotalNumUsed/mPathLoss.mClutter.mNumber)
+		if (NumUsed > 0.2*TotalNumUsed/mPathLoss.mClutter.mNumber)
 		{
 			for (i=0; i<NUMTERMS; i++)
 			{
@@ -692,7 +692,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD()
 			// Term 8 will be equivalent to term 7 if the clutter height is zero
 			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[8] = 
 				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[8] &&
-				(mPathLoss.mClutter.mClutterTypes[mClutterFilter].sHeight>1); 
+				(mPathLoss.mClutter.mClutterTypes[mClutterFilter].sHeight>0.1); 
 	
 			Size = 0;
 			for (i=0; i<NUMTERMS; i++)

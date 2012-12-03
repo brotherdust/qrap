@@ -743,7 +743,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 		{
 			if (!mCurrentRasters[i]->mUsed)
 			{
-				cout << "Removing " << mCurrentRasters[i]->mFilename << endl;
+//				cout << "Removing " << mCurrentRasters[i]->mFilename << endl;
 				delete mCurrentRasters[i];
 				mCurrentRasters.erase(mCurrentRasters.begin()+i);
 			}

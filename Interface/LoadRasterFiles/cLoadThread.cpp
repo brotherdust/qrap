@@ -112,7 +112,6 @@ void cLoadThread::run()
 	   	 	while( it != mFiles.end() ) 
 	    		{
 	    			File = *it;
-	    			emit Set(k,File);
 	    			printf("SourceDir: %s\nFile; %s\nType: %d\nmType: %d\n",mSourceDir.latin1(),File.latin1(),Type,mType);
 	    			try
 	    			{
@@ -125,8 +124,9 @@ void cLoadThread::run()
 	    				printf("Error trying to Load files:\n%s",e1.what());
 	    				emit (mFileCount,e1.what());
 	    			}
+				emit Set(k,File);
 	    		}
-	    		emit Set(mFileCount,"Writng to Database");
+//	    		emit Set(mFileCount,"Writng to Database");
 	    		try
 	    		{
 	    			Rasters.WriteDB();

@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/qrap">
+    	<file>qrap.png</file>
         <file>Data.png</file>
         <file>Site.png</file>
         <file>SiteSelect.png</file>

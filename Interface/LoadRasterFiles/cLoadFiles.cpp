@@ -147,60 +147,60 @@ void cLoadFiles::on_pushButtonImport_clicked()
 	if (FileType != NULL)
 	{
 		if (tableWidgetFileSets->rowCount() > 0)
+		{
+			pushButtonImport->setEnabled(false);
+			pushButtonBrowse->setEnabled(false);
+			int Row = tableWidgetFileSets->currentRow();
+			QTableWidgetItem *ID = static_cast<QTableWidgetItem*>(tableWidgetFileSets->item(Row,0));
+			QTableWidgetItem *Bin = static_cast<QTableWidgetItem*>(tableWidgetFileSets->item(Row,5));
+			QTableWidgetItem *Projection = static_cast<QTableWidgetItem*>(tableWidgetFileSets->item(Row,6));
+			QTableWidgetItem *FileFormat = static_cast<QTableWidgetItem*>(tableWidgetFileSets->item(Row,3));
+			if (Bin->text() == "True")
 			{
-				pushButtonImport->setEnabled(false);
-				pushButtonBrowse->setEnabled(false);
-				int Row = tableWidgetFileSets->currentRow();
-				QTableWidgetItem *ID = static_cast<QTableWidgetItem*>(tableWidgetFileSets->item(Row,0));
-				QTableWidgetItem *Bin = static_cast<QTableWidgetItem*>(tableWidgetFileSets->item(Row,5));
-				QTableWidgetItem *Projection = static_cast<QTableWidgetItem*>(tableWidgetFileSets->item(Row,6));
-				QTableWidgetItem *FileFormat = static_cast<QTableWidgetItem*>(tableWidgetFileSets->item(Row,3));
-				if (Bin->text() == "True")
+				mBin=(short int)ID->text().toDouble();
+				mSource = mBin-1;
+			}
+			else
+			{
+				mSource=(short int)ID->text().toDouble();
+				mBin = mSource+1;
+			}
+			if (FileFormat->text() != "")
+			{
+				mFileType = FileFormat->text();
+			}
+			else
+			{
+				mFileType = "GDALFILE";
+			}
+			if (Projection->text() == "DEG")
+			{
+				mType = DEG;
+			}
+			else
+			{
+				if (Projection->text() == "UTM")
 				{
-					mBin=(short int)ID->text().toDouble();
-					mSource = mBin-1;
+					mType = UTM;
 				}
 				else
 				{
-					mSource=(short int)ID->text().toDouble();
-					mBin = mSource+1;
-				}
-				if (FileFormat->text() != "")
-				{
-					mFileType = FileFormat->text();
-				}
-				else
-				{
-					mFileType = "GDALFILE";
-				}
-				if (Projection->text() == "DEG")
-				{
-					mType = DEG;
-				}
-				else
-				{
-					if (Projection->text() == "UTM")
+					if (Projection->text() == "WGS84GC")
 					{
-						mType = UTM;
+						mType = WGS84GC;
 					}
 					else
 					{
-						if (Projection->text() == "WGS84GC")
-						{
-							mType = WGS84GC;
-						}
-						else
-						{
-							mType = DEG;
-						}
+						mType = DEG;
 					}
 				}
+			}
 		
-				mCentMer = -1; //\TODO: If CentMer has to be selected by User! GUI doesn't support this.
-				if (FileType->text() !="ORTFILE")
-				{
-			
-					CLoadThread->Set(mSource,  //Source Index
+			mCentMer = -1; //\TODO: If CentMer has to be selected by User! GUI doesn't support this.
+			if (FileType->text() !="ORTFILE")
+			{
+		
+				CLoadThread->Set(mSource,  //Source Index
 						mBin,  //Binary Index (Actually - Used in old stuff)
 						mType,  //GeoType
 						mCentMer, 
@@ -210,41 +210,41 @@ void cLoadFiles::on_pushButtonImport_clicked()
 						mCount, // File Count
 						mFileType); // QString File Type (GDAL<BIN)
 						
-					Set(0,"Initialising.....");
-					connect(CLoadThread,SIGNAL(Set(int,QString)),this,SLOT(Set(int,QString)));
-					connect(CLoadThread,SIGNAL(Finished()),this,SLOT(Finished()));
-					CLoadThread->start();
-				}
-				else //ort files
+				Set(0,"Initialising.....");
+				connect(CLoadThread,SIGNAL(Set(int,QString)),this,SLOT(Set(int,QString)));
+				connect(CLoadThread,SIGNAL(Finished()),this,SLOT(Finished()));
+				CLoadThread->start();
+			}
+			else //ort files
+			{
+				cLoadFile Files;
+				cout << "Na cLoadfile Constructer" << endl;
+				try
 				{
-					cLoadFile Files;
-					cout << "Na cLoadfile Constructer" << endl;
-					try
-					{
-						string Source = labelDirectory->text().toStdString();
-						string ORTDir = lineEditORTDirectory->text().toStdString();
-						string File =  lineEditORTFile->text().toStdString();
-						unsigned FileSet = (unsigned)mSource;
-						int CentMer = spinBoxORTCentralMeridian->value();
-						printf("ORTDir: %s\nBIN: %s\nFile: %s\nFileSet:%d\nCentMer:%d\n",
-							Source.c_str(),ORTDir.c_str(),File.c_str(),FileSet,CentMer);
-						Files.LoadOrt(Source,
+					string Source = labelDirectory->text().toStdString();
+					string ORTDir = lineEditORTDirectory->text().toStdString();
+					string File =  lineEditORTFile->text().toStdString();
+					unsigned FileSet = (unsigned)mSource;
+					int CentMer = spinBoxORTCentralMeridian->value();
+					printf("ORTDir: %s\nBIN: %s\nFile: %s\nFileSet:%d\nCentMer:%d\n",
+						Source.c_str(),ORTDir.c_str(),File.c_str(),FileSet,CentMer);
+					Files.LoadOrt(Source,
 							ORTDir, 
 							 File,
 							 FileSet, 
 							 CentMer);
-					}
-					catch (const exception &e)
-					{
-						cout << "Loading ORT Files..." << endl;
-						cout << e.what() << endl;
-					}
-					
-					QMessageBox::information(this, "QRap","Finished loading Directory");
-					pushButtonImport->setEnabled(true);
 				}
+				catch (const exception &e)
+				{
+					cout << "Loading ORT Files..." << endl;
+					cout << e.what() << endl;
+				}
+				
+				QMessageBox::information(this, "QRap","Finished loading Directory");
+				pushButtonImport->setEnabled(true);
 			}
 		}
+	}
 }
 
 //*******************************************************

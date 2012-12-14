@@ -230,7 +230,7 @@ int cPathLossPredictor::setParameters(double k, double f,
 	m_hrx = RxHeight;
 
 	mUseClutter = UseClutter;
-	if (ClutterClassGroup!=mClutter.mClassificationGroup)
+	if ((ClutterClassGroup!=mClutter.mClassificationGroup)&&(mUseClutter))
 	{
 		if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
 		UseClutter = mUseClutter;

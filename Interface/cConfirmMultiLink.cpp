@@ -382,6 +382,7 @@ void cConfirmMultiLink::on_pushOk_clicked()
 		int TxRadID, RxRadID;
 		char * temp = new char[33];
 		cLink Link;
+		cLinkAnalysis * LinkDisplay = new cLinkAnalysis(mParent,mFL);
 		string LinkName="Link";
 		QString Linkname = "Link";
 		int LinkID=0;
@@ -418,7 +419,6 @@ void cConfirmMultiLink::on_pushOk_clicked()
 								Link.SaveLink(LinkName,LinkID);
 								if (SavePDF)
 								{
-									cLinkAnalysis * LinkDisplay = new cLinkAnalysis(mParent,mFL);
 									Linkname = LinkName.c_str();
 									Transmitter = "Site:";
 									gcvt(mSiteList[i],8,temp);

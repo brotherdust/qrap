@@ -113,7 +113,7 @@ void cRapSites::InsertRow ()
 	mCurrentTable->CreateInsertForm();
 	
 	// Perform the insert
-//	mDbCommunicator->InsertRow(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"siteid",mCurrentSiteId);
+//	mDbCommunicator->InsertRow(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"siteid",mCurrentSiteId,false,true);
 	
 	// Let the GuiEngine object know that inserting is complete
 	mInsertingRow = false;
@@ -138,7 +138,7 @@ void cRapSites::ReloadTable ()
 	cout << "In cRapSites::ReloadTable" << endl;
 	if(mTables.key(mCurrentTable)!="site")
 	{
-		mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"siteid",mCurrentSiteId,false);
+		mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"siteid",mCurrentSiteId,false,true);
 	}
 	else
 	{
@@ -161,7 +161,7 @@ void cRapSites::ShowAllContents ()
 	disconnect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),0,0);
 	
 	if(mTables.key(mCurrentTable)!="site")
-		mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"siteid",-1,false);
+		mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"siteid",-1,false,true);
 	else
 		mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"id",-1,true,true);
 	
@@ -275,11 +275,11 @@ void cRapSites::TableSelectionChanged ()
 	{
 		if(mTables.key(mCurrentTable)!="site")
 		{
-			mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),selectedItem->data(Qt::UserRole).toString(),"siteid",mCurrentSiteId,false);
+			mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),selectedItem->data(Qt::UserRole).toString(),"siteid",mCurrentSiteId,false,true);
 		}
 		else
 		{
-			mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),selectedItem->data(Qt::UserRole).toString(),"id",mCurrentSiteId,false,true);
+			mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),selectedItem->data(Qt::UserRole).toString(),"id",mCurrentSiteId,true,true);
 		}
 		if (mCurrentTable->GetTable()->rowCount()<=0)
 		{

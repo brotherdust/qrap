@@ -78,7 +78,7 @@ www.QRap.org.za
 	description="The site table merely identifies a location for (potential) radio installations. It does not imply any installation" >
 	
 		<field name="id"
-		       type="integer primary key unique not null"
+		       type="serial primary key unique not null"
 		       label="ID"
 		       description="Primary key"
 		       readonly="false" />
@@ -614,7 +614,13 @@ www.QRap.org.za
 		       type="varchar(150)"
 			description="A descriptive name for the equipment"
 		       label="Device name" />
-		
+
+		<field name="techkey"
+		       type="smallint references technology(id)"
+		       label="Technology"
+			description="Foreign key referencing the technology table. This could be part of which frequency band of the antenna pattern is valid for"
+		       ui="dropdown(fromtable,technology,technologytype)" />
+
 		<field name="manufacturer"
 		       type="varchar(30)"
 		       label="Manufacturer" 
@@ -811,7 +817,7 @@ www.QRap.org.za
 	<table name="radioinstallation" label="Radio Installation"
 	description = "A Radio Installation represents everything that is essential for the effective transmission and/or reception of radiowaves. A site could have many Radio Installations. Each Radio Installation must below to a site.">
 		<field name="id"
-		       type="integer primary key unique not null"
+		       type="serial primary key unique not null"
 		       label="ID"
 		       description="Primary key"
 		       readonly="false" />
@@ -1290,7 +1296,7 @@ www.QRap.org.za
 	<table name="cell" label="Cell" fulldownload="true"
 	description="A Cell is a logical entity typically representing traffic carried via a radio installation.">
 		<field name="id"
-		       type="integer primary key unique not null"
+		       type="serial primary key unique not null"
 		       label="ID"
 		       description="Primary key"
 		       readonly="false" />

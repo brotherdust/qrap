@@ -318,17 +318,17 @@ bool Qrap::InsertDefaultRadioInsts(int SiteId)
 			for (i=0; i<radinst.size(); i++)
 			{
 				gcvt(SiteId,20,siteID);
-//				string ID = siteID;
-//				ID +=radinst[i]["sector"].c_str();
+				string ID = siteID;
+				ID +=radinst[i]["sector"].c_str();
 
 				gcvt(gDb.globalMachineID,8,machineID);
 				query = "INSERT INTO radioinstallation ";
-				query += "(lastmodified, machineid, siteid, sector,techkey,eirp,txpower,";
+				query += "(lastmodified, machineid, id, siteid, sector,techkey,eirp,txpower,";
 				query += "txlosses,txantennaheight,txantpatternkey,txbearing,txmechtilt,";
 				query += "rxlosses,rxantennaheight,rxantpatternkey,rxbearing,rxmechtilt,";
 				query += "rxsensitivity,project,flagx,flagz) VALUES (now(),";
 				query += machineID;
-				query += ", "; //+ID +", ";
+				query += ", " +ID +", ";
 				query += siteID;
 				query += ", ";
 

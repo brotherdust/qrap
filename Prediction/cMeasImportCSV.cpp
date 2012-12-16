@@ -225,7 +225,10 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 		cout << filename << endl;
 		return 0;	
 	}
+	else cout << line << endl;                   
 
+	Ddist = max(min(0.0005*0.0005/(mFrequency*mFrequency),5e-8), 1e-12);
+	cout << "Ddist = " << Ddist << endl;
 	cout << "cMeasImportCSV::LoadMeasurement: before while " << endl;	
      	while (getline (DataFile, line))
     	{
@@ -250,7 +253,6 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 				Meas = atof(RSSIS.c_str());
 			}
 			
-			Ddist = max(min(0.0005*0.0005/(mFrequency*mFrequency),5e-8), 1e-12);
 			dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
 			if ((Meas > mSensitivity) && (fabs(Lat)>1.0e-12)&&(fabs(Lon)>1.0e-12)&&((dist<2)||(prevLat==0)))
 			{
@@ -275,8 +277,13 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 						return 0;
 					}
 	
-					if (LocalNum>0) LocalAve = LocalTotal/LocalNum;
+					if (LocalNum>0) 
+					{
+						LocalAve = (LocalTotal+Meas)/(LocalNum+1);
+						cout << "mLastMeas = " <<mLastMeas <<"	LocalNum = " << LocalNum << endl;
+					}
 					else LocalAve = Meas;
+
 					LocalTotal = 0.0;
 					LocalNum = 0;
 					query = queryM;

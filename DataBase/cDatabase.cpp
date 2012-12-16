@@ -1685,7 +1685,8 @@ bool cDatabase::GetFieldUiParams (const string& tableName, const string& fieldNa
 			cols.push_back("id");
 			cols.push_back(field);
 			
-			// now attempt to select the field from the given table
+			cout <<  "now attempt to select the field from the given table=";
+			cout << table <<"	field=" << field << endl;
 			if (!Select("id,"+field, table, ""))
 			{
 				msAlertCode = acDbNotAllowed;
@@ -1695,13 +1696,15 @@ bool cDatabase::GetFieldUiParams (const string& tableName, const string& fieldNa
 			
 			// run through the results and populate the output parameters list
 			len = mLastResult.size();
+			cout << "success: len=" << len << endl;
 			for (i=0;i<len;i++)
 			{
 				id = atoi(mLastResult[i]["id"].c_str());
 				// push it onto the output parameters list
 				params[id] = string(mLastResult[i][field].c_str());
 			}
-		} else
+		} 
+		else
 		{
 			msAlertCode = acParse;
 			return false; // parsing error

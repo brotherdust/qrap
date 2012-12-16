@@ -251,7 +251,7 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 					cout << query << endl;
 					return 0;
 				}
-				if (LocalNum>0) LocalAve = LocalTotal/LocalNum;
+				if (LocalNum>0) LocalAve = (LocalTotal+Meas)/(LocalNum+1);
 				else LocalAve = Meas;
 				LocalTotal = 0.0;
 				LocalNum = 0;

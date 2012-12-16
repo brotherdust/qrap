@@ -75,10 +75,12 @@ void cFilter::LoadCombos()
 	comboBoxTechType->addItem(QString("All"));
 	int j=1;
 	cout << " In cFilter::LoadCombos() voor Technology " << endl;
-	string table="technology";
-	string field="technologytype";
+	string table="radioinstallation";
+	string field="techkey";
 	uiType = gDb.GetFieldUiType(table,field);
 	gDb.GetFieldUiParams(table,field,vals);
+	comboBoxProject->addItem(QString("All"));
+	j=1;
 	// Poulate the combobox with the default data
 	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 	{
@@ -244,7 +246,7 @@ void cFilter::on_comboBoxTechType_currentIndexChanged(int index)
 		{
 			string query;
 			query = "create view antennapattern_view as select distinct antennapattern.* ";
-			query += " from attennapattern cross join technology where techkey=technology.id ";
+			query += " from antennapattern cross join technology where techkey=technology.id ";
 			query += " and technologytype='"+NewValue+"';";
 
 			if (gDb.ViewExists("antennapattern_view"))
@@ -575,8 +577,12 @@ void cFilter::CreateViews()
 			whereclause+=" and (techkey=technology.id and technologytype='"+techtype + "') " ;
 //			Alter parameter selection
 			string navraag;
-			navraag = "create view cellparameters_view as select * from cellparameters cross join technology";
+
+			if (gDb.ViewExists("cellparameters_view"))
+				gDb.RemoveView("cellparameters_view");
+			navraag = "create view cellparameters_view as select cellparameters.* from cellparameters cross join technology";
 			navraag += " where (techkey=technology.id and technologytype='"+techtype + "'); " ;
+
 			gDb.PerformRawSql(navraag);
 		}
 		if ((project!="")&&(project!="All"))
@@ -605,6 +611,7 @@ void cFilter::CreateViews()
 		}
 		queryIN+=whereclause+");";
 
+		cout << "whereclause=" << whereclause << endl;
 		if (radinvolved)
 		{
 			queryIN = " create view site_view_only as select distinct ";
@@ -666,6 +673,7 @@ void cFilter::CreateViews()
 		}
 		else queryIN += "where radioinstallation.siteid=site_view_list.id; ";;
 
+		cout << "RadInst queryIN = " << queryIN << endl; 
 		if (gDb.ViewExists("radioinstallation_view"))
 		{
 			string drop = "drop view radioinstallation_view cascade";

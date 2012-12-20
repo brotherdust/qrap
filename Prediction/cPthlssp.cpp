@@ -257,7 +257,7 @@ void cPathLossPredictor::set_Clutter(bool &UseClutter, unsigned ClutterClassGrou
 {
 	mUseClutter = UseClutter;
 	if (mUseClutter) mUseClutter=mClutter.Reset(ClutterClassGroup);
-	UseClutter = mUseClutter
+	UseClutter = mUseClutter;
 }
 
 //************************************************************************

@@ -88,6 +88,7 @@ void cLinkAnalysis::DoAndSetUpDisplay(eOutputUnits Units, bool Downlink, double 
 			mPathLoss, mRxLevEnd, mTxAntHeight, mRxAntHeight, 
 			mTxTilt,mRxTilt, mTxAzimuth, mRxAzimuth,
 			mTxLat, mTxLon, mRxLat, mRxLon, maxH, minH);
+	UseClutter = mUseClutter;
 
 	lblTxName->setText(TxName);
 	lblTxLat->setText(MakeStringFromDecDegrees(mTxLat,mOutputFormat,true));

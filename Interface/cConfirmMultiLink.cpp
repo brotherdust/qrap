@@ -382,7 +382,6 @@ void cConfirmMultiLink::on_pushOk_clicked()
 		int TxRadID, RxRadID;
 		char * temp = new char[33];
 		cLink Link;
-		cLinkAnalysis * LinkDisplay = new cLinkAnalysis(mParent,mFL);
 		string LinkName="Link";
 		QString Linkname = "Link";
 		int LinkID=0;

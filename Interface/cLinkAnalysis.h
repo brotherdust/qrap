@@ -58,7 +58,7 @@ public:
 	virtual ~cLinkAnalysis();
 	
 	void DoAndSetUpDisplay(eOutputUnits Units, bool Downlink, double Frequency, double kFactor,
-			double PlotResolution, short int DEMsource, short int ClutterSource, bool UseClutter,
+			double PlotResolution, short int DEMsource, short int ClutterSource, bool &UseClutter,
 			int TxID, int RxID, QString LinkName, QString TxName, QString RxName, int LinkID);
 	void CreatePDF(QString OutputFileName);
 	void SetAutoName(bool Input) {mAutoName=Input;};

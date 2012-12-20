@@ -237,12 +237,15 @@ int cPathLossPredictor::setParameters(double k, double f,
 		mClutter.mClassificationGroup = ClutterClassGroup;
 	}
 
-	mCterms[0] = TERM0;
-	mCterms[3] = TERM3;
-	mCterms[4] = TERM4;
-	mCterms[5] = TERM5;
-	mCterms[6] = TERM6;
-	mCterms[7] = TERM7;
+	if (mUseClutter)
+	{
+		mCterms[0] = TERM0;
+		mCterms[3] = TERM3;
+		mCterms[4] = TERM4;
+		mCterms[5] = TERM5;
+		mCterms[6] = TERM6;
+		mCterms[7] = TERM7;
+	}
 
 return 1;
 
@@ -250,10 +253,11 @@ return 1;
 
 
 //************************************************************************
-void cPathLossPredictor::set_Clutter(bool UseClutter, unsigned ClutterClassGroup)
+void cPathLossPredictor::set_Clutter(bool &UseClutter, unsigned ClutterClassGroup)
 {
 	mUseClutter = UseClutter;
 	if (mUseClutter) mUseClutter=mClutter.Reset(ClutterClassGroup);
+	UseClutter = mUseClutter
 }
 
 //************************************************************************

@@ -191,7 +191,7 @@ namespace Qrap
 			* @param ClutterClassGroup indicates the Clutter Classification Group 
 			* of the Clutter files that is used in the predictions
 			 */
-			void set_Clutter(bool UseClutter=false, unsigned ClutterClassGroup=9999); 
+			void set_Clutter(bool &UseClutter, unsigned ClutterClassGroup=9999); 
 
 			/**
 			 * Overloaded operator

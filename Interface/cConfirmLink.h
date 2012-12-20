@@ -47,19 +47,19 @@ public:
 	bool SetOldLink(int ID, int RxID,int TxID,string Name, double frequency, double kfactor);
 	
 	eOutputUnits	Units;
-	bool				Downlink;
-	double			Frequency;
-	double			kFactor;
-	double			PlotResolution;
-	short int			DEMsource;
-	short int			ClutterSource;
+	bool		Downlink;
+	double		Frequency;
+	double		kFactor;
+	double		PlotResolution;
+	short int	DEMsource;
+	short int	ClutterSource;
 	int 		TxID;
 	int 		RxID;
 	int		mLinkID;
-	bool				UseClutter;
-	QString 			TxName;
-	QString 			RxName;
-	QString mLinkName;
+	bool		UseClutter;
+	QString 	TxName;
+	QString 	RxName;
+	QString 	mLinkName;
 	
 public slots:
 	//void on_txtkFactor_textChanged();

@@ -125,7 +125,7 @@ namespace Qrap
 				double	PlotResolution,
 				short int DEMsource,
 				short int ClutterSource,
-				bool UseClutter,
+				bool &UseClutter,
 				int TxInst, //This will be site IDs in the case of trial Links
 				int RxInst, //This will be site IDs in the case of trial Links
 				bool Trail = false);
@@ -164,8 +164,8 @@ namespace Qrap
 
 			static double reR;			///< real earth Radius in m
 			static double c;			///< Speed of Light in m/s
-			
-			eOutputUnits	mUnits;			///< Requested output units of link
+			cPathLossPredictor 	PathLoss;			
+			eOutputUnits		mUnits;		///< Requested output units of link
 			bool			mDownlink;	///< Is the TxInst transmitting? 
 			double			mFrequency;	///< Operating frequency of Link
 			double			mkFactor;	///< k Factor used to calculate Effective earth radio(vs. real earth)

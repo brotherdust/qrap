@@ -209,7 +209,7 @@ void cLink::SetLink(eOutputUnits	Units,
 			double		PlotResolution,
 			short int 	DEMsource,
 			short int	ClutterSource,
-			bool 		UseClutter,
+			bool 		&UseClutter,
 			int		TxInst, //This will be site IDs in the case of trial Links
 			int 		RxInst, //This will be site IDs in the case of trial Links
 			bool		Trial)
@@ -231,6 +231,7 @@ void cLink::SetLink(eOutputUnits	Units,
 	if (mUseClutter) 
 		mClutterClassGroup = mClutter.GetClutterClassGroup();
 	if (mUseClutter) mClutterset.Reset(mClutterClassGroup);
+	UseClutter = mUseClutter;
 
 	if (mTrial)
 	{
@@ -317,7 +318,6 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	float *Tilt;
 	double EIRP, LinkOtherGain, TxAntValue=0.0, RxAntValue=0.0;
 
-	cPathLossPredictor PathLoss;
 	bool AfterReceiver = (mUnits!=dBWm2Hz) && (mUnits!=dBWm2);	
 
 	if (mDownlink)

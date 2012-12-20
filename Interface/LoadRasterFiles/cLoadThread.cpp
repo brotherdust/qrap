@@ -30,12 +30,14 @@
 //*****************************************************************
 cLoadThread::cLoadThread()
 {
+
 }
 
 //**************************************************************
 cLoadThread::cLoadThread(QObject *parent)
      : QThread(parent)
  {
+
      restart = false;
      abort = false;
  }
@@ -66,21 +68,25 @@ void cLoadThread::Set(unsigned Source,
 					short int Rule,
 					bool interpolate)
 {
-	try {
-	mSource = Source;
-	mBin = Bin;
-	mType = Type;
-	mCentMer = CentMer;
-	mDir = Dir;
-	mFiles = Files;
-	mSourceDir = SourceDir;
-	mFileCount = FileCount;
-	mFileType = FileType;
-	mCut = cut;
-	mInterpolate=interpolate;
-	mFileType=Rule;
-	}catch(const exception &e) {
-		cout << e.what() << endl;}
+	try 
+	{
+		mSource = Source;
+		mBin = Bin;
+		mType = Type;
+		mCentMer = CentMer;
+		mDir = Dir;
+		mFiles = Files;
+		mSourceDir = SourceDir;
+		mFileCount = FileCount;
+		mFileType = FileType;
+		mCut = cut;
+		mInterpolate=interpolate;
+		mFileType=Rule;
+	}
+	catch(const exception &e) 
+	{
+		cout << e.what() << endl;
+	}
 }
 
 //****************************************************************
@@ -112,10 +118,13 @@ void cLoadThread::run()
 	   	 	while( it != mFiles.end() ) 
 	    		{
 	    			File = *it;
+	    			
 	    			printf("SourceDir: %s\nFile; %s\nType: %d\nmType: %d\n",mSourceDir.latin1(),File.latin1(),Type,mType);
 	    			try
 	    			{
+					cout << "cLoadThread::run() loading raster: k = " << k << endl;
 	    				Rasters.LoadFile(mSourceDir.latin1(),File.latin1(),Type,mType,"",mCentMer);
+					cout << "cLoadThread::run() DONE loading raster: k = " << k << endl;
 	    				++it;
 	    				k++;
 	    			}
@@ -129,28 +138,40 @@ void cLoadThread::run()
 //	    		emit Set(mFileCount,"Writng to Database");
 	    		try
 	    		{
+				cout << "cLoadThread::run() Writing to Database." << endl;
 	    			Rasters.WriteDB();
+				cout << "cLoadThread::run() DONE Writing to Database." << endl;
 	    		}
 	    		catch (const exception &e1)
 	    		{
 	    			printf("Error trying to Load files to db:\n%s",e1.what());
 	    		}
+			cout << "cLoadThread::run()  Emiting Filecount, Finished." << endl;
 	    		emit Set(mFileCount,"Finished");
+			cout << "cLoadThread::run()  Emiting  Finished()." << endl;
 	    		emit Finished();
+			cout << "cLoadThread::run()  DONE Emiting  Finished()." << endl;
 		}
 		else//cut set
 		{
+			cout << "cLoadThread::run()  Emiting  Set(0,''Cutting fileset'')" << endl;
 			emit Set(0,"Cutting fileset");
+			cout << "cLoadThread::run()  DONE Emiting  Set(0,''Cutting fileset'')" << endl;
 			try
 			{
+				cout << "cLoadThread::run() cutting rasters" << endl;
 				Rasters.CutCurrentSet(mSource,mBin,mFileRule,mInterpolate);
+				cout << "cLoadThread::run() Done cutting rasters" << endl;
 			}
 			catch (const exception &e1)
 			{
 				printf("Error trying to Cut files:\n%s",e1.what());
 			}
-			emit Set(100,"Finished");
-    			emit Finished();
+			cout << "cLoadThread::run()  Emiting 100, Finished." << endl;
+	    		emit Set(100,"Finished");
+			cout << "cLoadThread::run()  Emiting  Finished()." << endl;
+	    		emit Finished();
+			cout << "cLoadThread::run()  DONE Emiting  Finished() to Database." << endl;
 		}
 	}
 	catch(const exception &e) 

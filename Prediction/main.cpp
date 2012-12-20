@@ -50,24 +50,24 @@ int main (int argc, char **argv)
 		return 0;
 	}
 	
-	cMeasAnalysisCalc Meas;
+//	cMeasAnalysisCalc Meas;
 //	Meas.OptimiseSeekWidth();
-	Meas.OptimiseModelCoefD();
-	Meas.OptimiseHeights();
-	Meas.OptimiseModelCoefD();
+//	Meas.OptimiseModelCoefD();
+//	Meas.OptimiseHeights();
+//	Meas.OptimiseModelCoefD();
 
-/*	string dir="/home/maggie/GISdata/SA National land cover 2001/BIN/";
-	cLoadFile Files(5,8,dir);
+	string dir="/home/anita/GISdata/SRTM/BIN/";
+	cLoadFile Files(3,4,dir);
 	cout << "Voor cut" << endl;
-	Files.CutCurrentSet(5,8, false, 2);
-*/
+	Files.CutCurrentSet(3,4, true, 1);
+
 	// For Arc Grid
 /*	string dir="/home/maggie/Data/RasterData/BIN";
 	cLoadFile Files(1,2,dir);
 	Files.LoadFile("/home/maggie/Data/RasterData/dtm_gt_bot","w001001a.adf",GDALFILE,DEG);
 	Files.LoadFile("/home/maggie/Data/RasterData/dtm_gt_top","w001001.adf",GDALFILE,DEG);
 	Files.WriteDB();
-*/	
+*/
 /*	char *text = new char[33];
 	string query = "INSERT INTO filesets values (11, now(),";
 	gcvt(gDb.globalMachineID,10,text);

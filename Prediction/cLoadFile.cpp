@@ -141,8 +141,10 @@ bool cLoadFile:: WriteDB()
 							"," + South + " " + East +\
 							"," + South + " " + West +\
 							"," + North + " " + West +"))',4326))";*/
+		cout << "query: " << query << endl;
 		if ((!gDb.PerformRawSql(query)))
 		{
+			cout << "gDb failed Count Write: " << i << endl;
 			cout << "Database Update on filesets table failed"<< endl;
 			return false;
 		}
@@ -216,13 +218,15 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 	query = "SELECT resolution, fileformat, projection, proj4string ";
 	query += "FROM filesets WHERE ID=";
 	query += OFSID;
+	query += ";";
 
+	cout << "cLoadFile::CutCurrentSet query: " << query << endl;
 	if(!gDb.PerformRawSql(query))
 	{
 		string err = "Database Select for Original FileSet failed. Query: ";
 		err += query;
 		cout << err << endl;
-		QRAP_WARN(err.c_str());
+//		QRAP_WARN(err.c_str());
 		return false;
 	}
 	else
@@ -251,22 +255,25 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 		{
 			string err = "Database Select for Original FileSet is empty. Query: ";
 			err += query;
-			QRAP_WARN(err.c_str());
+			cout << err << endl;
+//			QRAP_WARN(err.c_str());
 			return false;
 		}
 	}
 
-	cout << "Na original file set query" << endl;
+	cout << "Na original file set query." << endl;
 	gcvt(ResultFileSet,9,RFSID);
 	query = "SELECT resolution, fileformat, projection, proj4string ";
 	query += "FROM filesets WHERE ID=";
 	query += RFSID;
-		
+	
+	cout << "cLoadFile::CutCurrentSet query: " << query << endl; 	
 	if(!gDb.PerformRawSql(query))
 	{
 		string err = "Database Select for Original FileSet failed. Query: ";
 		err += query;
-		QRAP_WARN(err.c_str());
+		cout << err << endl;
+//		QRAP_WARN(err.c_str());
 		return false;
 	}
 	else
@@ -293,10 +300,12 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 		{
 			string err = "Database Select for Original FileSet is empty. Query: ";
 			err += query;
-			QRAP_WARN(err.c_str());
+			cout << err << endl;
+//			QRAP_WARN(err.c_str());
 			return false;
 		}
 	}
+	cout << "Na result file set query." << endl;
 	
 	StructMetaData MapHeader;
 	double maxN=-90.0, minW=360.0, minS=90.0, maxE=0.0; 
@@ -309,27 +318,33 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 	query += OFSID;
 	query += ") as tussen;";
 
+	
+	cout << "cLoadFile::CutCurrentSet query: " << query << endl;
 	if(!gDb.PerformRawSql(query))
 	{
 		string err = "Database Select to get Original Files info failed. Query: ";
 		err += query;
-		QRAP_WARN(err.c_str());
+		cout << err << endl;
+//		QRAP_WARN(err.c_str());
 		return false;
 	}
 	else
 	{
+		cout  <<"cLoadFile::CutCurrentSet. Getting content of original file set. r.size() = " << r.size() << endl; 
 		gDb.GetLastResult(r);
 		
 		if (r.size()==0)
 		{
 			string err = "Database Select to get Original Files is empty. Query: ";
 			err += query;
-			QRAP_WARN(err.c_str());
+			cout << err << endl;
+//			QRAP_WARN(err.c_str());
 			return false;	
 		}
 		
 		for (i=0; i< r.size(); i++)
 		{
+			cout  <<"cLoadFile::CutCurrentSet. Preparing OldMetaData  i=" << i << endl;
 			MapHeader.North = atof(r[i]["N"].c_str());
 			MapHeader.South = atof(r[i]["S"].c_str());
 			MapHeader.East = atof(r[i]["E"].c_str());
@@ -349,6 +364,7 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 			OldMetaData.push_back(MapHeader);
 		} // for i to r.size()
 	}
+
 	delete [] OFSID;
 	delete [] RFSID; 
 

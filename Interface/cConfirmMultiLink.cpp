@@ -388,6 +388,7 @@ void cConfirmMultiLink::on_pushOk_clicked()
 		int LinkID=0;
 		Link.SetLink(Units, DownLink, mInst.sFrequency, mkFactor, PlotResolution,
 				DEMsource, ClutterSource, UseClutter, 0, 0, true);
+		cLinkAnalysis * LinkDisplay = new cLinkAnalysis(mParent,mFL);
 
 		for (i=0; i<size; i++)
 		{

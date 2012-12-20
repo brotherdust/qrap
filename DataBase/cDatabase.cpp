@@ -262,7 +262,7 @@ bool cDatabase::PerformRawSql (const string& command)
 		QRAP_FATAL_CODE("Insufficient privileges for statement.", acDbNotAllowed);
 	} catch (...)
 	{
-		QRAP_FATAL_CODE("General error while attempting query.", acTransactionFailed);
+//		QRAP_FATAL_CODE("General error while attempting query.", acTransactionFailed);
 	}
 	
 	if (msAlertCode != acOk)

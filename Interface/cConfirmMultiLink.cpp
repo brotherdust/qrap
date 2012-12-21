@@ -360,10 +360,10 @@ void cConfirmMultiLink::on_pushOk_clicked()
 		DownLink  = false;
 	else DownLink  = true;
 	string Clutter = gDb.GetSetting("UseClutter");
-	bool UseClutter;
+	bool UseClutter=false;
 	if (Clutter=="true")
 		UseClutter = true;
-	else UseClutter = false;
+
 
 	if (Success)
 	{

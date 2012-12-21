@@ -295,7 +295,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		ReffHeight = Horizontalize(0,1);
 		PeakIndex = FindMainPeak(0,1,ReffHeight, MinClearance,sqrtD1D2);
 
-		mClutterIndex = mClutterProfile[PeakIndex];
+		if (mUseClutter) mClutterIndex = mClutterProfile[PeakIndex];
 
 		if ((MinClearance<1.0)&&(PeakIndex!=0))
 		{

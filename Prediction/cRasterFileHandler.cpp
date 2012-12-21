@@ -277,7 +277,7 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	OutProfile.SetInterPixelDist(DistRes);
 	OutProfile.SetProfile(NumPoints, profile);
 //	cProfile Rprofile(NumPoints, profile, DistRes);
-//	delete [] profile;
+	delete [] profile;
 	for (k=0;k<mCurrentRasters.size(); k++)
 		mCurrentRasters[k]->mUsed = false;
 	return AllFound;
@@ -755,8 +755,8 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 			if (!mCurrentRasters[i]->mUsed)
 			{
 				cout << "Removing " << mCurrentRasters[i]->mFilename << endl;
-				mCurrentRasters.erase(mCurrentRasters.begin()+i);
 				delete mCurrentRasters[i];
+				mCurrentRasters.erase(mCurrentRasters.begin()+i);
 			}
 		}
 		for (i=0; i<mCurrentRasters.size(); i++)

@@ -223,10 +223,10 @@ bool cSpectralLink::DoLink()
 	LinkOtherGain = EIRP+20.0*log10(mTxInst.sFrequency)+32.44;
 	//Loss_qrap -20log(f) - 32.44 + 10log(4*PI)
 	cout<<"PreDEM"<<endl;
-	DEM = mDEM->GetForLink(mTxInst.sSitePos, mRxInst.sSitePos, mPlotResolution);
+	mDEM->GetForLink(mTxInst.sSitePos, mRxInst.sSitePos, mPlotResolution, DEM);
 	cout<<"PostDEM"<<endl;
 	if (mUseClutter)
-		Clutter=mClutter.GetForLink(mTxInst.sSitePos, mRxInst.sSitePos,	mPlotResolution);
+		mClutter.GetForLink(mTxInst.sSitePos, mRxInst.sSitePos,	mPlotResolution,Clutter);
 	cout<<"PrePathloss"<<endl;
 	mPropLoss = PathLoss.TotPathLoss(DEM, Tilt, Clutter);
 	cout<<"PostPathloss"<<endl;

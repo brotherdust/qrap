@@ -309,7 +309,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 
 	cProfile DEM;
 	unsigned Length;
-	DEM = mDEM.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution);
+	mDEM.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution,DEM);
 	Length = DEM.GetSize();
 	mLength = Length;
 	
@@ -360,7 +360,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 
 	cProfile Clutter;
 	if (mUseClutter)
-		Clutter=mClutter.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution);
+		mClutter.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution, Clutter);
 
 	Initialize(DEM,Clutter);
 	SetEffProfile();	//Calculates the effective profile

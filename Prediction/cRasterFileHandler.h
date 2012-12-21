@@ -91,9 +91,10 @@ namespace Qrap
 			 *
 			 * @return cProfile Description
 			 */
-			cProfile GetForLink(	cGeoP TxLoc,
+			bool GetForLink(	cGeoP TxLoc,
 			    			cGeoP RxLoc,
-			    			double DistRes);
+			    			double DistRes,
+						cProfile &OutProfile);
 			
 			/**
 			 * Description of GetForCoverage

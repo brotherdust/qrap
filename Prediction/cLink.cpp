@@ -38,6 +38,7 @@ cLink::cLink()
 	mSlope 	= 0.0;
 	mEffRadius 	= reR;
 	mMinClearance  = 3.402823e+38;
+	mClutterClassGroup = 0;
 	mRxLev 		= new float[2];
     	mFlatProfile 	= new float[2];
 	mEffProfile  	= new float[2];
@@ -166,6 +167,7 @@ const cLink & cLink::operator=(const cLink &right)
 	mDEM			= right.mDEM;				///< Description
 	mUseClutter		= right.mUseClutter;		///< Description
 	mClutter		= right.mClutter;			///< Description
+	mClutterClassGroup 	= right.mClutterClassGroup;
 	CopyFixed(mTxInst,right.mTxInst);
 	CopyFixed(mRxInst,right.mRxInst);		///< Description
     	mRxLev	 = new float[mLength];

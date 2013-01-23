@@ -1599,22 +1599,23 @@ www.QRap.org.za
 		</view>
 -->
 		<view name = "links_view" as = 'select linkname, 
-			site1.sitename||rad1.sector as txsite,
-			radioinstallation1 as r1,
-			site2.sitename||rad2.sector as rxsite,
-			radioinstallation2 as r2, 
+			site1.sitename||rad1.sector as txsite, txinst,
+			rad1.txbearing as txbearing,
+			site2.sitename||rad2.sector as rxsite, rxinst,
+			rad2.txbearing as txbearing,
+			ST_Distance(site1.location, site2.location, true) as Distance,
 			minclearance as clear,
-			frequency, pathloss, kfactor
+			frequency, pathloss, kfactor, line
 			from links cross join radioinstallation as rad1 cross join site_view_only as site1
 	 		cross join radioinstallation as rad2 cross join site_view_only as site2
-	 		where rad1.id=radioinstallation1
-			and radioinstallation2=rad2.id
+	 		where rad1.id=txinst
+			and rxinst=rad2.id
 			and rad1.siteid=site1.id
 			and rad2.siteid=site2.id;'>
 			<field name="txsite" label="Tx Site" />
 			<field name="rxsite" label="Rx Site" />	
-			<field name="r1" label="Tx Radio" />
-			<field name="r2" label="Rx Radio" />
+			<field name="txinst" label="Tx Radio" />
+			<field name="rxinst" label="Rx Radio" />
 			<field name="clear" label="Clearance" />
 		</view>
 

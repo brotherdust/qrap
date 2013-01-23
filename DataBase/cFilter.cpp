@@ -779,6 +779,32 @@ void cFilter::CreateViews()
 			cout << "Error creating equipment_view in cFilter::CreateViews" << endl;
 			QRAP_ERROR("Error creating equipment_view in cFilter::CreateViews");
 		}
+
+		//change links view
+		query = "create view links_view as select linkname, ";
+		query+= "site1.sitename||rad1.sector as txsite, txinst, ";
+		query+= "rad1.txbearing as txbearing, ";
+		query+= "site2.sitename||rad2.sector as rxsite, rxinst, ";
+		query+= "rad2.txbearing as rxbearing, ";
+		query+= "ST_Distance(site1.location, site2.location, true) as Distance, ";
+		query+= "minclearance as clear, ";
+		query+= "frequency, pathloss, kfactor, line ";
+		query+= "from links cross join radioinstallation as rad1 cross join site_view_only as site1 ";
+	 	query+= "cross join radioinstallation as rad2 cross join site_view_only as site2 ";
+	 	query+= "where rad1.id=txinst ";
+		query+= "and rxinst=rad2.id ";
+		query+= "and rad1.siteid=site1.id ";
+		query+= "and rad2.siteid=site2.id;";
+		
+		if (gDb.ViewExists("links_view"))
+			gDb.RemoveView("links_view");
+		
+		if (!gDb.PerformRawSql(query))
+		{
+			cout << "Error creating links_view in cFilter::CreateViews" << endl;
+			QRAP_ERROR("Error creating links_view in cFilter::CreateViews");
+		}
+
 		radinvolved=false;
 					
 	}

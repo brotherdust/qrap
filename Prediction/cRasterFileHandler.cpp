@@ -155,6 +155,7 @@ unsigned cRasterFileHandler::GetClutterClassGroup()
 	delete [] temp;	
 	return ClassGroup;
 };
+
 //**********************************************************************
 bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cProfile &OutProfile)
 {
@@ -172,6 +173,7 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	Bearing = TxLoc.Bearing(RxLoc);
 	NumPoints = (int)ceil(Distance/DistRes);
 	DistRes = Distance/(double)NumPoints;
+	NumPoints ++;
 	profile = new float[NumPoints];
 	cGeoP point;
 	point.SetGeoType(WGS84GC);
@@ -325,6 +327,7 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 //			DistRes = min(DistRes,mCurrentRasters[i]->GetRes());
 		NumDistance = (int)ceil(Range/DistRes);
 		Range = NumDistance*DistRes;
+		NumDistance++;
 	}
 
 	if (mCurrentRasters.size()==0)

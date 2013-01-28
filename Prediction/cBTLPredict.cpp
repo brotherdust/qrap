@@ -68,9 +68,9 @@ cBTLPredict::~cBTLPredict()
 
 //*********************************************************************
 bool cBTLPredict::GetBTL(	unsigned 	&NumAngles,
-							unsigned		&NumRadialPoints,
-							double &Radius, // in meters
-							double &DistanceRes) // in meters
+				unsigned		&NumRadialPoints,
+				double &Radius, // in meters
+				double &DistanceRes) // in meters
 {
 	NumAngles = mNumAngles;
 	mAngleRes = 360.0/mNumAngles;

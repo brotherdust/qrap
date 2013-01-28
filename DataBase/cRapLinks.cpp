@@ -76,6 +76,7 @@ cRapLinks::cRapLinks (QWidget* parent) : QWidget(parent)
 	if(mCurrentTable->GetTable()->rowCount()!=0)
 	{
 		mCurrentTable->GetTable()->setCurrentCell(0,0);
+		mCurrentTable->GetTable()->selectRow(0);
 	} // if
 }
 
@@ -123,7 +124,7 @@ void cRapLinks::ReloadTable ()
 	// Make sure that no update signals are triggered
 	disconnect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),0,0);
 	
-	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"",-1,false,true);
+	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"id",-1,false,true);
 	
 	if (!tableViewSelected)
 		mCurrentTable->CreateUpdateForm();
@@ -139,7 +140,7 @@ void cRapLinks::ShowAllContents ()
 	// Make sure that no update signals are triggered
 	disconnect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),0,0);
 	
-	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"ci",-1,false,true);
+	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"id",-1,false,true);
 	
 	// Reconnect the update signals
 	connect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),this,SLOT(UpdateDatabase(int,int)));
@@ -199,7 +200,7 @@ void cRapLinks::ExecuteSearch (string search)
 {
 	disconnect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),0,0);
 	
-	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mCurrentTable->mTableName,"",-1,false,true,search);
+	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mCurrentTable->mTableName,"id",-1,false,true,search);
 	
 	connect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),this,SLOT(UpdateDatabase(int,int)));
 }
@@ -209,6 +210,7 @@ void cRapLinks::ExecuteSearch (string search)
 // Make sure that the correct table is made visible
 void cRapLinks::TableSelectionChanged ()
 {
+
 	QListWidgetItem* selectedItem = mTableList->currentItem();
 	
 	// Remove the previous table from the Grid layout
@@ -223,7 +225,7 @@ void cRapLinks::TableSelectionChanged ()
 	
 	// populate the current table
 	if(mCurrentTable->GetTable()->rowCount()==0)
-		mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),selectedItem->data(Qt::UserRole).toString(),"",-1,false,true);
+		mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),"links","id",-1,false,true);
 
 	
 	// Reconnect the update signals
@@ -290,7 +292,7 @@ void cRapLinks::PopulateTableList ()
 		it.value()->mTableViewSelected = &tableViewSelected;
 		
 		// Load the headers for each table
-		mDbCommunicator->LoadTableHeaders(it.value()->GetTable(),it.key(),"",true);
+		mDbCommunicator->LoadTableHeaders(it.value()->GetTable(),it.key(),"id",true);
 	} // while
 	
 	// Make sure that the site table is visible

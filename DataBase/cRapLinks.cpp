@@ -123,7 +123,7 @@ void cRapLinks::ReloadTable ()
 	// Make sure that no update signals are triggered
 	disconnect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),0,0);
 	
-	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"",-1,false);
+	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"",-1,false,true);
 	
 	if (!tableViewSelected)
 		mCurrentTable->CreateUpdateForm();
@@ -139,7 +139,7 @@ void cRapLinks::ShowAllContents ()
 	// Make sure that no update signals are triggered
 	disconnect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),0,0);
 	
-	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"ci",-1,false);
+	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mTables.key(mCurrentTable),"ci",-1,false,true);
 	
 	// Reconnect the update signals
 	connect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),this,SLOT(UpdateDatabase(int,int)));
@@ -199,7 +199,7 @@ void cRapLinks::ExecuteSearch (string search)
 {
 	disconnect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),0,0);
 	
-	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mCurrentTable->mTableName,"",-1,false,false,search);
+	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),mCurrentTable->mTableName,"",-1,false,true,search);
 	
 	connect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),this,SLOT(UpdateDatabase(int,int)));
 }
@@ -223,7 +223,7 @@ void cRapLinks::TableSelectionChanged ()
 	
 	// populate the current table
 	if(mCurrentTable->GetTable()->rowCount()==0)
-		mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),selectedItem->data(Qt::UserRole).toString(),"",-1,false);
+		mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),selectedItem->data(Qt::UserRole).toString(),"",-1,false,true);
 
 	
 	// Reconnect the update signals
@@ -290,7 +290,7 @@ void cRapLinks::PopulateTableList ()
 		it.value()->mTableViewSelected = &tableViewSelected;
 		
 		// Load the headers for each table
-		mDbCommunicator->LoadTableHeaders(it.value()->GetTable(),it.key(),"");
+		mDbCommunicator->LoadTableHeaders(it.value()->GetTable(),it.key(),"",true);
 	} // while
 	
 	// Make sure that the site table is visible
@@ -303,7 +303,7 @@ void cRapLinks::PopulateTableList ()
 	disconnect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),0,0);
 	
 	// Populate the site table first
-	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),"links","",-1,false);
+	mDbCommunicator->PopulateTable(mCurrentTable->GetTable(),"links","",-1,false,true);
 	
 	// Reconnect the update signals
 	connect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),this,SLOT(UpdateDatabase(int,int)));

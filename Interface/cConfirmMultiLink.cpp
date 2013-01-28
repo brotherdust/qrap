@@ -354,6 +354,7 @@ void cConfirmMultiLink::on_pushOk_clicked()
 
 	eOutputUnits Units = dBm;
 	double PlotResolution = atof(gDb.GetSetting("PlotResolution").c_str());
+	double tempPlotRes = PlotResolution;
 	string Down = gDb.GetSetting("Downlink");
 	bool DownLink;
 	if (Down=="false")
@@ -385,9 +386,10 @@ void cConfirmMultiLink::on_pushOk_clicked()
 		string LinkName="Link";
 		QString Linkname = "Link";
 		int LinkID=0;
-		Link.SetLink(Units, DownLink, mInst.sFrequency, mkFactor, PlotResolution,
+		double tempPlotRes;
+		tempPlotRes=PlotResolution;
+		Link.SetLink(Units, DownLink, mInst.sFrequency, mkFactor, tempPlotRes,
 				DEMsource, ClutterSource, UseClutter, 0, 0, true);
-		cLinkAnalysis * LinkDisplay = new cLinkAnalysis(mParent,mFL);
 
 		for (i=0; i<size; i++)
 		{
@@ -419,6 +421,7 @@ void cConfirmMultiLink::on_pushOk_clicked()
 								Link.SaveLink(LinkName,LinkID);
 								if (SavePDF)
 								{
+									cLinkAnalysis * LinkDisplay = new cLinkAnalysis(mParent,mFL);
 									Linkname = LinkName.c_str();
 									Transmitter = "Site:";
 									gcvt(mSiteList[i],8,temp);
@@ -432,9 +435,10 @@ void cConfirmMultiLink::on_pushOk_clicked()
 									Receiver += "_Radio:";
 									gcvt(RxRadID,8,temp);
 									Receiver += temp;
+									tempPlotRes = PlotResolution;
 									LinkDisplay->DoAndSetUpDisplay(Units, DownLink, 
 													mInst.sFrequency, 
-													mkFactor, PlotResolution,
+													mkFactor, tempPlotRes,
 													DEMsource, ClutterSource, 
 													UseClutter, TxRadID, RxRadID,
 													Linkname, Transmitter, 
@@ -452,6 +456,7 @@ void cConfirmMultiLink::on_pushOk_clicked()
 							{
 								cout << mSiteList[i] << " to " << mSiteList[j] << " does not work." << endl;
 							}
+							Link.ReSetPlotRes(PlotResolution);
 						}
 						else
 						{

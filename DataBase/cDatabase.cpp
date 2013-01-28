@@ -74,7 +74,7 @@ cDatabase::~cDatabase ()
 		} catch (...)
 		{
 			//QRAP_ERROR_CODE("Unable to destroy database connection.", acDbDisconnect);
-			cout << "Unable to destroy database connection." << endl;
+			cout << "cDatabase::~cDatabase:  Unable to destroy database connection." << endl;
 		}
 	}
 }
@@ -139,8 +139,8 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 	cout << "returning true ? ... " << endl;
 	if (!Create)
 	{
-		cout << " Not creating " << endl;
 		mUsername = username;
+		cout << "cDatabase::Connect. Not creating.  mUsername = " << mUsername << endl;
 		mUserGroup = GetGroupName(mUsername);
 		if (!PerformRawSql("select name, value from qrap_config where type='local' and username='"+mUsername+"';"))
 		{
@@ -1534,16 +1534,16 @@ bool cDatabase::RemoveView (const string& viewName)
 //**********************************************************************
 string cDatabase::GetSetting (const string& name)
 {
-	/*if (!PerformRawSql("select value from qrap_config where name='"+name+"' and type='local' and username='"+mUsername+"';"))
+	if (!PerformRawSql("select value from qrap_config where name='"+name+"' and type='local' and username='"+mUsername+"';"))
 		return string("");
 	
 	if (mLastResult.size() == 0)
 		return string("");
 	
-	return string(mLastResult[0]["value"].c_str());*/
+	return string(mLastResult[0]["value"].c_str());
 	
-	if (mSettings.count(name) > 0)
-		return mSettings[name];
+//	if (mSettings.count(name) > 0)
+//		return mSettings[name];
 	
 	return string("");
 }

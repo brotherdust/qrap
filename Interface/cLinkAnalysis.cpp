@@ -78,8 +78,8 @@ void cLinkAnalysis::DoAndSetUpDisplay(eOutputUnits Units, bool Downlink, double 
 	double maxH, minH;
 
 	cout << " mTxID: " << mTxID << "	mRxID: " << mRxID << endl;
-	mLink.SetLink(Units, Downlink, Frequency, kFactor, PlotResolution,
-			DEMsource, ClutterSource, UseClutter, mTxID, mRxID);
+	mLink.SetLink(Units, Downlink, Frequency, kFactor, mPlotResolution,
+			DEMsource, ClutterSource, mUseClutter, mTxID, mRxID);
 	mLink.DoLink();
 	mLink.GetLinkInfo(mSize, mInterPixDist, 
 			mMinClearance, mFrequency,

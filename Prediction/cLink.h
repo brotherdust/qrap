@@ -102,6 +102,7 @@ namespace Qrap
 			bool SetRxSite(int RxSite, tFixed Inst);
 			void SetTxInst(int TxInst){mTxInst.sInstKey=TxInst;};
 			void SetRxInst(int RxInst){mRxInst.sInstKey=RxInst;};
+			void ReSetPlotRes(int PlotRes){mPlotResolution=PlotRes;};
 			
 			void GetLinkInfo(int &Size, double &InterPixDist, 
 					double &MinClearance, double &Freq,

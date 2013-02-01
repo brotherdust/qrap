@@ -197,7 +197,25 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 	char *temp2;
 	temp2 = new char[10];
 
-	string query ="";
+	double res;
+	string query = "select min(resolution) as res from filesets;";
+	if (!gDb.PerformRawSql(query))
+	{
+		string err = "Error getting minimum resolution in file sets: ";
+		err += query;
+		QRAP_WARN(err.c_str());
+		cout << "cMeasImportSpace::LoadMeasurement: Error getting minimum resolution in file sets: " << endl;
+		cout << query << endl;
+		res = 90;
+	}
+	else
+	{
+		pqxx::result r;
+		gDb.GetLastResult(r);
+		res = atof(r[0]["res"].c_str());
+	}
+
+	query ="";
 	string queryP = "INSERT INTO testpoint (measdatasource, positionsource, meastype, location, id) VALUES(";
 	if (mMeasSource>0)
 		queryP += mMeasSourceS;
@@ -225,10 +243,54 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 		cout << filename << endl;
 		return 0;	
 	}
-	else cout << line << endl;                   
+	else cout << line << endl;     
 
-	Ddist = max(min(0.0005*0.0005/(mFrequency*mFrequency),5e-8), 1e-12);
-	cout << "Ddist = " << Ddist << endl;
+	double DegInMeter,DLat,DLon;
+
+     	while (getline(DataFile, line)&&(line.substr(1,1)=="#"))
+	{
+        	istringstream linestream(line);
+       		getline (linestream, TimeS, ',');
+		getline (linestream, LatS, ',');
+		getline (linestream, LonS, ',');
+		getline (linestream, RSSIS, ',');
+		getline (linestream, MERS);
+	}
+	if (LatS.substr(0,1)=="\"")
+	{
+		Lat = atof((LatS.substr(1,LatS.size()-2)).c_str());
+		Lon = atof((LonS.substr(1,LonS.size()-2)).c_str());
+		Meas = atof((RSSIS.substr(1,RSSIS.size()-2)).c_str());
+	}
+	else
+	{
+		Lat = atof(LatS.c_str());
+		Lon = atof(LonS.c_str());
+		Meas = atof(RSSIS.c_str());
+	}
+
+
+	double TLat=0.0, TLon=0.0;
+	cGeoP StartP(Lat,Lon);
+	prevLat = Lat;
+	prevLon = Lon;
+	cGeoP DeltaP(Lat,Lon);
+	DeltaP.FromHere(StartP,res,0);
+	DeltaP.Get(DLat,DLon);
+	DegInMeter = (DLat-Lat)*(DLat-Lat)/res/res;
+	DeltaP.FromHere(StartP,res,90);
+	DeltaP.Get(DLat,DLon);
+	DegInMeter = min(DegInMeter,(DLon-Lon)*(DLon-Lon)/res/res);
+	cout << "DegInMeter = " << DegInMeter << endl;
+
+//	Averaging distance = min ( 25x the wavelength , 25meter);
+	Ddist = min(25*25*DegInMeter*LIGSNEL*LIGSNEL/1.0e12/(mFrequency*mFrequency), 25*25*DegInMeter);             
+
+//	New sample distance ... mainly to resuce the number of samples stored
+//	1.41* resolution ... to make sure each measurement is at least on a different block.
+	double Ndist = max(Ddist, 2*res*res*DegInMeter);
+
+	cout << "Ddist = " << Ddist << "	Ndist = "<< Ndist << endl;
 	cout << "cMeasImportCSV::LoadMeasurement: before while " << endl;	
      	while (getline (DataFile, line))
     	{
@@ -256,69 +318,84 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 			dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
 			if ((Meas > mSensitivity) && (fabs(Lat)>1.0e-12)&&(fabs(Lon)>1.0e-12)&&((dist<2)||(prevLat==0)))
 			{
-				if (dist>Ddist)
-				{	
-					mLastTestPoint++;
-					mLastMeas++;
-					gcvt(mLastTestPoint,9,TPID);
-					query = queryP;
-					PosString=QString(",ST_GeomFromText('POINT(%1 %2)',4326),").arg(Lon).arg(Lat);
-					query += PosString.toStdString();
-					query += TPID;
-					query += ");";
-	
-					if (!gDb.PerformRawSql(query))
-					{
-						string err = "Error inserting Test Point by running query: ";
-						err += query;
-						QRAP_WARN(err.c_str());
-						cout << "cMeasImportCSV::LoadMeasurement: Error inserting the Test Point!: " << endl;
-						cout << query << endl;
-						return 0;
-					}
-	
-					if (LocalNum>0) 
-					{
-						LocalAve = (LocalTotal+Meas)/(LocalNum+1);
-						cout << "mLastMeas = " <<mLastMeas <<"	LocalNum = " << LocalNum << endl;
-					}
-					else LocalAve = Meas;
 
-					LocalTotal = 0.0;
-					LocalNum = 0;
-					query = queryM;
-					gcvt(mLastMeas,9,temp);
-					query += temp;
-					query += ",";
-					query += TPID;
-					query += ",";
-					gcvt(LocalAve,9,temp);
-					query += temp;
-					query += ");";
-					if (!gDb.PerformRawSql(query))
-					{
-						cout << "cMeasImportCSV::LoadMeasurement: Error inserting the Measurement!: " << endl;
-						cout << query << endl;
-						string err = "Error inserting Measurement by running query: ";
-						err += query;
-						QRAP_WARN(err.c_str());
-	
-						return 0;
-					}
+				if (dist>=Ddist)
+				{
 		
 					prevLon = Lon;
 					prevLat = Lat;
+
+					if (LocalNum>0) 
+					{
+						LocalAve = (LocalTotal+Meas)/(LocalNum+1);
+						Lon = (TLon+Lon)/(LocalNum+1);
+						Lat = (TLat+Lat)/(LocalNum+1);
+//						cout << "mLastMeas = " <<mLastMeas <<"	LocalNum = " << LocalNum << endl;
+					}
+					else LocalAve = Meas;
+	
+					LocalTotal = 0.0;
+					LocalNum = 0;
+					TLon = 0.0;
+					TLat = 0.0;
+
+					if (dist>=Ndist)
+					{
+						mLastTestPoint++;
+						mLastMeas++;
+						gcvt(mLastTestPoint,9,TPID);
+						query = queryP;
+						PosString=QString(",ST_GeomFromText('POINT(%1 %2)',4326),").arg(Lon).arg(Lat);
+						query += PosString.toStdString();
+						query += TPID;
+						query += ");";
+	
+						if (!gDb.PerformRawSql(query))
+						{
+							string err = "Error inserting Test Point by running query: ";
+							err += query;
+							QRAP_WARN(err.c_str());
+							cout << "cMeasImportCSV::LoadMeasurement: Error inserting the Test Point!: " << endl;
+							cout << query << endl;
+							return 0;
+						}
+		
+						query = queryM;
+						gcvt(mLastMeas,9,temp);
+						query += temp;
+						query += ",";
+						query += TPID;
+						query += ",";
+						gcvt(LocalAve,9,temp);
+						query += temp;
+						query += ");";
+						if (!gDb.PerformRawSql(query))
+						{
+							cout << "cMeasImportCSV::LoadMeasurement: Error inserting the Measurement!: " << endl;
+							cout << query << endl;
+							string err = "Error inserting Measurement by running query: ";
+							err += query;
+							QRAP_WARN(err.c_str());
+	
+							return 0;
+						}
+		
+
+					}
 				}
 				else
 				{
 					LocalNum++;
 					LocalTotal += Meas;
+					TLat+=Lat;
+					TLon+=Lon;
 				}
 			}
 			
 		}
 		else cout << line << endl;
 	}
+	cout << "cMeasImportCSV::LoadMeasurement: done " << endl;
 	DataFile.close();
 	delete [] temp;
 	delete [] temp2;

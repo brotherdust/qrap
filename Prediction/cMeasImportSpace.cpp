@@ -237,8 +237,8 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 	QString PosString;
 
 	double DegInMeter,DLat,DLon, TLat=0, TLon =0;
-	if (!DataFile.eof()) DataFile >> Lon >> Lat >> Meas;
-//	if (!DataFile.eof()) DataFile >> Lat >> Lon >> Meas; // For Planet
+//	if (!DataFile.eof()) DataFile >> Lon >> Lat >> Meas;
+	if (!DataFile.eof()) DataFile >> Lat >> Lon >> Meas; // For Planet
 	cGeoP StartP(Lat,Lon);
 	prevLat = Lat;
 	prevLon = Lon;
@@ -263,8 +263,8 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 	cout << "cMeasImportSpace::LoadMeasurement: before while " << endl;
      	while (!DataFile.eof())
      	{
-//        	DataFile >> Lat >> Lon >> Meas; // For Planet Format
-        	DataFile >> Lon >> Lat >> Meas;
+        	DataFile >> Lat >> Lon >> Meas; // For Planet Format
+//        	DataFile >> Lon >> Lat >> Meas;
 		dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
 //		cout << dist << endl;
 		if ((Meas > mSensitivity) && ((dist<2)||(prevLat==0)))

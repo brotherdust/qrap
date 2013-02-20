@@ -26,7 +26,7 @@
 #ifndef Qrap_cLink_h
 #define Qrap_cLink_h
 
-
+ 
 // Include local headers
 #include "PredStructs.h"
 #include "cMemmngr.h"

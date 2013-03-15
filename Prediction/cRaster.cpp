@@ -40,7 +40,7 @@ cRaster::cRaster()
 	mRaster = new_Float2DArray(mRows,mCols);	
 	mDirectory = "qrap/Data/SRTM/";
 	mFilename = "raster.bin";
-	cout << "Default constructor Raster" << endl;
+//	cout << "Default constructor Raster" << endl;
 }
  
 //*************************************************************************

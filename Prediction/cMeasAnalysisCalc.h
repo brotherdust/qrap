@@ -78,15 +78,15 @@ class cMeasAnalysisCalc
 	bool LoadMeasurements(unsigned MeasType=0, unsigned PosSource=0, 
 				unsigned MeasSource=0, unsigned Cell=0);
 
-
 	int PerformAnalysis(double &Mean, double &MeanSquareError,
 				double &StDev, double &CorrC, unsigned Clutterfilter=0);
 
 	int SaveResults();
 
-	bool OptimiseModelCoefD();
+	bool OptimiseModelCoefD(unsigned MeasSource=0);
+	bool OptimiseModelCoefAllTotal(unsigned MeasSource=0);
 	bool OptimiseSeekWidth();
-	bool OptimiseHeights();	
+	bool OptimiseHeights(unsigned MeasSource=0);	
 
    private:
 
@@ -110,7 +110,7 @@ class cMeasAnalysisCalc
 	cPathLossPredictor mPathLoss;	// we need to access the clutter coefficients of mClutter of PathLoss 
 					// ... hence mPathLoss needs to be a member/class global variable
 	double *mMinTerm;		// The minimum and maximum values of a specific term is used to identify 
-	double *mMaxTerm;		// whether or not the coefficients of these terms are relavent or whether 
+	double *mMaxTerm;		// whether or not the coefficients of these terms are relavant or whether 
 					// the term will be constant.
 	double *mMidTerm;
 };

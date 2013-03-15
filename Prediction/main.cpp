@@ -50,17 +50,82 @@ int main (int argc, char **argv)
 		return 0;
 	}
 	
-//	cMeasAnalysisCalc Meas;
+	string query = "update coefficients set coefficient=0.0;";
+
+	double Mean, MSE, StDev, CorrC;
+	cMeasAnalysisCalc Meas;
 //	Meas.OptimiseSeekWidth();
-//	Meas.OptimiseModelCoefD();
+
+	gDb.PerformRawSql(query);
+	Meas. LoadMeasurements();
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Voor0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl << endl;
+	Meas.OptimiseModelCoefAllTotal();
+	Meas. LoadMeasurements();
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Na0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	gDb.PerformRawSql(query);
+	Meas. LoadMeasurements(0,0,1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Voor1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<<endl;
+	Meas.OptimiseModelCoefAllTotal(1);
+	Meas. LoadMeasurements(0,0,1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
+
+	gDb.PerformRawSql(query);
+	Meas. LoadMeasurements(0,0,2);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Voor2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl;
+	Meas.OptimiseModelCoefAllTotal(2);
+	Meas. LoadMeasurements(0,0,2);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Na2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;;
+
+	gDb.PerformRawSql(query);
+	Meas. LoadMeasurements(0,0,3);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Voor3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl;
+	Meas.OptimiseModelCoefAllTotal(3);
+	Meas. LoadMeasurements(0,0,3);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Na3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+/*
+	gDb.PerformRawSql(query);
+	Meas.OptimiseModelCoefD();
+	Meas. LoadMeasurements();
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
+
+	gDb.PerformRawSql(query);
+	Meas.OptimiseModelCoefD(1);
+	Meas. LoadMeasurements(0,0,1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl;
+
+	gDb.PerformRawSql(query);
+	Meas.OptimiseModelCoefD(2);
+	Meas. LoadMeasurements(0,0,2);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl;
+
+	gDb.PerformRawSql(query);
+	Meas.OptimiseModelCoefDl(3);
+	Meas. LoadMeasurements(0,0,3);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl;
 //	Meas.OptimiseHeights();
 //	Meas.OptimiseModelCoefD();
+*/
 
-	string dir="/home/anita/GISdata/SRTM/BIN/";
+
+/*	string dir="/home/anita/GISdata/SRTM/BIN/";
 	cLoadFile Files(3,4,dir);
 	cout << "Voor cut" << endl;
 	Files.CutCurrentSet(3,4, true, 1);
-
+*/
 	// For Arc Grid
 /*	string dir="/home/maggie/Data/RasterData/BIN";
 	cLoadFile Files(1,2,dir);

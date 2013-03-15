@@ -237,8 +237,8 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 	QString PosString;
 
 	double DegInMeter,DLat,DLon, TLat=0, TLon =0;
-//	if (!DataFile.eof()) DataFile >> Lon >> Lat >> Meas;
-	if (!DataFile.eof()) DataFile >> Lat >> Lon >> Meas; // For Planet
+	if (!DataFile.eof()) DataFile >> Lon >> Lat >> Meas;
+//	if (!DataFile.eof()) DataFile >> Lat >> Lon >> Meas; // For Planet
 	cGeoP StartP(Lat,Lon);
 	prevLat = Lat;
 	prevLon = Lon;
@@ -255,16 +255,16 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 	Ddist = min(25*25*DegInMeter*LIGSNEL*LIGSNEL/1.0e12/(mFrequency*mFrequency), 25*25*DegInMeter);             
 
 //	New sample distance ... mainly to resuce the number of samples stored
-//	1.41* resolution ... to make sure each measurement is at least on a different block.
+//	resolution ... to make sure each measurement is at least on a different block.
 	double Ndist = max(Ddist, 2*res*res*DegInMeter);
-
+//	double Ndist = max(Ddist, 0.000144*0.000144);
 	cout << "Ddist = " << Ddist << "	Ndist = "<< Ndist << endl;
 
 	cout << "cMeasImportSpace::LoadMeasurement: before while " << endl;
      	while (!DataFile.eof())
      	{
-        	DataFile >> Lat >> Lon >> Meas; // For Planet Format
-//        	DataFile >> Lon >> Lat >> Meas;
+//        	DataFile >> Lat >> Lon >> Meas; // For Planet Format
+        	DataFile >> Lon >> Lat >> Meas;
 		dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
 //		cout << dist << endl;
 		if ((Meas > mSensitivity) && ((dist<2)||(prevLat==0)))

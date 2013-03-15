@@ -34,7 +34,7 @@ using namespace Qrap;
 // Classification Group will be used. 
 cClutter::cClutter()
 {
-	cout << "In cClutter Default constructor" << endl;
+//	cout << "In cClutter Default constructor" << endl;
 	mNumber = 0;
 	mClutterTypes = NULL;
 	mClassificationGroup = 0;
@@ -49,7 +49,7 @@ cClutter::cClutter()
 // is specified. 
 cClutter::cClutter(unsigned ClassGroup)
 {
-	cout << "In cClutter Overlaod constructor" << endl;
+//	cout << "In cClutter Overlaod constructor" << endl;
 	mNumber = 0;
 	mClutterTypes = NULL;
 	mClassificationGroup = 0;
@@ -167,6 +167,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 		string err = "Not Using Clutter because of failure of Database Select for basic Clutter information. Query: ";
 		err += query;
 		QRAP_WARN(err.c_str());
+	 	Success=false;
 	}
 	else
 	{
@@ -197,13 +198,13 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 					mClutterTypes[j].sAllowCchange[jj] = false;
 				}
 			}
-			for (j=0; j<mNumber; j++)
+			for (j=0; (j<mNumber)&&(Success); j++)
 			{
 				landcoverid = atoi(r[j]["landcoverid"].c_str());
 				mClutterTypes[landcoverid].sLandCoverID = landcoverid;
 				mClutterTypes[landcoverid].sRho = atof(r[j]["width"].c_str());
 				mClutterTypes[landcoverid].sHeight = atof(r[j]["height"].c_str());
-				cout << landcoverid << "	" << mClutterTypes[landcoverid].sHeight << endl;
+//				cout << landcoverid << "	" << mClutterTypes[landcoverid].sHeight << endl;
 				gcvt(atoi(r[j]["id"].c_str()),9,idnr);
 				gcvt(landcoverid,9,type);
 				queryCC = queryU;
@@ -216,6 +217,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 					string err = "Database Select for Clutter Coefficients failed. Query: ";
 					err += queryCC;
 					QRAP_WARN(err.c_str());
+					Success = false;
 				}
 				else
 				{
@@ -263,7 +265,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 					else if (landcoverid>0)
 					{
 //						cout << "Empty query: " << queryCC << endl;
-						for (jj=0; jj<NUMTERMS; jj++)
+						for (jj=0; (jj<NUMTERMS)&&(Success); jj++)
 						{
 							queryI = "INSERT INTO coefficients (term, cluttertype, coefficient) values (";
 							gcvt(jj,9,temp);
@@ -276,6 +278,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 								string err = "Failure inserting the coefficients. Query: ";
 								err += queryI;
 								QRAP_WARN(err.c_str());
+								Success= false;						
 							}
 						}
 					}
@@ -287,6 +290,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 			string err = "Not Using Clutter because of void query for basic Clutter information. Query: ";
 			err += query;
 			QRAP_WARN(err.c_str());
+			Success = false;
 		}
 			
 	} 
@@ -320,7 +324,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 	}
 */
 	mNumber = MaxLandCoverID+1;
-	cout << "mNumber=" << mNumber << endl;
+//	cout << "mNumber=" << mNumber << endl;
 	delete [] type;
 	delete [] temp;
 	delete [] idnr; 
@@ -375,7 +379,8 @@ bool cClutter::UpdateCoefficients(unsigned ClutterType)
 	queryA += type;
 	queryA += ");";
 
-	for (j=0; j<NUMTERMS; j++)
+	Success=true;
+	for (j=0; (j<NUMTERMS)&&(Success); j++)
 	{
 		query = "UPDATE coefficients set coefficient = ";
 		gcvt(mClutterTypes[ClutterType].sCoefficients[j],9,coef);	
@@ -416,7 +421,7 @@ bool cClutter::UpdateHeightsWidths()
 	unsigned j=0;
 
 
-	for (j=1; j<mNumber; j++)
+	for (j=1; (j<mNumber)&&(Success); j++)
 	{
 		gcvt(mClutterTypes[j].sLandCoverID,9,type);
 		gcvt(mClassificationGroup,9,group);

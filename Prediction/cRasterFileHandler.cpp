@@ -74,7 +74,7 @@ bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
 	CmdStr += RuleStr;  
 	CmdStr +=";";
 	
-	cout << CmdStr << endl;
+//	cout << CmdStr << endl;
 	if(!gDb.PerformRawSql(CmdStr))
 	{
 		string err = "Getting the fileset to use failed. Query: ";
@@ -131,7 +131,7 @@ unsigned cRasterFileHandler::GetClutterClassGroup()
 	query += temp;	
 	query += ";";
 
-	cout << query << endl; 
+//	cout << query << endl; 
 	if(!gDb.PerformRawSql(query))
 	{
 		string err = "Getting the Clutter Classification Group to use failed. Query: ";
@@ -436,8 +436,8 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 			}
 			else mCurrentRasters[Current]->mUsed = true;
 		}
-		if (((double)i/10.0)==(i/10))
-			cout << "Get Raster Data: " << 100*i/NumAngles << endl;
+//		if (((double)i/10.0)==(i/10))
+//			cout << "Get Raster Data: " << 100*i/NumAngles << endl;
 	}
 
 	for (k=0;k<mCurrentRasters.size(); k++)
@@ -451,7 +451,7 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 					unsigned &Rows, unsigned &Cols, 
 					Float2DArray &Data, GeoType ProjIn) 
 {
-	cout << "In GetForDEM" << endl;
+//	cout << "In GetForDEM" << endl;
 	cGeoP NE, SW, rNW, rSE, rNE, rSW, Point, tempP,Mid;
 	double N,W,S,E,WE, Ydist, Xdist, MidX, MidY, tempD;
 	unsigned i,j,k,midRow,midCol;
@@ -470,8 +470,8 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	SE.Get(S,E);
 	Mid.Set((N+S)/2,(W+E)/2.0, DEG);
 	Hemisphere = Mid.Hemisphere();
-	cout << " In  cRasterFileHandler::GetForDEM.   Mid: " << endl;
-	Mid.Display();
+//	cout << " In  cRasterFileHandler::GetForDEM.   Mid: " << endl;
+//	Mid.Display();
 	central=Mid.DefaultCentMer(ProjIn);
 
 	CentMer = central; 
@@ -516,31 +516,31 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 		
 	midRow = (int)(Rows/2.0);
 	midCol = (int)(Cols/2.0);
-	cout << Rows << "  " << Cols << endl;
+//	cout << Rows << "  " << Cols << endl;
 	delete_Float2DArray(Data);
 	Data = new_Float2DArray(Rows,Cols);
 
 	Ydist = (double)(0-(int)midRow)*Res;
 	Xdist = (double)(0-(int)midCol)*Res;
 	NW.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
-	cout << " In  cRasterFileHandler::GetForDEM.   NW: " << endl;
-	NW.Display();
+//	cout << " In  cRasterFileHandler::GetForDEM.   NW: " << endl;
+//	NW.Display();
 	Ydist = (double)((int)Rows-1-(int)midRow)*Res;
 	SW.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
-	cout << " In  cRasterFileHandler::GetForDEM.   SW: " << endl;
-	SW.Display();
+//	cout << " In  cRasterFileHandler::GetForDEM.   SW: " << endl;
+//	SW.Display();
 	Xdist = (double)((int)Cols-1-(int)midCol)*Res;
 	SE.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
-	cout << " In  cRasterFileHandler::GetForDEM.   SE: " << endl;
-	SE.Display();
+//	cout << " In  cRasterFileHandler::GetForDEM.   SE: " << endl;
+//	SE.Display();
 	Ydist = (double)(0-(int)midRow)*Res;
 	NE.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
-	cout << " In  cRasterFileHandler::GetForDEM.   NE: " << endl;
-	NE.Display();
+//	cout << " In  cRasterFileHandler::GetForDEM.   NE: " << endl;
+//	NE.Display();
 
-	cout << "In cRasterFileHandler::GetForDEM.  Resolution: " << Res << endl;
-	cout << "In cRasterFileHandler::GetForDEM.  midRow: " << midRow << endl;
-	cout << "In cRasterFileHandler::GetForDEM.  midCol: " << midCol << endl;
+//	cout << "In cRasterFileHandler::GetForDEM.  Resolution: " << Res << endl;
+//	cout << "In cRasterFileHandler::GetForDEM.  midRow: " << midRow << endl;
+//	cout << "In cRasterFileHandler::GetForDEM.  midCol: " << midCol << endl;
 
 	for(i=0; i<Rows; i++)
 		for (j=0; j<Cols; j++)
@@ -627,7 +627,7 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	for (k=0;k<mCurrentRasters.size(); k++)
 		mCurrentRasters[k]->mUsed = false;
 
-	cout << "Out GetForDEM" << endl;
+//	cout << "Out GetForDEM" << endl;
 	return true;
 }
 
@@ -693,12 +693,12 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 				if (!NewFound)
 				{				
 					NewFound = true;
-					cout << " mFileSetOrder.size() = " 
-						<< mFileSetOrder.size() << "	i=" << i << endl;
-					cout << "Not finding point ..."; 
-					NotFoundPoint.Display();
-					cout << "Found point ... ";
-					point.Display();
+//					cout << " mFileSetOrder.size() = " 
+//						<< mFileSetOrder.size() << "	i=" << i << endl;
+//					cout << "Not finding point ..."; 
+//					NotFoundPoint.Display();
+//					cout << "Found point ... ";
+//					point.Display();
 				}
 				NotFoundCount = 0;
 				RasterFound = true;
@@ -728,20 +728,20 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 				NotFoundCount++;
 				if (NewFound)
 				{
-					cout << " mFileSetOrder.size() = "; 
-					cout << mFileSetOrder.size() << "	i=" << i << endl;
-					cout << "Not finding point ... ";
-					point.Display();
+//					cout << " mFileSetOrder.size() = "; 
+//					cout << mFileSetOrder.size() << "	i=" << i << endl;
+//					cout << "Not finding point ... ";
+//					point.Display();
 					NotFoundCount = 0;
 					NewFound = false;
 				}
 				else NotFoundPoint = point; 
 				if (NotFoundCount>100000)
 				{
-					cout << " mFileSetOrder.size() = "; 
-					cout << mFileSetOrder.size() << "	i=" << i << endl;
-					cout << "Not finding point ... ";
-					point.Display();
+//					cout << " mFileSetOrder.size() = "; 
+//					cout << mFileSetOrder.size() << "	i=" << i << endl;
+//					cout << "Not finding point ... ";
+//					point.Display();
 					NotFoundCount = 0;
 					NewFound = false;
 				}
@@ -757,7 +757,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 		{
 			if (!mCurrentRasters[i]->mUsed)
 			{
-				cout << "Removing " << mCurrentRasters[i]->mFilename << endl;
+//				cout << "Removing " << mCurrentRasters[i]->mFilename << endl;
 				delete mCurrentRasters[i];
 				mCurrentRasters.erase(mCurrentRasters.begin()+i);
 			}

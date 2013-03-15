@@ -228,7 +228,7 @@ bool cGDAL::writeFile(Float2DArray &Raster,
 	else if ((!(South)) && (NSRes > 0))
 		NSRes = -NSRes;
 
-	cout << "before GetGeoTrasform" << endl;
+//	cout << "before GetGeoTrasform" << endl;
 //	cout << pj_get_def(OutProj4,0) << endl;
 	double *adfGeoTransform;
 	adfGeoTransform = new double[6];
@@ -251,7 +251,7 @@ bool cGDAL::writeFile(Float2DArray &Raster,
 	CPLFree( pszSRS_WKT );
 	CPLErr lCrGdal;
 
-	cout << "Converting Raster to single array: "<<endl;
+//	cout << "Converting Raster to single array: "<<endl;
 	unsigned i,j,k,l;
 	l = rows*cols;
 	float *abyRaster;
@@ -262,7 +262,7 @@ bool cGDAL::writeFile(Float2DArray &Raster,
 		{
 			abyRaster[j+i] = Raster[k][j];
 		}
-	cout << "Done with Conversion" <<endl;
+//	cout << "Done with Conversion" <<endl;
 
 	lCrGdal = poBand->RasterIO( GF_Write, 0, 0, cols, rows,
                   abyRaster, cols, rows, PxType, 0, 0 );
@@ -288,7 +288,7 @@ bool cGDAL::writeFile(Float2DArray &Raster,
  	GDALDestroyDriverManager();
  	delete [] adfGeoTransform;
 	delete [] abyRaster;
- 	cout <<"Fine" << endl;
+// 	cout <<"Fine" << endl;
 	return true;
 }
 

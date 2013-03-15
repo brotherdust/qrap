@@ -35,20 +35,20 @@
 #include "../DataBase/cDatabase.h"
 
 //The following terms in used in the clutter dependant propagation Prediction
-#define NUMTERMS 8
+#define NUMTERMS 6
  
-#define TERM0	1		//Constant offset
+#define TERM0 1		//Constant offset
 #define TERM1 log10(mLinkLength/1000.0) // This term occur in virtually all models. Here it will refer loss over and above free-space. 
 				// The coefficient may only be more than zero.
-#define TERM2 log10(m_htx)*log10(mLinkLength/1000.0)	// This term occurs amongst others in the Okumura Hata model
-#define TERM3 log10(m_freq)	// This term also occur often e.g. to account for the difference between plane-earth and free-space loss
-#define TERM4 m_freq
-#define TERM5 log10(m_freq)*log10(m_freq)		// This term occurs in ECC-33 and Ericsson models
+#define TERM2 log10(m_freq)	// This term also occur often e.g. to account for the difference between plane-earth and free-space loss
+#define TERM3 log10(m_htx)*log10(mLinkLength/1000.0)	// This term occurs amongst others in the Okumura Hata model
 
-#define TERM6 pow(m_freq,0.284)		// Weissberger-like term for vegetation loss
+#define TERM4 log10(m_freq)*log10(m_freq)		// This term occurs in ECC-33 and Ericsson models
+//#define TERM4 pow(m_freq,0.284)		// Weissberger-like term for vegetation loss
 						// ... depth through trees are assumed shallow and more or less constant
-#define TERM7 log10(m_htx)	// we assume a constant mobile/customer antenna height, hence this term is assumed to be incorporated 
+#define TERM5 log10(m_htx)	// we assume a constant mobile/customer antenna height, hence this term is assumed to be incorporated 
 				// in the offset.
+//#define TERM7 m_freq
 //#define TERM8 log10(m_htx-Cheight)		// Bertoni Walfish, not used as it diffraction elements are already included. 
 
 
@@ -60,10 +60,10 @@ namespace Qrap
 	struct sClutter 
 	{
 		unsigned	sLandCoverID;
-		double  	sRho;
+		double  		sRho;
 		double 		sHeight;
 		double*		sCoefficients;
-		bool*		sAllowCchange;		
+		bool*			sAllowCchange;		
 	};
 
 

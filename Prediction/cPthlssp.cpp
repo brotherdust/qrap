@@ -77,11 +77,9 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	};
 
 	mCterms[0] = TERM0;
-	mCterms[3] = TERM3;
+	mCterms[2] = TERM2;
 	mCterms[4] = TERM4;
 	mCterms[5] = TERM5;
-	mCterms[6] = TERM6;
-	mCterms[7] = TERM7;
 
 	mUseClutter = true;
 	if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
@@ -240,11 +238,9 @@ int cPathLossPredictor::setParameters(double k, double f,
 	if (mUseClutter)
 	{
 		mCterms[0] = TERM0;
-		mCterms[3] = TERM3;
+		mCterms[2] = TERM2;
 		mCterms[4] = TERM4;
 		mCterms[5] = TERM5;
-		mCterms[6] = TERM6;
-		mCterms[7] = TERM7;
 	}
 
 return 1;
@@ -365,7 +361,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
 //		cout << "	" << mLinkLength << ".";
 		mCterms[1] = TERM1;
-		mCterms[2] = TERM2;
+		mCterms[3] = TERM3;
 //		if (Cheight < (m_htx+0.1))
 //			mCterms[8] = TERM8;
 //		else mCterms[8] = 100;

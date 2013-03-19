@@ -273,7 +273,6 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	double radius = 0.0;
 	double alpha = 0.1;
 	int PeakIndex = 0;
-	int MainPeakIndex = 0;
 	int OldPeakIndex = 0;
 	int IfTooManyPeaks = 0;
 	int i;
@@ -290,8 +289,9 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		
 		ReffHeight = Horizontalize(0,1);
 		PeakIndex = FindMainPeak(0,1,ReffHeight, MinClearance,sqrtD1D2);
-
-		if (mUseClutter) mClutterIndex = mClutterProfile[PeakIndex];
+		if (mUseClutter) 
+			if ((MinClearance<1.0)&&(PeakIndex!=0)) mClutterIndex = mClutterProfile[PeakIndex];
+			else mClutterIndex = mClutterProfile[m_size-1];
 
 		if ((MinClearance<1.0)&&(PeakIndex!=0))
 		{
@@ -320,13 +320,13 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 								KnifeEdge, RoundHill);
 					if ((MinClearance<=0)&&(OldMinClear<=-1)&&(i<MAXPEAK-3)&&(m_markers[i+3]>-1))
 					{
-/*						cout << endl << " i=" << i << " oldpeak: " << OldPeakIndex 
-/							<< " peak: " << PeakIndex << endl;;
-						for (int k=0;k<MAXPEAK; k++)
-						{
-							cout << k << " Peak: " << m_markers[k] << endl; 
-						}
-*/
+//						cout << endl << " i=" << i << " oldpeak: " << OldPeakIndex 
+//							<< " peak: " << PeakIndex << endl;;
+//						for (int k=0;k<MAXPEAK; k++)
+//						{
+//							cout << k << " Peak: " << m_markers[k] << endl; 
+//						}
+
 						double d2 = abs(m_markers[i+2]-m_markers[i+1]);
 						double d1 = abs(m_markers[i+1]-m_markers[i]);
 						double d3 = abs(m_markers[i+3]-m_markers[i+2]);
@@ -352,7 +352,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 			}
 		}
 	}
-	
+
 	if (mUseClutter)
 	{
 //		cout << mClutterProfile[m_size-1] <<"."; 
@@ -367,7 +367,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //		else mCterms[8] = 100;
 
 		for (i=0; i<NUMTERMS; i++)
-			m_Loss += mClutter.mClutterTypes[mClutterProfile[MainPeakIndex]].sCoefficients[i]*mCterms[i];
+			m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
 	}
 
 /*

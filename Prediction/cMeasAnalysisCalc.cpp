@@ -102,7 +102,6 @@ cMeasAnalysisCalc::~cMeasAnalysisCalc() // destructor
 	delete [] mMidTerm;
 }
 
-
 //*********************************************************************
 bool cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource, 
 					unsigned MeasSource, unsigned CI)
@@ -346,6 +345,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		}
 	}
 
+	cout <<"cMeasAnalysisCalc::PerformAnalysis: Na Terms initialisation" << endl;
 	NumUsed = 0;
 	for (i=0; i<mNumMeas; i++) 
 	{
@@ -373,7 +373,6 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			//Change settings if the Fixed Installation changed
 			if (mMeasPoints[i].sInstKeyFixed!=currentInst)
 			{
-
 				if (CNumUsed>0)
 				{
 					CMean = CTotalError/CNumUsed;
@@ -384,11 +383,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
 
-					cout << "Inst: " << currentInst << "	M: " << CMean 
+/*					cout << "Inst: " << currentInst << "	M: " << CMean 
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-				}
+*/				}
 
 				CNumUsed = 0;
 				CError=0;
@@ -405,7 +404,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				CCorrC = 0;
 				
 				currentInst = mMeasPoints[i].sInstKeyFixed;
-
+				
 				while ((mFixedInsts[FixedNum].sInstKey!=currentInst)&&(FixedNum < mFixedInsts.size()))
 					FixedNum++;
 
@@ -427,12 +426,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 								mFixedInsts[FixedNum].sTxHeight,
 								mMobiles[MobileNum].sMobileHeight,
 								mUseClutter, mClutterClassGroup);
-
+				
 				if (mUseClutter)
 				{
 					m_freq = mFixedInsts[FixedNum].sFrequency;
 					m_htx = mFixedInsts[FixedNum].sTxHeight;
-					Cheight = mPathLoss.mClutter.mClutterTypes[mMeasPoints[i].sClutter].sHeight;
 					
 					terms[0] = TERM0;
 					terms[2] = TERM2;
@@ -444,34 +442,32 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			mDEM.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution, DEM);
 			mMeasPoints[i].sDistance = mFixedInsts[FixedNum].sSitePos.Distance(mMeasPoints[i].sPoint);
 			Length = DEM.GetSize();
-
+			
 			if (Length > 2)
 			{
 				NumUsed ++ ;
 				CNumUsed ++;
-
 //				tClutter = mMeasPoints[i].sClutter;
 				if (mUseClutter)
 				{
 					mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution,Clutter);
-//					
 				}			
 //				tPathLoss = mMeasPoints[i].sPathLoss;
 				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter);
 				mMeasPoints[i].sClutter = mPathLoss.get_Clutter();
-								
+						
 /*				if (tClutter!=mMeasPoints[i].sClutter)
 				{
 					cout << "	" << i << "."<< tClutter << ":" << mMeasPoints[i].sClutter;
 				}
-
-				if (fabs(mMeasPoints[i].sPathLoss) > 200)
+*/
+/*				if (fabs(mMeasPoints[i].sPathLoss) > 175)
 				{
 					cout << endl; 
 					cout<<mMeasPoints[i].sClutter << "	l=" << mMeasPoints[i].sDistance <<"	";
 					cout << "Meas " << i << " of " <<  mNumMeas << " ID=" << mMeasPoints[i].sID << "	";
-					cout << mMeasPoints[i].sPathLoss << " P " << tPathLoss <<"	";
-					mMeasPoints[i].sPoint.Display();
+					cout << mMeasPoints[i].sPathLoss << " P "  <<"	";
+//					mMeasPoints[i].sPoint.Display();
 //					DEM.Display();
 				}
 */
@@ -497,6 +493,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				CTotalPred += mMeasPoints[i].sPredValue;
 				CTotalSPred += mMeasPoints[i].sPredValue*mMeasPoints[i].sPredValue;				
 				CTotalMeasPred+= mMeasPoints[i].sPredValue*mMeasPoints[i].sMeasValue;
+				
 				
 				if (mUseClutter)
 				{
@@ -532,11 +529,12 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 						for (jj=0; jj<NUMTERMS; jj++)
 							mSolveCoefMatrix(j,jj) += terms[j]*terms[jj];
 					}
-					
 				}
 			}
 		}// if included in calculations
 	}//for all measurements
+
+	cout << "cMeasAnalysisCalc::PerformAnalysis: Na Propagation predictions" << endl;
 
 	if (CNumUsed>0)
 	{
@@ -632,6 +630,7 @@ int cMeasAnalysisCalc::SaveResults()
 		QRAP_ERROR("Error creating meas_view in cMeasAnalysisCalc::SaveResults()");
 	}
 	cout << " leaving cMeasAnalysisCalc::SaveResults()" << endl;
+	return 1;
 }
 
 
@@ -640,7 +639,7 @@ int cMeasAnalysisCalc::SaveResults()
 bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 {
 	unsigned i,j,Size = 0, Index = 0, Index2=0;
-	double Mean, MeanSquareError, StDev, CorrC, C1, C2;
+	double Mean, MeanSquareError, StDev, CorrC;
 	MatrixXd SolveCoefMatrix;	//Declare local matrixes of reduced size
 	MatrixXd LeftSide;
 	MatrixXd DeltaCoeff;
@@ -648,10 +647,13 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 
 	mUseClutter = true;
 
-	LoadMeasurements(0,0,MeasSource);
+	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor LoadMeasurements()" << endl;
+
+//	LoadMeasurements(0,0,MeasSource);
 
 	mClutterFilter=0;
 	// This first analysis is to update the clutter each pixel belongs to. 
+	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor performAnalysis()" << endl;
 	NumUsed = PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, mClutterFilter);
 	TotalNumUsed = NumUsed;
 	cout << "clutterType = " << mClutterFilter;
@@ -659,6 +661,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 		<< "	MeanSquare: " << MeanSquareError << "	StDev: " << StDev
 		<< "	CorrC: " << CorrC << endl;
 	
+	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor Preprosessing Terms" << endl;
 	for (i=0; i<NUMTERMS; i++)
 	{
 		cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
@@ -672,10 +675,15 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 			= ((mMaxTerm[i] - mMidTerm[i]) > 0.01*fabs(mMidTerm[i]))
 			&& ((mMidTerm[i] - mMinTerm[i]) > 0.01*fabs(mMidTerm[i]));
 
+	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5]=
+		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5]
+		&&(MeasSource!=1);
+
 	// Term 3 should be zero if there is no Tx Height change		
 	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[3] = 
 		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[3] &&
 		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5];
+
 
 	// Term 8 will be equivalent to term 7 if the clutter height is zero
 //	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[8] = 
@@ -687,6 +695,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 		if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
 			Size++;
 		
+	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor Matrix manipulation" << endl;
 	cout <<"Size = " << Size << endl; 
 	if (Size > 0)
 	{
@@ -728,8 +737,8 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 
 		DeltaCoeff = SolveCoefMatrix.fullPivLu().solve(LeftSide);
 
-		cout << "Verandering in Koeffisiente.  Size = " << Size << endl;
-		cout << DeltaCoeff << endl;
+//		cout << "Verandering in Koeffisiente.  Size = " << Size << endl;
+//		cout << DeltaCoeff << endl;
 		
 //		cout << "cMeasAnalysisCalc::OptimiseModel. Voor terugskryf lus. Size = " << Size << endl;
 		for (i=0; i<Size; i++)
@@ -746,7 +755,8 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 		for(i=0;i<NUMTERMS; i++)
 			cout << i<< "	" << mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[i] << endl;
 
-/*		if (Size==2)
+/*		double C1, C2;		
+		if (Size==2)
 		{
 			C1 = (mLeftSide(1)*mSolveCoefMatrix(0,1) - mLeftSide(0)*mSolveCoefMatrix(1,1) )
 				/ ( mSolveCoefMatrix(0,1)*mSolveCoefMatrix(0,1) 
@@ -777,7 +787,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 {
 	unsigned i,j,Size = 0, Index = 0, Index2=0;
-	double Mean, MeanSquareError, StDev, CorrC, C1, C2;
+	double Mean, MeanSquareError, StDev, CorrC;
 	MatrixXd SolveCoefMatrix;	//Declare local matrixes of reduced size
 	MatrixXd LeftSide;
 	MatrixXd DeltaCoeff;
@@ -785,47 +795,51 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 
 	mUseClutter = true;
 
-	LoadMeasurements(0,0,MeasSource);
+//	LoadMeasurements(0,0,MeasSource);
 
 	// This first analysis is to update the clutter each pixel belongs to. 
 	NumUsed = PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, 0);
 	TotalNumUsed = NumUsed;
 	cout << "clutterType = " << mClutterFilter;
 	cout << "	#Used: " << NumUsed << "	Mean: " << Mean 
-		<< "	MeanSquare: " << MeanSquareError << "	StDev: " << StDev
-		<< "	CorrC: " << CorrC << endl;
-	
-	// First Update all clutter types
-	for(mClutterFilter=1; mClutterFilter< mPathLoss.mClutter.mNumber; mClutterFilter++)
+		<< "	MeanSquare: " << MeanSquareError << "	StDev: "<< StDev
+		<< "	CorrC: " << CorrC << endl;	
+
+	for (mClutterFilter = 1; mClutterFilter<mPathLoss.mClutter.mNumber; mClutterFilter ++)
 	{
-
+		
 		NumUsed = PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, mClutterFilter);
+		TotalNumUsed = NumUsed;
 		cout << "clutterType = " << mClutterFilter;
-		cout << "	#Used: " << NumUsed << "	Mean: " << Mean 
-			<< "	MeanSquare: " << MeanSquareError << "	StDev: " << StDev
+			cout << "	#Used: " << NumUsed << "	Mean: " << Mean 
+			<< "	MeanSquare: " << MeanSquareError << "	StDev: "<< StDev
 			<< "	CorrC: " << CorrC << endl;
-
 		// Only optimise if enough points are involved
-		if (NumUsed > 0.05*TotalNumUsed/mPathLoss.mClutter.mNumber)
+		if (NumUsed > 0.01*TotalNumUsed/mPathLoss.mClutter.mNumber)
 		{
 			for (i=0; i<NUMTERMS; i++)
 			{
-				cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
-					<< "Mid="<< mMidTerm[i] << "	Min=" << mMinTerm[i] << endl;
+//				cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
+//					<< "Mid="<< mMidTerm[i] << "	Min=" << mMinTerm[i] << endl;
 				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
 						= ((mMaxTerm[i]-mMinTerm[i]) > 0.02*fabs(mMidTerm[i]));
 			}
-
+	
 			i=4;
-				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
-					= ((mMaxTerm[i] - mMidTerm[i]) > 0.01*fabs(mMidTerm[i]))
-					&& ((mMidTerm[i] - mMinTerm[i]) > 0.01*fabs(mMidTerm[i]));
+			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
+				= ((mMaxTerm[i] - mMidTerm[i]) > 0.01*fabs(mMidTerm[i]))
+				&& ((mMidTerm[i] - mMinTerm[i]) > 0.01*fabs(mMidTerm[i]));
+
+//			These lines should mostly be commented out ... this is just to trial the effectiveness 
+//			of a Global model with Offsets
+//			for (i=1;i<NUMTERMS; i++)
+//				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] = false;
 
 /*			// Term 2 should be zero if there is no Tx Height change		
 			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[2] = 
 				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[2] &&
 				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[6];
-*/
+*/	
 			// Term 8 will be equivalent to term 7 if the clutter height is zero
 //			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[8] = 
 //				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[8] &&
@@ -836,14 +850,15 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 				if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
 					Size++;
 			
-			cout <<"Size = " << Size << endl; 
+//			cout <<"Size = " << Size << endl; 
+
 			if (Size > 0)
 			{
 				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[0]=true;
 				Size++;
 //				cout << "cMeasAnalysisCalc::OptimiseModel. " 
-//					<< "Voor resizing van die plaaslike veranderlikes. Size = " << Size << endl; 
-
+//				<< "Voor resizing van die plaaslike veranderlikes. Size = " << Size << endl; 
+	
 				SolveCoefMatrix.resize(Size,Size);	//Declare local matrixes of reduced size
 				LeftSide.resize(Size,1);
 
@@ -870,41 +885,37 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 						Index++;
 					}
 				}
-	
+		
 //				cout << "cMeasAnalysisCalc::OptimiseModel. Voor oplossing. Size = " << Size << endl; 
 //				cout << SolveCoefMatrix << endl << endl;
 //				cout << LeftSide << endl << endl;
-
 				DeltaCoeff = SolveCoefMatrix.fullPivLu().solve(LeftSide);
-
-				cout << "Verandering in Koeffisiente.  Size = " << Size << endl;
-				cout << DeltaCoeff << endl;
-		
+//				cout << "Verandering in Koeffisiente.  Size = " << Size << endl;
+//				cout << DeltaCoeff << endl;
+			
 //				cout << "cMeasAnalysisCalc::OptimiseModel. Voor terugskryf lus. Size = " << Size << endl;
 				for (i=0; i<Size; i++)
 				{
 //					cout << (int)mDeltaCoeff(i) << "	" 
 //						<< mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] 
 //						<< endl;
-					mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] += DeltaCoeff(i);
-
+					mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[(int)mDeltaCoeff(i)] += DeltaCoeff(i);	
 				}
 
-				cout << "Final coefficients" << endl;
-				for(i=0;i<NUMTERMS; i++)
-					cout << i<< "	" << mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[i] << endl;
 
-/*				if (Size==2)
-
+//				cout << "Final coefficients" << endl;
+//				for(i=0;i<NUMTERMS; i++)
+//					cout << i<< "	" << mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[i] << endl;
+	
+/*				double C1, C2;
+				if (Size==2)
 				{
 					C1 = (mLeftSide(1)*mSolveCoefMatrix(0,1) - mLeftSide(0)*mSolveCoefMatrix(1,1) )
-
 						/ ( mSolveCoefMatrix(0,1)*mSolveCoefMatrix(0,1) 
 							- mSolveCoefMatrix(0,0)*mSolveCoefMatrix(1,1));
-
+	
 					C2 = (mLeftSide(0) - mSolveCoefMatrix(0,0)*C1) / mSolveCoefMatrix(0,1);
-					cout << "	C1=" << C1 << "	C2=" << C2 << endl;
-
+						cout << "	C1=" << C1 << "	C2=" << C2 << endl;
 				}
 */
 			}
@@ -912,15 +923,18 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 			{
 //				cout << "mean?=?" << mLeftSide(0)/mSolveCoefMatrix(0,0) << endl;
 				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[0] += Mean;
+				cout << mPathLoss.mClutter.mClutterTypes[mClutterFilter].sLandCoverID << "	Mean=" << Mean << endl;
 //				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sCoefficients[1] 
-//								+= mLeftSide(1)/mSolveCoefMatrix(1,1);
+//						+= mLeftSide(1)/mSolveCoefMatrix(1,1);
 //				cout << " logdCoef=" << mLeftSide(1)/mSolveCoefMatrix(1,1) << endl;
 			}
+
 			if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sLandCoverID > 0)
 				if (!mPathLoss.mClutter.UpdateCoefficients(mClutterFilter))
 					cout << "Updating clutter Coefficients failed" << endl;
 		}
 	}
+	
 	return true;
 }
 
@@ -940,8 +954,6 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 
 	mUseClutter = true;
 
-	LoadMeasurements();
-	
 	SeekWidth= 3.0e8/mFixedInsts[0].sFrequency/mPlotResolution/1300;
 //	SeekWidth = 19;
 

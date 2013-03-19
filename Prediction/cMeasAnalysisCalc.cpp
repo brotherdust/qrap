@@ -345,7 +345,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		}
 	}
 
-	cout <<"cMeasAnalysisCalc::PerformAnalysis: Na Terms initialisation" << endl;
+//	cout <<"cMeasAnalysisCalc::PerformAnalysis: Na Terms initialisation" << endl;
 	NumUsed = 0;
 	for (i=0; i<mNumMeas; i++) 
 	{
@@ -534,7 +534,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		}// if included in calculations
 	}//for all measurements
 
-	cout << "cMeasAnalysisCalc::PerformAnalysis: Na Propagation predictions" << endl;
+//	cout << "cMeasAnalysisCalc::PerformAnalysis: Na Propagation predictions" << endl;
 
 	if (CNumUsed>0)
 	{
@@ -544,10 +544,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
 		double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 		CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
-		cout << "Inst: " << currentInst << "	M: " << CMean 
+/*		cout << "Inst: " << currentInst << "	M: " << CMean 
 			<< "	MSE: " << CMeanSquareError 
 			<< "	StDev: " << CStDev
 			<< "	Corr: " << CCorrC << endl;
+*/
 	}
 
 	if (NumUsed>0)

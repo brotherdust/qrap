@@ -85,8 +85,11 @@ class cMeasAnalysisCalc
 
 	bool OptimiseModelCoefD(unsigned MeasSource=0);
 	bool OptimiseModelCoefAllTotal(unsigned MeasSource=0);
+	bool OptimiseModelCoefAllTogether();
 	bool OptimiseSeekWidth();
 	bool OptimiseHeights(unsigned MeasSource=0);	
+	cPathLossPredictor mPathLoss;	// we need to access the clutter coefficients of mClutter of PathLoss 
+					// ... hence mPathLoss needs to be a member/class global variable
 
    private:
 
@@ -107,8 +110,6 @@ class cMeasAnalysisCalc
 	MatrixXd mSolveCoefMatrix;	// matrix representing the set of linear equations to be solved
 	VectorXd mLeftSide;
 	RowVectorXd mDeltaCoeff;
-	cPathLossPredictor mPathLoss;	// we need to access the clutter coefficients of mClutter of PathLoss 
-					// ... hence mPathLoss needs to be a member/class global variable
 	double *mMinTerm;		// The minimum and maximum values of a specific term is used to identify 
 	double *mMaxTerm;		// whether or not the coefficients of these terms are relavant or whether 
 					// the term will be constant.

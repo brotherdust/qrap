@@ -660,7 +660,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 	PointString += ",";
 	PointString += temp;
 	PointString += ")'"; 
-//	cout << "cRasterFileHandler::AddRaster: mFileSetOrder.size() = " << mFileSetOrder.size() << endl;
+	cout << "cRasterFileHandler::AddRaster: mFileSetOrder.size() = " << mFileSetOrder.size() << endl;
 	i=0;
 	
 	while((i<mFileSetOrder.size())&&(!(RasterFound)))
@@ -717,7 +717,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 				else if (projection=="WGS84GC") GeoProj=WGS84GC;
 				else if (projection=="UTM")	GeoProj=UTM;
 				else GeoProj=NDEF;
-//				cout << FileName <<  endl;
+				cout << FileName <<  endl;
 				cRaster* New = new cRaster(Directory, FileName, filetype, GeoProj,proj4string, centmer);
 				New->mUsed=true;
 				mCurrentRasters.push_back(New);
@@ -751,13 +751,13 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 		i++;
 	}
 	
-	if ((RasterFound)&&(mCurrentRasters.size()>3))
+	if ((RasterFound)&&(mCurrentRasters.size()>2))
 	{	
 		for (i=0; i<mCurrentRasters.size(); i++)
 		{
 			if (!mCurrentRasters[i]->mUsed)
 			{
-//				cout << "Removing " << mCurrentRasters[i]->mFilename << endl;
+				cout << "Removing " << mCurrentRasters[i]->mFilename << endl;
 				delete mCurrentRasters[i];
 				mCurrentRasters.erase(mCurrentRasters.begin()+i);
 			}

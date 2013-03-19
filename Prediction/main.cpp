@@ -55,7 +55,12 @@ int main (int argc, char **argv)
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 
-//	Meas.Loadmeasurement();
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+	Meas.mPathLoss.mClutter.Reset(1);
+	Meas.OptimiseHeights();
 //	Meas.OptimiseSeekWidth();
 
 /*
@@ -124,7 +129,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor0,1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-
+/*
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -179,10 +184,8 @@ int main (int argc, char **argv)
 	Meas.OptimiseModelCoefD(1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nac1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+*/
 
-
-//	Meas.OptimiseHeights();
-//	Meas.OptimiseModelCoefD();
 
 /*	string dir="/home/anita/GISdata/SRTM/BIN/";
 	cLoadFile Files(3,4,dir);

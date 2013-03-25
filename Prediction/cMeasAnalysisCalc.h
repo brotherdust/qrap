@@ -99,6 +99,7 @@ class cMeasAnalysisCalc
 	bool mUseClutter;
 	unsigned mClutterClassGroup;
 	unsigned mClutterFilter;
+	unsigned *mClutterCount;
 	double mPlotResolution;
 	eOutputUnits mUnits;
 	short int mDEMsource;

@@ -31,7 +31,7 @@ using namespace Qrap;
 cRasterFileHandler::cRasterFileHandler()
 {
 	short int Source;
-	mSampleMethod=2;
+	mSampleMethod=1;
 //	Source = atoi(gDb.GetSetting("DEMsource").c_str());
 //	SetRasterFileRules(Source);
 }
@@ -47,7 +47,7 @@ void cRasterFileHandler::DirectChangeSetToUse(int OriginalSet)
 cRasterFileHandler::cRasterFileHandler(short int Source)
 {
 	SetRasterFileRules(Source);
-	mSampleMethod=2;
+	mSampleMethod=1;
 }
 
 //*********************************************************************

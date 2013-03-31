@@ -60,7 +60,7 @@ int main (int argc, char **argv)
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas.OptimiseHeights(1);
+	Meas.OptimiseHeights(0);
 //	Meas.OptimiseSeekWidth();
 
 /*

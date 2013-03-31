@@ -14,7 +14,8 @@ psql -c "CREATE DATABASE qrap"
 pause
 # PostGIS stuff
 echo "activiting postgis"
-# find the following *.sql files on your machine and change PostGISDir accordingly 
+# find the following *.sql files on your machine and change PostGISDir accordingly.
+# Hint: Look under the "installed file" for postgres-$.$-postgis to see where the files are stored
 PostGISDir=/usr/share/postgresql/9.1/contrib/postgis-2.0/
 createlang plpgsql -d qrap
 echo "running postgis.sql"

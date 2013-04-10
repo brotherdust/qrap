@@ -158,10 +158,10 @@ int main (int argc, char **argv)
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
 	Meas. LoadMeasurements(0,0,3);
-//	Meas.OptimiseModelCoefAllTotal(3);
+	Meas.OptimiseModelCoefAllTotal(3);
 	Meas.OptimiseModelCoefD(3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nah3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
+	cout<< "Naho3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
 
 /*	if (!gDb.PerformRawSql(query))
 	{

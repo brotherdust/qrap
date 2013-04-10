@@ -373,7 +373,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 			m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
 	}
 	else
-		mLoss+=DiffLoss;
+		m_Loss+=DiffLoss;
 
 /*
 #ifndef NO_DEBUG

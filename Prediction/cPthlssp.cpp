@@ -260,7 +260,7 @@ void cPathLossPredictor::set_Clutter(bool &UseClutter, unsigned ClutterClassGrou
 // Calculates the Total Path Loss
 float cPathLossPredictor::TotPathLoss(cProfile &InputProfile, 
 					float &ElevAngleTX,  
-					cProfile &ClutterProfile)
+					cProfile &ClutterProfile, double &DiffLoss)
 {
 	double MinClearance=DBL_MAX;
 	double OldMinClear=DBL_MAX;
@@ -282,6 +282,8 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //	InputProfile.Display();
 	mLinkLength = CalcDist(InputProfile);
 	m_Loss = CalcFreeSpaceLoss(mLinkLength);
+//	m_Loss =0;
+	DiffLoss = 0;
 	if (InputProfile.GetSize()>2)
 	{
 		InitEffectEarth(InputProfile, ClutterProfile);
@@ -296,7 +298,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		if ((MinClearance<1.0)&&(PeakIndex!=0))
 		{
 			radius = SetPeakRadius(PeakIndex,alpha);
-			m_Loss += CalcDiffLoss(m_markers[0],m_markers[1],PeakIndex,
+			DiffLoss += CalcDiffLoss(m_markers[0],m_markers[1],PeakIndex,
 							ReffHeight,sqrtD1D2,radius,alpha,
 							true,IfTooManyPeaks,
 							KnifeEdge, RoundHill);
@@ -313,7 +315,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 				if ((MinClearance<0.6)&&(PeakIndex!=0))
 				{     
 					radius= SetPeakRadius(PeakIndex,alpha);
-					m_Loss += CalcDiffLoss(m_markers[i],m_markers[i+1],
+					DiffLoss += CalcDiffLoss(m_markers[i],m_markers[i+1],
 								PeakIndex,ReffHeight,
 								sqrtD1D2,radius,alpha,
 								false,IfTooManyPeaks,
@@ -339,7 +341,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 						double L=0;
 						if (param>0) L=-20*log10(param);
 //						cout << endl << mCalcMarker << " L=" << L ;
-						m_Loss += L;
+						DiffLoss += L;
 					}
 					if (IfTooManyPeaks) i++;
 				}
@@ -353,6 +355,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		}
 	}
 
+	mCterms[6] = DiffLoss;
 	if (mUseClutter)
 	{
 //		cout << mClutterProfile[m_size-1] <<"."; 
@@ -369,6 +372,8 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		for (i=0; i<NUMTERMS; i++)
 			m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
 	}
+	else
+		mLoss+=DiffLoss;
 
 /*
 #ifndef NO_DEBUG

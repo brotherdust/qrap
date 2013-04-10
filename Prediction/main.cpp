@@ -55,14 +55,14 @@ int main (int argc, char **argv)
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 
-	if (!gDb.PerformRawSql(query))
+/*	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas.OptimiseHeights(0);
+//	Meas.OptimiseHeights(3);
 //	Meas.OptimiseSeekWidth();
-
+*/
 /*
 	if (!gDb.PerformRawSql(query))
 	{
@@ -151,7 +151,7 @@ int main (int argc, char **argv)
 	Meas. LoadMeasurements(0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nac0,3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
+*/
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -161,9 +161,9 @@ int main (int argc, char **argv)
 //	Meas.OptimiseModelCoefAllTotal(3);
 	Meas.OptimiseModelCoefD(3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nac3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
+	cout<< "Nah3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
 
-	if (!gDb.PerformRawSql(query))
+/*	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}

@@ -350,7 +350,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	mRxLev = new float[Length];
 	delete [] mPropLoss;
 	mPropLoss = new float[Length];
-
+	double DiffLoss=0;
 	for (j=0;j<Length; j++)
 	{
 		Tilt[j]=0;
@@ -370,7 +370,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	PathLoss.setParameters(mkFactor,mFrequency,mTxInst.sTxHeight,mRxInst.sRxHeight,
 				mUseClutter,mClutterClassGroup);
 	j=(Length-1);
-	mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter);
+	mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss);
 	mTxBearing = mTxInst.sSitePos.Bearing(mRxInst.sSitePos);
 	if (mTxBearing < 180.0)
 		mRxBearing = mTxBearing + 180.0;
@@ -379,7 +379,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	PathLoss.FindElevAngles(mTxTilt,mRxTilt);
 	for (j=(Length-1); j>0 ; j--)
 	{
-		mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter);
+		mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss);
 		TxAntValue = mTxAnt.GetPatternValue(mTxBearing, Tilt[j])
 					+ mRxAnt.GetPatternValue(mRxBearing, -Tilt[j]);
 		mRxLev[j] = -mPropLoss[j] + LinkOtherGain - TxAntValue;

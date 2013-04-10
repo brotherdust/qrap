@@ -101,7 +101,8 @@ namespace Qrap
 			 */
 			float TotPathLoss (cProfile &DTMProfile, 
 						float &Tilt, 
-						cProfile &ClutterProfile);
+						cProfile &ClutterProfile,
+						double &DiffLoss);
 			
 			/**
 			 * Find the elevation angle in which the main ray is directed.

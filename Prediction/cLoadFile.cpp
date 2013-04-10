@@ -390,12 +390,12 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 	unsigned Rows, Cols, Size; // (Estimated) Size of map in pixels
 	double SizeEW, SizeNS; // Size of map in degrees
 	
-	SizeEW = 1.0; // Size of map in degrees
-	SizeNS = 1.0; 
+	SizeEW = 3.0; // Size of map in degrees
+	SizeNS = 3.0; 
 	Rows = (unsigned) (SizeNS*100000 / OrigRes);
 	Cols = (unsigned) (SizeEW*100000 / OrigRes);
 	Size = Rows*Cols;
-	while (Size> 10000000) // limit size to something below 60MB
+	while (Size> 1000000000) 
 	{
 		if (Cols>Rows)	SizeEW/=2.0;
 		else			SizeNS/=2.0;

@@ -406,7 +406,7 @@ int cBTLPredict::PredictBTL(unsigned NumAngles, unsigned NumDistance,
 				double DistanceRes, Float2DArray DTM, 
 				bool UseClutter, unsigned ClutterClassGroup, Float2DArray Clutter)
 {
-	
+	double DiffLoss=0;
 	int MaxRadialP=0;
 	unsigned i;
 	int j;
@@ -439,7 +439,7 @@ int cBTLPredict::PredictBTL(unsigned NumAngles, unsigned NumDistance,
 			ClutterProfile.SetProfile(mNumRadialPoints, Clutter[i]);
 		for (j=(NumDistance-1); j>0 ; j--)
 		{
-			mBTL[i][j] = PathLoss.TotPathLoss(DTMProfile, mTilt[i][j], ClutterProfile);
+			mBTL[i][j] = PathLoss.TotPathLoss(DTMProfile, mTilt[i][j], ClutterProfile,DiffLoss);
 			if ((mBTL[i][j]<-mMaxPathLoss)&&(j>MaxRadialP))
 			{
 				MaxRadialP = j;

@@ -45,6 +45,7 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	m_Loss = 0;
 	m_size = 2;
 	mCalcMarker = 0;
+	mTuning=false;
 
 	delete [] m_profile;
 	m_profile = new float[m_size];
@@ -285,7 +286,8 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	mLinkLength = CalcDist(InputProfile);
 	FreeSpace = CalcFreeSpaceLoss(mLinkLength);
 	PlaneEarth = CalcPlaneEarthLoss(mLinkLength);
-	m_Loss = FreeSpace;
+	m_Loss = FreeSpace ;
+
 //	m_Loss =0;
 	DiffLoss = 0;
 	if (InputProfile.GetSize()>2)
@@ -359,8 +361,11 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		}
 	}
 
-	double ClutterCheck=0;
-	mCterms[6] = DiffLoss;
+	if ((NUMTERMS>6)&&(mUseClutter))
+		if (( mClutter.mClutterTypes[mClutterIndex].sCoefficients[6]>0)||(mTuning))	mCterms[6] = DiffLoss;
+		else m_Loss+=DiffLoss;
+	else m_Loss+=DiffLoss;
+	
 	if (mUseClutter)
 	{
 //		cout << mClutterProfile[m_size-1] <<"."; 
@@ -373,21 +378,14 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //		if (Cheight < (m_htx+0.1))
 //			mCterms[8] = TERM8;
 //		else mCterms[8] = 100;
-		for (i=0; i<NUMTERMS; i++)		
-			ClutterCheck += fabs(mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]);
 
-		if (ClutterCheck>0.05)
-		{
-			for (i=0; i<NUMTERMS; i++)
-				m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
-		}
-		else 
-			m_Loss+=DiffLoss;
+		for (i=0; i<NUMTERMS; i++)
+			m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
+
 	}
-	else
-		m_Loss+=DiffLoss;
 
-	m_Loss = max(m_Loss,min(FreeSpace,PlaneEarth));
+
+//	m_Loss = max(m_Loss,min(FreeSpace,PlaneEarth));
 /*
 #ifndef NO_DEBUG
 	m_counter++;

@@ -322,6 +322,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	unsigned currentMobile=0;
 	cAntennaPattern FixedAnt, MobileAnt;
 	double *terms;
+	double DiffLoss =0;
 	terms = new double[NUMTERMS];
 	double CMean = 0, CMeanSquareError=0, CStDev = 0, CCorrC = 0;
 	Mean = 0; 
@@ -478,7 +479,9 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 */
 				}			
 //				tPathLoss = mMeasPoints[i].sPathLoss;
-				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter,terms[6]);
+				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter,DiffLoss);
+				if ((NUMTERMS>6)&&(mUseClutter)) terms[6]=DiffLoss;
+
 				mMeasPoints[i].sClutter = mPathLoss.get_Clutter();
 						
 /*				if (tClutter!=mMeasPoints[i].sClutter)
@@ -671,6 +674,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 	MatrixXd LeftSide;
 	MatrixXd DeltaCoeff;
 	int NumUsed, TotalNumUsed;
+	mPathLoss.set_Tuning(true);
 
 	mUseClutter = true;
 
@@ -696,15 +700,15 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
 					= ((mMaxTerm[i]-mMinTerm[i]) > 0.02*fabs(mMidTerm[i]));
 	}
-
+/*
 	i=4;
 		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
 			= ((mMaxTerm[i] - mMidTerm[i]) > 0.01*fabs(mMidTerm[i]))
 			&& ((mMidTerm[i] - mMinTerm[i]) > 0.01*fabs(mMidTerm[i]));
-
-	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5]=
+*/
+/*	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5]=
 		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5];
-
+*/
 	// Term 3 should be zero if there is no Tx Height change		
 	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[3] = 
 		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[3] &&
@@ -818,7 +822,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 	MatrixXd LeftSide;
 	MatrixXd DeltaCoeff;
 	int NumUsed, TotalNumUsed;
-
+	mPathLoss.set_Tuning(true);
 	mUseClutter = true;
 
 //	LoadMeasurements(0,0,MeasSource);
@@ -851,21 +855,21 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 						= ((mMaxTerm[i]-mMinTerm[i]) > 0.02*fabs(mMidTerm[i]));
 			}
 	
-			i=4;
+/*			i=4;
 			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
 				= ((mMaxTerm[i] - mMidTerm[i]) > 0.01*fabs(mMidTerm[i]))
 				&& ((mMidTerm[i] - mMinTerm[i]) > 0.01*fabs(mMidTerm[i]));
-
+*/
 //			These lines should mostly be commented out ... this is just to trial the effectiveness 
 //			of a Global model with Offsets
-			for (i=1;i<NUMTERMS; i++)
-				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] = false;
+//			for (i=1;i<NUMTERMS; i++)
+//				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] = false;
 
-/*			// Term 2 should be zero if there is no Tx Height change		
-			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[2] = 
-				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[2] &&
-				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[6];
-*/	
+			// Term 3 should be zero if there is no Tx Height change		
+			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[3] = 
+				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[3] &&
+				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5];
+	
 			// Term 8 will be equivalent to term 7 if the clutter height is zero
 //			mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[8] = 
 //				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[8] &&
@@ -977,7 +981,7 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 	bool Up;
 	int DeltaSeek;
 	int NumStop = 10;
-
+	mPathLoss.set_Tuning(false);
 	mUseClutter = true;
 
 	SeekWidth= 3.0e8/mFixedInsts[0].sFrequency/mPlotResolution/1300;
@@ -1071,6 +1075,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	StepResult = new double[NumStop+1];
 	double SizeOfDiff, sumSquareDiff=0;
 	unsigned stuck=0, giveUP=0, smallStepSize=0;
+	mPathLoss.set_Tuning(false);
 
 	unsigned *NumClut;
 	bool *Up;
@@ -1216,9 +1221,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			{
 				if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 					mPathLoss.mClutter.mClutterTypes[i].sHeight 
-						-= CHeightDiff[i]/SizeOfDiff*TempStepSize;
+						-= CHeightDiff[i]/SizeOfDiff*TempStepSize
 //														*mNumMeas/mClutterCount[i];
-//														*TotNum/mClutterCount[i];
+														*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 			}
 //			cout << endl;
@@ -1238,9 +1243,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				{
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
-								+= CHeightDiff[i]/SizeOfDiff*2*TempStepSize;
+								+= CHeightDiff[i]/SizeOfDiff*2*TempStepSize
 //														*mNumMeas/mClutterCount[i];
-//														*TotNum/mClutterCount[i];
+														*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -1259,9 +1264,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				{
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
-								-= CHeightDiff[i]/SizeOfDiff*TempStepSize;
+								-= CHeightDiff[i]/SizeOfDiff*TempStepSize
 //														*mNumMeas/mClutterCount[i];
-//														*TotNum/mClutterCount[i];
+														*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -1272,9 +1277,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				{
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
-							-= CHeightDiff[i]/SizeOfDiff*TempStepSize;
+							-= CHeightDiff[i]/SizeOfDiff*TempStepSize
 //														*mNumMeas/mClutterCount[i];
-//														*TotNum/mClutterCount[i];
+														*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -1293,9 +1298,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				{
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
-								+= CHeightDiff[i]/SizeOfDiff*2*TempStepSize;
+								+= CHeightDiff[i]/SizeOfDiff*2*TempStepSize
 //														*mNumMeas/mClutterCount[i];
-//														*TotNum/mClutterCount[i];
+														*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -1322,9 +1327,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			{
 				if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 					mPathLoss.mClutter.mClutterTypes[i].sHeight 
-							-= CHeightDiff[i]/SizeOfDiff*TempStepSize;
+							-= CHeightDiff[i]/SizeOfDiff*TempStepSize
 //														*mNumMeas/mClutterCount[i];
-//													*TotNum/mClutterCount[i];
+													*TotNum/mClutterCount[i];
 //				cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 			}
 //			cout << endl;
@@ -1361,9 +1366,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				{
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
-								-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize);
+								-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize)
 //														*mNumMeas/mClutterCount[i];
-//														*TotNum/mClutterCount[i];
+														*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -1382,14 +1387,14 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			if (fabs(TempStepSize)<0.0005) 
 			{
 				smallStepSize++;
-//				TempStepSize=fabs(0.5*CHeightDiff[1]/SizeOfDiff*mClutterCount[1]/TotNum);
+				TempStepSize=fabs(0.5*CHeightDiff[1]/SizeOfDiff*mClutterCount[1]/TotNum);
 //				TempStepSize=fabs(0.5*CHeightDiff[1]/SizeOfDiff*mClutterCount[1]/mNumMeas);
-				TempStepSize = fabs(0.5*CHeightDiff[1]);
+//				TempStepSize = fabs(0.5*CHeightDiff[1]);
 				for (i=1; i<mPathLoss.mClutter.mNumber; i++)
 				{
-//					OldStepSize=fabs(0.5*CHeightDiff[i]/SizeOfDiff*mClutterCount[i]/TotNum);
+					OldStepSize=fabs(0.5*CHeightDiff[i]/SizeOfDiff*mClutterCount[i]/TotNum);
 //					OldStepSize=fabs(0.5*CHeightDiff[1]/SizeOfDiff*mClutterCount[1]/mNumMeas);
-					OldStepSize=fabs(0.5*CHeightDiff[i]);
+//					OldStepSize=fabs(0.5*CHeightDiff[i]);
 					if (OldStepSize<TempStepSize)
 						TempStepSize = OldStepSize;
 				}

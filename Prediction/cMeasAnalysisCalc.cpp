@@ -703,8 +703,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 			&& ((mMidTerm[i] - mMinTerm[i]) > 0.01*fabs(mMidTerm[i]));
 
 	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5]=
-		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5]
-		&&(MeasSource!=1);
+		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[5];
 
 	// Term 3 should be zero if there is no Tx Height change		
 	mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[3] = 

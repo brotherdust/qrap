@@ -266,6 +266,8 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	double OldMinClear=DBL_MAX;
 	float ElevAngleRX=0.0;
 	ElevAngleTX=0.0;
+	double FreeSpace=0.0;
+	double PlaneEarth=0.0;
 	double KnifeEdge=0.0;
 	double RoundHill=0.0;
 	double ReffHeight=0.0;
@@ -281,7 +283,9 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //	cout << endl << mCalcMarker << "	";
 //	InputProfile.Display();
 	mLinkLength = CalcDist(InputProfile);
-	m_Loss = CalcFreeSpaceLoss(mLinkLength);
+	FreeSpace = CalcFreeSpaceLoss(mLinkLength);
+	PlaneEarth = CalcPlaneEarthLoss(mLinkLength);
+	m_Loss = FreeSpace;
 //	m_Loss =0;
 	DiffLoss = 0;
 	if (InputProfile.GetSize()>2)
@@ -355,6 +359,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		}
 	}
 
+	double ClutterCheck=0;
 	mCterms[6] = DiffLoss;
 	if (mUseClutter)
 	{
@@ -368,13 +373,21 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //		if (Cheight < (m_htx+0.1))
 //			mCterms[8] = TERM8;
 //		else mCterms[8] = 100;
+		for (i=0; i<NUMTERMS; i++)		
+			ClutterCheck += fabs(mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]);
 
-		for (i=0; i<NUMTERMS; i++)
-			m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
+		if (ClutterCheck>0.05)
+		{
+			for (i=0; i<NUMTERMS; i++)
+				m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
+		}
+		else 
+			m_Loss+=DiffLoss;
 	}
 	else
 		m_Loss+=DiffLoss;
 
+	m_Loss = max(m_Loss,min(FreeSpace,PlaneEarth));
 /*
 #ifndef NO_DEBUG
 	m_counter++;
@@ -421,6 +434,17 @@ inline double cPathLossPredictor::CalcFreeSpaceLoss(const double pathLength)
 						+ 20.0*log10(pathLength/1000.0);
 	else	FreeLoss = 0;
 return  FreeLoss;
+}/* end CalcFreeSpaceLoss */
+
+//************************************************************************
+inline double cPathLossPredictor::CalcPlaneEarthLoss(const double pathLength)
+{
+	double PlaneEarth;
+	if (pathLength >0)
+		PlaneEarth = 40.0*log10(pathLength) 
+				+ 20.0*log10(m_htx) + 20.0*log10(m_hrx);
+	else	PlaneEarth = 0;
+return  PlaneEarth;
 }/* end CalcFreeSpaceLoss */
 
 

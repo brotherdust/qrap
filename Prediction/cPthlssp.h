@@ -218,6 +218,10 @@ namespace Qrap
 			 */
 			inline double CalcFreeSpaceLoss (const double pathLength);
 			
+
+			inline double CalcPlaneEarthLoss(const double pathLength);
+
+
 			/**
 			 * Initializes the object of type CPathLossPredictor, setting the effective profile, and the other members.
 			 */

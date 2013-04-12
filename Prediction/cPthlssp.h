@@ -194,6 +194,8 @@ namespace Qrap
 			 */
 			void set_Clutter(bool &UseClutter, unsigned ClutterClassGroup=9999); 
 
+			void set_Tuning( bool Tuning) { mTuning=Tuning;}
+
 			/**
 			 * Overloaded operator
 			 */
@@ -314,6 +316,7 @@ namespace Qrap
 			int *mClutterProfile;
 			double m_tempIPD;		///< Temporary InterPixelDist used to "flatten" the profile in meter
 			double m_slope;			///< (temporary) slope of the profile.
+			double mTuning;
 			int *m_markers;			///< Indexes of markers
 			int *m_peakwidth;		///< number of pixel from peak not to seek the next peak.
 			double *m_aboveEarth;		///< array to store the mast heights and the height of the line of sigth above the earth at each marker.

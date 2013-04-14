@@ -700,6 +700,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 
 					= ((mMaxTerm[i]-mMinTerm[i]) > 0.02*fabs(mMidTerm[i]));
 	}
+	
 /*
 	i=4;
 		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] 

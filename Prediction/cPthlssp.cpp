@@ -288,7 +288,6 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	PlaneEarth = CalcPlaneEarthLoss(mLinkLength);
 	m_Loss = FreeSpace ;
 
-//	m_Loss =0;
 	DiffLoss = 0;
 	if (InputProfile.GetSize()>2)
 	{
@@ -360,6 +359,11 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 			}
 		}
 	}
+
+// The following 2 commands should mostly be commented out. It is when a emperical model is tuned:
+//	m_Loss = 0;
+//	DiffLoss = 0;
+
 
 	if ((NUMTERMS>6)&&(mUseClutter))
 		if (( mClutter.mClutterTypes[mClutterIndex].sCoefficients[6]>0)||(mTuning))	mCterms[6] = DiffLoss;

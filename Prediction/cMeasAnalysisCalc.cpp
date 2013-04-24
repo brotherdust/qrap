@@ -309,6 +309,10 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	float *TempClutter;
 	bool *ClutterOccur;
 	ClutterOccur = new bool[mPathLoss.mClutter.mNumber];
+	unsigned * LOS;
+	unsigned * NLOS;
+	LOS = new unsigned[mPathLoss.mClutter.mNumber];
+	NLOS = new unsigned[mPathLoss.mClutter.mNumber];
 	TempClutter = new float[2];
 	int ClutterLength;
 	mClutterFilter = Clutterfilter;
@@ -341,7 +345,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	double mLinkLength, m_freq, m_htx, Cheight;
 	
 	for (j=0;j<mPathLoss.mClutter.mNumber;j++)
+	{
 		mClutterCount[j]=0;
+		LOS[j]=0;
+		NLOS[j]=0;
+	}
 
 	if (mUseClutter)
 	{
@@ -422,10 +430,6 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				while ((mFixedInsts[FixedNum].sInstKey!=currentInst)&&(FixedNum < mFixedInsts.size()))
 					FixedNum++;
 
-/*				cout << "mClutterFilter = " << mClutterFilter << "	currentInst = " << currentInst 
-					<< "	FixedInst=" << mFixedInsts[FixedNum].sInstKey
-					<< "	which is " << FixedNum << "	of " << mFixedInsts.size() << endl;
-*/		
 				if (FixedNum == mFixedInsts.size())
 				{
 					cout << "FixedNum reached limit ... ending measurement analysis" <<endl;			
@@ -481,8 +485,13 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 //				tPathLoss = mMeasPoints[i].sPathLoss;
 				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter,DiffLoss);
 				if ((NUMTERMS>6)&&(mUseClutter)) terms[6]=DiffLoss;
-
+ 
 				mMeasPoints[i].sClutter = mPathLoss.get_Clutter();
+
+				if (DiffLoss>0)
+					NLOS[mMeasPoints[i].sClutter]++;
+				else
+					LOS[mMeasPoints[i].sClutter]++;
 						
 /*				if (tClutter!=mMeasPoints[i].sClutter)
 				{
@@ -590,6 +599,18 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		CorrC = (NumUsed*TotalMeasPred - TotalMeas*TotalPred) / (TempMeas*TempPred);
 	}
 	else cout << "No predictions done." << endl;
+
+/*	for (j=0;j<mPathLoss.mClutter.mNumber;j++)
+	{
+		cout << j<< "	Num: " << mClutterCount[j];
+		cout << "	#LOS: " << LOS[j];
+		cout << "	#NLOS: " << NLOS[j] << endl;
+	}
+*/
+
+	delete [] LOS;
+	delete [] NLOS;
+	delete [] ClutterOccur;
 	delete [] terms;
 	delete [] TempClutter;
 	return NumUsed;
@@ -1096,7 +1117,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	{
 		Change[i] = true;
 		Up[i] = true;
-		CHeightDiff[i] = 1;
+		CHeightDiff[i] = -1;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
 		DeltaH[i] =0.2;
 		NumClut[i] = 0;
@@ -1142,14 +1163,15 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		{
 			cout << "Starting Exhaustive search " << endl;
 			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
-				DeltaH[i] =1;
+				DeltaH[i] =0.8;
 			if (0<mClutterCount[i]) Change[i] =true;
 			smallStepSize = 0;
-			StepSize = 0.0005;
+			StepSize = 0.0004;
  			ExhaustiveSearch=true;
-			stop = true;
+//			stop = true;
 		}	
 		
+		if (!stop)
 		for (i=1; i<mPathLoss.mClutter.mNumber; i++)
 		{
 			if (Change[i])
@@ -1179,7 +1201,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				cout << "	Mean: " << Mean << "	StDev: " << StDev;
 				cout << "	CorrC: " << CorrC << endl;
 		
-				if (cost<=costMin-0.000000005)
+				if( (cost<=costMin-0.000000005)&&(cost<costMinTemp+0.005))
 				{
 					if (TempMinIndex>0)
 						TempHeight= BestHeight[TempMinIndex];
@@ -1216,6 +1238,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		cout << endl;
 */
 
+//		if (TempStepSize<0.001) TempStepSize=0.001;
 		if ((fabs(TempStepSize) > 0.0005)&&(smallStepSize<=3))
 		{
 			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
@@ -1407,11 +1430,16 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			if (fabs(TempStepSize)<0.0005)
 				TempStepSize = 0.00051;
 			StepSize = TempStepSize;
+
+			for (i=0; i<mPathLoss.mClutter.mNumber; i++)
+				if (fabs(StepSize*20)<fabs(DeltaH[i]))
+					DeltaH[i] = max(StepSize*DeltaH[i]/(fabs(DeltaH[i]))*20,0.01);
+				
 		} // if TempStepSize groot genoeg.
 
 //		cout << "SizeOfDiff " << SizeOfDiff << endl;
-		stop = (((100*fabs((cost - costMin)/costMin)) < 0.005)&&(giveUP>3)&&(StepSize<0.001));
-		for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+		stop = (stop)||(((100*fabs((cost - costMin)/costMin)) < 0.005)&&(giveUP>3)&&(StepSize<0.001));
+		for (i=1;i<mPathLoss.mClutter.mNumber; i++)
 		{
 			if (mPathLoss.mClutter.mClutterTypes[i].sHeight < 0)
 				mPathLoss.mClutter.mClutterTypes[i].sHeight = 0.0;

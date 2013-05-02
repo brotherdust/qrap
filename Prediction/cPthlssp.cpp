@@ -60,7 +60,7 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	m_tempIPD = 30;
 	m_slope = 0.0;
 	m_SmoothWidth=1;
-	m_SeekWidth=19;
+	m_SeekWidth=22;
 	mUseClutter = UseClutter;
 
 	m_markers[0] = 0;
@@ -77,10 +77,10 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 		m_aboveEarth[i] = 0.0;
 	};
 
-	mCterms[0] = TERM0;
-	mCterms[2] = TERM2;
-	mCterms[4] = TERM4;
-	mCterms[5] = TERM5;
+	if (NUMTERMS>0) mCterms[0] = TERM0;
+	if (NUMTERMS>2) mCterms[2] = TERM2;
+	if (NUMTERMS>4) mCterms[4] = TERM4;
+	if (NUMTERMS>5) mCterms[5] = TERM5;
 
 	mUseClutter = true;
 	if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
@@ -238,10 +238,10 @@ int cPathLossPredictor::setParameters(double k, double f,
 
 	if (mUseClutter)
 	{
-		mCterms[0] = TERM0;
-		mCterms[2] = TERM2;
-		mCterms[4] = TERM4;
-		mCterms[5] = TERM5;
+		if (NUMTERMS>0) mCterms[0] = TERM0;
+		if (NUMTERMS>2) mCterms[2] = TERM2;
+		if (NUMTERMS>4) mCterms[4] = TERM4;
+		if (NUMTERMS>5) mCterms[5] = TERM5;
 	}
 
 return 1;
@@ -377,8 +377,8 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		
 //		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
 //		cout << "	" << mLinkLength << ".";
-		mCterms[1] = TERM1;
-		mCterms[3] = TERM3;
+		if (NUMTERMS>1) mCterms[1] = TERM1;
+		if (NUMTERMS>3) mCterms[3] = TERM3;
 //		if (Cheight < (m_htx+0.1))
 //			mCterms[8] = TERM8;
 //		else mCterms[8] = 100;
@@ -498,7 +498,7 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 			mClutterProfile[i] = (int)m_TempProfile[i];
 	}
 
-      	m_SeekWidth = (int)(m_c/m_freq/m_interPixelDist/1300+1);
+	m_SeekWidth = (int) 36.9*pow((m_interPixelDist/18.4),(m_freq/1900));
 //	cout << " m_SeekWidth=" << m_SeekWidth;
 //      m_SmoothWidth = (int)(m_c/m_freq/m_interPixelDist/18000);
 //	cout << " m_SmoothWidth=" << m_SmoothWidth  << endl;
@@ -820,14 +820,12 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex, double &alpha)
 	if (radius>MAXDOUBLE/1.2) radius = 3*m_reR;
 	else if (radius<-(MAXDOUBLE/1.2)) radius = 3*m_reR;
 
-/*	if (mCalcMarker==142423)
-	{
+/*	
 	cout << endl<< "	r2:"<< radius;
 
 	double  r1 = (2.0*(xL+xR)*xR*xL)/(alpha*(xL*xL+xR*xR)); 
 	cout << "	r1:"<< r1;
         cout << "	xL=" << xL << "  xR=" << xR << "  yL=" << yL << "  yR=" << yR << endl;
-	}
 */
 	delete [] SmoothProfile;
 	if (leftInfl>=rightInfl)
@@ -870,8 +868,6 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 			* sqrt(2.0/lambda)/SQd1d2;
 	MhuRho = mhu*rho;
 
-//	if (mCalcMarker==1358542) 
-//	cout << endl << mCalcMarker;
 #ifndef NO_DEBUG
 //	cout	<< " radius=" << radius << "  rho=" << rho
 //		<< "   mhu=" << mhu << "   MhuRho=" << MhuRho << endl;
@@ -903,7 +899,6 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 	else if ((radius>0)&&(rho<=1.2)&&(radius<=0.5*m_reR)&&(mhu>-0.6))
 	{
 		//  Old RAP 	// if (rho<=1.0) 
-//		if (mCalcMarker==142423) 
 //		cout << " OldRap		";
 		RoundHill = 6.02 + 5.556*rho + 3.418*rho*rho +
 				0.256*rho*rho*rho;
@@ -939,8 +934,6 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 		Surface -=  (HeightGain(Y1,K) + HeightGain(Y2,K));
 		KnifeEdge = 0;
 //		Surface *= mClutter.mClutterTypes[mClutterProfile[PeakIndex]].sRho;
-//		if (mCalcMarker==142423) 
-//		cout << " SEarth	X=" << X;
 	}
 	else if (radius>0)
 	{
@@ -981,13 +974,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 		Surface = -mClutter.mClutterTypes[mClutterProfile[PeakIndex]].sRho
 				*20.0*log10(Y1*Y2*4.0*M_PI/(lambda*mLinkLength));
 	}
-*/	else
-	{
-//		if (mCalcMarker==142423)
-//	 	cout << " Nothing		";
-	}
-
-//	if (mCalcMarker==142423)
+*/	
 /*	{
 #ifndef NO_DEBUG
 	cout << " mhu=" << mhu;

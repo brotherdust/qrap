@@ -62,6 +62,8 @@ class cMeasImportCSV
 			unsigned long LastTestPoint,
 			unsigned long LastMeas);
 
+	void cSetCI (unsigned CI) {mCIS =CI;};
+
 	void cGetMeas(	double &Sensitivity,
 			double &Frequency,
 			unsigned &CI, 

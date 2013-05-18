@@ -31,6 +31,8 @@
 #include "cLink.h"
 #include "cRasterFileHandler.h"
 #include "cMeasAnalysisCalc.h"
+#include "cMeasImportSpace.h"
+#include "cMeasImportCSV.h"
 
 using namespace std;
 using namespace Qrap;
@@ -50,7 +52,7 @@ int main (int argc, char **argv)
 		return 0;
 	}
 	
-	string query = "update coefficients set coefficient=0.0;";
+/*	string query = "update coefficients set coefficient=0.0;";
 
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
@@ -61,11 +63,11 @@ int main (int argc, char **argv)
 	}
 
 	Meas.mPathLoss.mClutter.Reset(1);
-//	Meas. LoadMeasurements(0,0,2);
-//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-//	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas. LoadMeasurements(0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-//	Meas.OptimiseHeights(1);
+//	Meas.OptimiseHeights(4);
 //	Meas.OptimiseSeekWidth();
 
 
@@ -74,7 +76,7 @@ int main (int argc, char **argv)
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
-
+*/
 /*	Meas. LoadMeasurements(0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
@@ -84,7 +86,7 @@ int main (int argc, char **argv)
 	Meas. LoadMeasurements(0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-*/	Meas. LoadMeasurements();
+	Meas. LoadMeasurements();
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl << endl;
 
@@ -121,7 +123,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nao0,3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-/*
+
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -141,7 +143,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nac0,3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-
+/*
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -160,7 +162,7 @@ int main (int argc, char **argv)
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas. LoadMeasurements(0,0,2);
+	Meas. LoadMeasurements(0,0,4);
 	Meas.OptimiseModelCoefAllTotal(2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
@@ -173,13 +175,173 @@ int main (int argc, char **argv)
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas. LoadMeasurements(0,0,3);
-	Meas.OptimiseModelCoefAllTotal(3);
+	Meas. LoadMeasurements(0,0,4);
+	Meas.OptimiseModelCoefAllTotal(4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Na3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
-	Meas.OptimiseModelCoefD(3);
+	cout<< "Na4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
+	Meas.OptimiseModelCoefD(4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "NaO3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Nac4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+*/
+{
+cMeasImportCSV MeasImport(-120, 390,8, 1, 1, 1);
+MeasImport.SetCI(8);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Kwamalhanga_0000_to_0131.csv");
+MeasImport.SetCI(10);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Ronesterkop_0000_to_0262.csv");
+MeasImport.SetCI(11);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/RUST DE WINTER0.csv");
+MeasImport.SetCI(164);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Benoni_0000_to_0134.csv");
+MeasImport.SetCI(166);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Braamfontein_0000_to_0102.csv");
+MeasImport.SetCI(168);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Bronkhorstspruit_0000_to_0419.csv");
+MeasImport.SetCI(170);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/cable hill_0001_to_0147.csv");
+MeasImport.SetCI(176);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/daveyton_0000.csv");
+MeasImport.SetCI(178);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Dawn Park_0000_to_0163.csv");
+MeasImport.SetCI(182);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/DE TWEEDE SPRUIT_0002_to_0166.csv");
+MeasImport.SetCI(184);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Devon_0000_to_0170.csv");
+MeasImport.SetCI(186);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Donkerhoek_0000_to_0185.csv");
+MeasImport.SetCI(190);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Groienfontien_0000_to_0229.csv");
+MeasImport.SetCI(194);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/hekpoort_0000_to_0118.csv");
+MeasImport.SetCI(196);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Helderkruin.csv");
+MeasImport.SetCI(198);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Hennopsridge_0000_to_0079.csv");
+MeasImport.SetCI(200);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/HoneyDew_0000_to_0074.csv");
+MeasImport.SetCI(202);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Horizon Park_0000_to_0109.csv");
+MeasImport.SetCI(204);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Jabulani_0000_to_0199.csv");
+MeasImport.SetCI(206);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Johannesburg Hospital_0000_to_0033.csv");
+MeasImport.SetCI(208);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Kameeldrift_0000_to_0116.csv");
+MeasImport.SetCI(212);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Kloof Mine_0000_to_0207.csv");
+MeasImport.SetCI(214);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Kromdraai_0000_to_0087.csv");
+MeasImport.SetCI(216);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Langerand_0000_to_0201.csv");
+MeasImport.SetCI(218);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Laudium_0000_to_0092.csv");
+MeasImport.SetCI(220);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Lenasia South_0000_to_0185.csv");
+MeasImport.SetCI(222);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Lindley_0000_to_0090.csv");
+MeasImport.SetCI(225);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/MALGALIES_0000_to_0288.csv");
+MeasImport.SetCI(227);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Midrand_0000_to_0112.csv");
+MeasImport.SetCI(229);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Millgate Farm_0000_to_0132.csv");
+MeasImport.SetCI(231);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/minerva_0000_to_0133.csv");
+MeasImport.SetCI(233);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/moreleta park_0000_to_0084.csv");
+MeasImport.SetCI(235);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Modderfontein_0000_to_0155.csv");
+MeasImport.SetCI(237);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Munsieville_0000_to_0134.csv");
+MeasImport.SetCI(239);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/northclif_0002_to_0213.csv");
+MeasImport.SetCI(241);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Observatory_0000_to_0063.csv");
+MeasImport.SetCI(243);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/platberg_0000_to_0289.csv");
+MeasImport.SetCI(245);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Protea Ridge_0000_to_0078.csv");
+MeasImport.SetCI(247);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Randfontein_0000_to_0186.csv");
+MeasImport.SetCI(249);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/randmarcht bank_0000_to_0083.csv");
+MeasImport.SetCI(251);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/risana_0000_to_0100.csv");
+MeasImport.SetCI(253);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/SEEKOEIFONTEIN_0000_to_0105.csv");
+MeasImport.SetCI(256);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Silverton_0000_to_0065.csv");
+MeasImport.SetCI(258);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Soshangeuwe_0000_to_0132.csv");
+MeasImport.SetCI(260);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/SPRINGS_0000_to_0196.csv");
+MeasImport.SetCI(264);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Tembisa_0000_to_0056.csv");
+MeasImport.SetCI(266);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Tierpoort_0000_to_0117.csv");
+MeasImport.SetCI(268);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/vaal marina_0000_to_0066.csv");
+MeasImport.SetCI(268);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Vaal Marina_0000_to_0073.csv");
+MeasImport.SetCI(270);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Vanderbijlpark_0000_to_0134.csv");
+MeasImport.SetCI(272);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Vereeniging_0000_to_0135.csv");
+MeasImport.SetCI(274);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Waverly_0000_to_0163.csv");
+MeasImport.SetCI(276);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Welbekend_0000_to_0326.csv");
+MeasImport.SetCI(280);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/zonkizizwe_0000_to_0157.csv");
+MeasImport.SetCI(85051);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/waterkoolf_0000_to_0124.csv");
+}
+{
+cMeasImportSpace MeasImport(-120, 2145,85070, 1, 3, 1);
+MeasImport.SetCI(85070);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT0603r1.dat");
+MeasImport.SetCI(85070);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT0603r2.dat");
+MeasImport.SetCI(85070);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT0603r3.dat");
+MeasImport.SetCI(85073);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT2996r1.dat");
+MeasImport.SetCI(85073);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT2996r2.dat");
+MeasImport.SetCI(85074);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT0001r1.dat");
+MeasImport.SetCI(85074);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT0001r2.dat");
+MeasImport.SetCI(85074);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT0001r3.dat");
+MeasImport.SetCI(85077);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT0602r1.dat");
+MeasImport.SetCI(85077);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT0602r2.dat");
+MeasImport.SetCI(85078);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT2135r1.dat");
+MeasImport.SetCI(85078);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT2135r2.dat");
+MeasImport.SetCI(85079);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT2997r1.dat");
+MeasImport.SetCI(85079);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT2997r2.dat");
+MeasImport.SetCI(85080);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT3986r1.dat");
+MeasImport.SetCI(85080);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT3986r2.dat");
+MeasImport.SetCI(85080);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT3986r3.dat");
+MeasImport.SetCI(85080);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT3986r4.dat");
+MeasImport.SetCI(85081);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT2518r1.dat");
+MeasImport.SetCI(85081);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/TuningT2518r2.dat");
+MeasImport.SetCI(85066);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0205r1.dat");
+MeasImport.SetCI(85066);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0205r2.dat");
+MeasImport.SetCI(85076);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0237r1.dat");
+MeasImport.SetCI(85076);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0237r2.dat");
+MeasImport.SetCI(85076);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0237r3.dat");
+MeasImport.SetCI(85072);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0277r1.dat");
+MeasImport.SetCI(85072);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0277r2.dat");
+MeasImport.SetCI(85072);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0277r3.dat");
+MeasImport.SetCI(85075);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0411r1.dat");
+MeasImport.SetCI(85075);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0411r2.dat");
+MeasImport.SetCI(85075);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0411r3.dat");
+MeasImport.SetCI(85067);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT0435r2.dat");
+MeasImport.SetCI(85068);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT1086r1.dat");
+MeasImport.SetCI(85068);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT1086r2.dat");
+MeasImport.SetCI(85060);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT1440r1.dat");
+MeasImport.SetCI(85060);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT1440r2.dat");
+MeasImport.SetCI(85071);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT2197r1.dat");
+MeasImport.SetCI(85071);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT2197r2.dat");
+MeasImport.SetCI(85071);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT2197r3.dat");
+MeasImport.SetCI(85065);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT2525r2.dat");
+MeasImport.SetCI(85069);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT3322r1.dat");
+MeasImport.SetCI(85069);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Urban Sites/TuningT3322r2.dat");
+MeasImport.SetCI(85062);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0054r1.dat");
+MeasImport.SetCI(85062);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0054r2.dat");
+MeasImport.SetCI(85062);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0054r3.dat");
+MeasImport.SetCI(85061);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0200r1.dat");
+MeasImport.SetCI(85061);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0200r2.dat");
+MeasImport.SetCI(85057);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0370r1.dat");
+MeasImport.SetCI(85057);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0370r2.dat");
+MeasImport.SetCI(85054);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0471r1.dat");
+MeasImport.SetCI(85054);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0471r2.dat");
+MeasImport.SetCI(85053);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0477r1.dat");
+MeasImport.SetCI(85053);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0477r2.dat");
+MeasImport.SetCI(85053);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0477r3.dat");
+MeasImport.SetCI(85058);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0500r1.dat");
+MeasImport.SetCI(85058);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0500r2.dat");
+MeasImport.SetCI(85058);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0500r3.dat");
+MeasImport.SetCI(85056);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0615r1.dat");
+MeasImport.SetCI(85056);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0615r2.dat");
+MeasImport.SetCI(85056);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0615r3.dat");
+MeasImport.SetCI(85064);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0757r1.dat");
+MeasImport.SetCI(85064);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0757r2.dat");
+MeasImport.SetCI(85064);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0757r3.dat");
+MeasImport.SetCI(85063);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0894r1.dat");
+MeasImport.SetCI(85063);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT0894r2.dat");
+MeasImport.SetCI(85052);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT1031r1.dat");
+MeasImport.SetCI(85052);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT1031r2.dat");
+MeasImport.SetCI(85052);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT1031r3.dat");
+MeasImport.SetCI(85052);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT1031r4.dat");
+MeasImport.SetCI(85055);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT1944r1.dat");
+MeasImport.SetCI(85055);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT1944r2.dat");
+MeasImport.SetCI(85055);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/TuningT1944r3.dat");
+}
+{
+cMeasImportSpace MeasImport(-120, 1817.4,85082, 1, 3, 1);
+MeasImport.SetCI(85082);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0002_1800.dat");
+MeasImport.SetCI(85083);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0066_1800.dat");
+MeasImport.SetCI(85084);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0236_1800.dat");
+MeasImport.SetCI(85085);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T5997_1800.dat");
+MeasImport.SetCI(85086);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T3986_1800.dat");
+MeasImport.SetCI(85087);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0658_1800.dat");
+MeasImport.SetCI(85088);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T4683_1800.dat");
+MeasImport.SetCI(85089);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0435_1800.dat");
+}
+{
+cMeasImportSpace MeasImport(-120, 945,85082, 1, 3, 1);
+MeasImport.SetCI(539);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2567all.dat");
+MeasImport.SetCI(540);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2857all.dat");
+MeasImport.SetCI(541);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2899all.dat");
+MeasImport.SetCI(542);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2911all.dat");
+MeasImport.SetCI(543);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2999all.dat");
+MeasImport.SetCI(544);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3004all.dat");
+MeasImport.SetCI(545);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3007all.dat");
+MeasImport.SetCI(546);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3540all.dat");
+MeasImport.SetCI(547);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3519all.dat");
+MeasImport.SetCI(548);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3506all.dat");
+}
+
+
 
 /*	string dir="/home/anita/GISdata/SRTM/BIN/";
 	cLoadFile Files(3,4,dir);
@@ -199,7 +361,7 @@ int main (int argc, char **argv)
 	query +=text; 
 	query += ", ";	
 	query += " ' Original SRTM 90m ArcASCII ', 'DEM', null, 90, now(), true, ";
-	query += " false, null, 'GDALFILE', 'DEG', '');";
+	query += " false, null, 'GDALFILE', 'DEG', ");";
 	if ((!gDb.PerformRawSql(query)))
 	{
 		cout << "Database Update on filesets table failed"<< endl;
@@ -210,7 +372,7 @@ int main (int argc, char **argv)
 	query +=text; 
 	query += ", ";	
 	query += " ' Cut SRTM 90m ArcASCII ', 'DEM', null, 90, now(), true, ";
-	query += " true, 11, 'BINFILE', 'WGS84GC', '');";
+	query += " true, 11, 'BINFILE', 'WGS84GC', ");";
 	if ((!gDb.PerformRawSql(query)))
 	{
 		cout << "Database Update on filesets table failed"<< endl;

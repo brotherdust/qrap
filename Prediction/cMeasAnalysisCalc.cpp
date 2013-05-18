@@ -885,8 +885,8 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 */
 //			These lines should mostly be commented out ... this is just to trial the effectiveness 
 //			of a Global model with Offsets
-			for (i=1;i<NUMTERMS; i++)
-				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] = false;
+//			for (i=1;i<NUMTERMS; i++)
+//				mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i] = false;
 
 			if (NUMTERMS>5)
 			// Term 3 should be zero if there is no Tx Height change		
@@ -1118,7 +1118,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	bool StopStepSize=false;
 	double cost, costOld, costMin, costMinTemp, cost1, cost2;
 	double dCost1,dCost2,ddCost;
-	double StepSize=2,TempStepSize=2,OldStepSize;
+	double StepSize=0.5,TempStepSize=0.5,OldStepSize;
 	double TempHeight;
 	int NumStop = 100;
 	int NumStopStore ;

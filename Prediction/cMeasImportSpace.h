@@ -71,7 +71,11 @@ class cMeasImportSpace
 			unsigned long &LastTestPoint,
 			unsigned long &LastMeas);
 
-	void cSetCI (unsigned CI) {mCI =CI;};
+	void SetCI (unsigned CI) 
+			{
+				mCI =CI;
+				gcvt(mCI,9,mCIS);
+			};
 
 	int LoadMeasurement(char *filename);
 

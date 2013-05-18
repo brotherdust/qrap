@@ -182,7 +182,7 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 	}
 
 	unsigned MeasCount=0, LocalNum=0;	
-	double Lat, Lon, prevLat, prevLon, Meas, dist=0, Ddist=1e-8;
+	double Lat, Lon, prevLat, prevLon, Meas, dist=0, Ddist=1e-8, NprevLat, NprevLon, ndist=0;
 	double LocalTotal=0.0, LocalAve=0.0;
 
     	// reposition to the start of measurement data
@@ -242,6 +242,8 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 	cGeoP StartP(Lat,Lon);
 	prevLat = Lat;
 	prevLon = Lon;
+	NprevLat = Lat;
+	NprevLon = Lon;
 	cGeoP DeltaP(Lat,Lon);
 	DeltaP.FromHere(StartP,res,0);
 	DeltaP.Get(DLat,DLon);
@@ -257,7 +259,7 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 //	New sample distance ... mainly to resuce the number of samples stored
 //	resolution ... to make sure each measurement is at least on a different block.
 	double Ndist = max(Ddist, 2*res*res*DegInMeter);
-//	double Ndist = max(Ddist, 0.000144*0.000144);
+//   double Ndist = max(Ddist, 0.0001*0.0001);
 	cout << "Ddist = " << Ddist << "	Ndist = "<< Ndist << endl;
 
 	cout << "cMeasImportSpace::LoadMeasurement: before while " << endl;
@@ -266,6 +268,7 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 //        	DataFile >> Lat >> Lon >> Meas; // For Planet Format
         	DataFile >> Lon >> Lat >> Meas;
 		dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
+		ndist = (NprevLat-Lat)*(NprevLat-Lat)+(NprevLon-Lon)*(NprevLon-Lon);
 //		cout << dist << endl;
 		if ((Meas > mSensitivity) && ((dist<2)||(prevLat==0)))
 		{
@@ -290,9 +293,10 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 				TLon = 0.0;
 				TLat = 0.0;
 
-				if (dist>=Ndist)
+				if (ndist>=Ndist)
 				{
-	
+					NprevLon = Lon;
+					NprevLat = Lat;
 					query = queryP;
 					PosString=QString(",ST_GeomFromText('POINT(%1 %2)',4326),").arg(Lon).arg(Lat);
 					query += PosString.toStdString();

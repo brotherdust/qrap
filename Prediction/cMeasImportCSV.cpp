@@ -181,7 +181,7 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 	}
 
 	unsigned MeasCount=0, LocalNum=0;	
-	double Lat, Lon, prevLat, prevLon, Meas, dist, Ddist=1e-12;
+	double Lat, Lon, prevLat, prevLon, Meas, dist, Ddist=1e-12, NprevLat, NprevLon, ndist=0;
 	double LocalTotal=0.0, LocalAve=0.0;
 
     	// reposition to the start of measurement data
@@ -274,6 +274,8 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 	cGeoP StartP(Lat,Lon);
 	prevLat = Lat;
 	prevLon = Lon;
+	NprevLat = Lat;
+	NprevLon = Lon;
 	cGeoP DeltaP(Lat,Lon);
 	DeltaP.FromHere(StartP,res,0);
 	DeltaP.Get(DLat,DLon);
@@ -288,7 +290,7 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 
 //	New sample distance ... mainly to resuce the number of samples stored
 //	1.41* resolution ... to make sure each measurement is at least on a different block.
-	double Ndist = max(Ddist, 2*res*res*DegInMeter);
+	double Ndist = max(Ddist, 15*res*res*DegInMeter);
 
 	cout << "Ddist = " << Ddist << "	Ndist = "<< Ndist << endl;
 	cout << "cMeasImportCSV::LoadMeasurement: before while " << endl;	
@@ -316,6 +318,7 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 			}
 			
 			dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
+			ndist = (NprevLat-Lat)*(NprevLat-Lat)+(NprevLon-Lon)*(NprevLon-Lon);
 			if ((Meas > mSensitivity) && (fabs(Lat)>1.0e-12)&&(fabs(Lon)>1.0e-12)&&((dist<2)||(prevLat==0)))
 			{
 
@@ -339,8 +342,10 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 					TLon = 0.0;
 					TLat = 0.0;
 
-					if (dist>=Ndist)
+					if (ndist>=Ndist)
 					{
+						NprevLon = Lon;
+						NprevLat = Lat;
 						mLastTestPoint++;
 						mLastMeas++;
 						gcvt(mLastTestPoint,9,TPID);

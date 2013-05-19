@@ -258,7 +258,7 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 
 //	New sample distance ... mainly to resuce the number of samples stored
 //	resolution ... to make sure each measurement is at least on a different block.
-	double Ndist = max(Ddist, 2*res*res*DegInMeter);
+	double Ndist = max(Ddist, 5*res*res*DegInMeter);
 //   double Ndist = max(Ddist, 0.0001*0.0001);
 	cout << "Ddist = " << Ddist << "	Ndist = "<< Ndist << endl;
 

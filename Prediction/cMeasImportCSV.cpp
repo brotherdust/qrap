@@ -290,7 +290,7 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 
 //	New sample distance ... mainly to resuce the number of samples stored
 //	1.41* resolution ... to make sure each measurement is at least on a different block.
-	double Ndist = max(Ddist, 15*res*res*DegInMeter);
+	double Ndist = max(Ddist, 30*res*res*DegInMeter);
 
 	cout << "Ddist = " << Ddist << "	Ndist = "<< Ndist << endl;
 	cout << "cMeasImportCSV::LoadMeasurement: before while " << endl;	

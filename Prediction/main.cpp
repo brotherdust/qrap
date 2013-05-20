@@ -67,17 +67,17 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-//	Meas.OptimiseHeights(4);
+	Meas.OptimiseHeights(4);
 //	Meas.OptimiseSeekWidth();
-
-
+*/
+/*
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
-*/
-/*	Meas. LoadMeasurements(0,0,3);
+
+	Meas. LoadMeasurements(0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 	Meas. LoadMeasurements(0,0,2);
@@ -183,6 +183,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nac4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
+/*
 {
 cMeasImportCSV MeasImport(-120, 390,8, 1, 1, 1);
 MeasImport.SetCI(8);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Kwamalhanga_0000_to_0131.csv");
@@ -316,6 +317,7 @@ MeasImport.SetCI(85055);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MT
 MeasImport.SetCI(85055);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T1944r2.dat");
 MeasImport.SetCI(85055);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T1944r3.dat");
 }
+*/
 {
 cMeasImportSpace MeasImport(-120, 1817.4,85082, 1, 4, 1);
 MeasImport.SetCI(85082);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0002_1800.dat");
@@ -327,6 +329,7 @@ MeasImport.SetCI(85087);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Si
 MeasImport.SetCI(85088);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T4683_1800.dat");
 MeasImport.SetCI(85089);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0435_1800.dat");
 }
+/*
 {
 cMeasImportSpace MeasImport(-120, 945,85082, 1, 2, 1);
 MeasImport.SetCI(539);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2567all.dat");
@@ -340,7 +343,7 @@ MeasImport.SetCI(546);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW20
 MeasImport.SetCI(547);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3519all.dat");
 MeasImport.SetCI(548);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3506all.dat");
 }
-
+*/
 
 
 /*	string dir="/home/anita/GISdata/SRTM/BIN/";

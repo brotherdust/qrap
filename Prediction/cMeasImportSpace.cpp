@@ -258,10 +258,8 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 
 //	New sample distance ... mainly to resuce the number of samples stored
 //	resolution ... to make sure each measurement is at least on a different block.
-	double Ndist = max(Ddist, 2*res*res*DegInMeter);
-	mSensitivity = -102;
+	double Ndist = max(Ddist, 12*res*res*DegInMeter);
 	cout << "Ddist = " << Ddist << "	Ndist = "<< Ndist << endl;
-
 	
 	cout << "cMeasImportSpace::LoadMeasurement: before while " << endl;
      	while (!DataFile.eof())
@@ -271,7 +269,7 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 		dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
 		ndist = (NprevLat-Lat)*(NprevLat-Lat)+(NprevLon-Lon)*(NprevLon-Lon);
 //		cout << dist << endl;
-		if ((Meas > mSensitivity)&&(Meas<-42)&& ((dist<2)||(prevLat==0)))
+		if ((Meas>-107)&&(Meas<-42)&&((dist<2)||(prevLat==0)))
 		{
 			if (dist>=Ddist)
 			{

@@ -52,7 +52,8 @@ int main (int argc, char **argv)
 		return 0;
 	}
 	
-/*	string query = "update coefficients set coefficient=0.0;";
+
+	string query = "update coefficients set coefficient=0.0;";
 
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
@@ -69,7 +70,7 @@ int main (int argc, char **argv)
 
 	Meas.OptimiseHeights(4);
 //	Meas.OptimiseSeekWidth();
-*/
+
 /*
 	if (!gDb.PerformRawSql(query))
 	{
@@ -193,7 +194,7 @@ MeasImport.SetCI(164);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS
 MeasImport.SetCI(166);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Braamfontein_0000_to_0102.csv");
 MeasImport.SetCI(168);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Bronkhorstspruit_0000_to_0419.csv");
 MeasImport.SetCI(170);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/cable hill_0001_to_0147.csv");
-MeasImport.SetCI(176);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/daveyton_0000.csv");
+//MeasImport.SetCI(176);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/daveyton_0000.csv");
 MeasImport.SetCI(178);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Dawn Park_0000_to_0163.csv");
 MeasImport.SetCI(182);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/DE TWEEDE SPRUIT_0002_to_0166.csv");
 MeasImport.SetCI(184);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Devon_0000_to_0170.csv");
@@ -317,19 +318,81 @@ MeasImport.SetCI(85055);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MT
 MeasImport.SetCI(85055);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T1944r2.dat");
 MeasImport.SetCI(85055);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T1944r3.dat");
 }
-*/
+
 {
 cMeasImportSpace MeasImport(-120, 1817.4,85082, 1, 4, 1);
-MeasImport.SetCI(85082);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0002_1800.dat");
-MeasImport.SetCI(85083);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0066_1800.dat");
-MeasImport.SetCI(85084);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0236_1800.dat");
-MeasImport.SetCI(85085);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T5997_1800.dat");
-MeasImport.SetCI(85086);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T3986_1800.dat");
-MeasImport.SetCI(85087);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0658_1800.dat");
-MeasImport.SetCI(85088);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T4683_1800.dat");
-MeasImport.SetCI(85089);    MeasImport.LoadMeasurement("/home/maggie/MeasData/Signia_1800_Urban_Johannesburg/T0435_1800.dat");
+//RSA Centre - 1817.4MHz
+MeasImport.SetCI(85082);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T0002_1800.dat");
+//Royal York Flats - 1817.6MHz
+MeasImport.SetCI(85084);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T0236_1800.dat");
+// Konica Minolta - 1817.4MHz
+MeasImport.SetCI(85085);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T5997_1800.dat");
+//MTN Doornfontein Switch - 1817.4MHz
+MeasImport.SetCI(85086);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T3986_1800.dat");
+//Old Medical School -1817.4MHz
+MeasImport.SetCI(85087);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T0658_1800.dat");
+//Commanche Flats - 1817.6MHz
+MeasImport.SetCI(85095);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T3748_1800.dat");
+//Atteridgeville W/Res - 1817.4MHz
+MeasImport.SetCI(85099);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Suburban_1800/T0053_1800.dat");
 }
-/*
+{
+cMeasImportSpace MeasImport(-120, 1829.8,85082, 1, 4, 1);
+//Princess Towers - 1829.8MHz
+MeasImport.SetCI(85089);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T0435_1800.dat");
+//Sanlam Plaza East - 1829.8MHz
+MeasImport.SetCI(85090);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T0049_1800.dat");
+//BMW warehouse - 1829.8MHz
+MeasImport.SetCI(85091);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T0411_1800.dat");
+//Discount Glass and Aluminium- 1829.8MHz
+MeasImport.SetCI(85092);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T0606_1800.dat");
+//Laerskool Simon Bekker- 1829.8MHz
+MeasImport.SetCI(85093);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T2525_1800.dat");
+//270 Strubenstraat - 1829.8MHz
+MeasImport.SetCI(85094);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T2998_1800.dat");
+//Hatfield Metro Virgin Active - 1829.8MHz
+MeasImport.SetCI(85096);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T3764_1800.dat");
+//Avril Flats - 1829.8MHz
+MeasImport.SetCI(85097);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T4142_1800.dat");
+//Willmor Park - 1829.8MHz
+MeasImport.SetCI(85098);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Suburban_1800/T0052_1800.dat");
+//Garsfontein High School - 1829.8MHz
+MeasImport.SetCI(85100);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Suburban_1800/T0868_1800.dat");
+//Lehlabile Secondary School - 1829.8MHz
+MeasImport.SetCI(85101);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Suburban_1800/T3009_1800.dat");
+//Taphuis Restaurant - 1829.8MHz
+MeasImport.SetCI(85102);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Suburban_1800/T3021_1800.dat");
+//Highveld Park S/Centre- 1829.8MHz
+MeasImport.SetCI(85103);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Suburban_1800/T5354_1800.dat");
+//Palmland Nursery Akasia - 1829.8MHz
+MeasImport.SetCI(85104);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Suburban_1800/T5380_1800.dat");
+//Holding 66 Montana AH - 1829.8MHz
+MeasImport.SetCI(85105);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Suburban_1800/T5924_1800.dat");
+//Prinsloo - 1829.8MHz
+MeasImport.SetCI(85106);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T0151_1800.dat");
+//Suikerbosfontein Farm - 1829.8MHz
+MeasImport.SetCI(85107);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T0152_1800.dat");
+//De Wagensdrift Farm - 1829.8MHz
+MeasImport.SetCI(85108);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T1525_1800.dat");
+//Sterling Farm Delmas - 1829.8MHz
+MeasImport.SetCI(85109);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T2186_1800.dat");
+//Renosterkop - 1829.8MHz
+MeasImport.SetCI(85110);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T2398_1800.dat");
+//Mahlangu Farm - 1829.8MHz
+MeasImport.SetCI(85111);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T2932_1800.dat");
+//Schultz Farm - 1829.8MHz
+MeasImport.SetCI(85112);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T3684_1800.dat");
+//Geldenhuys Farm- 1829.8MHz
+MeasImport.SetCI(85113);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T3690_1800.dat");
+//Bryanston NW CC - 1830MHz
+MeasImport.SetCI(85088);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T4683_1800.dat");
+}
+{
+cMeasImportSpace MeasImport(-120, 1876.8,85082, 1, 4, 1);
+//Baragwana Nurses Home - 1876.8 MHz
+MeasImport.SetCI(85083);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T0066_1800.dat");
+}
+
 {
 cMeasImportSpace MeasImport(-120, 945,85082, 1, 2, 1);
 MeasImport.SetCI(539);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2567all.dat");

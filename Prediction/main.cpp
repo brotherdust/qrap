@@ -1,5 +1,5 @@
  /*
- *    QRAP Project
+ *    Q-Rap Project
  *
  *    Version     : 0.1
  *    Date        : 2008/04/01
@@ -64,11 +64,11 @@ int main (int argc, char **argv)
 	}
 
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas. LoadMeasurements(0,0,4);
+	Meas. LoadMeasurements(0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-	Meas.OptimiseHeights(4);
+	Meas.OptimiseHeights(0);
 //	Meas.OptimiseSeekWidth();
 
 /*
@@ -163,7 +163,7 @@ int main (int argc, char **argv)
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas. LoadMeasurements(0,0,4);
+	Meas. LoadMeasurements(0,0,2);
 	Meas.OptimiseModelCoefAllTotal(2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;

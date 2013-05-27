@@ -1,5 +1,5 @@
  /*
- *    QRAP Project
+ *    Q-Rap Project
  *
  *    Version     : 0.1
  *    Date        : 2012/04/24

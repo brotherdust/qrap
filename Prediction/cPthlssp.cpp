@@ -617,7 +617,7 @@ void cPathLossPredictor::FindElevAngles(float &ElevAngleTX, float &ElevAngleRX)
 
    	if (m_kFactor!=1.0)
    	{
-		R = m_reR/((1.0-1.0/m_kFactor)*cos(atan(yHeight/xDist)));
+			R = m_reR/((1.0-1.0/m_kFactor)*cos(atan(yHeight/xDist)));
 	   	temp = yHeight*yHeight + xDist*xDist;
 	   	y0 = yHeight/2.0 - xDist * sqrt(4.0*R*R/temp -1.0) /2.0;
 	   	x0 = (temp - 2.0*y0*yHeight) / (2.0*xDist);
@@ -637,8 +637,7 @@ double cPathLossPredictor::Horizontalize(	const int BeginMarkerIndex,
 {
 	int i,start,stop;
 	double angle;	// The angle of the line of sight of the
-				// originals profile with r:q
-			  //	espect to the horizon
+				// originals profile with respect to the horizon
 	double sinA;
 	double BeginHeight, EndHeight;
 	int Begin,End;

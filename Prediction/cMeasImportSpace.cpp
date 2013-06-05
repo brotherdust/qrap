@@ -258,98 +258,98 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 
 //	New sample distance ... mainly to resuce the number of samples stored
 //	resolution ... to make sure each measurement is at least on a different block.
-	double Ndist = max(Ddist, 12*res*res*DegInMeter);
+	double Ndist = max(Ddist, 16*res*res*DegInMeter);
 	cout << "Ddist = " << Ddist << "	Ndist = "<< Ndist << endl;
 	
 	cout << "cMeasImportSpace::LoadMeasurement: before while " << endl;
      	while (!DataFile.eof())
      	{
 //        	DataFile >> Lat >> Lon >> Meas; // For Planet Format
-       	DataFile >> Lon >> Lat >> Meas;
-		dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
-		ndist = (NprevLat-Lat)*(NprevLat-Lat)+(NprevLon-Lon)*(NprevLon-Lon);
-//		cout << dist << endl;
-		if ((Meas>-107)&&(Meas<-42)&&((dist<2)||(prevLat==0)))
-		{
-			if (dist>=Ddist)
+			DataFile >> Lon >> Lat >> Meas;
+			dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
+			ndist = (NprevLat-Lat)*(NprevLat-Lat)+(NprevLon-Lon)*(NprevLon-Lon);
+//			cout << dist << endl;
+			if ((dist<2)||(prevLat==0))
 			{
-				prevLon = Lon;
-				prevLat = Lat;
-				mLastTestPoint++;
-				mLastMeas++;
-				gcvt(mLastTestPoint,9,TPID);
-
-				if (LocalNum>0) 
+				if (dist>=Ddist)
 				{
-					LocalAve = (LocalTotal+Meas)/(LocalNum+1);
-					Lon = (TLon+Lon)/(LocalNum+1);
-					Lat = (TLat+Lat)/(LocalNum+1);
-//					cout << "mLastMeas = " <<mLastMeas <<"	LocalNum = " << LocalNum << endl;
-				}
-				else LocalAve = Meas;
-				LocalTotal = 0.0;
-				LocalNum = 0;
-				TLon = 0.0;
-				TLat = 0.0;
+					prevLon = Lon;
+					prevLat = Lat;
+					mLastTestPoint++;
+					mLastMeas++;
+					gcvt(mLastTestPoint,9,TPID);
 
-				if (ndist>=Ndist)
-				{
-					NprevLon = Lon;
-					NprevLat = Lat;
-					query = queryP;
-					PosString=QString(",ST_GeomFromText('POINT(%1 %2)',4326),").arg(Lon).arg(Lat);
-					query += PosString.toStdString();
-					query += TPID;
-					query += ");";
-	
-					if (!gDb.PerformRawSql(query))
+					if (LocalNum>0) 
 					{
-						string err = "Error inserting Test Point by running query: ";
-						err += query;
-						QRAP_WARN(err.c_str());
-						cout << "cMeasImportSpace::LoadMeasurement: Error inserting the Test Point!: " << endl;
-						cout << query << endl;
-						return 0;
+						LocalAve = (LocalTotal+Meas)/(LocalNum+1);
+						Lon = (TLon+Lon)/(LocalNum+1);
+						Lat = (TLat+Lat)/(LocalNum+1);
+//						cout << "mLastMeas = " <<mLastMeas <<"	LocalNum = " << LocalNum << endl;
 					}
-
+					else LocalAve = Meas;
+					LocalTotal = 0.0;
+					LocalNum = 0;
+					TLon = 0.0;
+					TLat = 0.0;
 	
-					query = queryM;
-					gcvt(mLastMeas,9,temp);
-					query += temp;
-					query += ",";
-					query += TPID;
-					query += ",";
-					gcvt(LocalAve,9,temp);
-					query += temp;
-					query += ");";
-					if (!gDb.PerformRawSql(query))
+					if (ndist>=Ndist)
 					{
-						cout << "cMeasImportSpace::LoadMeasurement: Error inserting the Measurement!: " << endl;
-						cout << query << endl;
-						string err = "Error inserting Measurement by running query: ";
-						err += query;
-						QRAP_WARN(err.c_str());
+						NprevLon = Lon;
+						NprevLat = Lat;
+						query = queryP;
+						PosString=QString(",ST_GeomFromText('POINT(%1 %2)',4326),").arg(Lon).arg(Lat);
+						query += PosString.toStdString();
+						query += TPID;
+						query += ");";
 		
-						return 0;
-					}
-				}
+						if (!gDb.PerformRawSql(query))
+						{
+							string err = "Error inserting Test Point by running query: ";
+							err += query;
+							QRAP_WARN(err.c_str());
+							cout << "cMeasImportSpace::LoadMeasurement: Error inserting the Test Point!: " << endl;
+							cout << query << endl;
+							return 0;
+						}
+
 	
-			}
-			else
-			{
-				LocalNum++;
-				LocalTotal += Meas;
-				TLat+=Lat;
-				TLon+=Lon;
+						query = queryM;
+						gcvt(mLastMeas,9,temp);
+						query += temp;
+						query += ",";
+						query += TPID;
+						query += ",";
+						gcvt(LocalAve,9,temp);
+						query += temp;
+						query += ");";
+						if (!gDb.PerformRawSql(query))
+						{
+							cout << "cMeasImportSpace::LoadMeasurement: Error inserting the Measurement!: " << endl;
+							cout << query << endl;
+							string err = "Error inserting Measurement by running query: ";
+							err += query;
+							QRAP_WARN(err.c_str());
+			
+							return 0;
+						}
+					}
+		
+				}
+				else
+				{
+					LocalNum++;
+					LocalTotal += Meas;
+					TLat+=Lat;
+					TLon+=Lon;
+				}
 			}
 		}
-	}
-	cout << "cMeasImportSpace::LoadMeasurement: done " << endl;
-	DataFile.close();
-	delete [] temp;
-	delete [] temp2;
-	delete [] TPID;
-	cout << "cMeasImportSpace::LoadMeasurement: leaving " << endl;
+		cout << "cMeasImportSpace::LoadMeasurement: done " << endl;
+		DataFile.close();
+		delete [] temp;
+		delete [] temp2;
+		delete [] TPID;
+		cout << "cMeasImportSpace::LoadMeasurement: leaving " << endl;
 }
 
 

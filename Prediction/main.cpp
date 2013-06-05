@@ -53,7 +53,7 @@ int main (int argc, char **argv)
 	}
 	
 
-	string query = "update coefficients set coefficient=0.0;";
+   string query = "update coefficients set coefficient=0.0;";
 
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
@@ -64,20 +64,24 @@ int main (int argc, char **argv)
 	}
 
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas. LoadMeasurements(0,0,0);
+	Meas. LoadMeasurements(0,0,2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-	Meas.OptimiseHeights(0);
+	Meas.OptimiseHeights(2);
+
 //	Meas.OptimiseSeekWidth();
 
-/*
+
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
 
+	Meas. LoadMeasurements(0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Voor4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 	Meas. LoadMeasurements(0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
@@ -91,6 +95,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl << endl;
 
+	Meas. LoadMeasurements();
 	Meas.OptimiseModelCoefAllTotal(0);
 
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
@@ -104,9 +109,12 @@ int main (int argc, char **argv)
 	Meas. LoadMeasurements(0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na0,3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas. LoadMeasurements(0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Na0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-
-	Meas. LoadMeasurements();
+/*
+//	Meas. LoadMeasurements();
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
 //	cout<< "Voor" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
@@ -123,6 +131,9 @@ int main (int argc, char **argv)
 	Meas. LoadMeasurements(0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nao0,3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas. LoadMeasurements(0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nao0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 
 	if (!gDb.PerformRawSql(query))
@@ -143,8 +154,11 @@ int main (int argc, char **argv)
 	Meas. LoadMeasurements(0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nac0,3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-*/
-/*
+	Meas. LoadMeasurements(0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nac0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -187,9 +201,10 @@ int main (int argc, char **argv)
 /*
 {
 cMeasImportCSV MeasImport(-120, 390,8, 1, 1, 1);
+//MeasImport.SetCI(196);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Helderkruin.csv");
 MeasImport.SetCI(8);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Kwamalhanga_0000_to_0131.csv");
 MeasImport.SetCI(10);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Ronesterkop_0000_to_0262.csv");
-MeasImport.SetCI(11);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/RUST DE WINTER0.csv");
+//MeasImport.SetCI(11);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/RUST DE WINTER0.csv");
 MeasImport.SetCI(164);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Benoni_0000_to_0134.csv");
 MeasImport.SetCI(166);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Braamfontein_0000_to_0102.csv");
 MeasImport.SetCI(168);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Bronkhorstspruit_0000_to_0419.csv");
@@ -201,8 +216,7 @@ MeasImport.SetCI(184);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS
 MeasImport.SetCI(186);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Donkerhoek_0000_to_0185.csv");
 MeasImport.SetCI(190);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Groienfontien_0000_to_0229.csv");
 MeasImport.SetCI(194);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/hekpoort_0000_to_0118.csv");
-MeasImport.SetCI(196);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Helderkruin.csv");
-MeasImport.SetCI(198);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Hennopsridge_0000_to_0079.csv");
+//MeasImport.SetCI(198);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Hennopsridge_0000_to_0079.csv");
 MeasImport.SetCI(200);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/HoneyDew_0000_to_0074.csv");
 MeasImport.SetCI(202);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Horizon Park_0000_to_0109.csv");
 MeasImport.SetCI(204);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Jabulani_0000_to_0199.csv");
@@ -243,6 +257,7 @@ MeasImport.SetCI(276);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS
 MeasImport.SetCI(280);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/zonkizizwe_0000_to_0157.csv");
 MeasImport.SetCI(85051);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/waterkoolf_0000_to_0124.csv");
 }
+/*
 {
 cMeasImportSpace MeasImport(-120, 2145,85070, 1, 3, 1);
 MeasImport.SetCI(85070);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/Tuning/T0603r1.dat");
@@ -290,8 +305,8 @@ MeasImport.SetCI(85069);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MT
 MeasImport.SetCI(85062);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T0054r1.dat");
 MeasImport.SetCI(85062);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T0054r2.dat");
 MeasImport.SetCI(85062);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T0054r3.dat");
-MeasImport.SetCI(85061);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T0200r1.dat");
-MeasImport.SetCI(85061);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T0200r2.dat");
+//MeasImport.SetCI(85061);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T0200r1.dat");
+//MeasImport.SetCI(85061);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T0200r2.dat");
 MeasImport.SetCI(85057);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T0370r1.dat");
 MeasImport.SetCI(85057);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T0370r2.dat");
 MeasImport.SetCI(85054);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T0471r1.dat");
@@ -319,6 +334,7 @@ MeasImport.SetCI(85055);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MT
 MeasImport.SetCI(85055);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Suburban Sites/Tuning/T1944r3.dat");
 }
 
+
 {
 cMeasImportSpace MeasImport(-120, 1817.4,85082, 1, 4, 1);
 //RSA Centre - 1817.4MHz
@@ -328,7 +344,7 @@ MeasImport.SetCI(85084);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MT
 // Konica Minolta - 1817.4MHz
 MeasImport.SetCI(85085);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T5997_1800.dat");
 //MTN Doornfontein Switch - 1817.4MHz
-MeasImport.SetCI(85086);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T3986_1800.dat");
+//MeasImport.SetCI(85086);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T3986_1800.dat");
 //Old Medical School -1817.4MHz
 MeasImport.SetCI(85087);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T0658_1800.dat");
 //Commanche Flats - 1817.6MHz
@@ -337,15 +353,15 @@ MeasImport.SetCI(85095);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MT
 MeasImport.SetCI(85099);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Suburban_1800/T0053_1800.dat");
 }
 {
-cMeasImportSpace MeasImport(-120, 1829.8,85082, 1, 4, 1);
+cMeasImportSpace MeasImport(-120, 1829.8,85089, 1, 4, 1);
 //Princess Towers - 1829.8MHz
-MeasImport.SetCI(85089);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T0435_1800.dat");
+//MeasImport.SetCI(85089);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T0435_1800.dat");
 //Sanlam Plaza East - 1829.8MHz
 MeasImport.SetCI(85090);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T0049_1800.dat");
 //BMW warehouse - 1829.8MHz
-MeasImport.SetCI(85091);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T0411_1800.dat");
+//MeasImport.SetCI(85091);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T0411_1800.dat");
 //Discount Glass and Aluminium- 1829.8MHz
-MeasImport.SetCI(85092);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T0606_1800.dat");
+//MeasImport.SetCI(85092);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T0606_1800.dat");
 //Laerskool Simon Bekker- 1829.8MHz
 MeasImport.SetCI(85093);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T2525_1800.dat");
 //270 Strubenstraat - 1829.8MHz
@@ -373,7 +389,7 @@ MeasImport.SetCI(85106);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MT
 //Suikerbosfontein Farm - 1829.8MHz
 MeasImport.SetCI(85107);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T0152_1800.dat");
 //De Wagensdrift Farm - 1829.8MHz
-MeasImport.SetCI(85108);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T1525_1800.dat");
+//MeasImport.SetCI(85108);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T1525_1800.dat");
 //Sterling Farm Delmas - 1829.8MHz
 MeasImport.SetCI(85109);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T2186_1800.dat");
 //Renosterkop - 1829.8MHz
@@ -385,16 +401,18 @@ MeasImport.SetCI(85112);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MT
 //Geldenhuys Farm- 1829.8MHz
 MeasImport.SetCI(85113);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Rural_1800/T3690_1800.dat");
 //Bryanston NW CC - 1830MHz
-MeasImport.SetCI(85088);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T4683_1800.dat");
+//MeasImport.SetCI(85088);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T4683_1800.dat");
 }
+
 {
-cMeasImportSpace MeasImport(-120, 1876.8,85082, 1, 4, 1);
+cMeasImportSpace MeasImport(-120, 1876.8,85083, 1, 4, 1);
 //Baragwana Nurses Home - 1876.8 MHz
 MeasImport.SetCI(85083);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia_1800_Urban_Johannesburg/T0066_1800.dat");
 }
 
+
 {
-cMeasImportSpace MeasImport(-120, 945,85082, 1, 2, 1);
+cMeasImportSpace MeasImport(-120, 945,539, 1, 2, 1);
 MeasImport.SetCI(539);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2567all.dat");
 MeasImport.SetCI(540);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2857all.dat");
 MeasImport.SetCI(541);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2899all.dat");

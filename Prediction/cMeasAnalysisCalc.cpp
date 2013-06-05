@@ -405,7 +405,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
 
-/*					cout << "Inst: " << currentInst << "	#: " << CNumUsed << "	M: " << CMean 
+/*				cout << "Inst: " << currentInst << "	#: " << CNumUsed << "	M: " << CMean 					
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
@@ -585,8 +585,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			<< "	MSE: " << CMeanSquareError 
 			<< "	StDev: " << CStDev
 			<< "	Corr: " << CCorrC << endl;
-*/
-	}
+*/	}
 
 	if (NumUsed>0)
 	{
@@ -1147,7 +1146,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	{
 		Change[i] = true;
 		Up[i] = true;
-		CHeightDiff[i] = 1;
+		CHeightDiff[i] = 0.5;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
 		DeltaH[i] =0.2;
 		NumClut[i] = 0;
@@ -1275,9 +1274,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			{
 				if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 					mPathLoss.mClutter.mClutterTypes[i].sHeight 
-						-= CHeightDiff[i]/SizeOfDiff*TempStepSize
+						-= CHeightDiff[i]/SizeOfDiff*TempStepSize;
 //														*mNumMeas/mClutterCount[i];
-														*sqrt(TotNum/mClutterCount[i]);
+//														*sqrt(TotNum/mClutterCount[i]);
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 			}
 //			cout << endl;
@@ -1299,7 +1298,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
 								+= CHeightDiff[i]/SizeOfDiff*2*TempStepSize
 //														*mNumMeas/mClutterCount[i];
-														*TotNum/mClutterCount[i];
+													*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -1459,7 +1458,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				smallStepSize=0;				
 			if (fabs(TempStepSize)<0.002)
 				TempStepSize = 0.002;
-			StepSize = TempStepSize;
+			StepSize = min(TempStepSize, OldStepSize);
 
 			for (i=0; i<mPathLoss.mClutter.mNumber; i++)
 				if (fabs(StepSize*5)<fabs(DeltaH[i]))

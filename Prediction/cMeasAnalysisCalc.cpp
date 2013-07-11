@@ -585,7 +585,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			<< "	MSE: " << CMeanSquareError 
 			<< "	StDev: " << CStDev
 			<< "	Corr: " << CCorrC << endl;
-*/	}
+*/
+}
 
 	if (NumUsed>0)
 	{
@@ -598,8 +599,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		CorrC = (NumUsed*TotalMeasPred - TotalMeas*TotalPred) / (TempMeas*TempPred);
 	}
 	else cout << "No predictions done." << endl;
-
-/*	for (j=0;j<mPathLoss.mClutter.mNumber;j++)
+/*
+	for (j=0;j<mPathLoss.mClutter.mNumber;j++)
 	{
 		cout << j<< "	Num: " << mClutterCount[j];
 		cout << "	#LOS: " << LOS[j];

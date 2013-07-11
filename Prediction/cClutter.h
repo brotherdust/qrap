@@ -35,7 +35,7 @@
 #include "../DataBase/cDatabase.h"
 
 //The following terms in used in the clutter dependant propagation Prediction
-#define NUMTERMS 3
+#define NUMTERMS 7
  
 #define TERM0 1		//Constant offset
 #define TERM1 log10(mLinkLength/1000.0) // This term occur in virtually all models. Here it will refer loss over and above free-space. 
@@ -44,7 +44,7 @@
 
 //#define TERM4 log10(m_freq)*log10(m_freq)*log10(m_freq)	
 //#define TERM4 log10(m_freq)*log10(m_freq)		// This term occurs in ECC-33 and Ericsson models, but results in an ill-conditioned matrix. 
-#define TERM4 pow(m_freq,0.285)		// Weissberger-like term for vegetation loss. 
+#define TERM4 pow(m_freq,0.5)		// Weissberger-like term for vegetation loss. 
 											// 0.5 in accordance with Phetsri, Sunghapong and Phaiboon from Thailand, conference in 2011 
 						// ... depth through trees are assumed shallow and more or less constant
 #define TERM5 log10(m_htx)	// we assume a constant mobile/customer antenna height, 

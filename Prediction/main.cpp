@@ -64,15 +64,15 @@ int main (int argc, char **argv)
 	}
 
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas. LoadMeasurements(0,0,2);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+//	Meas. LoadMeasurements(0,0,4);
+//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+//	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-	Meas.OptimiseHeights(2);
+//	Meas.OptimiseHeights(4);
 
 //	Meas.OptimiseSeekWidth();
 
-
+/*
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -81,59 +81,60 @@ int main (int argc, char **argv)
 
 	Meas. LoadMeasurements(0,0,4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Voor4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Voor4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas. LoadMeasurements(0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Voor3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Voor3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC <<  endl;
 	Meas. LoadMeasurements(0,0,2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Voor2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Voor2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas. LoadMeasurements(0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Voor1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Voor1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas. LoadMeasurements();
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Voor0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl << endl;
+	cout<< "Voor0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
+
 
 	Meas. LoadMeasurements();
 	Meas.OptimiseModelCoefAllTotal(0);
 
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Na0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Na0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas. LoadMeasurements(0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Na0,1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Na0,1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas. LoadMeasurements(0,0,2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Na0,2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Na0,2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC  << endl;
 	Meas. LoadMeasurements(0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Na0,3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Na0,3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC  << endl;
 	Meas. LoadMeasurements(0,0,4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Na0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Na0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 
-/*
-//	Meas. LoadMeasurements();
-//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
-//	cout<< "Voor" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas. LoadMeasurements();
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+
+	cout<< "Voor" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas.OptimiseModelCoefD(0);
-//	Meas. LoadMeasurements(0,0,0);
+	Meas. LoadMeasurements(0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nao0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Nao0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas. LoadMeasurements(0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nao0,1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Nao0,1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC  << endl;
 	Meas. LoadMeasurements(0,0,2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nao0,2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Nao0,2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas. LoadMeasurements(0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nao0,3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Nao0,3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas. LoadMeasurements(0,0,4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nao0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Nao0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 
 
 	if (!gDb.PerformRawSql(query))
@@ -159,18 +160,20 @@ int main (int argc, char **argv)
 	cout<< "Nac0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 
+
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
 	Meas. LoadMeasurements(0,0,1);
-	Meas.OptimiseModelCoefAllTotal(1);
+//	Meas.OptimiseModelCoefAllTotal(1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
 	Meas.OptimiseModelCoefD(1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nao1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
+	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
+
 
 	if (!gDb.PerformRawSql(query))
 	{
@@ -178,27 +181,42 @@ int main (int argc, char **argv)
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
 	Meas. LoadMeasurements(0,0,2);
-	Meas.OptimiseModelCoefAllTotal(2);
+//	Meas.OptimiseModelCoefAllTotal(2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
 	Meas.OptimiseModelCoefD(2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nao2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
+	cout<< "Nacb2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
+*/
 
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
+	Meas. LoadMeasurements(0,0,3);
+	Meas.OptimiseModelCoefAllTotal(3);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Na3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
+	Meas.OptimiseModelCoefD(3);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nach3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+/*
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+	Meas.mPathLoss.mClutter.Reset(1);
 	Meas. LoadMeasurements(0,0,4);
-	Meas.OptimiseModelCoefAllTotal(4);
+//	Meas.OptimiseModelCoefAllTotal(4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
 	Meas.OptimiseModelCoefD(4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nac4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-*/
-/*
+	cout<< "Nach4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+
 {
 cMeasImportCSV MeasImport(-120, 390,8, 1, 1, 1);
 //MeasImport.SetCI(196);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Helderkruin.csv");
@@ -257,7 +275,7 @@ MeasImport.SetCI(276);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS
 MeasImport.SetCI(280);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/zonkizizwe_0000_to_0157.csv");
 MeasImport.SetCI(85051);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/waterkoolf_0000_to_0124.csv");
 }
-/*
+
 {
 cMeasImportSpace MeasImport(-120, 2145,85070, 1, 3, 1);
 MeasImport.SetCI(85070);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTNUMTS/Dense Urban Sites/Tuning/T0603r1.dat");
@@ -365,9 +383,9 @@ MeasImport.SetCI(85090);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MT
 //Laerskool Simon Bekker- 1829.8MHz
 MeasImport.SetCI(85093);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T2525_1800.dat");
 //270 Strubenstraat - 1829.8MHz
-MeasImport.SetCI(85094);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T2998_1800.dat");
+//MeasImport.SetCI(85094);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T2998_1800.dat");
 //Hatfield Metro Virgin Active - 1829.8MHz
-MeasImport.SetCI(85096);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T3764_1800.dat");
+//MeasImport.SetCI(85096);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T3764_1800.dat");
 //Avril Flats - 1829.8MHz
 MeasImport.SetCI(85097);    MeasImport.LoadMeasurement("/home/maggie/MeasData/MTN1800/Signia files Urban_1800/T4142_1800.dat");
 //Willmor Park - 1829.8MHz
@@ -416,13 +434,18 @@ cMeasImportSpace MeasImport(-120, 945,539, 1, 2, 1);
 MeasImport.SetCI(539);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2567all.dat");
 MeasImport.SetCI(540);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2857all.dat");
 MeasImport.SetCI(541);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2899all.dat");
-MeasImport.SetCI(542);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2911all.dat");
+//MeasImport.SetCI(542);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2911all.dat");
 MeasImport.SetCI(543);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T2999all.dat");
 MeasImport.SetCI(544);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3004all.dat");
 MeasImport.SetCI(545);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3007all.dat");
+//MeasImport.SetCI(545);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CWMeas/c_T3007all.dat");
 MeasImport.SetCI(546);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3540all.dat");
 MeasImport.SetCI(547);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3519all.dat");
 MeasImport.SetCI(548);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CW2001/c_T3506all.dat");
+MeasImport.SetCI(550);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CWMeas/c_T0945all.dat");
+MeasImport.SetCI(551);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CWMeas/c_T1440All.dat");
+MeasImport.SetCI(552);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CWMeas/c_T2525all.dat");
+MeasImport.SetCI(553);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CWMeas/c_T3024all.dat");
 }
 */
 

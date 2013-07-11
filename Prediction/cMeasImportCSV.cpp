@@ -292,6 +292,9 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 //	1.41* resolution ... to make sure each measurement is at least on a different block.
 	double Ndist = max(Ddist, 30*res*res*DegInMeter);
 
+	mSensitivity = -108;
+	double MaxVal = -33;
+
 	cout << "Ddist = " << Ddist << "	Ndist = "<< Ndist << endl;
 	cout << "cMeasImportCSV::LoadMeasurement: before while " << endl;	
      	while (getline (DataFile, line))
@@ -319,7 +322,7 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 			
 			dist = (prevLat-Lat)*(prevLat-Lat)+(prevLon-Lon)*(prevLon-Lon);
 			ndist = (NprevLat-Lat)*(NprevLat-Lat)+(NprevLon-Lon)*(NprevLon-Lon);
-			if ((Meas > mSensitivity) && (fabs(Lat)>1.0e-12)&&(fabs(Lon)>1.0e-12)&&((dist<2)||(prevLat==0)))
+			if ((Meas > mSensitivity)&&(Meas<MaxVal) && (fabs(Lat)>1.0e-12)&&(fabs(Lon)>1.0e-12)&&((dist<2)||(prevLat==0)))
 			{
 
 				if (dist>=Ddist)

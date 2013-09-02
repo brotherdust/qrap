@@ -69,6 +69,11 @@ string MakeDBFromArray(vector<float> &input)
 cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey, 
 				unsigned int &TxKey, double &Resol, double &kFactor)
 {
+	mUseClutter = mClutter.SetRasterFileRules(mClutterSource);
+	if (mUseClutter) 
+		mClutterClassGroup = mClutter.GetClutterClassGroup();
+	if (mUseClutter) mClutterset.Reset(mClutterClassGroup);
+
 	bool FoundRasterSet=FALSE;
 	mFrequencySpacing=Resol;
 	mTxInst.sInstKey=TxKey;
@@ -87,7 +92,7 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey,
 	mkFactor = kFactor;
 	mDEMsource = 1;
 	mClutterSource = 1;
-	mUseClutter = false;
+//	mUseClutter = false;
 	mPlotResolution = 90;
 	
 	FoundRasterSet = mDEM->SetRasterFileRules(mDEMsource);
@@ -103,6 +108,7 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey,
 		mUseClutter = FoundRasterSet;
 		if (!FoundRasterSet)
 		{
+			mUseClutter=false;
 			string err = "Error fetching clutter ";
 			err+=": Trouble getting Clutter list. Using default.";
 			QRAP_WARN(err.c_str());
@@ -200,7 +206,7 @@ bool cSpectralLink::DoLink()
 	if (mDownlink)
 	{
 		//cout<<"TX pat : "<<mTxInst.sTxPatternKey<<endl;
-		//cout<<"RX pat : "<<mRxInst.sRxPatternKey<<endl;
+		//cout<<"RX pat : "<<mRxInst.sRxPatternKey<<endl;mkFactor
 		mTxAnt.SetAntennaPattern(mTxInst.sTxPatternKey, mTxInst.sTxAzimuth,
 				mTxInst.sTxMechTilt);
 		mRxAnt.SetAntennaPattern(mRxInst.sRxPatternKey, mRxInst.sRxAzimuth,
@@ -219,6 +225,10 @@ bool cSpectralLink::DoLink()
 		EIRP =mRxInst.sTxPower - mRxInst.sTxSysLoss
 				+ mRxAnt.mGain;
 	}
+
+	PathLoss.setParameters(mkFactor, mTxInst.sFrequency,
+					mTxInst.sTxHeight, mRxInst.sRxHeight, 
+					mUseClutter, mClutterClassGroup);
 	//\\TODO Check and verify this
 	LinkOtherGain = EIRP+20.0*log10(mTxInst.sFrequency)+32.44;
 	//Loss_qrap -20log(f) - 32.44 + 10log(4*PI)
@@ -267,7 +277,7 @@ bool cSpectralLink::GetDBinfo(tFixed &Inst)
 	char text[33];
 
 	gcvt(Inst.sInstKey,10,text);
-	query = "SELECT siteid,eirp,radioinstallation.txpower,txlosses,rxlosses,";
+	query = "SELECT siteid,eirp,radioinstallation_view.txpower as txpower,txlosses,rxlosses,";
 	query +="rxsensitivity,startfreq,spacing,channel,";
 	query+= "txantpatternkey,txbearing,txmechtilt,rxantpatternkey,";
 	query+="rxbearing,rxmechtilt,txantennaheight,rxantennaheight ";
@@ -310,7 +320,7 @@ bool cSpectralLink::GetDBinfo(tFixed &Inst)
 			Inst.sTxHeight = atof(r[0]["txantennaheight"].c_str());
 			Inst.sRxHeight = atof(r[0]["rxantennaheight"].c_str());
 			//if (mFrequency>59999)
-			Inst.sFrequency = atof(r[0]["startfreq"].c_str())+1000.0*atof(r[0]["channel"].c_str())*atof(r[0]["spacing"].c_str());
+			Inst.sFrequency = atof(r[0]["startfreq"].c_str())+atof(r[0]["channel"].c_str())*atof(r[0]["spacing"].c_str())/1000;
 			//else Inst.sFrequency = mFrequency;
 			cout<<"Startfreq : "<<atof(r[0]["startfreq"].c_str())<<endl;
 			cout<<"Channel no : "<<atof(r[0]["channel"].c_str())<<endl;
@@ -333,6 +343,7 @@ bool cSpectralLink::GetDBinfo(tFixed &Inst)
 //*******************************************************************************************************************
 bool cSpectralLink::CalcDistribution()
 {
+	bool returnval = true;
 	// \TODO: Fix once we have a radio installation to work with
 	pqxx::result r;
 	char *text =new char[33];
@@ -399,9 +410,9 @@ bool cSpectralLink::CalcDistribution()
 			/mFrequencySpacing)*mFrequencySpacing;
 	double maxFreq = ceil((mTxInst.sFrequency + mDescOffset[mDescSize-1]/1000.0)
 			/mFrequencySpacing)*mFrequencySpacing;
-	//cout<<"Center Freq : "<<mTxInst.sFrequency<<endl;
-	//cout<<"Spacing : "<<mFrequencySpacing<<endl;
-	//cout<<"Min : "<<minFreq<<" and Max : "<<maxFreq<<endl;
+	cout<<"Center Freq : "<<mTxInst.sFrequency<<endl;
+	cout<<"Spacing : "<<mFrequencySpacing<<endl;
+	cout<<"Min : "<<minFreq<<" and Max : "<<maxFreq<<endl;
 	double tempEnvelopeSize=(maxFreq-minFreq)/mFrequencySpacing;
 	if ((tempEnvelopeSize-floor(tempEnvelopeSize))>0.5)
 		mEnvelopeSize= (int)(ceil(tempEnvelopeSize)+1);
@@ -450,7 +461,7 @@ bool cSpectralLink::CalcDistribution()
 		mEnvelopeTotal+=mEnvelopeValue[i];
 	}
 	// \TODO: Are there other factors as well from Transmitter?
-	cout<<"Normalizing ... "<<endl;
+/*	cout<<"Normalizing ... "<<endl;
 	double TxPower = mTxInst.sTxPower;
 	//mEnvelopeTotal=pow(10, mEnvelopeTotal/10);
 	for (int i=0; i<mEnvelopeSize; ++i)
@@ -458,7 +469,9 @@ bool cSpectralLink::CalcDistribution()
 		mEnvelopeValue[i]=mEnvelopeValue[i]*TxPower/(mEnvelopeTotal*mFrequencySpacing*1000);
 		//cout<<mEnvelopeFreq[i]<<":"<<mEnvelopeValue[i]<<endl;
 	}
+*/
 	delete [] text;
+	return true;
 }
 
 }

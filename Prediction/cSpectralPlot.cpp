@@ -181,7 +181,7 @@ bool cSpectralPlot::CombinePlots()
 	{
             if (mPFDValue[i]>0)
 		mPFDValue[i]=10*log10(mPFDValue[i]);
-            else mPFDValue[i]=0;
+            else mPFDValue[i]=-200;
 	}
 }
 
@@ -191,20 +191,30 @@ bool cSpectralPlot::DoPlot()
 	bool success=true;
 	int i;
 	mNumLinks = mLinks.size();
-	cout << "In cSpectralPlot::DoPlot() aantal Links " << mLinks.size() << endl;
+	cout << "In cSpectralPlot::DoPlot() aantal Links " << mNumLinks << endl;
 	for(i=0;i<mNumLinks;i++)
 	{
 		cout << " In cSpectralPlot::DoPlot() before (*i)->CalcDistribution()" << endl;
 		if (mLinks[i]->CalcDistribution())
 		{
-			cout << " In cSpectralPlot::DoPlot() before (*i)->DoLink()" <<  endl;
+			cout << " In cSpectralPlot::DoPlot() before (*i)->DoLink() i=" << i <<endl;
 			mLinks[i]->DoLink();
 		}
-		else success=false;
+		else
+		{
+			cout << " In cSpectralPlot::DoPlot() before (*i)->DoLink() failing i="<< i <<  endl;
+			success=false;
+		}
 	}
-	cout << " In cSpectralPlot::DoPlot() before CombinePlots()" << endl;
-	if (success) CombinePlots();
-	cout << " In cSpectralPlot::DoPlot() after CombinePlots()" << endl;
+
+	if (success) 
+	{
+		cout << " In cSpectralPlot::DoPlot() before CombinePlots()" << endl;
+		CombinePlots();
+		cout << " In cSpectralPlot::DoPlot() after CombinePlots()" << endl;
+	}
+	else cout << " In cSpectralPlot::DoPlot() NOT combining plots" << endl;
+	
 	return success;
 }
 

@@ -70,6 +70,7 @@ private:
 	GeoType mType;
 	int mCentMer;
 	QString mFileType;
+	short int mIFileType;
 	cLoadThread *CLoadThread;
 };
 

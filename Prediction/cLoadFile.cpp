@@ -59,9 +59,11 @@ bool cLoadFile::LoadFile(string SrcDirectory,
 									int CentMer,
 									bool Hem)
 {
-	cout << "In Loadfile" << endl; 
+	cout << "In cLoadfile.cpp LoadFile" << endl; 
 	StructMetaData MapHeader;
+	cout << "In cLoadfile.cpp LoadFile Before cRaster constructer" << endl; 
 	cRaster INRaster(SrcDirectory, FileName,filetype,Proj,Proj4String,CentMer,Hem);
+
 	cGeoP NW,SE;
 	FileType Type;
 	unsigned Rows,Cols;
@@ -203,6 +205,15 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
                                 unsigned ResultFileSet, bool Interpolate,
                                 short int inFileType)
 {
+	cout << " In cLoadFile::CutCurrentSet(..). OriginalFileSet=" 
+		<< OriginalFileSet << "	ResultFileSet=" << ResultFileSet <<
+		"	inFileType=" << inFileType << "	Interpolate=";
+
+	if (Interpolate)
+		cout << "True";
+	else cout << "False";
+	cout << endl;
+
 	string Type, Oproj4, Rproj4, projection;
 	MetaData OldMetaData;
 	FileType Ofiletype, Rfiletype;
@@ -234,8 +245,8 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 		cout << "Voor get result original file set query" << endl;
 		gDb.GetLastResult(r);
 		
-		cout << "Got result original file set query" << endl;
-		if(r.size()!=0)
+		cout << "Got result original file set query. r.size()="<< r.size() << endl;
+		if(r.size()>0)
 		{
 			OrigRes = atof(r[0]["resolution"].c_str());
 			Type = r[0]["fileformat"].c_str();
@@ -266,11 +277,12 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 	query = "SELECT resolution, fileformat, projection, proj4string ";
 	query += "FROM filesets WHERE ID=";
 	query += RFSID;
+	query += ";";
 	
 	cout << "cLoadFile::CutCurrentSet query: " << query << endl; 	
 	if(!gDb.PerformRawSql(query))
 	{
-		string err = "Database Select for Original FileSet failed. Query: ";
+		string err = "Database Select for Result FileSet failed. Query: ";
 		err += query;
 		cout << err << endl;
 //		QRAP_WARN(err.c_str());
@@ -298,7 +310,7 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 		} // if r.size()
 		else
 		{
-			string err = "Database Select for Original FileSet is empty. Query: ";
+			string err = "Database Select for Result FileSet is empty. Query: ";
 			err += query;
 			cout << err << endl;
 //			QRAP_WARN(err.c_str());
@@ -390,12 +402,12 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 	unsigned Rows, Cols, Size; // (Estimated) Size of map in pixels
 	double SizeEW, SizeNS; // Size of map in degrees
 	
-	SizeEW = 3.0; // Size of map in degrees
-	SizeNS = 3.0; 
+	SizeEW = 0.5; // Size of map in degrees
+	SizeNS = 0.5; 
 	Rows = (unsigned) (SizeNS*100000 / OrigRes);
 	Cols = (unsigned) (SizeEW*100000 / OrigRes);
 	Size = Rows*Cols;
-	while (Size> 1000000000) 
+	while (Size> 100000000) 
 	{
 		if (Cols>Rows)	SizeEW/=2.0;
 		else			SizeNS/=2.0;

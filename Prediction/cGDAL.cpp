@@ -48,7 +48,9 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 	Cols = 0;
 	string FN = Directory+"/" +FileName;
 	m_file_name = FN;
+	cout << " In cGDAL::openFile(...) before GDALDataset constructor." << endl;
 	GDALDataset *poDataset;
+	cout << " In cGDAL::openFile(...) before GDALOpen ..." << endl;
 	poDataset = (GDALDataset *) GDALOpen( m_file_name.c_str(), GA_ReadOnly );
 	if( poDataset == NULL )
 	{
@@ -60,7 +62,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		//\TODO:Error message
 		return false;
 	}
-//	printf("The GDAL file is open");
+	printf("The GDAL file is open");
 	/* Getting the meta data */
 
 /*	printf( "Driver: %s/%s\n",
@@ -99,6 +101,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 	}
 	else Proj = DEG;
 
+	cout << " In cGDAL::openFile(...) before Getting the raster band ..." << endl;
 	/* Getting the raster band */
 	poBand = poDataset->GetRasterBand( 1 );
 	poBand->GetBlockSize( &nBlockXSize, &nBlockYSize );

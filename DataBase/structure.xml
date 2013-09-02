@@ -345,13 +345,13 @@ www.QRap.org.za
 		       ui="dropdown(fromtable,site,sitename)" />
 		
 		<field name="dtmsource"
-		       type="smallint references filesets(id)"
+		       type="smallint references filesetsused(id)"
 		       label="DTM source file"
 			description="Foreign Key to the file-set table. Reference the Digital Elevation Model file set used during the Basic Transmission Loss calculations"
 		       ui="dropdown(fromtable,filesets,description)" />
 		
 		<field name="cluttersource"
-		       type="smallint references filesets(id)"
+		       type="smallint references filesetsused(id)"
 		       label="Clutter source file"
 			description="Foreign Key to the file-set table. Reference the Clutter file set used during the Basic Transmission Loss calculations"
 		       ui="dropdown(fromtable,filesets,description)" />

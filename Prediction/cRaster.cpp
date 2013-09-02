@@ -69,7 +69,9 @@ cRaster::cRaster(string Directory,
 	mEWres = 1.0;
 	mDirectory = Directory;
 	mFilename = FileName;
-	mRaster = new_Float2DArray(mRows,mCols);	
+	cout << "In cRaster non-default constructor, before new_Float2DArray" << endl;
+	mRaster = new_Float2DArray(mRows,mCols);
+	cout << "In cRaster non-default constructor, before ReadFile" << endl;	
 	ReadFile(Directory, FileName,filetype,mProjType,
 							Proj4String,CentMer,mSouth,
 							mMin,mMax);
@@ -271,8 +273,9 @@ bool cRaster::ReadFile(string Directory,
 	}
 	else if (filetype == GDALFILE) // GDAL file 
 	{
-//		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE " << endl;
+		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE ...)" << endl;
 		cGDAL MyRaster;
+		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE ...) before cGDAL.openFile" << endl;
 		msgs = MyRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax);
 	}

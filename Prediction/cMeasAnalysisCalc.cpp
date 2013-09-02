@@ -1198,7 +1198,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			smallStepSize = 0;
 			StepSize = 0.0004;
  			ExhaustiveSearch=true;
-//			stop = true;
+			stop = true;
 		}	
 		
 		if (!stop)
@@ -1275,9 +1275,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			{
 				if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 					mPathLoss.mClutter.mClutterTypes[i].sHeight 
-						-= CHeightDiff[i]/SizeOfDiff*TempStepSize;
+						-= CHeightDiff[i]/SizeOfDiff*TempStepSize
 //														*mNumMeas/mClutterCount[i];
-//														*sqrt(TotNum/mClutterCount[i]);
+														*sqrt(TotNum/mClutterCount[i]);
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 			}
 //			cout << endl;
@@ -1333,7 +1333,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
 							-= CHeightDiff[i]/SizeOfDiff*TempStepSize
 //														*mNumMeas/mClutterCount[i];
-														*TotNum/mClutterCount[i];
+													*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -1354,7 +1354,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
 								+= CHeightDiff[i]/SizeOfDiff*2*TempStepSize
 //														*mNumMeas/mClutterCount[i];
-														*TotNum/mClutterCount[i];
+													*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -1468,7 +1468,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		} // if TempStepSize groot genoeg.
 
 //		cout << "SizeOfDiff " << SizeOfDiff << endl;
-		stop = (stop)||(((100*fabs((cost - costMin)/costMin)) < 0.005)&&(giveUP>3)&&(StepSize<0.001));
+//		stop = (stop)||(((100*fabs((cost - costMin)/costMin)) < 0.005)&&(giveUP>3)&&(StepSize<0.001));
 		for (i=1;i<mPathLoss.mClutter.mNumber; i++)
 		{
 			if (mPathLoss.mClutter.mClutterTypes[i].sHeight < 0)
@@ -1517,8 +1517,8 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			if (cost < costMin)
 			{
 				costMin = cost;
-				stuck=0;
-				giveUP=0;
+//				stuck=0;
+//				giveUP=0;
 				mPathLoss.mClutter.UpdateHeightsWidths();
 			}
 			TempMinIndex=0;
@@ -1538,7 +1538,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
 			cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
 			cout << "	CorrC: " << CorrC << endl;
-			stuck=0;
+//			stuck=0;
 			giveUP++;
 			StepResult[NumStop] = cost;
 		}

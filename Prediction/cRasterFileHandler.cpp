@@ -660,7 +660,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 	PointString += ",";
 	PointString += temp;
 	PointString += ")'"; 
-	cout << "cRasterFileHandler::AddRaster: mFileSetOrder.size() = " << mFileSetOrder.size() << endl;
+//	cout << "cRasterFileHandler::AddRaster: mFileSetOrder.size() = " << mFileSetOrder.size() << endl;
 	i=0;
 	
 	while((i<mFileSetOrder.size())&&(!(RasterFound)))
@@ -697,8 +697,8 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 //						<< mFileSetOrder.size() << "	i=" << i << endl;
 //					cout << "Not finding point ..."; 
 //					NotFoundPoint.Display();
-//					cout << "Found point ... ";
-//					point.Display();
+					cout << "Found point ... ";
+					point.Display();
 				}
 				NotFoundCount = 0;
 				RasterFound = true;
@@ -736,12 +736,12 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 					NewFound = false;
 				}
 				else NotFoundPoint = point; 
-				if (NotFoundCount>100000)
+				if (NotFoundCount>1000000)
 				{
 //					cout << " mFileSetOrder.size() = "; 
 //					cout << mFileSetOrder.size() << "	i=" << i << endl;
-//					cout << "Not finding point ... ";
-//					point.Display();
+					cout << "Not finding point ... ";
+					point.Display();
 					NotFoundCount = 0;
 					NewFound = false;
 				}

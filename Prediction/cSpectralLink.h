@@ -77,6 +77,8 @@ private:
 	double			mPlotResolution;///< Hz
 	short int		mDEMsource;		///< Description
 	short int		mClutterSource;	///< Description
+	unsigned 		mClutterClassGroup;
+	cClutter		mClutterset;
 	cRasterFileHandler 	*mDEM;		///< Description
 	bool			mUseClutter;	///< Description
 	cRasterFileHandler 	mClutter;	///< Description
@@ -94,8 +96,8 @@ private:
 	double 			mRxBearing;		///< Recommended bearing of receiving antenna
 	double 			mTxElevation;	///< True height of Tx site
 	double 			mRxElevation;	///< True height of Rx site
-	float 			mPropLoss;		///< Array storing the propagation loss at each point along the profile
-	float 			mRxLev;		///< Array storing the propagation loss at each point along the profile
+	float 			mPropLoss;		///< The propagation loss at the end point
+	float 			mRxLev;		///< The propagation loss at each point along the profile
 };
 
 }

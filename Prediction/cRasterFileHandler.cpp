@@ -509,7 +509,7 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	if (Rows*Cols==0)
 	{
 		string err = "Empty Raster ... Rows of Cols is 0 ";
-		QRAP_ERROR(err.c_str());
+//		QRAP_ERROR(err.c_str());
 		cout << "No DEM available for this area" << endl;
 		return false;
 	}
@@ -565,7 +565,7 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	else 
 	{
 		string err = "No DEM available for this area ";
-		QRAP_ERROR(err.c_str());
+//		QRAP_ERROR(err.c_str());
 		cout << "No DEM available for this area" << endl;
 		return false;
 	}

@@ -51,9 +51,10 @@ cCutSet::~cCutSet()
 //********************************************
 void cCutSet::on_pushButtonBrowse1_clicked()
 {
-		mFiles.clear();
-		mBinDir = QFileDialog::getExistingDirectory(this,"Please select a directory");
-		lineEditDirectory->setText(mBinDir);
+	mFileType = comboBoxFileType1->currentText();
+	mFiles.clear();
+	mBinDir = QFileDialog::getExistingDirectory(this,"Please select a directory");
+	lineEditDirectory->setText(mBinDir);
 }
 
 
@@ -61,6 +62,7 @@ void cCutSet::on_pushButtonBrowse1_clicked()
 void cCutSet::on_pushButtonCut1_clicked()
 {
 	cout << "Cutting......."<<endl;
+	mFileType = comboBoxFileType1->currentText();
 	try
 	{
 		if ((tableWidgetFileSets1->rowCount() > 0) && (tableWidgetFileSets2->rowCount()>0))
@@ -73,7 +75,7 @@ void cCutSet::on_pushButtonCut1_clicked()
 			int BinRow = tableWidgetFileSets2->currentRow();
 		
 			cout << "Setting up mocking vals..."<<endl;
-		//Values are not used....
+			//Values are not used....
 			mCentMer =-1;
 			mFiles.clear();
 			mCount =0;
@@ -85,7 +87,7 @@ void cCutSet::on_pushButtonCut1_clicked()
 			mSource = (short int)ID->text().toDouble();
 			mBin = (short int)Bin->text().toDouble();
 			cout << "Setting up thread..."<<endl;
-			CLoadThread->Set(mSource,  //Source Index
+/*			CLoadThread->Set(mSource,  //Source Index
 					mBin,  //Binary Index (Actually - Used in old stuff)
 					mType,  //GeoType
 					mCentMer, 
@@ -93,7 +95,7 @@ void cCutSet::on_pushButtonCut1_clicked()
 					mFiles, // List of Files
 					mBinDir, // Directory of Source Files
 					mCount, // File Count
-					mFileType, // QString File Type (GDAL<BIN<ORT)
+					mFileType, // QString File Type (DEM or Clutter)
 					true); 
 			cout << "Initialising..."<<endl;		
 			Set(0,"Initialising.....");
@@ -101,6 +103,14 @@ void cCutSet::on_pushButtonCut1_clicked()
 			connect(CLoadThread,SIGNAL(Finished()),this,SLOT(Finished()));
 			cout << "Starting Thread..."<<endl;
 			CLoadThread->start();
+*/
+			
+			bool Interpolate;
+			short int FileRule=mIFileType;
+			Interpolate = (1==FileRule);
+			
+			cLoadFile Rasters(mSource,mBin,mBinDir.toStdString());
+			Rasters.CutCurrentSet(mSource,mBin,Interpolate,FileRule);
 		}
 	}
 	catch(const exception &e) 
@@ -134,6 +144,7 @@ void cCutSet::Finished()
 //******************************************************
 void cCutSet::on_comboBoxFileType1_currentIndexChanged()
 {
+	mFileType = comboBoxFileType1->currentText();
 	LoadData();
 }
 
@@ -164,6 +175,8 @@ void cCutSet::LoadData()
 {
 	disconnect(tableWidgetFileSets1,SIGNAL(currentCellChanged ( int , int , int , int )),this,SLOT(on_tableWidgetFileSets1_currentCellChanged ( int, int, int, int)));
 	
+	cout << comboBoxFileFormat1->currentText().toStdString() << endl;
+	mFileType = comboBoxFileType1->currentText();
 	while (tableWidgetFileSets1->rowCount() > 0)
 	{
 			tableWidgetFileSets1->removeRow(0);
@@ -172,6 +185,12 @@ void cCutSet::LoadData()
 	query += "WHERE derivedbinary=FALSE AND ";
 	query += "filetype = '";
 	query += comboBoxFileType1->currentText().toStdString();
+	cout << comboBoxFileType1->currentText().toStdString() << endl;
+
+	if (!strcmp("DEM", comboBoxFileType1->currentText().toStdString().c_str()))
+		mIFileType = 1;
+	else 	mIFileType = 2;
+	
 	query += "'";
 	if (comboBoxFileFormat1->currentText() != "All")
 		{
@@ -243,6 +262,7 @@ void cCutSet::LoadData()
 	{
 		
 	}
+	mFileType = comboBoxFileType1->currentText();
 	
 }
 
@@ -317,6 +337,7 @@ void cCutSet::on_tableWidgetFileSets1_currentCellChanged ( int currentRow, int c
 		}
 		if (tableWidgetFileSets2->rowCount() > 0)
 		{
+			mFileType = comboBoxFileType1->currentText();
 			tableWidgetFileSets2->setCurrentCell(0,0);
 			pushButtonCut1->setEnabled(true);
 		}

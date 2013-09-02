@@ -271,10 +271,10 @@ bool cSpectralLink::GetDBinfo(tFixed &Inst)
 	query +="rxsensitivity,startfreq,spacing,channel,";
 	query+= "txantpatternkey,txbearing,txmechtilt,rxantpatternkey,";
 	query+="rxbearing,rxmechtilt,txantennaheight,rxantennaheight ";
-	query+= "FROM radioinstallation CROSS JOIN cell ";
+	query+= "FROM radioinstallation FULL JOIN cell ";
 	query+= "ON cell.risector=radioinstallation.id ";
-	query+= "CROSS JOIN frequencyallocationlist ";
-	query += "ON cell.id=ci CROSS JOIN technology ";
+	query+= "FULL JOIN frequencyallocationlist ";
+	query += "ON cell.id=ci FULL JOIN technology ";
 	query +="ON radioinstallation.techkey=technology.id ";
 	query += "WHERE radioinstallation.id =";
 	query += text;
@@ -337,11 +337,11 @@ bool cSpectralLink::CalcDistribution()
 	pqxx::result r;
 	char *text =new char[33];
 	string query = "SELECT offsets,values,numpoints ";
-	query += "FROM radioinstallation CROSS JOIN ";
-	query += "(technology CROSS JOIN envelopes ";
+	query += "FROM radioinstallation FULL JOIN ";
+	query += "(technology FULL JOIN envelopes ";
 	query += "ON envelopes.techkey = technology.id) ";
 	query += " ON radioinstallation.techkey = technology.id ";
-	query += "WHERE radioinstallation.id ="; 
+	query += "WHERE radioinstallation.id =";
 	gcvt(mTxInst.sInstKey,8,text);
 	query+=text;
 	query+=";";

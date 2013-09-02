@@ -173,7 +173,7 @@ int main (int argc, char **argv)
 	Meas.OptimiseModelCoefD(1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
-
+*/
 
 	if (!gDb.PerformRawSql(query))
 	{

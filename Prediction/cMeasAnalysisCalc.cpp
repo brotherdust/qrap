@@ -1193,7 +1193,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		{
 			cout << "Starting Exhaustive search " << endl;
 			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
-				DeltaH[i] =1;
+				DeltaH[i] =-1;
 			if (0<mClutterCount[i]) Change[i] =true;
 			smallStepSize = 0;
 			StepSize = 0.0004;
@@ -1481,7 +1481,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				else Passed[i]=true;
 			}
 			Up[i] = (CHeightDiff[i]<0);
-			stop = stop&&Passed[i];
+//			stop = stop&&Passed[i];
 		}
 
 		NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);

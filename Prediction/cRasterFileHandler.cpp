@@ -705,6 +705,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 				FileName = r[j]["filename"].c_str();
 				Directory = r[j]["location"].c_str();
 				Type = r[j]["fileformat"].c_str();
+
 				if (Type=="BINFILE") 		filetype=BINFILE;
 				else if (Type=="NESFILE") 	filetype=NESFILE;
 				else if (Type=="GRASSFILE")	filetype=GRASSFILE;

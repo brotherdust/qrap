@@ -271,18 +271,18 @@ bool cSpectralLink::GetDBinfo(tFixed &Inst)
 	query +="rxsensitivity,startfreq,spacing,channel,";
 	query+= "txantpatternkey,txbearing,txmechtilt,rxantpatternkey,";
 	query+="rxbearing,rxmechtilt,txantennaheight,rxantennaheight ";
-	query+= "FROM radioinstallation FULL JOIN cell ";
-	query+= "ON cell.risector=radioinstallation.id ";
+	query+= "FROM radioinstallation_view FULL JOIN cell ";
+	query+= "ON cell.risector=radioinstallation_view.id ";
 	query+= "FULL JOIN frequencyallocationlist ";
 	query += "ON cell.id=ci FULL JOIN technology ";
-	query +="ON radioinstallation.techkey=technology.id ";
-	query += "WHERE radioinstallation.id =";
+	query +="ON radioinstallation_view.techkey=technology.id ";
+	query += "WHERE radioinstallation_view.id =";
 	query += text;
 	query +=";";
 
 	if (!gDb.PerformRawSql(query))
 	{
-		string err ="In cLink: Database Select on tables radioinstallation ";
+		string err ="In cLink: Database Select on tables radioinstallation_view ";
 		err +="and frequencyallocation failed: Query:";
 		err+=query;
 		QRAP_ERROR(err.c_str());

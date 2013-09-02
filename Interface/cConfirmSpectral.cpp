@@ -60,10 +60,10 @@ bool cConfirmSpectral::SetPoints(QList<QgsPoint> Points)
 		string query;
 		pqxx::result SitesIn;
 		query = "SELECT siteid,sitename,ST_AsText(location) AS location,status,";
-		query += " sector,radioinstallation.id AS radinst,"; 
+		query += " sector,radioinstallation_view.id AS radinst,"; 
 		query += " techkey, technologytype,groundheight,status,project,flagx,flagz, ";
 		query += " maxrange as radius";
-		query += " FROM radioinstallation cross join technology cross join site ";
+		query += " FROM radioinstallation_view cross join technology cross join site_view ";
 		query += " WHERE techkey=technology.id AND location ";
         	query +="@ ST_GeomFromText('POLYGON((";
 	        for (int i = 0 ; i < Points.size();i++)
@@ -86,7 +86,7 @@ bool cConfirmSpectral::SetPoints(QList<QgsPoint> Points)
   		query += " ";
 		gcvt(Points[0].y(),10,text);
         	query += text;
-        	query += "))',4326) AND siteid = site.id";	
+        	query += "))',4326) AND siteid = site_view.id";	
 		if (!gDb.PerformRawSql(query))
 		{
 			cout << "Database Select on sites table failed"<< endl;

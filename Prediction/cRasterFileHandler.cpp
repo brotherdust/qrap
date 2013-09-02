@@ -737,7 +737,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 					NewFound = false;
 				}
 				else NotFoundPoint = point; 
-				if (NotFoundCount>1000000)
+				if (NotFoundCount>100000)
 				{
 //					cout << " mFileSetOrder.size() = "; 
 //					cout << mFileSetOrder.size() << "	i=" << i << endl;

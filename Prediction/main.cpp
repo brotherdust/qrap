@@ -64,11 +64,11 @@ int main (int argc, char **argv)
 	}
 
 	Meas.mPathLoss.mClutter.Reset(1);
-//	Meas. LoadMeasurements(0,0,4);
+//	Meas. LoadMeasurements(0,0,0);
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 //	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-//	Meas.OptimiseHeights(4);
+//	Meas.OptimiseHeights(0);
 
 //	Meas.OptimiseSeekWidth();
 
@@ -90,11 +90,12 @@ int main (int argc, char **argv)
 	cout<< "Voor2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas. LoadMeasurements(0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Voor1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
+	cout<< "Voor1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl; 
+
 	Meas. LoadMeasurements();
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-
+*/
 
 	Meas. LoadMeasurements();
 	Meas.OptimiseModelCoefAllTotal(0);
@@ -136,7 +137,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nao0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 
-
+/*
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -187,7 +188,7 @@ int main (int argc, char **argv)
 	Meas.OptimiseModelCoefD(2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nacb2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
-*/
+
 
 	if (!gDb.PerformRawSql(query))
 	{
@@ -202,7 +203,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach3" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-/*
+
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;

@@ -823,7 +823,7 @@ void QRap::GetLink(double lat, double lon)
 	query += ")',4326)";
 	if (!gDb.PerformRawSql(query))
 	{
-		cout << "Database link select failed"<< endl;
+		cout << "In QRap::GetLink(...)  Database link select failed"<< endl;
 	}
 	else
 	{
@@ -831,6 +831,7 @@ void QRap::GetLink(double lat, double lon)
 		gDb.GetLastResult(Li);
 		if (Li.size()>0)
 		{
+			cout << "In QRap::GetLink(...) Database link select suceeded" << endl;
 			int ID =(int)atof(Li[0]["id"].c_str()) ;
 			int TxID =(int)atof(Li[0]["txinst"].c_str()) ;
 			int RxID = (int)atof(Li[0]["rxinst"].c_str());
@@ -839,8 +840,10 @@ void QRap::GetLink(double lat, double lon)
 			string name = Li[0]["linkname"].c_str();
 			cout << name << endl;
 			cConfirmLink *ConfirmLink = new cConfirmLink(mQGisIface->mainWindow(), QgisGui::ModalDialogFlags);
+			cout << "In QRap::GetLink(...) After constructor " << endl;
 			if (ConfirmLink->SetOldLink(ID,TxID,RxID,name,frequency, kfactor))
 			{
+				cout << "In QRap::GetLink(...) SetOldLink success " << endl;
 				if (ConfirmLink->exec()==1)
 				{
 					cLinkAnalysis *Plot = new cLinkAnalysis(mQGisIface->mainWindow(), QgisGui::ModalDialogFlags);

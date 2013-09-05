@@ -77,10 +77,12 @@ void cLinkAnalysis::DoAndSetUpDisplay(eOutputUnits Units, bool Downlink, double 
 	mUseClutter = UseClutter;
 	double maxH, minH;
 
-	cout << " mTxID: " << mTxID << "	mRxID: " << mRxID << endl;
+//	cout << " mTxID: " << mTxID << "	mRxID: " << mRxID << endl;
 	mLink.SetLink(Units, Downlink, Frequency, kFactor, mPlotResolution,
 			DEMsource, ClutterSource, mUseClutter, mTxID, mRxID);
+//	cout << "In cLinkAnalysis::DoAndSetUpDisplay( ... ) before mLink.DoLink()" << endl;
 	mLink.DoLink();
+//	cout << "In cLinkAnalysis::DoAndSetUpDisplay( ... ) after mLink.DoLink() before mLink.GetLinkInfo(...)" << endl;
 	mLink.GetLinkInfo(mSize, mInterPixDist, 
 			mMinClearance, mFrequency,
 			mTxElevation, mRxElevation, 
@@ -194,6 +196,7 @@ void cLinkAnalysis::DoAndSetUpDisplay(eOutputUnits Units, bool Downlink, double 
     	mRxLev->setPen(QPen(Qt::darkMagenta));
     	mRxLev->attach(qwtBTLPlot);
  
+//	cout << "In cLinkAnalysis::DoAndSetUpDisplay( ... ) before reassigning " << endl;
 // The next code essentially translate the floats in cLink to doubles for the qwtplot     
     	double *Eff = new double[mSize];
     	double *Los = new double[mSize];

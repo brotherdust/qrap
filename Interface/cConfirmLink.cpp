@@ -37,8 +37,10 @@ cConfirmLink::cConfirmLink(): QDialog()
 cConfirmLink::cConfirmLink(QWidget* parent, Qt::WFlags fl)
 : QDialog(parent, fl)
 {
+	cout << "In cConfirmLink::cConfirmLink(...) non-Default constructor" << endl; 
 	setupUi(this);
 	this->setModal(true);
+	cout << "In cConfirmLink::cConfirmLink(...) non-Default constructor exiting" << endl;
 }
 
 //***************************************************************/
@@ -372,6 +374,7 @@ void cConfirmLink::on_btnOk_clicked()
 //*******************************************************************************
 bool cConfirmLink::SetOldLink(int ID, int RxID,int TxID, string Name, double frequency, double kfactor)
 {
+	cout << "In cConfirmLink::SetOldLink( ... ) entering" << endl;
 	mLinkID = ID;
 	char Tx[33];
     	char Rx[33];
@@ -380,11 +383,11 @@ bool cConfirmLink::SetOldLink(int ID, int RxID,int TxID, string Name, double fre
 	string query;
 
 	pqxx::result SiteCloseby;
-	query = "SELECT distinct radioinstallation_view.id AS rid,site.sitename,technologytype, ";
-	query += "radioinstallation_view.techkey AS ttk ";
-	query += "FROM radioinstallation_view LEFT OUTER JOIN technology ON (radioinstallation_view.techkey=technology.id)  ";
+	query = "SELECT distinct radioinstallation.id AS rid,site.sitename,technologytype, ";
+	query += "radioinstallation.techkey AS ttk ";
+	query += "FROM radioinstallation LEFT OUTER JOIN technology ON (radioinstallation.techkey=technology.id)  ";
 	query += "CROSS JOIN site WHERE (siteid = site.id) AND ";
-    	query += "radioinstallation_view.id = ";
+    	query += "radioinstallation.id = ";
     	query += Tx;
     	query += ";";
 	
@@ -395,9 +398,11 @@ bool cConfirmLink::SetOldLink(int ID, int RxID,int TxID, string Name, double fre
 	}
 	else
 	{
+		cout << "In cConfirmLink::SetOldLink( ... ) query Tx success" << endl;
 		gDb.GetLastResult(SiteCloseby);
 		if (SiteCloseby.size())
 		{
+			cout << "In cConfirmLink::SetOldLink( ... ) Closeby Tx query success" << endl;
 			TxIDTable->setRowCount(1);
 			QRadioButton *Enabled = new QRadioButton(SiteCloseby[0]["sitename"].c_str());
 			Enabled->setChecked(true);
@@ -405,14 +410,19 @@ bool cConfirmLink::SetOldLink(int ID, int RxID,int TxID, string Name, double fre
 			TxIDTable->setItem(0,1,new QTableWidgetItem(SiteCloseby[0]["technologytype"].c_str()));
 			TxIDTable->setItem(0,2,new QTableWidgetItem(SiteCloseby[0]["rid"].c_str()));
 		}
-		else return false;
+		else 
+		{
+			cout << "In cConfirmLink::SetOldLink( ... ) query Tx empty" << endl;
+			close();
+			return false;
+		}
 	}
 
-	query = "SELECT distinct radioinstallation_view.id AS rid,site.sitename,technologytype, ";
-	query += "radioinstallation_view.techkey AS ttk ";
-	query += "FROM radioinstallation_view LEFT OUTER JOIN technology ON (radioinstallation_view.techkey=technology.id)  ";
+	query = "SELECT distinct radioinstallation.id AS rid,site.sitename,technologytype, ";
+	query += "radioinstallation.techkey AS ttk ";
+	query += "FROM radioinstallation LEFT OUTER JOIN technology ON (radioinstallation.techkey=technology.id)  ";
 	query += "CROSS JOIN site WHERE (siteid = site.id) AND ";
-	query += "radioinstallation_view.id = ";
+	query += "radioinstallation.id = ";
 	query += Rx;
 	query += ";";
 	if (!gDb.PerformRawSql(query))
@@ -425,6 +435,7 @@ bool cConfirmLink::SetOldLink(int ID, int RxID,int TxID, string Name, double fre
 		gDb.GetLastResult(SiteCloseby);
 		if (SiteCloseby.size())
 		{
+			cout << "In cConfirmLink::SetOldLink( ... ) Closeby Rx query success" << endl;
 			RxIDTable->setRowCount(1);
 			QRadioButton *Enabled = new QRadioButton(SiteCloseby[0]["sitename"].c_str());
 			Enabled->setChecked(true);
@@ -432,7 +443,12 @@ bool cConfirmLink::SetOldLink(int ID, int RxID,int TxID, string Name, double fre
 			RxIDTable->setItem(0,1,new QTableWidgetItem(SiteCloseby[0]["technologytype"].c_str()));
 			RxIDTable->setItem(0,2,new QTableWidgetItem(SiteCloseby[0]["rid"].c_str()));
 		}
-		else return false;
+		else
+		{
+			cout << "In cConfirmLink::SetOldLink( ... ) query Rx empty" << endl;
+			close();
+			return false;
+		}
 	}
 	
 	nameEdit->setText(QApplication::translate("ConfirmLink", Name.c_str(), 0, QApplication::UnicodeUTF8));	
@@ -503,5 +519,6 @@ bool cConfirmLink::SetOldLink(int ID, int RxID,int TxID, string Name, double fre
 		
 	frequencySpinBox->setValue(frequency);
 	kFactorIntSpinBox->setValue(kfactor);
+	cout << "In cConfirmLink::SetOldLink( ... ) exiting." << endl;
 	return true;
 }

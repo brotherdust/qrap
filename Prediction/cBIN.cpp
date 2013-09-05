@@ -46,21 +46,23 @@ bool cBIN::openFile(Float2DArray &Raster,string Directory, string FileName,
 {
 	char *binfname;
 	binfname = new char[100];
-	char *QRap;
-	QRap = new char[100];
+//	char *QRap;
+//	QRap = new char[100];
 	ifstream NESbinfile;			// DTM data file
  	int central;			// central meridian of data co-ordinates
  	double s_lat, n_lat, e_lon, w_lon;  // boundaries of file data
  	unsigned i,j;                            // loop variables
 	sprintf(binfname,"%s/%s",Directory.c_str(),FileName.c_str());
+//	cout << "In cBIN::openFile( ... ) before opening file" << endl; 
 	NESbinfile.open(binfname,  ios::in | ios::binary);
+//	cout << "In cBIN::openFile( ... ) after opening file" << endl; 
 	#ifdef _MSC_VER
 	if (!NESbinfile.is_open())		// Binary doesn't file exists
-    #else
-    if (!NESbinfile)
-    #endif
+	#else
+    	if (!NESbinfile)
+    	#endif
 	{
-    	string err = "Trouble opening BIN File";
+    		string err = "Trouble opening BIN File";
 		QRAP_WARN(err.c_str());
 		
 		cout << "NOT OPENED" <<endl;
@@ -100,13 +102,15 @@ bool cBIN::openFile(Float2DArray &Raster,string Directory, string FileName,
 //	ew_res = 0;
 	min = 0; // Need to write this in...
 	max = 0; // Need to write this in...
-	Proj4 = NULL;
+//	Proj4 = NULL;
 	//pj_free(Proj4);
 	//Proj4 = pj_init_plus(QRap);
 	//cout << pj_get_def(Proj4,0) << endl;
 	// load the DTM data into the array
+//	cout << "In cBIN::openFile( ... ) before allocating new Raster memory" << endl;
 	delete_Float2DArray(Raster);
 	Raster = new_Float2DArray(rows, cols);
+//	cout << "In cBIN::openFile( ... ) AFTER allocating new Raster memory" << endl;
 	//trace("allocated memory");
 	for (i=0; i<rows; i++)
 	{
@@ -115,7 +119,7 @@ bool cBIN::openFile(Float2DArray &Raster,string Directory, string FileName,
 	}
 //	cout << "Bin Done" << endl;
 	delete [] binfname;
-	delete [] QRap;
+//	delete [] QRap;
 	return true;
 }
 
@@ -134,7 +138,8 @@ bool cBIN::writeFile(Float2DArray &Raster,
 				double EWRes)
 {
 	bool South;
-	char binfname[100];
+	char *binfname;
+	binfname = new char[100];
 //	char QRap[100];
 	ifstream NESbinfile,NESfile;			// DTM data file
  	ofstream NESoutfile;
@@ -188,9 +193,11 @@ bool cBIN::writeFile(Float2DArray &Raster,
 				
 		}
 //		cout << endl;
+		delete [] binfname;
 		NESoutfile.close();
 		return true; 
 	}
+	delete [] binfname;
 	return false;
 }
 

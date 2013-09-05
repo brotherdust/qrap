@@ -52,6 +52,7 @@ cLink::cLink()
 	mTrueHeightGrid1 = new float[2];
 	mTrueHeightGrid2 = new float[2];
 	mTrueHeightGrid3 = new float[2];
+	mClutterProfile = new int[2];
 	mUnits = dBm;
 	mFrequency = 2400;
 	mkFactor = 1;
@@ -119,6 +120,7 @@ cLink::~cLink()
 	delete [] mTrueHeightGrid1;
 	delete [] mTrueHeightGrid2;
 	delete [] mTrueHeightGrid3;
+	delete [] mClutterProfile;
 }
 
 //***************************************************************************
@@ -143,6 +145,7 @@ const cLink & cLink::operator=(const cLink &right)
 	delete [] mTrueHeightGrid1;
 	delete [] mTrueHeightGrid2;
 	delete [] mTrueHeightGrid3;
+	delete [] mClutterProfile;
 
 	mClutterset		= right.mClutterset;
 	mLength			= right.mLength;
@@ -183,6 +186,7 @@ const cLink & cLink::operator=(const cLink &right)
 	mTrueHeightGrid1 = new float[mLength];
 	mTrueHeightGrid2 = new float[mLength];
 	mTrueHeightGrid3 = new float[mLength];
+	mClutterProfile = new int[mLength];
 
 	for(i=0;i<mLength;i++)
 	{
@@ -199,6 +203,7 @@ const cLink & cLink::operator=(const cLink &right)
 		*(mTrueHeightGrid1) = *(right.mTrueHeightGrid1+i);
 		*(mTrueHeightGrid2) = *(right.mTrueHeightGrid2+i);
 		*(mTrueHeightGrid3) = *(right.mTrueHeightGrid3+i);
+		*(mClutterProfile) = *(right.mClutterProfile+i);
 	}
 	return (*this);
 }/* cLink Assignment */
@@ -317,7 +322,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 		return false;
 
 	int j;
-	float *Tilt;
+	
 	double EIRP, LinkOtherGain, TxAntValue=0.0, RxAntValue=0.0;
 
 	bool AfterReceiver = (mUnits!=dBWm2Hz) && (mUnits!=dBWm2);	
@@ -345,6 +350,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	}
 	else LinkOtherGain = EIRP;
 	
+	float *Tilt;
 	Tilt = new float[Length];
 	delete [] mRxLev;
 	mRxLev = new float[Length];
@@ -362,13 +368,16 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	if (mUseClutter)
 		mClutter.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution, Clutter);
 
+	cout << "cLink::DoLink( ... ) before Initialize" << endl; 
 	Initialize(DEM,Clutter);
 	SetEffProfile();	//Calculates the effective profile
 	SetLineOfSight();
 	SetFresnelClear();
-		
+	
+	cout << "cLink::DoLink( ... ) before PathLoss.setParameters" << endl; 	
 	PathLoss.setParameters(mkFactor,mFrequency,mTxInst.sTxHeight,mRxInst.sRxHeight,
 				mUseClutter,mClutterClassGroup);
+	cout << "cLink::DoLink( ... ) After PathLoss.setParameters" << endl;
 	j=(Length-1);
 	mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss);
 	mTxBearing = mTxInst.sSitePos.Bearing(mRxInst.sSitePos);
@@ -377,6 +386,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	else	
 		mRxBearing = mTxBearing - 180.0;
 	PathLoss.FindElevAngles(mTxTilt,mRxTilt);
+	cout << "cLink::DoLink( ... ) before mPropLoss loop" << endl;
 	for (j=(Length-1); j>0 ; j--)
 	{
 		mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss);
@@ -386,10 +396,13 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 		if (mUseClutter) Clutter.ReduceSize();
 		DEM.ReduceSize();
 	}
+	cout << endl;
 	mRxLev[0]=mRxLev[1];
 
 	mPathLossEnd = mPropLoss[mLength-1];
+//	cout << "cLink::DoLink( ... ) before delete [] Tilt" << endl;
 	delete [] Tilt;
+//	cout << "cLink::DoLink( ... ) exiting" << endl;
 	return true;
 }
 
@@ -408,6 +421,7 @@ void cLink::Initialize(const cProfile &DEMProfile,const cProfile &ClutterProfile
 	mTxElevation = mFlatProfile[0];
 	mRxElevation = mFlatProfile[mLength-1];
 
+//	cout << "In cLink::Initialize(...) before if mUseClutter" << endl;
 	if (mUseClutter)
 	{
 		delete [] mClearance;		//Just temporary (mis)using mClearance
@@ -421,6 +435,7 @@ void cLink::Initialize(const cProfile &DEMProfile,const cProfile &ClutterProfile
 			mFlatProfile[i] += mClutterset.mClutterTypes[mClutterProfile[i]].sHeight;
 	}
 
+//	cout << "In cLink::Initialize(...) before delete []'s" << endl;
 	delete [] mRxLev;
 	delete [] mPropLoss;
     	delete [] mEffProfile;
@@ -434,6 +449,7 @@ void cLink::Initialize(const cProfile &DEMProfile,const cProfile &ClutterProfile
 	delete [] mTrueHeightGrid2;
 	delete [] mTrueHeightGrid3;
 
+//	cout << "In cLink::Initialize(...) before delete []'s" << endl;
 	mPropLoss    	= new float[mLength];
 	mRxLev    	= new float[mLength];
 	mEffProfile  	= new float[mLength];
@@ -462,6 +478,7 @@ void cLink::Initialize(const cProfile &DEMProfile,const cProfile &ClutterProfile
 		mTrueHeightGrid2[i]	= 0.0;
 		mTrueHeightGrid3[i]	= 0.0;
 	}
+//	cout << "In cLink::Initialize(...) exiting" << endl;
 }/* end CLink::Initialize */
 
 
@@ -824,7 +841,7 @@ void cLink::SaveLink(string &LinkName, int &LinkID)
 	if (!LinkID)
 		query += " VALUES";
 	else
-		query = " = ";
+		query += " = ";
 	query += "(now(),'";
 	query += LinkName;
 	query += "', ";

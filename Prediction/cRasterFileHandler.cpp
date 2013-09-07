@@ -619,7 +619,7 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 					Data[i][j] = mCurrentRasters[Current]->GetValue(Point,mSampleMethod);
 					mCurrentRasters[Current]->mUsed = true;
 				}
-				else Data[i][j]=OUTOFRASTER;
+				else Data[i][j]=0;
 			}
 			else mCurrentRasters[Current]->mUsed = true;
 		}

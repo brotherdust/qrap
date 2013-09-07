@@ -273,9 +273,9 @@ bool cRaster::ReadFile(string Directory,
 	}
 	else if (filetype == GDALFILE) // GDAL file 
 	{
-		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE ...)" << endl;
+//		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE ...)" << endl;
 		cGDAL MyRaster;
-		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE ...) before cGDAL.openFile" << endl;
+//		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE ...) before cGDAL.openFile" << endl;
 		msgs = MyRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax);
 	}

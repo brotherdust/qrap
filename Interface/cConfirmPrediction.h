@@ -52,8 +52,10 @@
 
 
 //QGIS includes
-#include <qgssymbol.h>
+#include <qgssymbolv2.h>
+#include <qgsrendererv2.h>
 #include <qgsmaprenderer.h>
+#include <qgsrasterrenderer.h>
 #include <qgsmapcanvas.h>
 #include <qgspoint.h>
 #include <qgsmaplayerregistry.h>
@@ -61,13 +63,11 @@
 #include <qgisinterface.h>
 #include <qgisgui.h>
 #include <qgsapplication.h>
-#include <qgssymbol.h>
-#include <qgsmapcanvas.h>
-#include <qgsrenderer.h>
 #include <qgslogger.h>
 #include <qgslabelattributes.h>
 #include <qgslabel.h>
 #include <qgscolorrampshader.h>
+#include <qgssinglebandpseudocolorrenderer.h>
 #include <qgsrasterlayer.h>
 
 using namespace std;

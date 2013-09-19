@@ -906,17 +906,19 @@ void cConfirmPrediction::on_btnDo_clicked()
 	File +="/"; //\TODO: Windows....
 	File+=OutputFileForResult.c_str();
 	QgsRasterLayer *mRasterLayerO = mQGisIface->addRasterLayer(File);
+	QgsRasterTransparency *Deurskynend= new QgsRasterTransparency();
 	QgsRasterTransparency::TransparentSingleValuePixel myTransparentPixel; // setting null value transparancy
 	QList<QgsRasterTransparency::TransparentSingleValuePixel> myTransparentSingleValuePixelList;// setting null value transparancy
 	myTransparentPixel.percentTransparent = 100.00;// setting null value transparancy
-	myTransparentPixel.pixelValue = -9999;// setting null value transparancy
+	myTransparentPixel.min = -10000;// setting null value transparancy
+	myTransparentPixel.max = -9998;// setting null value transparancy
 	myTransparentSingleValuePixelList.append(myTransparentPixel);// setting null value transparancy
-	mRasterLayerO->rasterTransparency()->setTransparentSingleValuePixelList(myTransparentSingleValuePixelList);// setting null value transparancy
-	mRasterLayerO->setTransparency(200); // value from 0 - 255 for global map transparancy
-	mRasterLayerO->setColorShadingAlgorithm(QgsRasterLayer::ColorRampShader); // setup of the colour settings
-	mRasterLayerO->setDrawingStyle(QgsRasterLayer::SingleBandPseudoColor);
-	QgsColorRampShader* myRasterShaderFunction =  (QgsColorRampShader*)mRasterLayerO->rasterShader()->rasterShaderFunction();
-    	if(myRasterShaderFunction)
+	Deurskynend->setTransparentSingleValuePixelList( myTransparentSingleValuePixelList );
+
+  	QgsRasterShader* rasterShader = new QgsRasterShader();
+  	QgsColorRampShader* colorRampShader = new QgsColorRampShader();
+  	colorRampShader->setColorRampType( QgsColorRampShader::INTERPOLATED );
+    	if(colorRampShader)
     	{
       		//iterate through mColormapTreeWidget and set colormap info of layer
 		pqxx::result res;
@@ -1010,12 +1012,18 @@ void cConfirmPrediction::on_btnDo_clicked()
 				}// for number of inst
    	   		}//end found db info for primary/secondary servers
 		}// end Database success
-    		myRasterShaderFunction->setColorRampItemList(mColorRampItems);
+    		colorRampShader->setColorRampItemList(mColorRampItems);
   	
       		if (discrete)
-      			myRasterShaderFunction->setColorRampType(QgsColorRampShader::DISCRETE);
+      			colorRampShader->setColorRampType(QgsColorRampShader::DISCRETE);
       		else
-      			myRasterShaderFunction->setColorRampType(QgsColorRampShader::INTERPOLATED);
+      			colorRampShader->setColorRampType(QgsColorRampShader::INTERPOLATED);
+ 		rasterShader->setRasterShaderFunction( colorRampShader );
+  		QgsSingleBandPseudoColorRenderer* r = 
+				new QgsSingleBandPseudoColorRenderer( mRasterLayerO->dataProvider(), 1, rasterShader );
+		r->setRasterTransparency(Deurskynend);
+  		mRasterLayerO->setRenderer( r );
+
     	} //end if there is a RasterShader
 
     	else
@@ -1075,7 +1083,9 @@ void cConfirmPrediction::on_plotTypeCombo_currentIndexChanged(QString File)
 //
 void cConfirmPrediction::on_pushButtonPrint_clicked()
 {
-	QPrinter* myPrinter = new QPrinter (QPrinter::PrinterResolution );
+	string err="The print option is no longer available. Use the QGIS D.print composer instead";
+	QRAP_ERROR(err.c_str());
+/*	QPrinter* myPrinter = new QPrinter (QPrinter::PrinterResolution );
 	myPrinter->setDocName(plotTypeCombo->currentText());
 
 	QString TitleText = plotTypeCombo->currentText();
@@ -1243,15 +1253,15 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
     		QgsMapLayer * mypLayer = QgsMapLayerRegistry::instance()->mapLayer( myLayerId );
     		if ( mypLayer )
     		{
-      			const QgsVectorLayer *mypVectorLayer  = dynamic_cast<QgsVectorLayer *>( mypLayer );
+      			QgsVectorLayer *mypVectorLayer  = dynamic_cast<QgsVectorLayer *>( mypLayer );
       			if ( mypVectorLayer )
       			{
         			QString myLayerName = mypVectorLayer->name();
         			QIcon myIcon;
 	        		QPixmap myPixmap( QSize( myIconWidth, myIconWidth ) );   //square
         			//based on code from qgslegendlayer.cpp - see that file for more info
-        			const QgsRenderer* mypRenderer = mypVectorLayer->renderer();
-        			const QList<QgsSymbol*> mySymbolList = mypRenderer->symbols();
+        			QgsFeatureRendererV2* mypRenderer = mypVectorLayer->rendererV2();
+        			QList<QgsSymbolV2*> mySymbolList = mypRenderer->symbols();
         			//
         			// Single symbol
         			//
@@ -1259,9 +1269,9 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 	
         			if ( 1 == mySymbolList.size() )
         			{
-        	  			QgsSymbol * mypSymbol = mySymbolList.at( 0 );
-        	  			myPainter->setPen( mypSymbol->pen() );
-        	  			myPainter->setBrush( mypSymbol->brush() );
+        	  			QgsSymbolV2 * mypSymbol = mySymbolList.at( 0 );
+        	  			//myPainter->setPen( mypSymbol->pen() );
+        	  			//myPainter->setBrush( mypSymbol->brush() );
         	  			myLegendXPos = 0 ;
         	  			if ( mypSymbol->type() == QGis::Point )
         	  			{
@@ -1325,10 +1335,10 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
         	  			//
         	  			// Loop through the class breaks
         	  			//
-        	 			QListIterator<QgsSymbol *> myIterator( mySymbolList );
+        	 			QListIterator<QgsSymbolV2 *> myIterator( mySymbolList );
         	  			while ( myIterator.hasNext() && myLegendYPos < myLegendDimensionY )
         	  			{
-        	    				QgsSymbol * mypSymbol = myIterator.next();
+        	    				QgsSymbolV2 * mypSymbol = myIterator.next();
         	    				myPainter->setPen( mypSymbol->pen() );
         	    				myPainter->setBrush( mypSymbol->brush() );
         	    				myLegendXPos = myLegendSpacer * 3; //extra indent for class breaks
@@ -1403,11 +1413,11 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 		myLegendYPos = 0;
 	}
 
-/*	bool Server =((plotTypeCombo->currentText() == "Primary Server") ||
-			(plotTypeCombo->currentText() == "Secondary Server")	||
-			(plotTypeCombo->currentText() == "Primary Co-Channel Interferers") ||
-			(plotTypeCombo->currentText() == "Primary Adjacent-Channel Interferers"));
-*/
+//	bool Server =((plotTypeCombo->currentText() == "Primary Server") ||
+//			(plotTypeCombo->currentText() == "Secondary Server")	||
+//			(plotTypeCombo->currentText() == "Primary Co-Channel Interferers") ||
+//			(plotTypeCombo->currentText() == "Primary Adjacent-Channel Interferers"));
+
 
 	bool Server = 	((mPlotType == PrimServer) || (mPlotType == SecondServer) || 
 			(mPlotType == PrimIntCo) || (mPlotType == PrimIntAd));
@@ -1512,17 +1522,17 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
   	myPainter->setViewport( myOriginalViewport );
 
 	// Print plot info
-/*	bool CoInterf = (plotTypeCombo->currentText()=="Co-channel Interference")||
-			(plotTypeCombo->currentText()=="Primary Co-channel interferer");
-	bool AdInterf = (plotTypeCombo->currentText()=="Adjacent-channel Interference")||
-			(plotTypeCombo->currentText()=="Primary adjacent-channel interferer");
-	bool Interf = (plotTypeCombo->currentText()=="Interfered areas")||CoInterf||
-			(plotTypeCombo->currentText()=="Number of Interferers")||AdInterf||
-			(plotTypeCombo->currentText()=="Energy per Bit to Noise Power");
-	bool Noise = (plotTypeCombo->currentText()=="Energy per Bit to Noise Power")||
-			(plotTypeCombo->currentText()=="Signal to Noise Ratio")||
-			(plotTypeCombo->currentText()=="Service Limiters");
-*/	
+//	bool CoInterf = (plotTypeCombo->currentText()=="Co-channel Interference")||
+//			(plotTypeCombo->currentText()=="Primary Co-channel interferer");
+//	bool AdInterf = (plotTypeCombo->currentText()=="Adjacent-channel Interference")||
+//			(plotTypeCombo->currentText()=="Primary adjacent-channel interferer");
+//	bool Interf = (plotTypeCombo->currentText()=="Interfered areas")||CoInterf||
+//			(plotTypeCombo->currentText()=="Number of Interferers")||AdInterf||
+//			(plotTypeCombo->currentText()=="Energy per Bit to Noise Power");
+//	bool Noise = (plotTypeCombo->currentText()=="Energy per Bit to Noise Power")||
+//			(plotTypeCombo->currentText()=="Signal to Noise Ratio")||
+//			(plotTypeCombo->currentText()=="Service Limiters");
+	
 
 	bool CoInterf = (mPlotType==IntRatioCo)|| (mPlotType==PrimIntCo);
 	bool AdInterf = (mPlotType==IntRatioAd)||(mPlotType==PrimIntAd);
@@ -1681,6 +1691,8 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
 	// Cleaning up
 	delete myPrinter;
    	delete myPainter;
+*/
+
 }
 
 //*********************************************************************************

@@ -30,7 +30,7 @@
 
 #include <qgisinterface.h>
 #include <qgisgui.h>
-#include <qgsapplication.h>
+//#include <qgsapplication.h>
 #include "../DataBase/Config.h"
 #include "../DataBase/MainWindow.h"
 #include "../Prediction/cRaster.h"

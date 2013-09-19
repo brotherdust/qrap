@@ -141,8 +141,7 @@ enum MouseActionType
 
 class QRap: public QObject, public QgisPlugin 
 {
-Q_OBJECT 
-public:
+Q_OBJECT public:
       
   	//////////////////////////////////////////////////////////////////////
   	//
@@ -159,21 +158,7 @@ public:
   	//! Destructor
   	virtual ~QRap();
   
- 	virtual QString name();
-    	/**
-     	* Virtual function to return the version of the plugin.
-     	*/
-  	virtual QString version();
-    	/**
-     	* Virtual function to return a description of the plugins functions
-     	*/
-  	virtual QString description();
-    	/**
-     	* Return the plugin type
-     	*/
-   	virtual int type(); 
-  
-	
+ 	
 public slots:
   	//! init the gui
   	virtual void initGui();
@@ -220,24 +205,14 @@ private:
   	//
   	////////////////////////////////////////////////////////////////////
   
-  	int mPluginType;
   	//! Pointer to our toolbar
   	QToolBar *mToolBarPointer;
   	//! Pointer to the QGIS interface object
   	QgisInterface *mQGisIface;
   	//!pointer to the qaction for this plugin
   	QAction * mQActionPointer;
-	//! Name of the plugin
-    	QString pName;
-    	//! Descrption of the plugin
-    	QString pPluginVersion;
-    	//! Descrption of the plugin
-    	QString pDescription;
-    	//! Plugin type as defined in QgisPlugin::PLUGINTYPE
-    	int pType;
     	//! Pionter to QGIS main application object
     	QWidget *qgisMainWindow;
-    	//! Pointer to the QGIS interface object
 
   	////////////////////////////////////////////////////////////////////
   	//

@@ -32,7 +32,11 @@
 #include <QToolBar>
 #include <QMessageBox>
 
+#ifdef WIN32
+#define QGISEXTERN extern "C" __declspec( dllexport )
+#else
 #define QGISEXTERN extern "C"
+#endif
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -46,10 +50,11 @@
  * an interface object that provides access to exposed functions in QGIS.
  * @param theQGisInterface - Pointer to the QGIS interface object
  */
-static const QString pluginVersion = QObject::tr( "Version 0.1" );
 
-static const char * const pIdent = "$Id: qrap.cpp 9327 2008-06-10 11:18:44Z magdaleen $";
+static const QString pPluginIcon = ":/qrap/Coverage.png";
+//static const char * const pIdent = "$Id: qrap.cpp 9327 2008-06-10 11:18:44Z magdaleen $";
 static const QgisPlugin::PLUGINTYPE pPluginType = QgisPlugin::UI;
+static const QString pCategory = QObject::tr( "Database" );
 static const QString pName = QObject::tr("Q-Rap");
 static const QString pDescription = QObject::tr("Radio Systems Planning Tool");
 static const QString pPluginVersion = QObject::tr("Version 0.1");
@@ -57,13 +62,13 @@ static const QString pPluginVersion = QObject::tr("Version 0.1");
 
 //*************************************************************************
  QRap::QRap(QgisInterface * theQgisInterface):
-		qgisMainWindow(theQgisInterface->mainWindow() ),
+    QgisPlugin( pName, pDescription, pCategory, pPluginVersion, pPluginType ),
+//		qgisMainWindow(theQgisInterface->mainWindow() ),
 		mQGisIface (theQgisInterface)
 {
-	pType = QgisPlugin::UI;
-	pName = QObject::tr("Q-Rap");
-	pDescription = QObject::tr("Radio Systems Planning Tool");
-	pPluginVersion = QObject::tr("Version 0.1");	
+  	cout << "VOOR DataBase Connect" << endl;
+  	openDatabaseConnection();
+  	cout << "Na DataBase Connect" << endl;
 }
 
 //************************************************************************
@@ -71,34 +76,7 @@ QRap::~QRap()
 {
 }
 
-//*********************************************************************************
-/* Following functions return name, description, version, and type for the plugin */
-QString QRap::name()
-{
-	pName = QObject::tr("Q-Rap");
-  	return pName;
-}
-
-//**********************************************************************************
-QString QRap::version()
-{
-	pPluginVersion = QObject::tr("Version 0.1");
-  	return pPluginVersion;
-}
-
-//************************************************************************************
-QString QRap::description()
-{
-  	pDescription = QObject::tr("Radio Systems Planning Tool");
-  	return pDescription;
-}
-
-//*************************************************************************************
-int QRap::type()
-{
-  	return QgisPlugin::UI;
-}
-
+//
 //*****************************************************************************
 /*
  * Initialize the GUI interface for the plugin - this is only called once when the plugin is 
@@ -166,12 +144,16 @@ void QRap::initGui()
   	mToolBarPointer->addAction(mQActionPointer);
 //  	mToolBarPointer->addAction(mImportExportAction);
 //  	mToolBarPointer->addAction(mHelpAction); 
+
 	mLoaded = true; 
  
-  	openDatabaseConnection();
-  	cout << "Na DataBase Connect" << endl;
-  	Mouse = new MouseEvents(mQGisIface->mapCanvas());
+//  	openDatabaseConnection();
+//  	cout << "Na DataBase Connect" << endl;
 
+//  	mQGisIface->addToolBarIcon( mQActionPointer );
+//  	mQGisIface->addPluginToMenu( tr( "Q-Rap Database" ), mQActionPointer );
+
+  	Mouse = new MouseEvents(mQGisIface->mapCanvas());
   	cout << "Na Mouse" << endl;
   	connect(Mouse, SIGNAL(RightPoint(QgsPoint&)), this, SLOT(ReceivedRightPoint(QgsPoint&)));
   	connect(Mouse, SIGNAL(LeftPoint(QgsPoint&)), this, SLOT(ReceivedLeftPoint(QgsPoint&)));
@@ -184,18 +166,13 @@ void QRap::help()
   	
 }
 
-// Slot called when the menu item is activated
-// If you created more menu items / toolbar buttons in initiGui, you should 
-// create a separate handler for each action - this single run() method will
-// not be enough
-
 //****************************************************************************************
 // Unload the plugin by cleaning up the GUI
 void QRap::unload()
 {
 	if (mLoaded)
 	{
-/*	  	// remove the GUI  
+	  	// remove the GUI  
 		cout << "QRap::unload(): removing pulgin menu's" << endl;
 	  	mQGisIface->removePluginMenu("&QRap",mSiteAction);
 		mQGisIface->removePluginMenu("&QRap",mSelectSiteAction);
@@ -241,7 +218,7 @@ void QRap::unload()
 		disconnect(Mouse);
 	//	delete Mouse;
 		mLoaded =false;
-*/
+
 	}
 	cout << "QRap::unload(): leaving" << endl;
 }
@@ -274,28 +251,35 @@ QGISEXTERN QgisPlugin * classFactory(QgisInterface * theQgisInterfacePointer)
 // the class may not yet be insantiated when this method is called.
 QGISEXTERN QString name()
 {
-	return QObject::tr("Q-Rap");
+	return pName;
 }
 
 //*******************************************************************************
 // Return the description
 QGISEXTERN QString description()
 {
-	return QObject::tr("Radio Systems Planning Tool");
+	return pDescription;
 }
 
 //********************************************************************************
 // Return the type (either UI or MapLayer plugin)
 QGISEXTERN int type()
 {
-	return QgisPlugin::UI;
+	return pPluginType;
 }
 
 //********************************************************************************
 // Return the version number for the plugin
 QGISEXTERN QString version()
 {
-	return QObject::tr("Version 0.1");
+	return pPluginVersion;
+}
+
+//********************************************************************************
+// Return the Icon for the plugin
+QGISEXTERN QString icon()
+{
+  return pPluginIcon;
 }
 
 //*******************************************************************************
@@ -399,6 +383,7 @@ bool QRap::openDatabaseConnection()
 } 
 
 //*************************************************************************************
+//* This actually calls the database interface
 void QRap::run()
 {
  	gMainWindow = new MainWindow(qgisMainWindow);

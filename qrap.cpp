@@ -66,9 +66,7 @@ static const QString pPluginVersion = QObject::tr("Version 0.1");
 //		qgisMainWindow(theQgisInterface->mainWindow() ),
 		mQGisIface (theQgisInterface)
 {
-  	cout << "VOOR DataBase Connect" << endl;
-  	openDatabaseConnection();
-  	cout << "Na DataBase Connect" << endl;
+
 }
 
 //************************************************************************
@@ -89,6 +87,11 @@ void QRap::initGui()
 	mPoints.clear();
 	mMouseType = CLEAN;
 	// Create the action for tool
+  	cout << "VOOR DataBase Connect" << endl;
+  	openDatabaseConnection();
+  	cout << "Na DataBase Connect" << endl;
+
+
 	cout << "Voor new Actions" << endl;
 	mQActionPointer = new QAction(QIcon(":/qrap/Data.png"),tr("Q-Rap Database Interface"), this);
 	mSiteAction = new QAction(QIcon(":/qrap/Site.png"),tr("Q-Rap: Place a Site"), this);
@@ -173,32 +176,19 @@ void QRap::unload()
 	if (mLoaded)
 	{
 	  	// remove the GUI  
-		cout << "QRap::unload(): removing pulgin menu's" << endl;
-	  	mQGisIface->removePluginMenu("&QRap",mSiteAction);
-		mQGisIface->removePluginMenu("&QRap",mSelectSiteAction);
-		mQGisIface->removePluginMenu("&QRap",mDeleteSiteAction);
-	  	mQGisIface->removePluginMenu("&QRap",mLinkAction);
-		mQGisIface->removePluginMenu("&QRap",mSelectLinkAction);
-		mQGisIface->removePluginMenu("&QRap",mDeleteLinkAction);
-	  	mQGisIface->removePluginMenu("&QRap",mRadioAction);
-		mQGisIface->removePluginMenu("&QRap",mMultiLinkAction);
-		mQGisIface->removePluginMenu("&QRap",mSpectralAction);
-		mQGisIface->removePluginMenu("&QRap",mPreferencesAction);
-		mQGisIface->removePluginMenu("&QRap",mMeasAnalysisAction);
-	  	mQGisIface->removePluginMenu("&QRap",mQActionPointer);
-	  
-	  	mQGisIface->removeToolBarIcon(mSiteAction);
-		mQGisIface->removeToolBarIcon(mSelectSiteAction);
-		mQGisIface->removeToolBarIcon(mDeleteSiteAction);
-	  	mQGisIface->removeToolBarIcon(mLinkAction);
-		mQGisIface->removeToolBarIcon(mSelectLinkAction);
-		mQGisIface->removeToolBarIcon(mDeleteLinkAction);
-	  	mQGisIface->removeToolBarIcon(mRadioAction);
-		mQGisIface->removeToolBarIcon(mMultiLinkAction);
-	  	mQGisIface->removeToolBarIcon(mSpectralAction);
-		mQGisIface->removeToolBarIcon(mPreferencesAction);
-		mQGisIface->removeToolBarIcon(mMeasAnalysisAction);
-	  	mQGisIface->removeToolBarIcon(mQActionPointer);
+  
+	  	mToolBarPointer->removeAction(mSiteAction);
+		mToolBarPointer->removeAction(mSelectSiteAction);
+		mToolBarPointer->removeAction(mDeleteSiteAction);
+	  	mToolBarPointer->removeAction(mLinkAction);
+		mToolBarPointer->removeAction(mSelectLinkAction);
+		mToolBarPointer->removeAction(mDeleteLinkAction);
+	  	mToolBarPointer->removeAction(mRadioAction);
+		mToolBarPointer->removeAction(mMultiLinkAction);
+	  	mToolBarPointer->removeAction(mSpectralAction);
+		mToolBarPointer->removeAction(mPreferencesAction);
+		mToolBarPointer->removeAction(mMeasAnalysisAction);
+	   mToolBarPointer->removeAction(mQActionPointer);
 
 	  	delete mQActionPointer;
 	  	delete mSelectSiteAction;
@@ -212,8 +202,8 @@ void QRap::unload()
 		delete mMultiLinkAction;
 	  	delete mPreferencesAction;
 		delete mMeasAnalysisAction;
-	//  	delete mImportExportAction;
-	//  	delete mHelpAction;
+		
+		delete mToolBarPointer;
 
 		disconnect(Mouse);
 	//	delete Mouse;

@@ -100,7 +100,7 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 	mPort = (port.length() == 0) ? 5432 : atoi(port.c_str());
 	//	mPort =5433;
 	gSettings.GetDbStructure(mStructure);
-
+	mConnected=true;
 	// try to connect to the database
 	try
 	{
@@ -118,19 +118,22 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 	} catch (pqxx::broken_connection& e)
 	{
 		mConnected=false;
-		QRAP_FATAL_CODE("Invalid username or password specified. ... or port ... or host" , acDbAuth);
+		QRAP_WARN("Invalid username or password specified. ... or port ... or host. Did you create the database? See manual for instructions on creating the database");
+//		QRAP_FATAL_CODE("Invalid username or password specified. ... or port ... or host" , acDbAuth);
 	} catch (pqxx::internal_error& e)
 	{
 		mConnected=false;
-		QRAP_FATAL_CODE("Internal PQXX error.", acInternalError);
+		QRAP_WARN("Internal PQXX error. Did you create the database? See manual for instructions on creating the database.");
+//		QRAP_FATAL_CODE("Internal PQXX error.", acInternalError);
 	} catch (...)
 	{
 		mConnected=false;
-		QRAP_FATAL_CODE("Unknown exception caught while connecting.", acDbConnect);
+		QRAP_WARN("Unknown exception caught while connecting Did you create the database? See manual for instructions on creating the database.");
+//		QRAP_FATAL_CODE("Unknown exception caught while connecting.", acDbConnect);
 	}
 	
 	cout << "After connection attempt" << endl;
-	if (msAlertCode != acOk)
+	if ((msAlertCode != acOk)||(!mConnected))
 	{
 		mConnected =false;
 		return false;

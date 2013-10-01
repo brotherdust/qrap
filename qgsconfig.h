@@ -4,7 +4,7 @@
 #ifndef QGSCONFIG_H
 #define QGSCONFIG_H
 
-#define VERSION "1.4.02"
+#define VERSION "2.0"
 
 #define PREFIX "/usr/"
 

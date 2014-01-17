@@ -430,6 +430,7 @@ SET (qrap_SRCS
 	Interface/cDeleteObject.cpp
 	Interface/cFilterDialog.cpp
 	Interface/cBackup.cpp
+	Interface/Optimisation.cpp
 	Interface/cRestore.cpp
 	Interface/cImportExportMenu.cpp
 	Interface/cUpdateToServer.cpp
@@ -470,6 +471,7 @@ SET (qrap_UIS
 	Interface/LoadRasterFiles/LoadFiles.ui
 	Interface/LoadRasterFiles/LoadRasterFiles.ui
         Interface/LinkAnalysis.ui
+	Interface/Optimisation.ui
 	Interface/ConfirmSpectral.ui
 	Interface/ConfirmMultiLink.ui
         Interface/ColourManager.ui
@@ -553,6 +555,7 @@ SET (qrap_MOC_HDRS
 	Interface/cUpdateToServer.h
 	Interface/cCreateUpdateFile.h
 	Interface/cImportUpdateFile.h
+	Interface/Optimisation.h
 	Interface/cMeasurementAnalysis.h
 	Interface/cLoadMeasurements.h
 	Interface/LoadRasterFiles/cLoadRasterFiles.h

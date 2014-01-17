@@ -89,7 +89,7 @@ namespace Qrap
 			int 	GetSize() { return mLength; }
 			double 	GetInterDist() { return mPlotResolution; }
 		    	double 	GetMinClearance() { return mMinClearance; }
-			double 	GetPathLoss() { return mMinClearance; }
+			double 	GetPathLoss() { return mPathLossEnd; }
 			double 	GetTxElevation() { return mTxElevation; }
 			double 	GetRxElevation() { return mRxElevation; }
 			double 	GetTxTilt() { return mTxTilt; }
@@ -97,6 +97,9 @@ namespace Qrap
 			double 	GetTxBearing() {return mTxBearing; }
 			double 	GetRxBearing() {return mRxBearing; }
 			double 	GetFreq() {return mFrequency;}
+                        double 	GetEIRP() {return EIRP;}
+                        double 	GetRxLev() {return mRxLevEnd;}
+                        double 	GetDistance() {return mDist;}
 
 			bool SetTxSite(int TxSite, tFixed Inst);
 			bool SetRxSite(int RxSite, tFixed Inst);
@@ -188,6 +191,8 @@ namespace Qrap
 			double 			mEffRadius;	///< Effective earth radius
 			double 			mMinClearance;	///< Minimum fresnel clearance
 			double			mPathLossEnd;	///< PathLoss over path
+                        double			mRxLevEnd;	///< Signal level at receiver
+                        double                  mDist;          ///< Distance between transmitter and receiver
 			float			mTxTilt;	///< Recommended tilt on transmitting antenna
 			float 			mRxTilt;	///< Recommended tilt on receiving antenna
 			double 			mTxBearing;	///< Recommended bearing of transmitting antenna
@@ -197,6 +202,7 @@ namespace Qrap
 			float 			*mFlatProfile;	///< The flat earth profile not taking the true earth radius into account
 			float 			*mClearance;	///< Clearance at each point
 			int 			*mClutterProfile;
+                        double                  EIRP;
 			double 			mMinimum;
 			double 			mMaximum;
 	};

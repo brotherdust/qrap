@@ -214,7 +214,20 @@ www.QRap.org.za
 			description="Complete file reference to site documentation"
 		       label="Site documentation" 
 			filelink="true" />
-		
+
+		<field name="existing_mast"
+		       type="boolean"
+		       label="Existing Mast"
+                       ui="dropdown(fixed, {'FALSE', 'TRUE'})"/>
+
+		<field name="min_mast_height"
+		       type="integer"
+		       label="Minimum Mast Height"/>
+
+		<field name="max_mast_height"
+		       type="integer"
+		       label="Maximum Mast Height"/>
+
 		<view name = "sitedescription_view" as = 'select * from sitedescription'>
 		</view>
 
@@ -1595,6 +1608,12 @@ www.QRap.org.za
 		      label = "Line"
 			description="The geographical line that is used to display the link visually."
 		      postgis="true" />
+
+               <field name = "status"
+                      type = "varchar(15)"
+                      label = "Status" 
+                      ui="dropdown(fixed, {'Planned', 'Experimental'}"/>
+
 <!--		<view name = "links_view" as = 'select * from links'>
 		</view>
 -->
@@ -1605,7 +1624,7 @@ www.QRap.org.za
 			rad2.txbearing as txbearing,
 			ST_Distance(site1.location, site2.location, true) as Distance,
 			minclearance,
-			frequency, pathloss, kfactor, line
+			frequency, pathloss, kfactor, line, status
 			from links cross join radioinstallation as rad1 cross join site_view_only as site1
 	 		cross join radioinstallation as rad2 cross join site_view_only as site2
 	 		where rad1.id=txinst
@@ -2316,5 +2335,227 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		       label = "Simulated Value"
 		       description="The estimated received signal strength in simulation in dBm" />
 	</table> <!-- measurement -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="cable" label="Cable">
+	
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name="rikey"
+		       type="integer references radioinstallation(id) on delete cascade"
+		       label="Radio Installation"
+			description="Foreign Key to the Radio Installation where this cable is used"
+		       ui="dropdown(fromtable,radioinstallation_view,sectorname)" />
+		
+		<field name="cablekey"
+		       type="integer references cable_type(id)"
+		       label="Cable Type"
+			description="Foreign Key to the Cable Type to indicate what kind of cable this is"
+		       ui="dropdown(fromtable,cable_type_view,cabletype)" />
+		
+		<field name="installationdate"
+		       type="date"
+		       label="Installation date" />
+
+		<field name="txlength"
+		       type="integer"
+		       label="Txlength" />
+		
+		<field name="rxlength"
+		       type="integer"
+		       label="Rxlength" />
+
+		<view name = "cable_view" as = 'select * from cable;'>
+				</view>
+
+	</table> <!-- cable -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="cable_type" label="Cable Type" fulldownload="true">
+	
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="cabletype"
+		       type="varchar(15)"
+		       label="Cable Type" />
+		
+		<field name="cost_per_metre"
+		       type="numeric(12,2)"
+		       label="Cost Per Metre (R)" />
+
+		<field name="signal_loss_per_metre"
+		       type="numeric(12,2)"
+		       label="Signal Loss Per Metre (db)" />
+
+		<view name = "cable_type_view" as = 'select * from cable_type;'>
+				</view>
+
+	</table> <!-- cable_type -->
+
+
+<!-- *************************************************************************************************************************** -->
+	<table name="combiner_splitter" label="combiner_splitter"  fulldownload="true">
+	
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+		
+		<field name="rikey"
+		       type="integer references radioinstallation(id) on delete cascade"
+		       label="Radio Installation"
+			description="Foreign Key to the Radio Installation where this connector is used"
+		       ui="dropdown(fromtable,radioinstallation_view,sectorname)" />
+		
+		<field name="combiner_splitter_key"
+		       type="integer references combiner_splitter_type(id)"
+		       label="Combiner/Splitter Type"
+			description="Foreign Key to the Combiner/Splitter Type to indicate what type this is"
+		       ui="dropdown(fromtable,combiner_splitter_type_view,combiner_splitter_type)" />
+		
+		<field name="installationdate"
+		       type="date"
+		       label="Installation date" />
+
+		<view name = "combiner_splitter_view" as = 'select * from combiner_splitter;'>
+				</view>
+		
+	</table> <!-- combiner_splitter -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="combiner_splitter_type" label="Combiner/Splitter Type" fulldownload="true">
+	
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+                
+                <field name="description"
+		       type="varchar(15)"
+		       label="Description"/>
+
+		<field name="combiner_splitter_type"
+		       type="varchar(15)"
+		       label="Combiner/Splitter" 
+                       ui="dropdown(fixed, {'Combiner', 'Splitter'}"/>
+		
+		<field name="cost"
+		       type="numeric(12,2)"
+		       label="Cost (R)" />
+                
+                <field name="losses"
+		       type="numeric(12,2)"
+		       label="Losses" />
+
+		<view name = "combiner_splitter_type_view" as = 'select * from combiner_splitter_type;'>
+				</view>
+
+	</table> <!-- combiner_splitter_type -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="receiver_capabilities" label="Receiver Capabilities"  fulldownload="true">
+
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+
+		<field name="data_rate"
+		       type="integer"
+		       label="Data Rate"/>
+		
+		<field name="txpower"
+		       type="integer"
+		       label="Txpower" />
+		
+		<field name="rxsensitivity"
+		       type="integer"
+		       label="Rxsensitivity" />
+
+		<view name = "receiver_capabilities_view" as = 'select * from receiver_capabilities;'>
+				</view>
+
+	</table> <!-- receiver_capabilities -->
+        
+<!-- *************************************************************************************************************************** -->
+	<table name="height_costs" label="Height Costs"  fulldownload="true">
+
+            	<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+                
+                <field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+            
+		<field name="height"
+		       type="int"
+		       label="Height"/>
+
+		<field name="cost"
+		      type="numeric(12,2)"
+		      label="Cost"/>
+
+		<view name = "height_costs_view" as = 'select * from height_costs;'>
+				</view>
+
+	</table> <!-- height_costs -->  
 
 </structure>

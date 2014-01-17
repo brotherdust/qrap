@@ -128,7 +128,7 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 	} catch (...)
 	{
 		mConnected=false;
-		QRAP_WARN("Unknown exception caught while connecting Did you create the database? See manual for instructions on creating the database.");
+		QRAP_WARN("Unknown exception caught while connecting. Did you create the database? See manual for instructions on creating the database.");
 //		QRAP_FATAL_CODE("Unknown exception caught while connecting.", acDbConnect);
 	}
 	
@@ -401,7 +401,7 @@ int cDatabase::Insert (const StringMap& values, const string& tableName)
 // 	if (vals.count("id") > 0)
 // 		vals.erase(vals.find("id"));
 	vals["lastmodified"] = "now()";
-	if (tableName!="machine")
+	if ((tableName!="machine")&&(tableName!="receiver_capabilities")&&(tableName!="height_costs")&&(tableName!="cable_type")&&(tableName!="combiner_splitter_type"))
 	{
 		char *temp;
 		temp = new char[10];

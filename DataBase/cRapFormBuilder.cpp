@@ -100,6 +100,20 @@ cRapFormBuilder::cRapFormBuilder (QWidget* parent, QString tableName, QTableWidg
 	mFormLayout->addWidget(mCloseByButton,7,1,1,1,Qt::AlignLeft);
 	connect(mCloseByButton,SIGNAL(clicked()),this,SLOT(CloseBySite()));
 
+        mCalculateRxLossesButton = new QPushButton("Calculate &Rx Losses",this);
+	mCalculateRxLossesButton->setToolTip("Calculate the rx losses.");
+	mCalculateRxLossesButton->setVisible(false);
+	mCalculateRxLossesButton->setEnabled(false);
+	mFormLayout->addWidget(mCalculateRxLossesButton,15,3,1,1,Qt::AlignRight);
+	connect(mCalculateRxLossesButton,SIGNAL(clicked()),this,SLOT(CalculateRXLosses()));
+        
+        mCalculateTxLossesButton = new QPushButton("Calculate &Tx Losses",this);
+	mCalculateTxLossesButton->setToolTip("Calculate the tx losses.");
+	mCalculateTxLossesButton->setVisible(false);
+	mCalculateTxLossesButton->setEnabled(false);
+	mFormLayout->addWidget(mCalculateTxLossesButton,9,3,1,1,Qt::AlignRight);
+	connect(mCalculateTxLossesButton,SIGNAL(clicked()),this,SLOT(CalculateTXLosses()));
+
 	mGroundHeightButton = new QPushButton("&Lookup",this);
 	mGroundHeightButton->setToolTip("Search the Digital Elevation Model raster files for the ground height of the site.");
 	mGroundHeightButton->setVisible(false);
@@ -133,6 +147,14 @@ cRapFormBuilder::cRapFormBuilder (QWidget* parent, QString tableName, QTableWidg
 		mDefaultRadiosButton->setVisible(true);
 		mDefaultRadiosButton->setEnabled(true);
 	}
+
+        if (mTable == "radioinstallation")
+        {
+               mCalculateRxLossesButton->setVisible(true);
+               mCalculateRxLossesButton->setEnabled(true);
+               mCalculateTxLossesButton->setVisible(true);
+               mCalculateTxLossesButton->setEnabled(true);
+        }
 
 	// Get the database structure
 	gDb.GetDbStructure(mDbs);
@@ -301,7 +323,6 @@ cRapFormBuilder::cRapFormBuilder (StringMap ref, QWidget* parent,
 void cRapFormBuilder::TableItemSelectionChanged ()
 {
 	cout << "Running empty cRapFormBuilder::TableItemSelectionChanged ()" << endl;
-
 }
 
 //****************************************************************************
@@ -1158,6 +1179,13 @@ void cRapFormBuilder::Insert ()
 		mDefaultRadiosButton->setVisible(true);
 		mDefaultRadiosButton->setEnabled(true);
 	}
+        if (mTable == "radioinstallation")
+        {
+               mCalculateRxLossesButton->setVisible(true);
+               mCalculateRxLossesButton->setEnabled(true);
+               mCalculateTxLossesButton->setVisible(true);
+               mCalculateTxLossesButton->setEnabled(true);
+        }
 }
 
 
@@ -1320,6 +1348,13 @@ void cRapFormBuilder::ContentChanged (const QString& text)
 		mDefaultRadiosButton->setVisible(true);
 		mDefaultRadiosButton->setEnabled(true);
 	}
+        if (mTable == "radioinstallation")
+        {
+               mCalculateRxLossesButton->setVisible(true);
+               mCalculateRxLossesButton->setEnabled(true);
+               mCalculateTxLossesButton->setVisible(true);
+               mCalculateTxLossesButton->setEnabled(true);
+        }
 }
 
 //**************************************************************
@@ -1445,6 +1480,164 @@ void cRapFormBuilder::InsertDefaultRadios()
 	InsertDefaultRadioInsts(mCurrentRecordID);
 	mDefaultRadiosButton->setVisible(false);
 	mDefaultRadiosButton->setEnabled(false);
+}
+
+//***************************************************************
+void cRapFormBuilder::CalculateTXLosses()
+{
+	int currentRow = mTableView->currentRow();
+        double cableloss = 0;
+        double combloss = 0;
+        int txLength = 0;
+        
+        QTableWidgetItem* item = mTableView->item(currentRow,0);
+        QString id = item->data(Qt::DisplayRole).toString();
+        
+        string query = "";
+        pqxx::result CurrentRecord;
+    
+        query = "SELECT combiner_splitter_key FROM combiner_splitter WHERE rikey = ";
+        query += id.toStdString();
+        query += ";";
+        gDb.PerformRawSql(query);
+        gDb.GetLastResult(CurrentRecord);
+        
+        if(CurrentRecord.size() > 0)
+        {
+            string query2 = "";
+            pqxx::result CurrentRecord2;
+
+            query2 = "SELECT losses FROM combiner_splitter_type WHERE id = ";
+            query2 += CurrentRecord[0]["combiner_splitter_key"].c_str();
+            query2 += ";";
+            gDb.PerformRawSql(query2);
+            gDb.GetLastResult(CurrentRecord2);
+            
+            combloss = atof(CurrentRecord2[0]["losses"].c_str());
+        }
+        else
+        {
+            QString err = "There seems to be no combiner linked to the current radio installation. ";
+            QRAP_WARN(err.toStdString().c_str());
+            cout << "Query Empty: " << query.c_str() << endl;
+            //QMessageBox::information(this, "QRap", err);
+            return;
+        }
+        
+        string query3 = "";
+        pqxx::result CurrentRecord3;
+    
+        query3 = "SELECT cablekey,txlength FROM cable WHERE rikey = ";
+        query3 += id.toStdString();
+        query3 += ";";
+        gDb.PerformRawSql(query3);
+        gDb.GetLastResult(CurrentRecord3);
+        
+        if(CurrentRecord3.size() > 0)
+        {
+            string query4 = "";
+            pqxx::result CurrentRecord4;
+
+            query4 = "SELECT signal_loss_per_metre FROM cable_type WHERE id = ";
+            query4 += CurrentRecord3[0]["cablekey"].c_str();
+            query4 += ";";
+            gDb.PerformRawSql(query4);
+            gDb.GetLastResult(CurrentRecord4);
+            
+            cableloss = atof(CurrentRecord4[0]["signal_loss_per_metre"].c_str());
+            txLength = atoi(CurrentRecord3[0]["txlength"].c_str());
+        }
+        else
+        {
+            QString err = "There seems to be no cable linked to the current radio installation. ";
+            QRAP_WARN(err.toStdString().c_str());
+            cout << "Query Empty: " << query.c_str() << endl;
+            //QMessageBox::information(this, "QRap", err);
+            return;
+        }
+        
+        double txloss = (txLength * cableloss) + combloss;
+        
+        static_cast<QDoubleSpinBox*>(mFormWidgets["txlosses"])->setValue(txloss);
+}
+
+//***************************************************************
+void cRapFormBuilder::CalculateRXLosses()
+{
+	int currentRow = mTableView->currentRow();
+        double cableloss = 0;
+        double combloss = 0;
+        int rxLength = 0;
+        
+        QTableWidgetItem* item = mTableView->item(currentRow,0);
+        QString id = item->data(Qt::DisplayRole).toString();
+        
+        string query = "";
+        pqxx::result CurrentRecord;
+    
+        query = "SELECT combiner_splitter_key FROM combiner_splitter WHERE rikey = ";
+        query += id.toStdString();
+        query += ";";
+        gDb.PerformRawSql(query);
+        gDb.GetLastResult(CurrentRecord);
+        
+        if(CurrentRecord.size() > 0)
+        {
+            string query2 = "";
+            pqxx::result CurrentRecord2;
+
+            query2 = "SELECT losses FROM combiner_splitter_type WHERE id = ";
+            query2 += CurrentRecord[0]["combiner_splitter_key"].c_str();
+            query2 += ";";
+            gDb.PerformRawSql(query2);
+            gDb.GetLastResult(CurrentRecord2);
+            
+            combloss = atof(CurrentRecord2[0]["losses"].c_str());
+        }
+        else
+        {
+            QString err = "There seems to be no combiner linked to the current radio installation. ";
+            QRAP_WARN(err.toStdString().c_str());
+            cout << "Query Empty: " << query.c_str() << endl;
+            //QMessageBox::information(this, "QRap", err);
+            return;
+        }
+        
+        string query3 = "";
+        pqxx::result CurrentRecord3;
+    
+        query3 = "SELECT cablekey,rxlength FROM cable WHERE rikey = ";
+        query3 += id.toStdString();
+        query3 += ";";
+        gDb.PerformRawSql(query3);
+        gDb.GetLastResult(CurrentRecord3);
+        
+        if(CurrentRecord3.size() > 0)
+        {
+            string query4 = "";
+            pqxx::result CurrentRecord4;
+
+            query4 = "SELECT signal_loss_per_metre FROM cable_type WHERE id = ";
+            query4 += CurrentRecord3[0]["cablekey"].c_str();
+            query4 += ";";
+            gDb.PerformRawSql(query4);
+            gDb.GetLastResult(CurrentRecord4);
+            
+            cableloss = atof(CurrentRecord4[0]["signal_loss_per_metre"].c_str());
+            rxLength = atoi(CurrentRecord3[0]["rxlength"].c_str());
+        }
+        else
+        {
+            QString err = "There seems to be no cable linked to the current radio installation. ";
+            QRAP_WARN(err.toStdString().c_str());
+            cout << "Query Empty: " << query.c_str() << endl;
+            //QMessageBox::information(this, "QRap", err);
+            return;
+        }
+        
+        double rxloss = (rxLength * cableloss) + combloss;
+        
+        static_cast<QDoubleSpinBox*>(mFormWidgets["rxlosses"])->setValue(rxloss);
 }
 
 //***************************************************************
@@ -1737,8 +1930,7 @@ void cRapFormBuilder::CreateFormWidget (QString fieldName,
 			mCloseByButton->setVisible(true);
 			mCloseByButton->setEnabled(true);
 //			} 
-	
-			
+				
 			mFormLayout->addWidget(mFormLabels[fieldName+":latitude"],layoutRow,0,1,1,Qt::AlignLeft);
 			mFormLayout->addWidget(widgets[fieldName+":latitude"],layoutRow,1,1,1,Qt::AlignLeft);
 			
@@ -2865,7 +3057,7 @@ void cRapFormBuilder::CreateAntennaDeviceForm ()
 					else
 						j=0;
 					
-					// Poulate the combobox with the default data
+					// Populate the combobox with the default data
 					for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 					{
 						QString temp = QString::number(iterator->first) + ":" + QString::fromStdString(iterator->second);

@@ -300,7 +300,6 @@ void cRapLinks::PopulateTableList ()
 	mTables["links"]->show();
 	mCurrentTable = mTables["links"];
 	
-	
 	// Make sure that no update signals are triggered
 	disconnect(mCurrentTable->GetTable(),SIGNAL(cellChanged(int,int)),0,0);
 	

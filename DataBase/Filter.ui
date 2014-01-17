@@ -6,203 +6,225 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>174</width>
-    <height>551</height>
+    <width>180</width>
+    <height>671</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>161</width>
-     <height>551</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Filter:</string>
-   </property>
-   <layout class="QVBoxLayout">
-    <item>
-     <widget class="QPushButton" name="pushButtonApplyFilter">
-      <property name="text">
-       <string>Apply filter changes</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <spacer>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>139</width>
-        <height>16</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item>
-     <widget class="QLabel" name="labelTechType">
-      <property name="text">
-       <string>Technolgy Type:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="comboBoxTechType"/>
-    </item>
-    <item>
-     <spacer>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>139</width>
-        <height>16</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item>
-     <widget class="QLabel" name="labelStatus">
-      <property name="text">
-       <string>Status:</string>
-      </property>
-      <property name="textInteractionFlags">
-       <set>Qt::LinksAccessibleByMouse</set>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="comboBoxStatus"/>
-    </item>
-    <item>
-     <spacer>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>139</width>
-        <height>16</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item>
-     <widget class="QLabel" name="labelProject">
-      <property name="text">
-       <string>Project:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="comboBoxProject"/>
-    </item>
-    <item>
-     <spacer>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>139</width>
-        <height>16</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item>
-     <widget class="QLabel" name="labelFlagX">
-      <property name="text">
-       <string>Flag X:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="comboBoxFlagX"/>
-    </item>
-    <item>
-     <spacer>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>139</width>
-        <height>16</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item>
-     <widget class="QLabel" name="labelFlagZ">
-      <property name="text">
-       <string>Flag Z:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="comboBoxFlagZ"/>
-    </item>
-    <item>
-     <spacer>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>31</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item>
-     <widget class="QLabel" name="labelAreaType">
-      <property name="text">
-       <string>Area Type:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="comboBoxAreaType"/>
-    </item>
-    <item>
-     <widget class="QLabel" name="labelWhere">
-      <property name="text">
-       <string>where the field:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="comboBoxField"/>
-    </item>
-    <item>
-     <widget class="QLabel" name="labelArea">
-      <property name="text">
-       <string>is Area:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="comboBoxArea"/>
-    </item>
-    <item>
-     <widget class="QPushButton" name="pushButtonCreateArea">
-      <property name="text">
-       <string>Create Custom Area</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Filter:</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="pushButtonApplyFilter">
+        <property name="text">
+         <string>Apply filter changes</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>139</width>
+          <height>16</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelTechType">
+        <property name="text">
+         <string>Technolgy Type:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QComboBox" name="comboBoxTechType"/>
+      </item>
+      <item row="4" column="0">
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>139</width>
+          <height>16</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="labelStatus">
+        <property name="text">
+         <string>Site Status:</string>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse</set>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QComboBox" name="comboBoxStatus"/>
+      </item>
+      <item row="7" column="0">
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>139</width>
+          <height>16</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="labelLinkStatus">
+        <property name="text">
+         <string>Link Status:</string>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse</set>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="QComboBox" name="comboBoxLinkStatus"/>
+      </item>
+      <item row="10" column="0">
+       <spacer name="spacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>139</width>
+          <height>16</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="11" column="0">
+       <widget class="QLabel" name="labelProject">
+        <property name="text">
+         <string>Project:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="0">
+       <widget class="QComboBox" name="comboBoxProject"/>
+      </item>
+      <item row="13" column="0">
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>139</width>
+          <height>16</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="14" column="0">
+       <widget class="QLabel" name="labelFlagX">
+        <property name="text">
+         <string>Flag X:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="15" column="0">
+       <widget class="QComboBox" name="comboBoxFlagX"/>
+      </item>
+      <item row="16" column="0">
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>139</width>
+          <height>16</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="17" column="0">
+       <widget class="QLabel" name="labelFlagZ">
+        <property name="text">
+         <string>Flag Z:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="18" column="0">
+       <widget class="QComboBox" name="comboBoxFlagZ"/>
+      </item>
+      <item row="19" column="0">
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>31</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="20" column="0">
+       <widget class="QLabel" name="labelAreaType">
+        <property name="text">
+         <string>Area Type:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="21" column="0">
+       <widget class="QComboBox" name="comboBoxAreaType"/>
+      </item>
+      <item row="22" column="0">
+       <widget class="QLabel" name="labelWhere">
+        <property name="text">
+         <string>where the field:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="23" column="0">
+       <widget class="QComboBox" name="comboBoxField"/>
+      </item>
+      <item row="24" column="0">
+       <widget class="QLabel" name="labelArea">
+        <property name="text">
+         <string>is Area:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="25" column="0">
+       <widget class="QComboBox" name="comboBoxArea"/>
+      </item>
+      <item row="26" column="0">
+       <widget class="QPushButton" name="pushButtonCreateArea">
+        <property name="text">
+         <string>Create Custom Area</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
   <action name="actionOnApply">
    <property name="text">
     <string>onApply</string>

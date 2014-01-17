@@ -265,6 +265,10 @@ void cRapSupportingTables::PopulateTableList ()
 	QListWidgetItem* mobileInstallationItem = new QListWidgetItem("Mobile Installation");
 	QListWidgetItem* antennaDeviceItem = new QListWidgetItem("Antenna Device");
 	QListWidgetItem* antennaPatternItem = new QListWidgetItem("Antenna Pattern");
+	QListWidgetItem* receiverCapabilitiesItem = new QListWidgetItem("Receiver Capabilities");
+        QListWidgetItem* heightCostsItem = new QListWidgetItem("Height Costs");
+	QListWidgetItem* cableTypeItem = new QListWidgetItem("Cable Type");
+	QListWidgetItem* combinerSplitterTypeItem = new QListWidgetItem("Combiner/Splitter Type");
 	QListWidgetItem* equipmentTypeItem = new QListWidgetItem("Equipment Type");
 	QListWidgetItem* signalenvelopeItem = new QListWidgetItem("Signal Envelope");
 	
@@ -283,6 +287,14 @@ void cRapSupportingTables::PopulateTableList ()
 	antennaDeviceItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 	antennaPatternItem->setData(Qt::UserRole,QVariant("antennapattern"));
 	antennaPatternItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+receiverCapabilitiesItem->setData(Qt::UserRole,QVariant("receiver_capabilities"));
+	receiverCapabilitiesItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+        heightCostsItem->setData(Qt::UserRole,QVariant("height_costs"));
+	heightCostsItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+	cableTypeItem->setData(Qt::UserRole,QVariant("cable_type"));
+	cableTypeItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+	combinerSplitterTypeItem->setData(Qt::UserRole,QVariant("combiner_splitter_type"));
+	combinerSplitterTypeItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 	equipmentTypeItem->setData(Qt::UserRole,QVariant("equipmenttype"));
 	equipmentTypeItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 	signalenvelopeItem->setData(Qt::UserRole,QVariant("envelopes"));
@@ -296,6 +308,10 @@ void cRapSupportingTables::PopulateTableList ()
 	mTableList->addItem(mobileInstallationItem);
 	mTableList->addItem(antennaDeviceItem);
 	mTableList->addItem(antennaPatternItem);
+	mTableList->addItem(receiverCapabilitiesItem);
+        mTableList->addItem(heightCostsItem);
+	mTableList->addItem(cableTypeItem);
+	mTableList->addItem(combinerSplitterTypeItem);
 	mTableList->addItem(equipmentTypeItem);
 	mTableList->addItem(signalenvelopeItem);
 	
@@ -307,6 +323,10 @@ void cRapSupportingTables::PopulateTableList ()
 	mTables.insert("mobile",new cRapTableTab(this,"mobile"));
 	mTables.insert("antennadevice",new cRapTableTab(this,"antennadevice"));
 	mTables.insert("antennapattern",new cRapTableTab(this,"antennapattern"));
+	mTables.insert("receiver_capabilities",new cRapTableTab(this,"receiver_capabilities"));
+        mTables.insert("height_costs",new cRapTableTab(this,"height_costs"));
+	mTables.insert("cable_type",new cRapTableTab(this,"cable_type"));
+	mTables.insert("combiner_splitter_type",new cRapTableTab(this,"combiner_splitter_type"));
 	mTables.insert("equipmenttype",new cRapTableTab(this,"equipmenttype"));
 	mTables.insert("envelopes",new cRapTableTab(this,"envelopes"));
 

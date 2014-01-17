@@ -81,7 +81,7 @@ void cFilter::LoadCombos()
 	gDb.GetFieldUiParams(table,field,vals);
 	comboBoxProject->addItem(QString("All"));
 	j=1;
-	// Poulate the combobox with the default data
+	// Populate the combobox with the default data
 	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 	{
 		QString temp = QString::fromStdString(iterator->second);
@@ -96,11 +96,25 @@ void cFilter::LoadCombos()
 	gDb.GetFieldUiParams(table,field,vals);
 	comboBoxStatus->addItem(QString("All"));
 	j=1;
-	// Poulate the combobox with the default data
+	// Populate the combobox with the default data
 	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 	{
 		QString temp = QString::fromStdString(iterator->second);
 		comboBoxStatus->addItem(temp);
+		j++;
+	} // for
+
+        table="links";
+	field="status";
+	uiType = gDb.GetFieldUiType(table,field);
+	gDb.GetFieldUiParams(table,field,vals);
+	comboBoxLinkStatus->addItem(QString("All"));
+	j=1;
+	// Populate the combobox with the default data
+	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
+	{
+		QString temp = QString::fromStdString(iterator->second);
+		comboBoxLinkStatus->addItem(temp);
 		j++;
 	} // for
 
@@ -110,7 +124,7 @@ void cFilter::LoadCombos()
 	gDb.GetFieldUiParams(table,field,vals);
 	comboBoxProject->addItem(QString("All"));
 	j=1;
-	// Poulate the combobox with the default data
+	// Populate the combobox with the default data
 	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 	{
 		QString temp = QString::fromStdString(iterator->second);
@@ -124,7 +138,7 @@ void cFilter::LoadCombos()
 	gDb.GetFieldUiParams(table,field,vals);
 	comboBoxFlagX->addItem(QString("All"));
 	j=1;
-	// Poulate the combobox with the default data
+	// Populate the combobox with the default data
 	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 	{
 		QString temp = QString::fromStdString(iterator->second);
@@ -138,7 +152,7 @@ void cFilter::LoadCombos()
 	gDb.GetFieldUiParams(table,field,vals);
 	comboBoxFlagZ->addItem(QString("All"));
 	j=1;
-	// Poulate the combobox with the default data
+	// Populate the combobox with the default data
 	for( iterator=vals.begin() ; iterator!=vals.end() ; iterator++ )
 	{
 		QString temp = QString::fromStdString(iterator->second);
@@ -208,6 +222,11 @@ void cFilter::LoadDefaults()
 	if(setting!="")
 		comboBoxStatus->setCurrentIndex(comboBoxStatus->findText(QString::fromStdString(setting)));
 	else comboBoxStatus->setCurrentIndex(comboBoxStatus->findText("All"));
+
+     setting = gDb.GetSetting("FilterLinkStatus");
+	if(setting!="")
+		comboBoxLinkStatus->setCurrentIndex(comboBoxLinkStatus->findText(QString::fromStdString(setting)));
+	else comboBoxLinkStatus->setCurrentIndex(comboBoxLinkStatus->findText("All"));
 		
 	setting = gDb.GetSetting("FilterProject");
 	if(setting!="")
@@ -286,6 +305,19 @@ void cFilter::on_comboBoxStatus_currentIndexChanged(int index)
 		cout << "FilterStatus" << "\t\t" << NewValue.toStdString() << endl;
 		pushButtonApplyFilter->setEnabled(true);
 		mChangeSite=true;
+	}
+}
+
+//***************************************************
+void cFilter::on_comboBoxLinkStatus_currentIndexChanged(int index)
+{
+	if (!Initialise)
+	{
+		QString NewValue = comboBoxLinkStatus->currentText();
+		gDb.SetSetting("FilterLinkStatus",NewValue.toStdString());
+		cout << "FilterLinkStatus" << "\t\t" << NewValue.toStdString() << endl;
+		pushButtonApplyFilter->setEnabled(true);
+		mChangeLink=true;
 	}
 }
 
@@ -484,7 +516,7 @@ void cFilter::on_pushButtonApplyFilter_clicked()
 //*****************************************************************
 void cFilter::CreateViews() 
 {
-	string status="All", table="Not Used", column="Not Used";
+	string linkStatus="All", status="All", table="Not Used", column="Not Used";
 	string area="All", project="All", flagX="All", flagZ="All", techtype="All";
 	string whereclause ="";
 	string query = "", queryIN="", queryB="";
@@ -494,6 +526,7 @@ void cFilter::CreateViews()
 	{
 
 		status = comboBoxStatus->currentText().toStdString();
+		linkStatus = comboBoxLinkStatus->currentText().toStdString();
 		table = comboBoxAreaType->currentText().toStdString();
 		column= comboBoxField->currentText().toStdString();
 		area = comboBoxArea->currentText().toStdString();
@@ -781,17 +814,21 @@ void cFilter::CreateViews()
 		}
 
 		//change links view
-		query = "create view links_view as select links.id as id,linkname, ";
+		query = "create view links_view as select links.id as id, linkname, ";
 		query+= "site1.sitename||rad1.sector as txsite, txinst, ";
 		query+= "rad1.txbearing as txbearing, ";
 		query+= "site2.sitename||rad2.sector as rxsite, rxinst, ";
 		query+= "rad2.txbearing as rxbearing, ";
 		query+= "ST_Distance(site1.location, site2.location, true) as Distance, ";
 		query+= "minclearance, ";
-		query+= "frequency, pathloss, kfactor, line ";
+		query+= "frequency, pathloss, kfactor, line, links.status ";
 		query+= "from links cross join radioinstallation as rad1 cross join site_view_only as site1 ";
 	 	query+= "cross join radioinstallation as rad2 cross join site_view_only as site2 ";
-	 	query+= "where rad1.id=txinst ";
+                if ( (linkStatus != "")&&(linkStatus != "All") )
+                        query+= "where links.status= '" + linkStatus + "' and ";
+                else
+                        query+= "where ";
+	 	query+= "rad1.id=txinst ";
 		query+= "and rxinst=rad2.id ";
 		query+= "and rad1.siteid=site1.id ";
 		query+= "and rad2.siteid=site2.id;";
@@ -811,6 +848,7 @@ void cFilter::CreateViews()
 	
 	mChangeInsts=false;
 	mChangeSite=false;
+        mChangeLink=false;
 	
 }
 

@@ -198,6 +198,9 @@ namespace Qrap
 
 		void InsertDefaultRadios();
 	
+                void CalculateTXLosses();
+                void CalculateRXLosses();
+
 		/**
 		 * Private SLOT - This slot will enable the antenna device form widgets and disable the browseButton.
 		 */
@@ -297,6 +300,9 @@ namespace Qrap
 		QPushButton*		mGroundHeightButton;
 
 		QPushButton*		mCloseByButton;
+                
+                QPushButton*		mCalculateRxLossesButton;
+                QPushButton*		mCalculateTxLossesButton;
 
 		QPushButton*		mDefaultRadiosButton;
 

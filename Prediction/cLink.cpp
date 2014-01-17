@@ -307,6 +307,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	}
 
 	double Dist = mTxInst.sSitePos.Distance(mRxInst.sSitePos);
+	mDist = Dist;
 	if (Dist>MaxDist)
 		return false;
 	else if ((int)(Dist/mPlotResolution)<2)
@@ -323,7 +324,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 
 	int j;
 	
-	double EIRP, LinkOtherGain, TxAntValue=0.0, RxAntValue=0.0;
+	double LinkOtherGain, TxAntValue=0.0, RxAntValue=0.0;
 
 	bool AfterReceiver = (mUnits!=dBWm2Hz) && (mUnits!=dBWm2);	
 
@@ -400,6 +401,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	mRxLev[0]=mRxLev[1];
 
 	mPathLossEnd = mPropLoss[mLength-1];
+	mRxLevEnd = mRxLev[mLength-1];
 //	cout << "cLink::DoLink( ... ) before delete [] Tilt" << endl;
 	delete [] Tilt;
 //	cout << "cLink::DoLink( ... ) exiting" << endl;
@@ -837,7 +839,7 @@ void cLink::SaveLink(string &LinkName, int &LinkID)
 		query = "INSERT INTO links ";
 	else
 		query = "UPDATE links set ";
-	query+= "(lastmodified,linkname,txinst,rxinst, minclearance,frequency, pathloss, kfactor, line) ";
+	query+= "(lastmodified,linkname,txinst,rxinst, minclearance,frequency, pathloss, kfactor, status, line) ";
 	if (!LinkID)
 		query += " VALUES";
 	else
@@ -862,6 +864,7 @@ void cLink::SaveLink(string &LinkName, int &LinkID)
 	query += ", ";	
 	gcvt(mkFactor,8,temp);
 	query += temp;
+        query += ", 'Experimental'";
 	query += ", ST_GeomFromText('LINESTRING(";
 	double lat,lon;
 	mTxInst.sSitePos.SetGeoType(DEG);

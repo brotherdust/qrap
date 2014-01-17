@@ -46,6 +46,7 @@ public:
 public slots:
 	void on_comboBoxTechType_currentIndexChanged(int index);
 	void on_comboBoxStatus_currentIndexChanged(int index);
+        void on_comboBoxLinkStatus_currentIndexChanged(int index);
 	void on_comboBoxProject_currentIndexChanged(int index);
 	void on_comboBoxFlagX_currentIndexChanged(int index);
 	void on_comboBoxFlagZ_currentIndexChanged(int index);
@@ -67,6 +68,7 @@ private:
 	bool Initialise;
 	bool mChangeSite;
 	bool mChangeInsts;
+        bool mChangeLink;
 };
 
 #endif /*CFILTER_H_*/

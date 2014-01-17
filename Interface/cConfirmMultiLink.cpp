@@ -80,10 +80,7 @@ void cConfirmMultiLink::LoadDefaults()
 		lblPath->setVisible(false);
 	}
 
-	//\TODO: Anyone knows Qt ;-)
-	//Eish, Maggie doesn't understand where to enable to signals, so the slot doesn't work
-	connect(checkBox, SIGNAL(checkBox->stateChanged()),this,  SLOT(checkBoxChanged()));
-	connect(checkBox, SIGNAL(checkBox->toggled()),this,  SLOT(checkBoxChanged()));
+	connect(checkBox, SIGNAL(stateChanged(int)),this,  SLOT(checkBoxChanged(int)));
 
 	query = "SELECT id,technologytype from technology;";
 	if (!gDb.PerformRawSql(query))

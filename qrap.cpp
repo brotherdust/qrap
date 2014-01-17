@@ -105,6 +105,7 @@ void QRap::initGui()
 	mMeasAnalysisAction = new QAction(QIcon(":/qrap/Measurements.png"),tr("Q-Rap: Compare measurements with predictions"), this);
     	mSpectralAction = new QAction(QIcon(":/qrap/Spectral.png"),tr("Q-Rap: Perform Spectral Interference Analysis"), this);
     	mPreferencesAction = new QAction(QIcon(":/qrap/Preferences.png"),tr("Q-Rap Preferences"), this);
+	mOptimisationAction = new QAction(QIcon(":/qrap/Optimisation.png"),tr("Q-Rap: Optimise link structure in selected area"), this);
 //    	mImportExportAction = new QAction(QIcon(":/qrap/ImportExport.png"),tr("Import Export"),this);
 //    	mHelpAction = new QAction(QIcon(":/qrap/Help.png"),tr("Q-Rap Help"), this);
 
@@ -123,6 +124,7 @@ void QRap::initGui()
 	connect(mMeasAnalysisAction, SIGNAL(activated()), this, SLOT(Measurements()));
   	connect(mSpectralAction, SIGNAL(activated()), this, SLOT(SpectralAnalysis()));
   	connect(mPreferencesAction, SIGNAL(activated()), this, SLOT(Preferences()));
+	connect(mOptimisationAction, SIGNAL(activated()), this, SLOT(Optimise()));
 //  	connect(mImportExportAction,SIGNAL(activated()), this, SLOT(ImportExport()));
 //  	connect(mHelpAction,SIGNAL(activated()), this, SLOT(Help()));
   	cout << "Na Connect" << endl;
@@ -143,6 +145,7 @@ void QRap::initGui()
 	mToolBarPointer->addAction(mMultiLinkAction);
 	mToolBarPointer->addAction(mMeasAnalysisAction);
   	mToolBarPointer->addAction(mSpectralAction);
+        mToolBarPointer->addAction(mOptimisationAction);
   	mToolBarPointer->addAction(mPreferencesAction);
   	mToolBarPointer->addAction(mQActionPointer);
 //  	mToolBarPointer->addAction(mImportExportAction);
@@ -185,6 +188,7 @@ void QRap::unload()
 		mToolBarPointer->removeAction(mDeleteLinkAction);
 	  	mToolBarPointer->removeAction(mRadioAction);
 		mToolBarPointer->removeAction(mMultiLinkAction);
+		mToolBarPointer->removeAction(mOptimisationAction);
 	  	mToolBarPointer->removeAction(mSpectralAction);
 		mToolBarPointer->removeAction(mPreferencesAction);
 		mToolBarPointer->removeAction(mMeasAnalysisAction);
@@ -478,6 +482,15 @@ void QRap::ReceivedRightPoint(QgsPoint &Point)
 			mQGisIface->mapCanvas()->setCursor(Qt::OpenHandCursor);
 			mMouseType = CLEAN;
 		}
+		if (mMouseType == OPTIMISATION)
+		{
+			mPoints.append(Point);
+			mRubberBand->addPoint(Point);
+			DesRubberBand();
+			PerformOptimisation();
+			mQGisIface->mapCanvas()->setCursor(Qt::OpenHandCursor);
+			mMouseType = CLEAN;
+		}
 	}
 }
 
@@ -563,6 +576,12 @@ void QRap::ReceivedLeftPoint(QgsPoint &Point)
 		if (mMouseType == MULTILINK)
 		{
 			cout << " multilink " << endl;
+			mPoints.append(Point);
+			mRubberBand->addPoint(Point);
+		}
+		if (mMouseType == OPTIMISATION)
+		{
+			cout << " optimisation " << endl;
 			mPoints.append(Point);
 			mRubberBand->addPoint(Point);
 		}
@@ -707,6 +726,12 @@ void QRap::Preferences()
 	Preferences->show();
 }
 
+//************************************************************************************
+void QRap::Optimise()
+{
+	mMouseType = OPTIMISATION;
+	InitRubberBand(true);
+}
 
 //************************************************************************************
 void QRap::Measurements()
@@ -878,6 +903,20 @@ void QRap::PerformMultiLink()
 		}
 	}
 }
+
+//**********************************************************************
+void QRap::PerformOptimisation()
+{
+	Optimisation Optim(mQGisIface->mainWindow(), QgisGui::ModalDialogFlags);
+	if ((Optim.SetPoints(mPoints))&&(Optim.LoadAntennas())&&(Optim.LoadCables())&&(Optim.LoadConnectors()))
+	{
+		if(Optim.exec()==1)
+		{
+			mQGisIface->mapCanvas()->refresh();
+		}
+	}
+}
+
 //**************************************************************
 void QRap::DeleteLink()
 {

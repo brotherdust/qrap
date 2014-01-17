@@ -100,6 +100,7 @@ using namespace std;
 #include "DataBase/PreferencesDialog.h"
 #include "Interface/cMeasurementAnalysis.h"
 #include "Interface/cBackup.h"
+#include "Interface/Optimisation.h"
 #include "Interface/cImportExportMenu.h"
 #include "Interface/cUpdateToServer.h"
 #include "Interface/cCreateUpdateFile.h"
@@ -135,6 +136,7 @@ enum MouseActionType
 	DELETELINK,
 	AREA,
 	MULTILINK,
+	OPTIMISATION,
 	SPECTRAL,
 	FILTERAREA
 };
@@ -177,6 +179,7 @@ public slots:
   	void SelectLink();
   	void SelectArea();
 	void MoveSiteClicked();
+	void Optimise();
   	void Preferences();
 	void Measurements();
   	void SpectralAnalysis();
@@ -230,6 +233,7 @@ private:
   	QAction *mDeleteLinkAction;
 	QAction *mMultiLinkAction;
   	QAction *mPreferencesAction;
+	QAction *mOptimisationAction;
   	QAction *mSpectralAction;
   	QAction *mImportExportAction;
   	QAction *mHelpAction;
@@ -248,6 +252,7 @@ private:
   	void FilterArea();
   	void PerformSpectral();
 	void PerformMultiLink();
+	void PerformOptimisation();
   	void GetLink(double lat, double lon);
   	MouseEvents *Mouse;
   	QString Action;

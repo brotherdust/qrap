@@ -1,0 +1,913 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Optimisation</class>
+ <widget class="QDialog" name="Optimisation">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1502</width>
+    <height>794</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Q-Rap Link Optimisation Request</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../.designer/Optimisation.png</normaloff>../../.designer/Optimisation.png</iconset>
+  </property>
+  <widget class="QWidget" name="gridLayout_2">
+   <property name="geometry">
+    <rect>
+     <x>1200</x>
+     <y>730</y>
+     <width>178</width>
+     <height>36</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridlayAccept">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="pushOk">
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="pushCancel">
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QTableWidget" name="tableInstallations">
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>40</y>
+     <width>651</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>651</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
+   <column>
+    <property name="text">
+     <string>Site</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>SiteID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Status</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Existing Mast</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Min Height</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Max Height</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QLabel" name="lblTechnology">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>110</y>
+     <width>81</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Technology: </string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbMinClear">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>705</y>
+     <width>96</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>0 - means Line of Sight; 60 means 60% of the 1st Fresnel Zone is clear; 100 means the entire 1st Fresnel Zone is clear.</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblMaxPath">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>645</y>
+     <width>171</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Maximum Path Loss (dB) : </string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbTechnology">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>110</y>
+     <width>156</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>This is the technology from which the parameters will be derived and from which the radio installations will generated. The technology must have a Default Site.</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblMinClear">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>705</y>
+     <width>161</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Minimum Clearance (%): </string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsbMaxPath">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>635</y>
+     <width>86</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <double>300.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsbMaxDist">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>670</y>
+     <width>86</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <double>1000.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblProject">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>190</y>
+     <width>76</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Project: </string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbProject">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>190</y>
+     <width>156</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>The project to which the generated Radioinstallations should be assigned</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsbKfactor">
+   <property name="geometry">
+    <rect>
+     <x>305</x>
+     <y>740</y>
+     <width>71</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="whatsThis">
+    <string>This is used to indicate the refractivity gradient in the lower troposphere</string>
+   </property>
+   <property name="maximum">
+    <double>10.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.010000000000000</double>
+   </property>
+   <property name="value">
+    <double>1.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox">
+   <property name="geometry">
+    <rect>
+     <x>1155</x>
+     <y>637</y>
+     <width>221</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save working links pdf files?</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit">
+   <property name="geometry">
+    <rect>
+     <x>1160</x>
+     <y>685</y>
+     <width>246</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblPath">
+   <property name="geometry">
+    <rect>
+     <x>1160</x>
+     <y>660</y>
+     <width>181</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Directory to save pdf files:</string>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="tableAntennas">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>310</y>
+     <width>521</width>
+     <height>301</height>
+    </rect>
+   </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
+   <column>
+    <property name="text">
+     <string>Device Name</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>AntennaID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Manufacturer</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Cost</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Gain</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QTableWidget" name="tableCables">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>310</y>
+     <width>421</width>
+     <height>301</height>
+    </rect>
+   </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
+   <column>
+    <property name="text">
+     <string>Cable Type</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>CableID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Cost p/m</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Loss p/m</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsbMinMastheight">
+   <property name="geometry">
+    <rect>
+     <x>1350</x>
+     <y>85</y>
+     <width>86</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <double>300.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblMinMastHeight1">
+   <property name="geometry">
+    <rect>
+     <x>1160</x>
+     <y>90</y>
+     <width>181</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Minimum Mast Height (m):</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblMaxMastheight">
+   <property name="geometry">
+    <rect>
+     <x>1160</x>
+     <y>120</y>
+     <width>181</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Maximum Mast Height (m): </string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsbMaxMastheight">
+   <property name="geometry">
+    <rect>
+     <x>1350</x>
+     <y>120</y>
+     <width>86</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <double>1000.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblMaxMastheight2">
+   <property name="geometry">
+    <rect>
+     <x>1210</x>
+     <y>170</y>
+     <width>181</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Specify min links per site:</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="chkClearance">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>730</y>
+     <width>21</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="chkStrength">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>660</y>
+     <width>21</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsbPower">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>670</y>
+     <width>86</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <double>300.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="chkPower">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>640</y>
+     <width>21</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblPower">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>640</y>
+     <width>171</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Specify txpower (dBm):</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblSensitivity">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>710</y>
+     <width>181</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Specify rxsensitivity (dBm):</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="chkSensitivity">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>710</y>
+     <width>21</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsbSensitivity">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>740</y>
+     <width>86</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <double>-300.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>300.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblRate">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>710</y>
+     <width>171</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Specify data rate (Mbps):</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbDatarate">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>740</y>
+     <width>96</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The data rate for the system that has an associated transmitter power and receiver sensitivity if none is specified.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="chkSignalStrength">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>640</y>
+     <width>21</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblSignalStrength">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>620</y>
+     <width>181</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Specify minimum required signal strength (dBm):</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsbSignalStrength">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>670</y>
+     <width>86</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <double>-300.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>300.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbMinLinks">
+   <property name="geometry">
+    <rect>
+     <x>1250</x>
+     <y>220</y>
+     <width>96</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of links that the optimisation algorithm will aim to form per site&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="tableConnectors">
+   <property name="geometry">
+    <rect>
+     <x>970</x>
+     <y>310</y>
+     <width>521</width>
+     <height>301</height>
+    </rect>
+   </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
+   <column>
+    <property name="text">
+     <string>Description</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Comb/Split ID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Comb/Split</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Cost</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Losses</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QLabel" name="lblNoMast_2">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>270</y>
+     <width>91</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 75 italic 16pt &quot;Ubuntu&quot;;
+text-decoration: underline;</string>
+   </property>
+   <property name="text">
+    <string>Antennas</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblNoMast_3">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>270</y>
+     <width>91</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 75 italic 16pt &quot;Ubuntu&quot;;
+text-decoration: underline;</string>
+   </property>
+   <property name="text">
+    <string>Cables</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblNoMast_4">
+   <property name="geometry">
+    <rect>
+     <x>1160</x>
+     <y>270</y>
+     <width>191</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 75 italic 16pt &quot;Ubuntu&quot;;
+text-decoration: underline;</string>
+   </property>
+   <property name="text">
+    <string>Combiners/Splitters</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblNoMast_5">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>0</y>
+     <width>91</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 75 italic 16pt &quot;Ubuntu&quot;;
+text-decoration: underline;</string>
+   </property>
+   <property name="text">
+    <string>Sites</string>
+   </property>
+  </widget>
+  <widget class="QFrame" name="frame">
+   <property name="geometry">
+    <rect>
+     <x>1120</x>
+     <y>30</y>
+     <width>341</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="lblNoMast">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>10</y>
+      <width>161</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 75 italic 12pt &quot;Ubuntu&quot;;
+text-decoration: underline;</string>
+    </property>
+    <property name="text">
+     <string>No Existing Mast</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="frame_2">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>30</y>
+     <width>331</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+  </widget>
+  <widget class="QFrame" name="frame_3">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>620</y>
+     <width>331</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="lblMaxDist">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>50</y>
+      <width>171</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Maximum Distance (km) : </string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblKfactor">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>120</y>
+      <width>61</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>k-Factor : </string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="frame_4">
+   <property name="geometry">
+    <rect>
+     <x>490</x>
+     <y>620</y>
+     <width>531</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="QFrame" name="frame_5">
+   <property name="geometry">
+    <rect>
+     <x>1120</x>
+     <y>620</y>
+     <width>311</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblSettings">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>40</y>
+     <width>161</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 75 italic 12pt &quot;Ubuntu&quot;;
+text-decoration: underline;</string>
+   </property>
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </widget>
+  <zorder>frame_4</zorder>
+  <zorder>frame_5</zorder>
+  <zorder>frame_3</zorder>
+  <zorder>frame</zorder>
+  <zorder>frame_2</zorder>
+  <zorder>gridLayout_2</zorder>
+  <zorder>tableInstallations</zorder>
+  <zorder>lblTechnology</zorder>
+  <zorder>cbMinClear</zorder>
+  <zorder>lblMaxPath</zorder>
+  <zorder>cbTechnology</zorder>
+  <zorder>lblMinClear</zorder>
+  <zorder>dsbMaxPath</zorder>
+  <zorder>dsbMaxDist</zorder>
+  <zorder>lblProject</zorder>
+  <zorder>cbProject</zorder>
+  <zorder>dsbKfactor</zorder>
+  <zorder>checkBox</zorder>
+  <zorder>lineEdit</zorder>
+  <zorder>lblPath</zorder>
+  <zorder>tableAntennas</zorder>
+  <zorder>tableCables</zorder>
+  <zorder>dsbMinMastheight</zorder>
+  <zorder>lblMinMastHeight1</zorder>
+  <zorder>lblMaxMastheight</zorder>
+  <zorder>dsbMaxMastheight</zorder>
+  <zorder>lblMaxMastheight2</zorder>
+  <zorder>chkClearance</zorder>
+  <zorder>chkStrength</zorder>
+  <zorder>dsbPower</zorder>
+  <zorder>chkPower</zorder>
+  <zorder>lblPower</zorder>
+  <zorder>lblSensitivity</zorder>
+  <zorder>chkSensitivity</zorder>
+  <zorder>dsbSensitivity</zorder>
+  <zorder>lblRate</zorder>
+  <zorder>cbDatarate</zorder>
+  <zorder>chkSignalStrength</zorder>
+  <zorder>lblSignalStrength</zorder>
+  <zorder>dsbSignalStrength</zorder>
+  <zorder>cbMinLinks</zorder>
+  <zorder>tableConnectors</zorder>
+  <zorder>lblNoMast_2</zorder>
+  <zorder>lblNoMast_3</zorder>
+  <zorder>lblNoMast_4</zorder>
+  <zorder>lblNoMast_5</zorder>
+  <zorder>lblSettings</zorder>
+ </widget>
+ <resources>
+  <include location="../qrap.qrc"/>
+ </resources>
+ <connections/>
+</ui>

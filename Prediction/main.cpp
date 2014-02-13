@@ -217,7 +217,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-
+/*
 {
 cMeasImportCSV MeasImport(-120, 390,8, 1, 1, 1);
 //MeasImport.SetCI(196);    MeasImport.LoadMeasurement("/home/maggie/MeasData/SAPS TETRA GAUTENG MEASUREMENT DATA/SAPS Gauteng Coverage/Helderkruin.csv");

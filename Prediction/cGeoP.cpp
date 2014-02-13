@@ -114,7 +114,7 @@ bool cGeoP::Get(double &lat, double &lon)
 	{
 		cout << "This overloaded Get assumes that the coordinate is in Degrees" << endl;
 		cout << " it would seem that this is not the case ... ";
-		cout << " hope you know what you are doing " << endl;
+		cout << " hope you know what you are doing ..." << endl;
 		return false;
 	}
 	return true; 

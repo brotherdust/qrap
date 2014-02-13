@@ -542,6 +542,12 @@ www.QRap.org.za
 		       label="Default Site"
 			description="The Radio installation(s) on this site will be duplicated when a default installation is added to a site. The site needs to be marked with the Default status-flag"
 		       ui="dropdown(fromtable,site,sitename)" />
+
+		<field name="DistRes"
+		       type="real"
+		       label="Distance Resolution" 
+			description="The distance represented by the number representing time diffrence between the transmitter en reciever. E.g. in GSM a timing Advance of 1 represents a resolution of 553.46 meter and 39 (36?) meters for UMTS type 1 measurements"
+			unittype="height"/>
 		
 		<view name = "technology_view" as = 'select * from technology'>
 		</view>
@@ -1369,6 +1375,12 @@ www.QRap.org.za
 		       type = "integer"
 		       label = "Layer threshold" 
 			unittype = "sensitivity"/>
+
+		<field name = "centriod"
+		       type="POINT"
+		       label = "Location Centre of Cell Coverage" 
+			description="This is the assumed centre of the cell coverage. "
+			postgis="true"/>
 	
 		<view name="cell_view" as='select 
 				cell.id as id,
@@ -2275,8 +2287,103 @@ in #define statements in qrap/Prediction/cClutter.h -->
 			unittype = "height"
 		       description="Height above sea level of local ground in meters" />
 
-
 	</table> <!-- testpoint -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="testpointauxGSM" label="GSM Auxiliary Test Point info">
+	       <field name="id"
+		      type="bigserial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+	       
+		<field name="tp"
+		       type="bigint references testpoint(id)"
+		       label="Test Point"
+		       description="Test Point of which this record contains the auxiliary data" />		
+
+		<field name = "serveci"
+		       type = "integer references cell(id) on delete cascade"
+		       label = "Serving Cell ID"
+		       ui = "dropdown(fromtable,cell_view,sectorname)" />
+
+		<field name = "TA"
+		       type = "smallint"
+		       label = "Timing Advance"
+		       description="Timing Advance as specified in the GSM specifications" />
+
+		<field name = "PropDelay"
+		       type = "smallint"
+		       label = "Propagation Delay"
+		       description="The Progation Delay measured in GSM symbols (as the TA) calculated from as sum of the Timing Advance and the Timing Offset" />
+
+		<field name = "BStxpower"
+		       type = "smallint"
+		       label = "Base Station Transmit Power"
+		       description="Base station power level. It is calculated using the Base Station Power Control level received and the nominal transmit power according to 3GPP 45.005 paragraph 4.1.2 " 
+			unittype="power"/>
+
+		<field name = "MStxpower"
+		       type = "smallint"
+		       label = "Mobile Station Transmit Power"
+		       description="Base station power level. It is calculated using the Base Station Power Control level received and information on the frequency band according to 3GPP 45.005 paragraph 4.1.1 " 
+			unittype="power"/>
+
+		<field name = "BSrxpower"
+		       type = "smallint"
+		       label = "Base Station Received Power"
+		       description="Power level received at the base station from the mobile station. RxLev_Sub if DTXul was used else RxLev_Full ... without accounting for power control" 
+			unittype="power"/>
+
+		<field name = "MSrxpower"
+		       type = "smallint"
+		       label = "Mobile Station Received Power"
+		       description="Power level received at the mobile station from the base station. RxLev_Sub if DTXdl was used else RxLev_Full ... without accounting for power control" 
+			unittype="power"/>
+
+		<field name = "BSrxQual"
+		       type = "smallint"
+		       label = "Base Station Received Quality"
+		       description="Uplink Quality indicater. RxQual_Sub id DTX was used else RxQual_Full" />
+
+		<field name = "MSrxQual"
+		       type = "smallint"
+		       label = "Mobile Station Received Quality"
+		       description="Downlink Quality indicator. RxQual_sub id DTX was used else RxQual_Full" />
+
+	</table> <!-- testpointauxGSM -->
+
+
+<!-- *************************************************************************************************************************** -->
+	<table name="testpointauxUTRAN" label="UTRAN Auxiliary Test Point info">
+
+	       <field name="id"
+		      type="bigserial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+	       
+		<field name="tp"
+		       type="bigint references testpoint(id)"
+		       label="Test Point"
+		       description="Test Point of which this record contains the auxiliary data" />		
+
+		<field name = "serveci"
+		       type = "integer references cell(id) on delete cascade"
+		       label = "Serving Cell ID"
+		       ui = "dropdown(fromtable,cell_view,sectorname)" />
+
+		<field name = "RxTxDiff"
+		       type = "int"
+		       label = "Receiver to Transmitter Time Difference"
+		       description="Rx-Tx Time difference Type 1 as specified 3GPP 25 133 par. 9.1.9.1" />
+
+		<field name = "RxTxDiff2"
+		       type = "int"
+		       label = "Receiver to Transmitter Time Difference Type 2"
+		       description="Rx-Tx Time difference Type 2 as specified 3GPP 25 133 par. 9.1.9.2" />
+
+	</table> <!-- testpointauxUTRAN -->
 
 <!-- *************************************************************************************************************************** -->
 	<table name="measurement" label="Measurement">

@@ -1438,9 +1438,9 @@ www.QRap.org.za
 			description="The channel allocated to the specific carrier or radio. The absolute frequency will be calculated using the entries in the Technology Table."
 		       label = "Channel" />
 		
-		<view name = "frequencyallocationlist_view" as = 'select 
+		<view name = "frequencyallocationlist_view" as = ' select 
 					frequencyallocationlist.id as id,
-					frequencyallocationlist.ci as ci, cell_view.cellname as cellname
+					frequencyallocationlist.ci as ci, cell_view.cellname as cellname,
 					frequencyallocationlist.carrier as carrier,
 					frequencyallocationlist.channel as channel 
 					from frequencyallocationlist, cell_view
@@ -1549,7 +1549,7 @@ www.QRap.org.za
 	
 		<view name = "parametersettings_view" as = 'select 
 					parametersettings.id as id,
-					parametersettings.ci as ci, cell_view.cellname cellname
+					parametersettings.ci as ci, cell_view.cellname as cellname,
 					parametername as cell_parameter, parametersettings.setting as setting
 					from parametersettings, cell_view, cellparameters 
 					where (parametersettings.ci=cell_view.id 
@@ -1636,7 +1636,7 @@ www.QRap.org.za
 			rad2.txbearing as txbearing,
 			ST_Distance(site1.location, site2.location, true) as Distance,
 			minclearance,
-			frequency, pathloss, kfactor, line, status
+			frequency, pathloss, kfactor, line, links.status
 			from links cross join radioinstallation as rad1 cross join site_view_only as site1
 	 		cross join radioinstallation as rad2 cross join site_view_only as site2
 	 		where rad1.id=txinst

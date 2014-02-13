@@ -418,6 +418,7 @@ SET (qrap_SRCS
 	Prediction/cMeasImportSpace.cpp
 	Prediction/cMeasImportCSV.cpp
 	Prediction/cMeasAnalysisCalc.cpp
+	Prediction/cPosEstimation.cpp
      
 	Interface/cPlaceSite.cpp
 	Interface/cConfirmLink.cpp
@@ -538,6 +539,7 @@ SET (qrap_MOC_HDRS
 	Prediction/cMeasImportSpace.h
 	Prediction/cMeasImportCSV.h
 	Prediction/cMeasAnalysisCalc.h
+	Prediction/cPosEstimation.h
 
 	Interface/cPlaceSite.h
 	Interface/cConfirmLink.h

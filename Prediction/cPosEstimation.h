@@ -31,14 +31,13 @@
 #include "../DataBase/Config.h"
 #include "../DataBase/cDatabase.h"
 #include "cGeoP.h"
-#include "PredStructs.h"
 #include "cPthlssp.h"
 #include "cProfile.h"
 #include "cAntpatn.h"
 #include "cMemmngr.h"
+#include "PredStructs.h"
 #include "cRasterFileHandler.h"
-#include "../Interface/ui_MeasurementAnalysis.h"
-#include "cGeoP.h"
+#include <qgspoint.h>
 
 #include <iostream>
 #include <Eigen/Dense>
@@ -97,14 +96,23 @@ struct tMeas
 
 typedef	vector<tMeas> vMeas;
 
-typedef tPosSet
+struct tPosSet
 {
-	vTestpoint sTestPoints,
-	vMeas sMeasurements,
-	unsigned sNumMeas
+	vTestPoint sTestPoints;
+	vMeas sMeasurements;
+	unsigned sNumMeas;
 };
 
 typedef	vector<tPosSet> vPosSet;
+
+struct tBand
+{
+	double sFrequency;
+	unsigned sAIndex;
+	unsigned sBIndex;
+	double sMaxMeasValue;
+};
+typedef	vector<tBand> vBand;
 
 
 //## Class cPosEstimation
@@ -140,7 +148,18 @@ class cPosEstimation
 	unsigned mCurrentPosSetIndex;
 	unsigned mNumPoints;
 	unsigned mNewTP;
-	
+
+	double mPlotResolution;
+	double mkFactor;
+	eOutputUnits mUnits;
+	bool mUseClutter;
+	short int mDEMsource;
+	short int mClutterSource;
+	cRasterFileHandler mDEM;
+	cRasterFileHandler mClutter;
+	unsigned mClutterClassGroup;
+	unsigned *mClutterCount;
+	cPathLossPredictor mPathLoss;
 };
 }
 #endif

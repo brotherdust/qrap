@@ -90,7 +90,7 @@ cPosEstimation::~cPosEstimation() // destructor
 }
 
 //*********************************************************************
-bool cPosEstimation::LoadMeasurements(QList<QgsPoint> Points,
+bool cPosEstimation::LoadMeasurements(vPoints Points,
 					unsigned MeasType, 
 					unsigned MeasSource,
 					unsigned PosSource,
@@ -99,14 +99,14 @@ bool cPosEstimation::LoadMeasurements(QList<QgsPoint> Points,
 	pqxx::result r;
 	unsigned tp = 0;
 	unsigned NumInPosSet = 0;
+	double Lat, Lon, mNorth, mSouth, mEast, mWest;
 	char *text= new char[33];
 	cGeoP NorthWestCorner,SouthEastCorner; 
 	if (Points.size() > 1)
 	{
-		double North = Points[0].y();
-		double South = Points[0].y();
-		double East = Points[0].x();
-		double West = Points[0].x();
+		Points[0].Get(mNorth,mEast);
+		mSouth = mNorth;
+		mWest = mEast;
 		string query;
 		pqxx::result MeasSelect;
 
@@ -128,27 +128,29 @@ bool cPosEstimation::LoadMeasurements(QList<QgsPoint> Points,
 		query += " where  siteLocation @ ST_GeomFromText('POLYGON((";
 		for (int i = 0 ; i < Points.size();i++)
 	        {
-	        	North = max(North,Points[i].y());
-	        	South = min(South,Points[i].y());
-	        	East = max(East,Points[i].x());
-	        	West = min(West,Points[i].x());
-			gcvt(Points[i].x(),12,text);
+			Points[i].Get(Lat, Lon);
+	        	mNorth = max(mNorth,Lat);
+	        	mSouth = min(mSouth,Lat);
+	        	mEast = max(mEast,Lon);
+	        	mWest = min(mWest,Lon);
+			gcvt(Lon,12,text);
 	        	query += text;
 	        	query += " ";
-			gcvt(Points[i].y(),12,text);
+			gcvt(Lat,12,text);
 	        	query += text;
 	        	query += ",";
 	        }
-	        NorthWestCorner.Set(North,West);
-	        SouthEastCorner.Set(South,East);
+	        NorthWestCorner.Set(mNorth,mWest);
+	        SouthEastCorner.Set(mSouth,mEast);
 		cout << "North West corner: " << endl;
 		NorthWestCorner.Display();
 		cout << "South East corner: " << endl;
 		SouthEastCorner.Display();
-		gcvt(Points[0].x(),12,text);
+		Points[0].Get(Lat,Lon);
+		gcvt(Lon,12,text);
 	        query += text;
 	        query += " ";
-		gcvt(Points[0].y(),12,text);
+		gcvt(Lat,12,text);
 	        query += text;
 	        query += "))',4326) order by radioinstallation_view.id;";
 
@@ -205,7 +207,7 @@ bool cPosEstimation::LoadMeasurements(QList<QgsPoint> Points,
 			NewTestPoint.sNewTP=0;
 
 			unsigned i;
-			for (int i = 0; i < r.size();i++)
+			for (i = 0; i < r.size();i++)
 			{
 				tp = atoi(r[i]["tp"].c_str());
 				if (tp != NewTestPoint.sOriginalTP)
@@ -341,7 +343,6 @@ bool cPosEstimation::CI_TA()
 	if (mPosSets[mCurrentPosSetIndex].sMeasurements[0].sBeamWidth > 270)
 		return false;
 
-	unsigned i;
 	double Distance = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance; 
 	tTestPoint newTestPoint;
 	newTestPoint.sOriginalTP = mPosSets[mCurrentPosSetIndex].sTestPoints[0].sOriginalTP;
@@ -677,7 +678,7 @@ bool cPosEstimation::CoSinRule()
 	newTestPoint.sMethodUsed = CosineRule;
 
 
-	double A, B, C, alpha, beta, gamma, onderwortel, cosB, cosC, cosA, sinA, sinB;
+	double A, B, C, alpha, beta, gamma, cosB, cosC, cosA, sinA, sinB;
 	cGeoP oldEst;
 	bool worked = false;
 	unsigned OtherSiteIndex;

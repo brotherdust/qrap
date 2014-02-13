@@ -37,14 +37,10 @@
 #include "cMemmngr.h"
 #include "PredStructs.h"
 #include "cRasterFileHandler.h"
-#include <qgspoint.h>
-
 #include <iostream>
-#include <Eigen/Dense>
 
 
 using namespace std;
-using namespace Eigen;
 using namespace Qrap;
 
 enum eMethod
@@ -113,6 +109,7 @@ struct tBand
 	double sMaxMeasValue;
 };
 typedef	vector<tBand> vBand;
+typedef vector<cGeoP> vPoints;
 
 
 //## Class cPosEstimation
@@ -125,11 +122,11 @@ class cPosEstimation
 	cPosEstimation(); // default constructor
 	~cPosEstimation(); // destructor
 
-	bool LoadMeasurements(QList<QgsPoint> Points,
-					unsigned MeasType=0, 
-					unsigned MeasSource=0,
-					unsigned PosSource=0,
-					unsigned Technology=0);
+	bool LoadMeasurements(vPoints Points,
+				unsigned MeasType=0, 
+				unsigned MeasSource=0,
+				unsigned PosSource=0,
+				unsigned Technology=0);
 
 
 	int SaveResults();

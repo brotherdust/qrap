@@ -1,6 +1,6 @@
-CC = g++ -g -Wall -W -D_REENTRANT -c -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/eigen3
+CC = g++ -g -Wall -W -D_REENTRANT -c -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/eigen3 
 
-OBJECTS = cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cClutter.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o cMeasAnalysisCalc.o cMeasImportSpace.o cMeasImportCSV.o cPosEstimation.o main.o
+OBJECTS = cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cClutter.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o cMeasAnalysisCalc.o cMeasImportSpace.o cMeasImportCSV.o main.o
 
 all: rap makefile
 
@@ -9,7 +9,7 @@ all: rap makefile
 #	$(CC) main.cpp 
 
 rap: $(OBJECTS) makefile
-	g++ -g -o rap $(OBJECTS) -L/usr/local/pgsql/lib -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal -lproj  -lssl -lPocoXML  -lPocoFoundation -lQtCore
+	g++ -g -o rap $(OBJECTS) -L/usr/local/pgsql/lib -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal1.7.0 -lproj  -lssl -lPocoXML  -lPocoFoundation -lQtCore 
 
 
 main.o: ../DataBase/Config.h main.cpp makefile
@@ -60,8 +60,8 @@ cPthlssp.o:  cPthlssp.h cClutter.o cMemmngr.o cGeoP.o cProfile.o cPthlssp.cpp ma
 cGDAL.o: cGDAL.h cMemmngr.o cGDAL.cpp makefile
 	$(CC) cGDAL.cpp
 
-cPosEstimation.o: cPosEstimation.h cGeoP.o cAntenna.o ../DataBase/Config.h makefile
-	$(CC) cPosEstimation.cpp
+#cPosEstimation.o: cPosEstimation.h cGeoP.o cAntpatn.o ../DataBase/Config.h cPosEstimation.cpp makefile
+#	$(CC) cPosEstimation.cpp
 
 cSiteEditTools.o: ../DataBase/cSiteEditTools.h ../DataBase/cSiteEditTools.cpp makefile
 	$(CC) ../DataBase/cSiteEditTools.cpp 

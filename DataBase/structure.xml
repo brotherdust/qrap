@@ -1391,6 +1391,7 @@ www.QRap.org.za
 				cell.permanent as permanent,
 				cell.cstraffic as cstraffic,
 				cell.pstraffic as pstraffic,
+				cell.centriod as centriod,
 				cell.txpower as txpower,
 				cell.beacon as beacon,
 				cell.layerthreshold as layerthreshold
@@ -2302,7 +2303,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		       label="Test Point"
 		       description="Test Point of which this record contains the auxiliary data" />		
 
-		<field name = "serveci"
+		<field name = "servci"
 		       type = "integer references cell(id) on delete cascade"
 		       label = "Serving Cell ID"
 		       ui = "dropdown(fromtable,cell_view,sectorname)" />
@@ -2368,7 +2369,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		       label="Test Point"
 		       description="Test Point of which this record contains the auxiliary data" />		
 
-		<field name = "serveci"
+		<field name = "servci"
 		       type = "integer references cell(id) on delete cascade"
 		       label = "Serving Cell ID"
 		       ui = "dropdown(fromtable,cell_view,sectorname)" />
@@ -2442,6 +2443,38 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		       label = "Simulated Value"
 		       description="The estimated received signal strength in simulation in dBm" />
 	</table> <!-- measurement -->
+
+<!-- *************************************************************************************************************************** -->
+	<table name="Celllist" label="List of cells with pilot frequencies and codes (i.e. BCCH and BSIC for GSM and ARFCN and SCN for UMTS">
+
+	       <field name="id"
+		      type="bigserial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+
+	       <field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+		      visible="false" />
+ 
+		<field name = "ci"
+		       type = "integer references cell(id) on delete cascade"
+		       label = "Serving Cell ID"
+		       ui = "dropdown(fromtable,cell_view,sectorname)" />
+
+		<field name = "Carrier"
+		       type = "int"
+		       label = "Carrier"
+		       description="Carrier number of pilot. i.e. BCCH in GSM or ARFCN in UMTS" />
+
+		<field name = "Code"
+		       type = "int"
+		       label = "Code"
+		       description="Indetifying code of Pilot, i.e. BSIV in GSM and SCN in UMTS" />
+
+	</table> <!-- Celllist -->
+
 
 <!-- *************************************************************************************************************************** -->
 	<table name="cable" label="Cable">
@@ -2582,6 +2615,12 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		      label="Last modified"
 			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
 		      visible="false" />
+
+	<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
                 
                 <field name="description"
 		       type="varchar(15)"
@@ -2620,6 +2659,12 @@ in #define statements in qrap/Prediction/cClutter.h -->
 			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
 		      visible="false" />
 
+	<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
 		<field name="data_rate"
 		       type="integer"
 		       label="Data Rate"/>
@@ -2651,6 +2696,12 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		      label="Last modified"
 			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
 		      visible="false" />
+
+	<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
             
 		<field name="height"
 		       type="int"

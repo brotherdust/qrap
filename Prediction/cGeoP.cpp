@@ -170,6 +170,7 @@ bool cGeoP::Between(cGeoP NW,cGeoP SE)
 //***********************************************************************
 const cGeoP & cGeoP::operator=(const cGeoP &right)
 {
+//	cout << " In cGeoP overloaded = " << endl;	
 	if (this==&right)
 		return(*this);
 	mLat = right.mLat;
@@ -191,6 +192,7 @@ bool cGeoP::operator!=(const cGeoP &right) const
 	cGeoP temp(right);
 	if (mType!=temp.mType)
 	{
+		cout << "In overloaded cGeoP != " << endl;
 		cout << "Different Types ... the program is coverting ... " << endl;
 		cout << " To save time you might want to sent them in the same type " << endl;
 		temp.SetGeoType(mType);
@@ -214,6 +216,7 @@ bool cGeoP::operator==(const cGeoP &right) const
 	else tol = 1.0;
 	if (mType!=temp.mType)
 	{
+		cout << "In overloaded cGeoP == " << endl;
 		cout << "Different Types ... the program is coverting ... " << endl;
 		cout << " To save time you might want to sent them in the same type " << endl;
 		temp.SetGeoType(mType);
@@ -276,7 +279,7 @@ bool cGeoP::SetGeoType(GeoType type, int central)
 				}
 			}
 		case NDEF:
-			cout << "GeoType not defined: Make Degrees" << endl;
+			cout << "In cGeoP::SetGeoType: GeoType not defined: Make Degrees" << endl;
 			mType=DEG;
 			switch (type)
 			{
@@ -291,7 +294,7 @@ bool cGeoP::SetGeoType(GeoType type, int central)
 				}
 			}
 		default:
-			cout << "Coversion requested is not surported." << endl;		
+			cout << "cGeoP::SetGeoType: Coversion requested is not surported." << endl;		
 			return false;
 	}
 	return false;
@@ -303,11 +306,11 @@ void cGeoP::Display()
 	if (mType==DEG)
 	{
 		cout << mLat;
-		if (mLat<0.0) cout << ",S, ";
-		else cout << ",N, ";
+		if (mLat<0.0) cout << " S, ";
+		else cout << " N, ";
 		cout << mLon;
-		if (mLon<0) cout << ",W, ";
-		else cout << ",E, ";
+		if (mLon<0) cout << " W, ";
+		else cout << " E, ";
 	}
 	else
 	{
@@ -315,8 +318,8 @@ void cGeoP::Display()
 		cout << mLon <<", ";
 		cout << ",T:," << mType;
 		cout << ",Cent, " << mCentMer;
-		if (mSouth)	cout << ",S, ";
-		else cout << ",N, ";
+		if (mSouth)	cout << " S, ";
+		else cout << " N, ";
 	}
 	cout << endl;
 }
@@ -324,6 +327,7 @@ void cGeoP::Display()
 //************************************************************************
 double cGeoP::Distance(const cGeoP right)
 {
+//	cout << " In cGeoP:: Distance " << endl;
 	double s=0.0;
 	cGeoP tempR(right);
 	cGeoP tempT(*this);
@@ -421,6 +425,7 @@ double cGeoP::Distance(const cGeoP right)
 //
 double cGeoP::Bearing(const cGeoP right)
 {
+//	cout << " In cGeoP::Bearing " << endl;
 	double bearing;
 	cGeoP tempR(right);
 	cGeoP tempT(*this);
@@ -484,6 +489,7 @@ void cGeoP::FromHere(cGeoP here, double distance, double direction)
 {
 	// distance in meter 
 	// direction in degrees
+//	cout << " In cGeoP FromHere " << endl;
 	cGeoP tempT(*this);
 	
  	double s = distance;

@@ -191,6 +191,8 @@ ENDIF (PEDANTIC)
 #############################################################
 # platform specific stuff
 
+set(CMAKE_CXX_FLAGS "-std=c++0x -std=gnu++0x")
+
 IF (WIN32)
   SET (DEFAULT_LIB_SUBDIR     lib)
   SET (DEFAULT_DATA_SUBDIR    .)
@@ -612,6 +614,7 @@ INCLUDE_DIRECTORIES(
 	${POSTGRES_INCLUDE_DIR}
 	${QT_INCLUDES}
 	/usr/include
+	/usr/include/c++
 	/usr/include/qgis
 	/usr/include/eigen3
 	/usr/include/gdal

@@ -88,7 +88,7 @@ class cMeasAnalysisCalc
 	bool OptimiseModelCoefAllTogether();
 	bool OptimiseSeekWidth();
 	bool OptimiseHeights(unsigned MeasSource=0);	
-	cPathLossPredictor mPathLoss;	// we need to access the clutter coefficients of mClutter of PathLoss 
+	cPathLossPredictor mPathLoss;	// we need to access the clutter coefficients of mClutter of cPathLoss 
 					// ... hence mPathLoss needs to be a member/class global variable
 
    private:
@@ -106,7 +106,7 @@ class cMeasAnalysisCalc
 	short int mClutterSource;
 	cRasterFileHandler mDEM;
 	cRasterFileHandler mClutter;
-	vector<tFixed>	mFixedInsts;	///< Inforamtion on the fixed installations
+	vector<tFixed>	mFixedInsts;	///< Information on the fixed installations
 	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
 	MatrixXd mSolveCoefMatrix;	// matrix representing the set of linear equations to be solved
 	VectorXd mLeftSide;

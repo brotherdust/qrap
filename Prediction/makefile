@@ -1,6 +1,6 @@
-CC = g++ -g -Wall -W -D_REENTRANT -c -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/eigen3 
+CC = g++ -g -Wall -W -D_REENTRANT -c -std=c++0x -std=gnu++0x -I/usr/include  -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include/eigen3 -I/usr/include/c++/4.6/
 
-OBJECTS = cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cClutter.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o cMeasAnalysisCalc.o cMeasImportSpace.o cMeasImportCSV.o cPosEstimation.o main.o
+OBJECTS = cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cClutter.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o cMeasAnalysisCalc.o cMeasImportSpace.o cMeasImportCSV.o cPosEstimation.o cMeasImportOldTEMS.o cMeas.o cCellList.o cTPoint.o main.o
 
 all: rap makefile
 
@@ -20,7 +20,19 @@ cMemmngr.o:  cMemmngr.h cMemmngr.cpp makefile
 
 cGeoP.o: cGeoP.h cGeoP.cpp makefile
 	$(CC) cGeoP.cpp
+
+cTPoint.o: cTPoint.h cTPoint.cpp makefile
+	$(CC) cTPoint.cpp
+
+cMeas.o: cMeas.h cMeas.cpp makefile
+	$(CC) cMeas.cpp
+
+cCellList.o: cCellList.h cCellList.cpp makefile
+	$(CC) cCellList.cpp
 	
+cMeasImportOldTEMS.o: cMeasImportOldTEMS.h cMeasImportOldTEMS.cpp makefile
+	$(CC) cMeasImportOldTEMS.cpp
+
 cAntpatn.o: cAntpatn.h cMemmngr.o cAntpatn.cpp makefile
 	$(CC) cAntpatn.cpp
 

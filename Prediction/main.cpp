@@ -33,6 +33,10 @@
 #include "cMeasAnalysisCalc.h"
 #include "cMeasImportSpace.h"
 #include "cMeasImportCSV.h"
+#include "cGeoP.h"
+#include "cPosEstimation.h"
+#include "cMeasImportOldTEMS.h"
+
 
 using namespace std;
 using namespace Qrap;
@@ -51,8 +55,76 @@ int main (int argc, char **argv)
 		cout << "Database connect failed:" << endl;
 		return 0;
 	}
-	
 
+	cout << "Connected " << endl;
+
+/*
+	cMeasImportOldTEMS VCMeasurements(1, 1, 1);
+	cout << "Constructed " << endl;
+
+	VCMeasurements.GetCurrentCellList();
+	cout << endl << "got Celllist " << endl;
+
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/23aug2.fmt" , '23/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/24aug1.fmt" , '24/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/24aug2.fmt" , '24/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/24aug3.fmt" , '24/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/campus.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv21a2.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv21a3.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv21a4.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv21a5.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv21aug.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv23aug.fmt" , '23/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drvbrook.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drvcityh.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv_cty_hatf.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv_ctypaulkruger.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv_hatf_brook.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv_hatf_cont.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv_hatf.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv_nrthPret_cont.fmt" , '21/08/2004');
+	VCMeasurements.ReadTEMSfile("/home/maggie/Positioning/VC_Drive-tests2006/drv_nrthPret.fmt" , '21/08/2004');
+
+	cout << endl << "Read File(s) " << endl;
+	VCMeasurements.SortReduceCellList();
+	cout << endl << "SortedCellList " << endl;
+	VCMeasurements.WriteCellListToDB();
+	cout << endl << "Wrote CellList to DB " << endl;
+	VCMeasurements.GetCIfromBSICBCCH();
+	cout << endl << "Got CI's " << endl;
+	VCMeasurements.WriteToDatabase();
+	cout << endl << "Wrote Measurements to DataBase" << endl;
+*/
+
+	cPosEstimation Positioning;
+	vPoints Punte;
+	cGeoP *Hoek;
+	Hoek = new cGeoP[4];
+
+	Hoek[0].Set(-25.78, 28.29);
+	Punte.push_back(Hoek[0]);
+	Hoek[1].Set(-25.60, 28.29);
+	Punte.push_back(Hoek[1]);
+	Hoek[2].Set(-25.60, 28.15);
+	Punte.push_back(Hoek[2]);
+	Hoek[3].Set(-25.78, 28.15);
+	Punte.push_back(Hoek[3]);
+	
+	delete [] Hoek;
+	
+	Positioning.LoadMeasurements(Punte);
+
+	cout << " Clearing Punte " << endl;
+	Punte.clear();
+
+	cout << " Estimating Positions " << endl;
+	Positioning.EstimatePositions();
+
+	cout << " Saving Results " << endl;
+	Positioning.SaveResults();
+
+/*
    string query = "update coefficients set coefficient=0.0;";
 
 	double Mean, MSE, StDev, CorrC;
@@ -72,6 +144,7 @@ int main (int argc, char **argv)
 
 //	Meas.OptimiseSeekWidth();
 
+*/
 /*
 	if (!gDb.PerformRawSql(query))
 	{
@@ -96,7 +169,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 */
-
+/*
 	Meas. LoadMeasurements();
 	Meas.OptimiseModelCoefAllTotal(0);
 
@@ -136,7 +209,7 @@ int main (int argc, char **argv)
 	Meas. LoadMeasurements(0,0,4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nao0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-
+*/
 /*
 	if (!gDb.PerformRawSql(query))
 	{
@@ -175,7 +248,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
 */
-
+/*
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -216,7 +289,7 @@ int main (int argc, char **argv)
 	Meas.OptimiseModelCoefD(4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
+*/
 /*
 {
 cMeasImportCSV MeasImport(-120, 390,8, 1, 1, 1);

@@ -452,6 +452,8 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 					Float2DArray &Data, GeoType ProjIn) 
 {
 //	cout << "In GetForDEM" << endl;
+	mCurrentRasters.clear();
+
 	cGeoP NE, SW, rNW, rSE, rNE, rSW, Point, tempP,Mid;
 	double N,W,S,E,WE, Ydist, Xdist, MidX, MidY, tempD;
 	unsigned i,j,k,midRow,midCol;
@@ -549,13 +551,13 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	if (mCurrentRasters.size()==0)
 		AddRaster(Mid);
 	if (mCurrentRasters.size()==0)
-		AddRaster(NW);
-	if (mCurrentRasters.size()==0)
 		AddRaster(SE);
 	if (mCurrentRasters.size()==0)
 		AddRaster(NE);
 	if (mCurrentRasters.size()==0)
 		AddRaster(SW);
+	if (mCurrentRasters.size()==0)
+		AddRaster(NW);
 
 	if (mCurrentRasters.size()!=0)
 	{

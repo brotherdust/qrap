@@ -62,7 +62,7 @@ cLink::cLink()
 	mPlotResolution = 90;
 	mTxInst.sInstKey=1;
 	mTxInst.sSiteID=1;
-	mTxInst.sSitePos.Set(-25,25);
+	mTxInst.sSitePos.Set(-25,25,DEG);
 	mTxInst.sFrequency=2400;
 	mTxInst.sEIRP=33;
 	mTxInst.sTxPower=2;	
@@ -83,7 +83,7 @@ cLink::cLink()
 	mRxInst.sBEdge=0;
 	mRxInst.sInstKey=1;
 	mRxInst.sSiteID=1;
-	mRxInst.sSitePos.Set(-25,25.5);
+	mRxInst.sSitePos.Set(-25,25.5,DEG);
 	mRxInst.sFrequency=2400;
 	mRxInst.sEIRP=33;
 	mRxInst.sTxPower=2;	
@@ -695,10 +695,11 @@ bool cLink::GetDBinfo(tFixed &Inst)
 	gcvt(Inst.sInstKey,8,temp);
 	if (mFrequency>59999)
 	{ // Get frequency from database
-		query = "SELECT siteid,ST_AsText(location) as location,eirp,txpower,txlosses,rxlosses,rxsensitivity,frequency ";
-		query += "txantpatternkey,txbearing,txmechtilt,txantennaheight, ";
-		query += "rxantpatternkey,rxbearing,rxmechtilt,rxantennaheight ";
-		query += "FROM radioinstallation cross join site cross join cell cross join frequencyallocationlist ";
+		query = "SELECT siteid,ST_AsText(location) as location, eirp, txpower, txlosses, rxlosses, "; 			query += "rxsensitivity, frequency, ";
+		query += "txantpatternkey, txbearing, txmechtilt, txantennaheight, ";
+		query += "rxantpatternkey, rxbearing, rxmechtilt, rxantennaheight ";
+		query += "FROM radioinstallation cross join site cross join cell ";
+		query += "cross join frequencyallocationlist ";
 		query += "WHERE cell.sector=radioinstallation.id and ci=cell.id and siteid=site.id ";
 		query += "and carrier=1 and radioinstallation.id ="; 
 		query += temp; 
@@ -706,8 +707,8 @@ bool cLink::GetDBinfo(tFixed &Inst)
 	}
 	else
 	{
-		query = "SELECT siteid,ST_AsText(location) as location,eirp,txpower,txlosses,rxlosses,rxsensitivity,";
-		query += "txantpatternkey,txbearing,txmechtilt,txantennaheight,";
+		query = "SELECT siteid,ST_AsText(location) as location, eirp, txpower, txlosses, rxlosses, ";
+		query += "rxsensitivity, txantpatternkey,txbearing,txmechtilt,txantennaheight,";
 		query += "rxantpatternkey,rxbearing,rxmechtilt,rxantennaheight ";
 		query += "FROM radioinstallation cross join site WHERE siteid=site.id AND radioinstallation.id =";
 		query += temp; 

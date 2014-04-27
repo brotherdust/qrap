@@ -26,6 +26,18 @@
 #ifndef cPosEstimation_h
 #define cPosEstimation_h 1
 
+#define GAMMA 2.5
+#define MOBILEHEIGHT 1.5
+#define SIGMA2 (14*14)
+#define MARGIN 15
+#define SENSITIVITY -110
+#define NUMPARTICLES 30
+#define INERTIA 0.72
+#define Cp 1.4
+#define Cg 1.4
+#define STOPN 20
+#define DELTA 0.000005
+
 
 // include local headers
 #include "../DataBase/Config.h"
@@ -38,7 +50,7 @@
 #include "PredStructs.h"
 #include "cRasterFileHandler.h"
 #include <iostream>
-
+#include <random>
 
 using namespace std;
 using namespace Qrap;
@@ -50,7 +62,11 @@ enum eMethod
 	CellID_RxTx,
 	SSiteDir, // The direction is based on the direction of the second strongest cell
 	CoSiteSecDir,
-	CosineRule,
+	CosRuleAngleDistRatio,
+	CosRuleDistDist,
+	CosRuleDistAngle,
+	CosRuleAngleAngle,
+	DCM_PSO,
 	None
 };
 
@@ -128,7 +144,7 @@ class cPosEstimation
 				unsigned PosSource=0,
 				unsigned Technology=0);
 
-
+	void EstimatePositions();
 	int SaveResults();
 
 
@@ -139,7 +155,13 @@ class cPosEstimation
 	bool SecondSite();
 	bool CoSecAzi(double &minAzi);
 	double FindAzi(unsigned BIndex, unsigned AIndex=0);
+	double SearchDistance(double Azimuth, double min, double max);
 	bool CoSinRule();
+	bool DCM_ParticleSwarm();
+
+	// In this function the default mobile installation 
+	// with height of MOBILEHEIGHT (#defined) and an isotropic antenna. 
+	double CostFunction(double rho, double phi);
 
 	vPosSet mPosSets;		/// an array with all the testpoints
 	unsigned mCurrentPosSetIndex;
@@ -154,9 +176,17 @@ class cPosEstimation
 	short int mClutterSource;
 	cRasterFileHandler mDEM;
 	cRasterFileHandler mClutter;
+	cAntennaPattern* mFixedAnts;
+	unsigned mNumInsts;
 	unsigned mClutterClassGroup;
 	unsigned *mClutterCount;
 	cPathLossPredictor mPathLoss;
+	double* mCellPathLoss;		/// Pathloss to each cell in a measurement set.
+	cProfile mClutterProfile;
+	cProfile mDEMProfile;
+	vector<tFixed>	mFixedInsts;	///< Information on the fixed installations
+	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
+
 };
 }
 #endif

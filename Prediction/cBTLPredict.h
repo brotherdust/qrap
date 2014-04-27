@@ -119,9 +119,9 @@ namespace Qrap
 			 * @return A boolean.
 			 */
 			bool GetBTL (	unsigned &NumAngles,
-							unsigned &NumRadialPoints,
-							double &Radius,
-							double &DistanceRes);
+					unsigned &NumRadialPoints,
+					double &Radius,
+					double &DistanceRes);
 
 
 			void SetMaxPathLoss(double MaxPathLoss) 

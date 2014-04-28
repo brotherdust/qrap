@@ -102,7 +102,7 @@ struct tMeas
 	double		sHeight;
 	double		sAzimuth;
 	double 		sBeamWidth;
-	double		sDistance;	// The estimated distance from the site in meters using TA or Rx-Tx chips
+	double		sDistance;
 	double 		sResDist;
 };
 

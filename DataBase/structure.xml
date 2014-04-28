@@ -1634,7 +1634,7 @@ www.QRap.org.za
 			site1.sitename||rad1.sector as txsite, txinst,
 			rad1.txbearing as txbearing,
 			site2.sitename||rad2.sector as rxsite, rxinst,
-			rad2.txbearing as txbearing,
+			rad2.rxbearing as rxbearing,
 			ST_Distance(site1.location, site2.location, true) as Distance,
 			minclearance,
 			frequency, pathloss, kfactor, line, links.status

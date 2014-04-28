@@ -287,6 +287,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	FreeSpace = CalcFreeSpaceLoss(mLinkLength);
 	PlaneEarth = CalcPlaneEarthLoss(mLinkLength);
 	m_Loss = FreeSpace ;
+   mClutterIndex = mClutterProfile[m_size-1];
 
 	DiffLoss = 0;
 	if (InputProfile.GetSize()>2)
@@ -298,7 +299,6 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		PeakIndex = FindMainPeak(0,1,ReffHeight, MinClearance,sqrtD1D2);
 		if (mUseClutter) 
 			if ((MinClearance<1.0)&&(PeakIndex!=0)) mClutterIndex = mClutterProfile[PeakIndex];
-			else mClutterIndex = mClutterProfile[m_size-1];
 
 		if ((MinClearance<1.0)&&(PeakIndex!=0))
 		{
@@ -461,7 +461,10 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 	double offset;
 	double Reff_2;
 
+//	cout << "In cPathLossPredictor::InitEffectEarth InputProfile.size()=" <<  InputProfile.GetSize() << endl;
+//	cout << "In cPathLossPredictor::InitEffectEarth ClutterProfile.size()=" <<  ClutterProfile.GetSize() << endl;
 	m_size = InputProfile.GetSize();
+
 	m_interPixelDist = InputProfile.GetInterPixelDist();
 	m_tempIPD = m_interPixelDist;
 	m_slope = 0.0;

@@ -618,8 +618,8 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 				if (IsInSet)
 				{
 					Current = k;
-					Data[i][j] = mCurrentRasters[Current]->GetValue(Point,mSampleMethod);
-					mCurrentRasters[Current]->mUsed = true;
+					Data[i][j] = mCurrentRasters[k]->GetValue(Point,mSampleMethod);
+					mCurrentRasters[k]->mUsed = true;
 				}
 				else Data[i][j]=0;
 			}

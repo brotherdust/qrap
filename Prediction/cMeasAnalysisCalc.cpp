@@ -860,15 +860,13 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 
 	for (mClutterFilter = 1; mClutterFilter<mPathLoss.mClutter.mNumber; mClutterFilter ++)
 	{
-		
 		NumUsed = PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, mClutterFilter);
-		TotalNumUsed = NumUsed;
 		cout << "clutterType = " << mClutterFilter;
 			cout << "	#Used: " << NumUsed << "	Mean: " << Mean 
 			<< "	MeanSquare: " << MeanSquareError << "	StDev: "<< StDev
 			<< "	CorrC: " << CorrC << endl;
 		// Only optimise if enough points are involved
-		if (NumUsed > 0.001*TotalNumUsed/mPathLoss.mClutter.mNumber)
+		if (NumUsed > 1000)
 		{
 			for (i=0; i<NUMTERMS; i++)
 			{
@@ -1149,7 +1147,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		Up[i] = true;
 		CHeightDiff[i] = 0.5;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
-		DeltaH[i] =0.2;
+		DeltaH[i] =-0.2;
 		NumClut[i] = 0;
 		Passed[i] = false;
 	}

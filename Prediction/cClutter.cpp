@@ -52,7 +52,7 @@ cClutter::cClutter(unsigned ClassGroup)
 //	cout << "In cClutter Overlaod constructor" << endl;
 	mNumber = 0;
 	mClutterTypes = NULL;
-	mClassificationGroup = 0;
+	mClassificationGroup = ClassGroup;
 	string setting = gDb.GetSetting("UseClutter");
 	if (setting=="true")
 		GetFromDatabase(ClassGroup);
@@ -352,6 +352,7 @@ bool cClutter::Reset (unsigned ClassGroup)
 //	cout << " In cClutter::Reset " << endl;
 	bool value;
 	Destroy();
+	mClassificationGroup=ClassGroup;
 	value = GetFromDatabase(ClassGroup);
 	return value;
 }

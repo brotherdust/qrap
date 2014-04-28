@@ -1125,8 +1125,10 @@ bool cPosEstimation::DCM_ParticleSwarm()
 
     	std::random_device RhoRD;
     	std::mt19937_64 Rho_engine(RhoRD());
-  	std::exponential_distribution<double> rho_distE(1);
-	uniform_real_distribution<double> rho_distU(0,1);
+  	   std::exponential_distribution<double> rho_distE(1);
+    	std::random_device RhoRDU;
+    	std::mt19937_64 Rho_engineU(RhoRDU());
+	   uniform_real_distribution<double> rho_distU(0,1);
 
 	double phi_min = -180;
 	double phi_max = 180;
@@ -1140,11 +1142,12 @@ bool cPosEstimation::DCM_ParticleSwarm()
 
 	gbestValue = MAXDOUBLE;
 
+	cout << " cPosEstimation::DCM_ParticleSwarm() VOOR initialisation loop" << endl; 
 	for (i=0; i<NUMPARTICLES; i++)
 	{
 		tempvalue = 2;
 		if (i>NUMPARTICLES/2)
-			tempvalue = rho_distU(Rho_engine);
+			tempvalue = rho_distU(Rho_engineU);
 		else
 		{
 			while (tempvalue>1)
@@ -1159,6 +1162,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				phi[i]-=180.0;
 			else phi[i]+=180.0;
 		}
+		if (rho[i]<3.0*mPlotResolution) rho[i] = 3.0*mPlotResolution;
 		if (phi[i]>180)
 			phi[i]-=360;
 		else if (phi[i]<-180)
@@ -1285,6 +1289,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				phi[i] = phi_dist(Phi_engine);
 				phi_snelheid[i] = 0;		
 			}
+			if (rho[i]<3.0*mPlotResolution) rho[i] = 3.0*mPlotResolution;
 					
 			if (phi[i]>180)
 				phi[i]-=360;
@@ -1328,27 +1333,26 @@ double cPosEstimation::CostFunction(double rho, double phi)
 	Prediction = new double[mNumInsts];
 	delete [] mCellPathLoss;
 	mCellPathLoss = new double[mNumInsts];
-	double DiffLoss, Azimuth, AntValue;
-	float Tilt;
+	double DiffLoss=0, Azimuth, AntValue;
+	float Tilt=0;
 	cGeoP ParticlePosition(-25.7, 28.2, DEG);
 
 	ParticlePosition.FromHere(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, rho, phi);
 	
 	for (i=0; i<mNumInsts; i++)
 	{
-		mPathLoss.setParameters(mkFactor,mPosSets[mCurrentPosSetIndex].sMeasurements[i].sFrequency,
-					mPosSets[mCurrentPosSetIndex].sMeasurements[i].sHeight, MOBILEHEIGHT,
-					mUseClutter, mClutterClassGroup);
 
-		mDEM.GetForLink(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation,
-				ParticlePosition,mPlotResolution, mDEMProfile);
-
+		mDEM.GetForLink(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation,
+				ParticlePosition, mPlotResolution, mDEMProfile);
 		if (mUseClutter)
 		{
 			mClutter.GetForLink(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation,
 						ParticlePosition, mPlotResolution, mClutterProfile);
 		}
-		
+
+		mPathLoss.setParameters(mkFactor,mPosSets[mCurrentPosSetIndex].sMeasurements[i].sFrequency,
+					mPosSets[mCurrentPosSetIndex].sMeasurements[i].sHeight, MOBILEHEIGHT,
+					mUseClutter, mClutterClassGroup);
 		mCellPathLoss[i] = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
 		Azimuth = mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation.Bearing(ParticlePosition);
 		AntValue = mFixedAnts[i].GetPatternValue(Azimuth, Tilt);

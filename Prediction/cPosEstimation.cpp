@@ -1155,7 +1155,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 
 	gbestValue = MAXDOUBLE;
 
-	cout << " cPosEstimation::DCM_ParticleSwarm() VOOR initialisation loop" << endl; 
+//	cout << " cPosEstimation::DCM_ParticleSwarm() VOOR initialisation loop" << endl; 
 	for (i=0; i<NUMPARTICLES; i++)
 	{
 		tempvalue = 2;
@@ -1354,7 +1354,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //	cout << "rho = " << rho << "	phi = " << phi << endl;
 	for (i=0; i<mNumInsts; i++)
 	{
-			mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation.Display();
+//			mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation.Display();
 //			cout << "i = " << i << "	mCurrentPosSetIndex =" << mCurrentPosSetIndex << endl;
 			mDEM.GetForLink(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation,
 													ParticlePosition, mPlotResolution, mDEMProfile);

@@ -77,6 +77,9 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 		m_aboveEarth[i] = 0.0;
 	};
 
+	for (i=0; i<NUMTERMS; i++)
+		mCterms[i]=0;
+		
 	if (NUMTERMS>0) mCterms[0] = TERM0;
 	if (NUMTERMS>2) mCterms[2] = TERM2;
 	if (NUMTERMS>4) mCterms[4] = TERM4;
@@ -119,12 +122,12 @@ cPathLossPredictor::cPathLossPredictor(const cPathLossPredictor &right)
 	mClutterProfile = new int[m_size];
 
 	for (i=0; i<m_size; i++)
-        {
+    {
 		m_CurvedProfile[i] = right.m_CurvedProfile[i];
                 m_TempProfile[i]=  right.m_TempProfile[i];
 		m_profile[i] = right.m_profile[i];
 		mClutterProfile[i] = right.mClutterProfile[i];	
-        }
+    }
 
 	m_markers = new int[MAXPEAK];
 	m_peakwidth = new int[MAXPEAK];
@@ -236,6 +239,9 @@ int cPathLossPredictor::setParameters(double k, double f,
 		mClutter.mClassificationGroup = ClutterClassGroup;
 	}
 
+	for (unsigned i=0; i<NUMTERMS; i++)
+		mCterms[i]=0;
+
 	if (mUseClutter)
 	{
 		if (NUMTERMS>0) mCterms[0] = TERM0;
@@ -287,7 +293,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	FreeSpace = CalcFreeSpaceLoss(mLinkLength);
 	PlaneEarth = CalcPlaneEarthLoss(mLinkLength);
 	m_Loss = FreeSpace ;
-   mClutterIndex = mClutterProfile[m_size-1];
+
 
 	DiffLoss = 0;
 	if (InputProfile.GetSize()>2)
@@ -299,6 +305,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		PeakIndex = FindMainPeak(0,1,ReffHeight, MinClearance,sqrtD1D2);
 		if (mUseClutter) 
 			if ((MinClearance<1.0)&&(PeakIndex!=0)) mClutterIndex = mClutterProfile[PeakIndex];
+			else    mClutterIndex = mClutterProfile[m_size-1];
 
 		if ((MinClearance<1.0)&&(PeakIndex!=0))
 		{
@@ -721,6 +728,12 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex, double &alpha)
 	double tempL, tempR;
 	int start, stop;
 
+	if (m_size<2)
+	{
+		alpha=PI;
+	 	return 0.0;		
+	}
+//	cout << "In cPathLossPredictor::SetPeakRadius:m_size = " << m_size;
 	sizeSP = m_size;
 	SmoothProfile = new float[sizeSP];
 	start = max(0,PeakIndex-m_SeekWidth-m_SmoothWidth);

@@ -219,6 +219,45 @@ bool cGeoP::operator==(const cGeoP &right) const
 		cout << "In overloaded cGeoP == " << endl;
 		cout << "Different Types ... the program is coverting ... " << endl;
 		cout << " To save time you might want to sent them in the same type " << endl;
+		if (mType==DEG)
+		{
+			cout << mLat;
+			if (mLat<0.0) cout << " S, ";
+			else cout << " N, ";
+			cout << mLon;
+			if (mLon<0) cout << " W, ";
+			else cout << " E, ";
+		}
+		else
+		{
+			cout << mLat <<", ";
+			cout << mLon <<", ";
+			cout << ",T:," << mType;
+			cout << ",Cent, " << mCentMer;
+			if (mSouth)	cout << " S, ";
+			else cout << " N, ";
+		}
+		cout << endl;
+		if (mType==DEG)
+		{
+			cout << right.mLat;
+			if (right.mLat<0.0) cout << " S, ";
+			else cout << " N, ";
+			cout << right.mLon;
+			if (right.mLon<0) cout << " W, ";
+			else cout << " E, ";
+		}
+		else
+		{
+			cout << right.mLat <<", ";
+			cout << right.mLon <<", ";
+			cout << ",T:," << mType;
+			cout << ",Cent, " << right.mCentMer;
+			if (right.mSouth)	cout << " S, ";
+			else cout << " N, ";
+		}
+		cout << endl << endl;
+
 		temp.SetGeoType(mType);
 	}
 	if (mType==DEG)

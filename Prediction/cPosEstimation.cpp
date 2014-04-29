@@ -255,7 +255,6 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 					NewTestPoint.sErrorEstimate = 0.0;
 					NewPosSet.sTestPoints.push_back(NewTestPoint);
 				}
-				else NumInPosSet++; 
 				NewMeasurement.sOriginalTP = tp;
 				NewMeasurement.sID = i;
 				NewMeasurement.sSiteID = atoi(r[i]["siteid"].c_str());
@@ -265,6 +264,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 				latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
 				if ((longitude<181)&&(longitude>-181)&&(latitude<91)&&(latitude>-91))
 				{
+					NumInPosSet++; 
 					NewMeasurement.sSiteLocation.Set(latitude,longitude,DEG);
 					NewMeasurement.sCellID = atoi(r[i]["ci"].c_str());
 					PointString = r[i]["centriod"].c_str();
@@ -368,6 +368,19 @@ void cPosEstimation::EstimatePositions()
 			&&(mPosSets[mCurrentPosSetIndex].sTestPoints.size()>0))
 		{
 			mNumInsts = mPosSets[mCurrentPosSetIndex].sMeasurements.size();
+			delete [] mFixedAnts;
+			mNumInsts = mPosSets[mCurrentPosSetIndex].sMeasurements.size();
+			mFixedAnts = new cAntennaPattern[mNumInsts];
+			for (i=0; i < mNumInsts; i++)
+			{
+				mFixedAnts[i].SetAntennaPattern(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sAntPatternKey, 
+					mPosSets[mCurrentPosSetIndex].sMeasurements[i].sAzimuth, 
+					mPosSets[mCurrentPosSetIndex].sMeasurements[i].sTilt);
+			}
+			mPathLoss.setParameters(mkFactor,mPosSets[mCurrentPosSetIndex].sMeasurements[0].sFrequency,
+					mPosSets[mCurrentPosSetIndex].sMeasurements[0].sHeight, MOBILEHEIGHT,
+					mUseClutter, mClutterClassGroup);
+	
 			CoSinRule();
 			CI_TA();
 			CI();
@@ -680,6 +693,7 @@ double cPosEstimation::SearchDistance(double Azimuth, double min, double max)
 	double Distance = (max-min)/2.0;
 	double BestCost = 999999;
 	double Cost = 999999;
+
 	for (i=0; i<StopNum; i++)
 	{
 		Cost = CostFunction(min + (double)i*mPlotResolution, Azimuth);
@@ -1075,21 +1089,6 @@ bool cPosEstimation::DCM_ParticleSwarm()
 	newTestPoint.sOriginalLocation = mPosSets[mCurrentPosSetIndex].sTestPoints[0].sOriginalLocation;
 	newTestPoint.sMethodUsed = DCM_PSO;
 
-	//Initialise predictions related stuff
-	//Initialise antenna patterns;
-	delete [] mFixedAnts;
-	mNumInsts = mPosSets[mCurrentPosSetIndex].sMeasurements.size();
-	mFixedAnts = new cAntennaPattern[mNumInsts];
-	for (i=0; i < mNumInsts; i++)
-	{
-		mFixedAnts[i].SetAntennaPattern(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sAntPatternKey, 
-				mPosSets[mCurrentPosSetIndex].sMeasurements[i].sAzimuth, 
-				mPosSets[mCurrentPosSetIndex].sMeasurements[i].sTilt);
-	}
-	mPathLoss.setParameters(mkFactor,mPosSets[mCurrentPosSetIndex].sMeasurements[0].sFrequency,
-				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sHeight, MOBILEHEIGHT,
-				mUseClutter, mClutterClassGroup);
-	
 	// Initialise swarm
 	// make position coordinates rho (in meters) and phi (cylindrical coordinates)
 
@@ -1352,38 +1351,39 @@ double cPosEstimation::CostFunction(double rho, double phi)
 	cGeoP ParticlePosition(-25.7, 28.2, DEG);
 
 	ParticlePosition.FromHere(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, rho, phi);
+//	cout << "rho = " << rho << "	phi = " << phi << endl;
 	for (i=0; i<mNumInsts; i++)
 	{
 			mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation.Display();
-			cout << "i = " << i << "	mCurrentPosSetIndex =" << mCurrentPosSetIndex << endl;
+//			cout << "i = " << i << "	mCurrentPosSetIndex =" << mCurrentPosSetIndex << endl;
 			mDEM.GetForLink(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation,
 													ParticlePosition, mPlotResolution, mDEMProfile);
 
-		if (mUseClutter)
-		{
-			mClutter.GetForLink(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation,
-														ParticlePosition, mPlotResolution, mClutterProfile);
-		}
+			if (mUseClutter)
+			{
+				mClutter.GetForLink(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation,
+															ParticlePosition, mPlotResolution, mClutterProfile);
+			}
 
-		mPathLoss.setParameters(mkFactor,mPosSets[mCurrentPosSetIndex].sMeasurements[i].sFrequency,
-					mPosSets[mCurrentPosSetIndex].sMeasurements[i].sHeight, MOBILEHEIGHT,
-					mUseClutter, mClutterClassGroup);
-		mCellPathLoss[i] = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
-		Azimuth = mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation.Bearing(ParticlePosition);
-		AntValue = mFixedAnts[i].GetPatternValue(Azimuth, Tilt);
-		Prediction[i] =  mPosSets[mCurrentPosSetIndex].sMeasurements[i].sEIRP 
-				- mCellPathLoss[i] - AntValue;
-		if (Prediction[i] > SENSITIVITY)
-			Delta[i] = (mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue - Prediction[i]) 
-				* (mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue - Prediction[i]);
-		else
-		{
-			Delta[i] = 0;
-			NumUsed --;
-		}
-
-//		cout << i << "	meas=" << mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue
-//			<< "	prediction =" << prediction << "	Delta[i]=" << Delta[i] << endl;
+			mPathLoss.setParameters(mkFactor,mPosSets[mCurrentPosSetIndex].sMeasurements[i].sFrequency,
+						mPosSets[mCurrentPosSetIndex].sMeasurements[i].sHeight, MOBILEHEIGHT,
+						mUseClutter, mClutterClassGroup);
+			mCellPathLoss[i] = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
+			Azimuth = mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation.Bearing(ParticlePosition);
+//			cout << "Tilt = " << Tilt << "	Azimuth = " << Azimuth << endl;
+			AntValue = mFixedAnts[i].GetPatternValue(Azimuth, Tilt);
+			Prediction[i] =  mPosSets[mCurrentPosSetIndex].sMeasurements[i].sEIRP 
+										- mCellPathLoss[i] - AntValue;
+			if (Prediction[i] > SENSITIVITY)
+				Delta[i] = (mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue - Prediction[i]) 
+								* (mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue - Prediction[i]);
+			else
+			{
+				Delta[i] = 0;
+				NumUsed --;
+			}
+//			cout << i << "	meas=" << mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue
+//						<< "	prediction =" << prediction << "	Delta[i]=" << Delta[i] << endl;
 	}
 
 

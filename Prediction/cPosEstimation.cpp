@@ -263,54 +263,57 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 				spacePos = PointString.find_first_of(' ');
 				longitude = atof((PointString.substr(6,spacePos).c_str())); 
 				latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
-				NewMeasurement.sSiteLocation.Set(latitude,longitude,DEG);
-				NewMeasurement.sCellID = atoi(r[i]["ci"].c_str());
-				PointString = r[i]["centriod"].c_str();
-				spacePos = PointString.find_first_of(' ');
-				longitude = atof((PointString.substr(6,spacePos).c_str())); 
-				latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
-				NewMeasurement.sCentroid.Set(latitude,longitude,DEG);
-				NewMeasurement.sInstKeyFixed = atoi(r[i]["InstKeyFixed"].c_str());
-				NewMeasurement.sAntPatternKey = atoi(r[i]["txantpatternkey"].c_str());
-				NewMeasurement.sFrequency = atof(r[i]["frequency"].c_str());
-				NewMeasurement.sMeasValue = atof(r[i]["measvalue"].c_str());
-				NewMeasurement.sPathLoss = atof(r[i]["pathloss"].c_str());
-				NewMeasurement.sResDist = atof(r[i]["DistRes"].c_str());
-				NewMeasurement.sEIRP = atof(r[i]["EIRP"].c_str());
-				NewMeasurement.sPredValue = 0;
-				NewMeasurement.sAzimuth = atof(r[i]["txbearing"].c_str());
-				NewMeasurement.sBeamWidth = atof(r[i]["azibeamwidth"].c_str());
-				NewMeasurement.sTilt = atof(r[i]["txmechtilt"].c_str());
-				NewMeasurement.sHeight = atof(r[i]["txantennaheight"].c_str());
-				NewMeasurement.sDistance = 999999;
-				NewMeasurement.sServingCell = false;
-				if (strlen(r[i]["timeDiff1"].c_str())>0)
+				if ((longitude<181)&&(longitude>-181)&&(latitude<91)&&(latitude>-91))
 				{
-					NewMeasurement.sServingCell = true;
-					Distance = (atoi(r[i]["timeDiff1"].c_str())+0.5)*NewMeasurement.sResDist;
-					if (Distance<NewMeasurement.sDistance)
-						NewMeasurement.sDistance = Distance;
+					NewMeasurement.sSiteLocation.Set(latitude,longitude,DEG);
+					NewMeasurement.sCellID = atoi(r[i]["ci"].c_str());
+					PointString = r[i]["centriod"].c_str();
+					spacePos = PointString.find_first_of(' ');
+					longitude = atof((PointString.substr(6,spacePos).c_str())); 
+					latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
+					NewMeasurement.sCentroid.Set(latitude,longitude,DEG);
+					NewMeasurement.sInstKeyFixed = atoi(r[i]["InstKeyFixed"].c_str());
+					NewMeasurement.sAntPatternKey = atoi(r[i]["txantpatternkey"].c_str());
+					NewMeasurement.sFrequency = atof(r[i]["frequency"].c_str());
+					NewMeasurement.sMeasValue = atof(r[i]["measvalue"].c_str());
+					NewMeasurement.sPathLoss = atof(r[i]["pathloss"].c_str());
+					NewMeasurement.sResDist = atof(r[i]["DistRes"].c_str());
+					NewMeasurement.sEIRP = atof(r[i]["EIRP"].c_str());
+					NewMeasurement.sPredValue = 0;
+					NewMeasurement.sAzimuth = atof(r[i]["txbearing"].c_str());
+					NewMeasurement.sBeamWidth = atof(r[i]["azibeamwidth"].c_str());
+					NewMeasurement.sTilt = atof(r[i]["txmechtilt"].c_str());
+					NewMeasurement.sHeight = atof(r[i]["txantennaheight"].c_str());
+					NewMeasurement.sDistance = 999999;
+					NewMeasurement.sServingCell = false;
+					if (strlen(r[i]["timeDiff1"].c_str())>0)
+					{
+						NewMeasurement.sServingCell = true;
+						Distance = (atoi(r[i]["timeDiff1"].c_str())+0.5)*NewMeasurement.sResDist;
+						if (Distance<NewMeasurement.sDistance)
+							NewMeasurement.sDistance = Distance;
+					}
+					if (strlen(r[i]["timeDiff2"].c_str())>0)
+					{
+						NewMeasurement.sServingCell = true;
+						NewMeasurement.sResDist /=16;
+						Distance = (atoi(r[i]["timeDiff2"].c_str())+0.5)*NewMeasurement.sResDist;
+						if (Distance<NewMeasurement.sDistance)
+							NewMeasurement.sDistance = Distance;
+					}
+					if (strlen(r[i]["TA"].c_str())>0)
+					{
+						NewMeasurement.sServingCell = true;
+						Distance = (atoi(r[i]["TA"].c_str())+0.5)*NewMeasurement.sResDist;
+						if (Distance<NewMeasurement.sDistance)
+							NewMeasurement.sDistance = Distance;
+					}
+	
+					NewMeasurement.sPathLoss = - NewMeasurement.sMeasValue 
+																					+ NewMeasurement.sEIRP;
+						
+					NewPosSet.sMeasurements.push_back(NewMeasurement);
 				}
-				if (strlen(r[i]["timeDiff2"].c_str())>0)
-				{
-					NewMeasurement.sServingCell = true;
-					NewMeasurement.sResDist /=16;
-					Distance = (atoi(r[i]["timeDiff2"].c_str())+0.5)*NewMeasurement.sResDist;
-					if (Distance<NewMeasurement.sDistance)
-						NewMeasurement.sDistance = Distance;
-				}
-				if (strlen(r[i]["TA"].c_str())>0)
-				{
-					NewMeasurement.sServingCell = true;
-					Distance = (atoi(r[i]["TA"].c_str())+0.5)*NewMeasurement.sResDist;
-					if (Distance<NewMeasurement.sDistance)
-						NewMeasurement.sDistance = Distance;
-				}
-
-				NewMeasurement.sPathLoss = - NewMeasurement.sMeasValue 
-								+ NewMeasurement.sEIRP;
-					
-				NewPosSet.sMeasurements.push_back(NewMeasurement);
 			}// end for number of entries
 
 			NewPosSet.sNumMeas = NumInPosSet;
@@ -364,7 +367,7 @@ void cPosEstimation::EstimatePositions()
 		if ((mPosSets[mCurrentPosSetIndex].sMeasurements.size()>0)
 			&&(mPosSets[mCurrentPosSetIndex].sTestPoints.size()>0))
 		{
-
+			mNumInsts = mPosSets[mCurrentPosSetIndex].sMeasurements.size();
 			CoSinRule();
 			CI_TA();
 			CI();
@@ -604,15 +607,19 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 	}
 
 	j=0;
-	while ((-1==Bands[j].sBIndex)&&(j<Bands.size()))
-		j++;
-
-	if (j>=Bands.size())
+	if (Bands.size()>0)
 	{
-		Bands.clear();
-		SecondSite();
-	 	return false;
+		while ((-1==Bands[j].sBIndex)&&(j<Bands.size()-1))
+			j++;
+
+		if ((j>=Bands.size()-1)&&(-1==Bands[j].sBIndex))
+		{
+			Bands.clear();
+			SecondSite();
+		 	return false;
+		}
 	}
+	else return false;
 
 	tTestPoint newTestPoint;
 	newTestPoint.sOriginalTP = mPosSets[mCurrentPosSetIndex].sTestPoints[0].sOriginalTP;
@@ -671,8 +678,8 @@ double cPosEstimation::SearchDistance(double Azimuth, double min, double max)
 	unsigned StopNum = ceil((max-min)/mPlotResolution);
 	cout << "StopNum = " << StopNum << endl;
 	double Distance = (max-min)/2.0;
-	double BestCost = 9999999999;
-	double Cost = 9999999999;
+	double BestCost = 999999;
+	double Cost = 999999;
 	for (i=0; i<StopNum; i++)
 	{
 		Cost = CostFunction(min + (double)i*mPlotResolution, Azimuth);
@@ -886,12 +893,12 @@ bool cPosEstimation::CoSinRule()
 						// Working in same band ... obstruction will affect different f-band differently
 						if (fabs( mPosSets[mCurrentPosSetIndex].sMeasurements[Bands[j].sAIndex].sFrequency -
 							mPosSets[mCurrentPosSetIndex].sMeasurements[i].sFrequency) < 200 )
-						{
+						{ //updating old band
 							if (mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue 
 								> Bands[j].sMaxMeasValue)
 								Bands[j].sBIndex=i; 
 						}
-						else 
+						else //initialise new band
 						{	
 							Band.sFrequency = mPosSets[mCurrentPosSetIndex].sMeasurements[i].sFrequency;
 							Band.sAIndex = i;
@@ -905,18 +912,24 @@ bool cPosEstimation::CoSinRule()
 		}
 	
 
-		j=0;
-		while ((-1==Bands[j].sBIndex)&&(j<Bands.size()))
-			j++;
 
-		if (j>=Bands.size())
-			Bands.clear();
-		else
-		{ 
-			AIndex = Bands[j].sAIndex;
-			BIndex = Bands[j].sBIndex;
-			Bands.clear();
-			stop = true;
+		if (Bands.size()>0)
+		{
+			j=0;
+			while ((-1==Bands[j].sBIndex)&&(j<Bands.size()-1))
+				j++;
+
+			if ((Bands.size()-1==j)&&(-1==Bands[j].sBIndex))
+				Bands.clear();
+			else if (Bands.size()-1<j)
+				Bands.clear();
+			else
+			{ 
+				AIndex = Bands[j].sAIndex;
+				BIndex = Bands[j].sBIndex;
+				Bands.clear();
+				stop = true;
+			}
 		}
 	}
 
@@ -989,7 +1002,7 @@ bool cPosEstimation::CoSinRule()
 	}
 
 // Have other site angle
-	if (-1!=OtherAziIndex)
+	if ((-1!=OtherAziIndex)&&(-1!=BIndex))
 	{
 		tTestPoint newTestPoint;
 		newTestPoint.sOriginalTP = mPosSets[mCurrentPosSetIndex].sTestPoints[0].sOriginalTP;
@@ -1136,6 +1149,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 		- (ceil)(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sBeamWidth/2.0);
 	phi_max = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sAzimuth
 		+ (ceil)(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sBeamWidth/2.0);	
+
     	std::random_device PhiRD;
     	std::mt19937_64 Phi_engine(PhiRD());
 	uniform_real_distribution<double> phi_dist(phi_min,phi_max);
@@ -1162,7 +1176,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				phi[i]-=180.0;
 			else phi[i]+=180.0;
 		}
-		if (rho[i]<3.0*mPlotResolution) rho[i] = 3.0*mPlotResolution;
+		if (rho[i]<2.0*mPlotResolution) rho[i] = 2.0*mPlotResolution;
 		if (phi[i]>180)
 			phi[i]-=360;
 		else if (phi[i]<-180)
@@ -1279,17 +1293,17 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					phi[i]-=180.0;
 				else phi[i]+=180.0;
 			}
-			if (rho[i]>rho_max*4)
+			if ((rho[i]>rho_max*4)||(rho[i]>120000))
 			{
 				tempvalue = 2;
 				while (tempvalue>1)
 					tempvalue = rho_distU(Rho_engine);
-				rho[i] = rho_min + (1.0 - tempvalue) * (2*rho_max - rho_min);	
+				rho[i] = rho_min + (1.0 - tempvalue) * (rho_max - rho_min);	
 				rho_snelheid[i] = 0;
 				phi[i] = phi_dist(Phi_engine);
 				phi_snelheid[i] = 0;		
 			}
-			if (rho[i]<3.0*mPlotResolution) rho[i] = 3.0*mPlotResolution;
+			if (rho[i]<2.0*mPlotResolution) rho[i] = 2.0*mPlotResolution;
 					
 			if (phi[i]>180)
 				phi[i]-=360;
@@ -1338,16 +1352,17 @@ double cPosEstimation::CostFunction(double rho, double phi)
 	cGeoP ParticlePosition(-25.7, 28.2, DEG);
 
 	ParticlePosition.FromHere(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, rho, phi);
-	
 	for (i=0; i<mNumInsts; i++)
 	{
+			mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation.Display();
+			cout << "i = " << i << "	mCurrentPosSetIndex =" << mCurrentPosSetIndex << endl;
+			mDEM.GetForLink(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation,
+													ParticlePosition, mPlotResolution, mDEMProfile);
 
-		mDEM.GetForLink(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation,
-				ParticlePosition, mPlotResolution, mDEMProfile);
 		if (mUseClutter)
 		{
 			mClutter.GetForLink(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sSiteLocation,
-						ParticlePosition, mPlotResolution, mClutterProfile);
+														ParticlePosition, mPlotResolution, mClutterProfile);
 		}
 
 		mPathLoss.setParameters(mkFactor,mPosSets[mCurrentPosSetIndex].sMeasurements[i].sFrequency,

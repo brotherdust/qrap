@@ -650,11 +650,18 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 	double maxDist = 35000;
 	if (Distance>120000)
 	{	
-		if (mPosSets[mCurrentPosSetIndex].sMeasurements.size()>1)
+		j=0;
+		while ((j<mPosSets[mCurrentPosSetIndex].sMeasurements.size()-1)
+			&&(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteID ==
+			mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteID))
+			j++;
+		if ((j<=mPosSets[mCurrentPosSetIndex].sMeasurements.size()-1)
+			&&(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteID !=
+			mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteID))
 		{
 			maxDist = 
 			mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation.Distance
-			(mPosSets[mCurrentPosSetIndex].sMeasurements[1].sSiteLocation);
+			(mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteLocation);
 		}
 //		Distance = SearchDistance(minAzi,minDist, maxDist); 
 	}

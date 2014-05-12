@@ -104,7 +104,7 @@ www.QRap.org.za
 		       type="varchar(15)"
 		       label="Status"
 		       description="This site status in the planning process. Options can be altered in structure.xml"
-		       ui="dropdown(fixed, {'Used', 'Not Used', 'Experimental', 'Draft', 'Planned', 'Active', 'Store', 'Office', 'Default'})" />
+		       ui="dropdown(fixed, {'Used', 'Not Used', 'Experimental', 'Planned', 'Active', 'Released', 'Operational', 'CoreNode', 'Ready for Service', 'Repeater', 'Default'})" />
 		
 		<field name="location"
 		       type="POINT"
@@ -1368,7 +1368,7 @@ www.QRap.org.za
 		
 		<field name = "beacon"
 		       type = "integer"
-			description="The unique cell identifier e.g. BSIC for GSM or CPICH for UMTS"
+			description="The unique cell identifier e.g. BSIC for GSM or scrambling code for UMTS"
 		       label = "Beacon" />
 		
 		<field name = "layerthreshold"

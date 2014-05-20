@@ -371,11 +371,11 @@ void cPosEstimation::EstimatePositions()
 			delete [] mFixedAnts;
 			mNumInsts = mPosSets[mCurrentPosSetIndex].sMeasurements.size();
 			mFixedAnts = new cAntennaPattern[mNumInsts];
-			for (i=0; i < mNumInsts; i++)
+			for (j=0; j < mNumInsts; j++)
 			{
-				mFixedAnts[i].SetAntennaPattern(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sAntPatternKey, 
-					mPosSets[mCurrentPosSetIndex].sMeasurements[i].sAzimuth, 
-					mPosSets[mCurrentPosSetIndex].sMeasurements[i].sTilt);
+				mFixedAnts[j].SetAntennaPattern(mPosSets[mCurrentPosSetIndex].sMeasurements[j].sAntPatternKey, 
+					mPosSets[mCurrentPosSetIndex].sMeasurements[j].sAzimuth, 
+					mPosSets[mCurrentPosSetIndex].sMeasurements[j].sTilt);
 			}
 			mPathLoss.setParameters(mkFactor,mPosSets[mCurrentPosSetIndex].sMeasurements[0].sFrequency,
 					mPosSets[mCurrentPosSetIndex].sMeasurements[0].sHeight, MOBILEHEIGHT,
@@ -395,7 +395,7 @@ void cPosEstimation::EstimatePositions()
 				{
 					case GPS: 			cout << "GPS" << endl;		break;  
 					case CellID: 			cout << "CellID" << endl;	break; 
-					case CellID_RxTx: 		cout << "CellID_RxTx" << endl;	break; 
+					case CellID_TA: 		cout << "CellID_TA" << endl;	break; 
 					case SSiteDir:			cout << "SSiteDir" << endl;	break; 
 					case CoSiteSecDir:		cout << "CoSiteSecDir" << endl;	break; 
 					case CosRuleAngleDistRatio:	cout << "CosRuleAngleDistRatio" << endl; break; 
@@ -411,6 +411,7 @@ void cPosEstimation::EstimatePositions()
 				cout << endl;
 
 			} 
+			cout << endl;
 		}
 	}
 }
@@ -484,7 +485,7 @@ bool cPosEstimation::CI_TA()
 	newTestPoint.sOriginalTP = mPosSets[mCurrentPosSetIndex].sTestPoints[0].sOriginalTP;
 	newTestPoint.sOriginalLocation = mPosSets[mCurrentPosSetIndex].sTestPoints[0].sOriginalLocation;
 
-	newTestPoint.sMethodUsed = CellID_RxTx;
+	newTestPoint.sMethodUsed = CellID_TA;
 
 	//Error Estimate is the arc at the Distance 
 	newTestPoint.sErrorEstimate = max(Distance * mPosSets[mCurrentPosSetIndex].sMeasurements[0].sBeamWidth * PI /180,
@@ -646,24 +647,27 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 	minAzi = FindAzi(BIndex, AIndex);
 
 	double Distance= mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance;
-	double minDist = 2.0*mPlotResolution;
+/*	double minDist = 2.0*mPlotResolution;
 	double maxDist = 35000;
 	if (Distance>120000)
 	{	
-		j=0;
-		while ((j<mPosSets[mCurrentPosSetIndex].sMeasurements.size()-1)
-			&&(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteID ==
-			mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteID))
-			j++;
-		if ((j<=mPosSets[mCurrentPosSetIndex].sMeasurements.size()-1)
-			&&(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteID !=
-			mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteID))
+		if (mPosSets[mCurrentPosSetIndex].sMeasurements.size()>1)
 		{
-			maxDist = 
-			mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation.Distance
-			(mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteLocation);
+			j=0;
+			while ((j<mPosSets[mCurrentPosSetIndex].sMeasurements.size()-1)
+						&&(	mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteID==
+								mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteID))
+				j++;
+		
+			if ((mPosSets[mCurrentPosSetIndex].sMeasurements.size()<j)
+				||(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteID!=
+								mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteID))
+			{		
+				maxDist = 
+				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation.Distance
+								(mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteLocation);
+			}
 		}
-//		Distance = SearchDistance(minAzi,minDist, maxDist); 
 	}
 	else
 	{
@@ -675,10 +679,12 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 				*mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist-50.0);
 	}
 
+	if (maxDist>120000) maxDist=35000;
+	if (maxDist<4.0*mPlotResolution) maxDist=4.0*mPlotResolution;;
 	Distance = SearchDistance(minAzi,minDist, maxDist); 
 	
 	cout << "Distance = " << Distance << endl;
-
+*/
 	newTestPoint.sEstimatedLocation.FromHere(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, Distance, minAzi);
 
 	double DegRes = min(5.0,max(90*mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sResDist/Distance/PI,1.0));
@@ -696,7 +702,8 @@ double cPosEstimation::SearchDistance(double Azimuth, double min, double max)
 {
 	unsigned i;
 	unsigned StopNum = ceil((max-min)/mPlotResolution);
-	cout << "StopNum = " << StopNum << endl;
+	cout << "StopNum = " << StopNum << "	mPlotResolution = " << mPlotResolution 
+				<< "	max = " << max << "	min = " << min << endl;
 	double Distance = (max-min)/2.0;
 	double BestCost = 999999;
 	double Cost = 999999;
@@ -854,6 +861,7 @@ bool cPosEstimation::CoSinRule()
 				(mPosSets[mCurrentPosSetIndex].sMeasurements[FirstOtherSite].sSiteLocation));
 		if (beta >180) beta -=360;
 		if (beta <-180) beta += 360;
+		if (beta <0) beta = 0;
 		
 		cosB = cos(beta*PI/180);
 		sinB = sin(beta*PI/180);
@@ -1040,24 +1048,49 @@ bool cPosEstimation::CoSinRule()
 					(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation));
 		if (alpha>180) alpha-=360;
 		if (alpha<-180) alpha+=360;
-	
+		if (alpha<0) alpha*=-1;
+
 		cosA = cos(alpha*PI/180);
 		sinA = sin(alpha*PI/180);
-		
-		A = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance;
-		B = C*cosA - sqrt(A*A-C*C*sinA*sinA);
 
+		double OwnPathL = - mPosSets[mCurrentPosSetIndex].sMeasurements[0].sMeasValue
+			+ mPosSets[mCurrentPosSetIndex].sMeasurements[0].sEIRP
+			- 20*log10(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sFrequency);
+		double OtherPathL = - mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sMeasValue
+			+ mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sEIRP
+			- 20*log10(mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sFrequency);
+
+		double k = pow(10, (OwnPathL - OtherPathL)/(10*GAMMA));
+
+		cout << "k = " << k << endl;
+		
+		if (k==1)
+			B = C / (2*cosA); 
+		else if (k<fabs(sinA))
+			B = C / (k+1);
+		else
+		{
+			double B1 = C*(cosA + sqrt(k*k-sinA*sinA))/(1-k*k);
+			double B2 = C*(cosA - sqrt(k*k-sinA*sinA))/(1-k*k);
+			if (B1<0) B1=B2;
+			else if (B2<0) B2=B1;
+			if (cosA>0) B =max(B1,B2);
+			else B = min(B1,B2);
+		}
+		
 		newTestPoint.sEstimatedLocation.FromHere(
 			mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sSiteLocation, B, OtherSiteAzi);
 		oldEst = newTestPoint.sEstimatedLocation;
 		newTestPoint.sErrorEstimate = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist;
-
+	
 		newTestPoint.sNewTP = mNewTP;	
 		mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
 		mNewTP++;
 
+
 		if (haveOwnAngle)
 		{
+			worked =true;
 			tTestPoint newTestPoint;
 			newTestPoint.sOriginalTP = mPosSets[mCurrentPosSetIndex].sTestPoints[0].sOriginalTP;
 			newTestPoint.sOriginalLocation = mPosSets[mCurrentPosSetIndex].sTestPoints[0].sOriginalLocation;
@@ -1194,10 +1227,11 @@ bool cPosEstimation::DCM_ParticleSwarm()
 //			"	rho[i]=" << rho[i] << "	phi[i]=" << phi[i] << "	Cost=" << value[i]<< endl;
 
 		phi_snelheid[i] = 0.0;
-		rho_snelheid[i] = -0.01;
+		rho_snelheid[i] = -0.001;
 		pbestRho[i] = rho[i];
 		pbestPhi[i] = phi[i];
 		pbestValue[i] = value[i];
+//		cout << 0 <<"	i=" <<i << "	rho=" << rho[i] << "	phi=" << phi[i] << "	value=" << value[i] << endl;
 		if (pbestValue[i] < gbestValue)
 		{
 			gbestValue = pbestValue[i];					
@@ -1238,7 +1272,9 @@ bool cPosEstimation::DCM_ParticleSwarm()
 
 	bool stop = false;
 	bool change = false;
+	LastChangedN = 0;
 
+	iterationN = 0;
 	while (!stop)
 	{
 		iterationN++;
@@ -1248,17 +1284,19 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			change = false;
 			if ((value[i]<pbestValue[i])&&(rho[i]>rho_min)&&(rho[i]<rho_max))
 			{
-				if ((phi[i]>phi_min-mPosSets[mCurrentPosSetIndex].sMeasurements[0].sBeamWidth/2.0)
+				change = true;
+/*				if ((phi[i]>phi_min-mPosSets[mCurrentPosSetIndex].sMeasurements[0].sBeamWidth/2.0)
 					&&(phi[i]<phi_max+mPosSets[mCurrentPosSetIndex].sMeasurements[0].sBeamWidth/2.0))
 				{
 					change = true;
-					for (j=1; j<mPosSets[mCurrentPosSetIndex].sMeasurements.size(); j++)
+				for (j=1; j<mPosSets[mCurrentPosSetIndex].sMeasurements.size(); j++)
 					{
 						change = change && ((mCellPathLoss[0]+MARGIN) > mCellPathLoss[j]);
 					}
 //					if (change) cout << "changing" << endl;
 //					else cout << "not changing" << endl;
 				}
+*/
 			}
 			if (change)
 			{
@@ -1268,8 +1306,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				if (pbestValue[i] < gbestValue)
 				{
 					cout << "Found better" << endl;
-					stop = (((pbestValue[i]-oldBestValue)
-						/(iterationN-LastChangedN)) < DELTA)&&(iterationN>2);
+					stop = (( ( (pbestValue[i]-oldBestValue) < DELTA) &&(iterationN>5))|| ((iterationN-LastChangedN)>STOPN));
 					oldBestValue = gbestValue;
 					oldBestRho = gbestRho;
 					oldBestPhi = gbestPhi;
@@ -1292,6 +1329,13 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					+ Cg*RgPhi_dist(RgPhi_engine)*(gbestValue - value[i]);			
 			rho[i] = rho[i] + rho_snelheid[i];
 			phi[i] = phi[i] + phi_snelheid[i];
+
+			phi[i] = fmod(phi[i],360);		
+			if (phi[i]>180)
+				phi[i]-=360;
+			else if (phi[i]<-180)
+				phi[i]+=360;
+
 			if (rho[i]<0)
 			{
 				rho[i]*=-1;
@@ -1310,12 +1354,9 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				phi_snelheid[i] = 0;		
 			}
 			if (rho[i]<2.0*mPlotResolution) rho[i] = 2.0*mPlotResolution;
-					
-			if (phi[i]>180)
-				phi[i]-=360;
-			else if (phi[i]<-180)
-				phi[i]+=360;
+
 			value[i] = CostFunction(rho[i], phi[i]);
+//			cout << iterationN <<"		i=" <<i << "		rho=" << rho[i] << "		phi=" << phi[i] << "		value=" << value[i] << endl;
 
 		}// end for
 	}// end while
@@ -1381,14 +1422,15 @@ double cPosEstimation::CostFunction(double rho, double phi)
 			AntValue = mFixedAnts[i].GetPatternValue(Azimuth, Tilt);
 			Prediction[i] =  mPosSets[mCurrentPosSetIndex].sMeasurements[i].sEIRP 
 										- mCellPathLoss[i] - AntValue;
-			if (Prediction[i] > SENSITIVITY)
+//			if (Prediction[i] > SENSITIVITY)
 				Delta[i] = (mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue - Prediction[i]) 
 								* (mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue - Prediction[i]);
-			else
+/*			else
 			{
 				Delta[i] = 0;
 				NumUsed --;
 			}
+*/
 //			cout << i << "	meas=" << mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue
 //						<< "	prediction =" << prediction << "	Delta[i]=" << Delta[i] << endl;
 	}
@@ -1397,28 +1439,30 @@ double cPosEstimation::CostFunction(double rho, double phi)
 	double Cost=0.0, Sexp=1.0, Pexp=1.0, Aexp=1.0;
 	for (i=0; i<mNumInsts; i++)
 	{
-		if (i>0) Cost += Delta[i-1] + Delta[i] 
+/*		if (i>0) Cost += Delta[i-1] + Delta[i] 
 			     -2*((mPosSets[mCurrentPosSetIndex].sMeasurements[i-1].sMeasValue-Prediction[i-1])
 				*(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue-Prediction[i]));
 		else Cost += Delta[i];
-/*		Cost += Delta[i];
+*/
+		Cost += Delta[i];
 
-		if (i>0) Aexp = Aexp*exp(Delta[i-1] + Delta[i] 
+/*		if (i>0) Aexp = Aexp*exp(Delta[i-1] + Delta[i] 
 			     -2*((mPosSets[mCurrentPosSetIndex].sMeasurements[i-1].sMeasValue-Prediction[i-1])
 			*(mPosSets[mCurrentPosSetIndex].sMeasurements[i].sMeasValue-Prediction[i]))/SIGMA2);
 		cout << SIGMA2 << "	"	<<exp(-Delta[i]/(SIGMA2)) << endl;
+*/
 				Sexp = Sexp*exp(-Delta[i]/(SIGMA2));
-*/	}
+	}
 
-//	Pexp = pow(Sexp, (double)(1.0/(double)NumUsed));
+	Pexp = pow(Sexp, (double)(1.0/(double)NumUsed));
 
 //	cout << Sexp << "	mNumInsts=" << mNumInsts << "	" << Pexp << endl;
 	double Pcost = 1.0 - Pexp;
 
 	delete [] Delta;
 	delete [] Prediction;
-	return Cost;
-//	return Pcost;
+//	return Cost;
+	return Pcost;
 }
 
 //*******************************************************************************************************************************

@@ -866,7 +866,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 			<< "	MeanSquare: " << MeanSquareError << "	StDev: "<< StDev
 			<< "	CorrC: " << CorrC << endl;
 		// Only optimise if enough points are involved
-		if (NumUsed > 1000)
+		if ((NumUsed > 1000)||(NumUsed/TotalNumUsed > 0.1))
 		{
 			for (i=0; i<NUMTERMS; i++)
 			{
@@ -1010,7 +1010,7 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 	SeekWidth= (3.0e8/mFixedInsts[0].sFrequency/mPlotResolution/1300+1);
 	cout << SeekWidth << endl;
 
-//	SeekWidth = 19;
+	SeekWidth = 19;
 
 	DeltaSeek = max(SeekWidth/2-1,1);
 	SeekWidthOld = SeekWidth;
@@ -1048,7 +1048,7 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 	}
 
 
-/*	while ((!stop)&&(NumStop>0))
+	while ((!stop)&&(NumStop>0))
 	{
 		NumStop --;
 		
@@ -1098,7 +1098,7 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 		}
 
 	}
-*/
+
 	mPathLoss.setSeekWidth(SeekWidthBest);
 
 	return true;
@@ -1147,7 +1147,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		Up[i] = true;
 		CHeightDiff[i] = 0.5;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
-		DeltaH[i] =-0.2;
+		DeltaH[i] = 0.2;
 		NumClut[i] = 0;
 		Passed[i] = false;
 	}

@@ -35,7 +35,6 @@
 #include "cMeasImportCSV.h"
 #include "cGeoP.h"
 #include "cPosEstimation.h"
-#include "cMeasImportOldTEMS.h"
 
 
 using namespace std;
@@ -136,16 +135,18 @@ int main (int argc, char **argv)
 	}
 
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas. LoadMeasurements(0,0,0);
+	Meas. LoadMeasurements(0,0,5);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-//   Meas.OptimiseHeights(0);
-
 //	Meas.OptimiseSeekWidth();
+
+ Meas.OptimiseHeights(5);
 */
 
+
 /*
+
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -161,21 +162,21 @@ int main (int argc, char **argv)
 	Meas. LoadMeasurements(0,0,2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-	Meas. LoadMeasurements(0,0,1);
+	Meas. LoadMeasurements(0,0,5);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl; 
 
 	Meas. LoadMeasurements();
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-*/
-/*
+
+
 	Meas. LoadMeasurements();
 	Meas.OptimiseModelCoefAllTotal(0);
 
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-	Meas. LoadMeasurements(0,0,1);
+	Meas. LoadMeasurements(0,0,5);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na0,1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas. LoadMeasurements(0,0,2);
@@ -188,8 +189,8 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 
-*/
-/*
+
+
 	Meas. LoadMeasurements();
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
@@ -198,7 +199,7 @@ int main (int argc, char **argv)
 	Meas. LoadMeasurements(0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nao0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-	Meas. LoadMeasurements(0,0,1);
+	Meas. LoadMeasurements(0,0,5);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nao0,1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC  << endl;
 	Meas. LoadMeasurements(0,0,2);
@@ -210,8 +211,8 @@ int main (int argc, char **argv)
 	Meas. LoadMeasurements(0,0,4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nao0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-*/
 
+*/
 /*
 	if (!gDb.PerformRawSql(query))
 	{
@@ -238,20 +239,20 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nac0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-/*
 
+/*
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas. LoadMeasurements(0,0,1);
+	Meas. LoadMeasurements(0,0,5);
 //	Meas.OptimiseModelCoefAllTotal(1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
-	Meas.OptimiseModelCoefD(1);
+	cout<< "Na5" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
+	Meas.OptimiseModelCoefD(5);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
+	cout<< "Nach5" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
 */
 /*
 	if (!gDb.PerformRawSql(query))

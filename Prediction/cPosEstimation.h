@@ -36,7 +36,7 @@
 #define Cp 1.4
 #define Cg 1.4
 #define STOPN 20
-#define DELTA 0.000005
+#define DELTA 5e-9
 
 
 // include local headers
@@ -59,7 +59,7 @@ enum eMethod
 {
 	GPS,
 	CellID,
-	CellID_RxTx,
+	CellID_TA,
 	SSiteDir, // The direction is based on the direction of the second strongest cell
 	CoSiteSecDir,
 	CosRuleAngleDistRatio,
@@ -86,11 +86,11 @@ struct tMeas
 {
 	unsigned	sID;
 	unsigned	sOriginalTP;
-	unsigned 	sSiteID;
+	unsigned sSiteID;
 	cGeoP		sSiteLocation;
 	unsigned	sCellID;
 	cGeoP		sCentroid;
-	bool		sServingCell;
+	bool			sServingCell;
 	unsigned	sInstKeyFixed;
 	double 		sEIRP;
 	unsigned	sAntPatternKey;
@@ -98,7 +98,7 @@ struct tMeas
 	double 		sMeasValue;
 	double		sPathLoss;
 	double 		sPredValue;
-	float		sTilt;
+	float			sTilt;
 	double		sHeight;
 	double		sAzimuth;
 	double 		sBeamWidth;

@@ -35,8 +35,8 @@
 #define INERTIA 0.72
 #define Cp 1.4
 #define Cg 1.4
-#define STOPN 20
-#define DELTA 5e-9
+#define STOPN 30
+#define DELTA 5e-10
 
 
 // include local headers

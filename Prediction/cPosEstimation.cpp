@@ -381,8 +381,12 @@ void cPosEstimation::EstimatePositions()
 					mPosSets[mCurrentPosSetIndex].sMeasurements[0].sHeight, MOBILEHEIGHT,
 					mUseClutter, mClutterClassGroup);
 	
-			CoSinRule();
-			CI_TA();
+			if (	mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance<120001)		
+			{
+				CoSinRule();
+				CI_TA();
+			}
+			else SecondSite();
 			CI();
 			DCM_ParticleSwarm();
 			for (j=0; j<mPosSets[mCurrentPosSetIndex].sTestPoints.size(); j++)
@@ -548,10 +552,10 @@ bool cPosEstimation::SecondSite()
 	cout << "k = " << k << endl;
 	double Distance = SiteToSite / (k+1);
 
-	Distance = SiteToSite / 2;
+//	Distance = SiteToSite / 2;
 
 	if ((fabs((Distance-mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance)/	
-		mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist)>0.6)
+		mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist)>1.0)
 		&&(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance<120000))
 	{
 		if ((Distance - mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance) < 0)
@@ -647,7 +651,8 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 	minAzi = FindAzi(BIndex, AIndex);
 
 	double Distance= mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance;
-/*	double minDist = 2.0*mPlotResolution;
+
+	double minDist = 2.0*mPlotResolution;
 	double maxDist = 35000;
 	if (Distance>120000)
 	{	
@@ -684,11 +689,11 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 	Distance = SearchDistance(minAzi,minDist, maxDist); 
 	
 	cout << "Distance = " << Distance << endl;
-*/
+
 	newTestPoint.sEstimatedLocation.FromHere(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, Distance, minAzi);
 
-	double DegRes = min(5.0,max(90*mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sResDist/Distance/PI,1.0));
-	newTestPoint.sErrorEstimate = max(((double)mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sResDist)/2.0,DegRes*PI*Distance/180);
+	double DegRes = min(5.0,max(90.0*mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sResDist/Distance/PI,1.0));
+	newTestPoint.sErrorEstimate = max(((double)mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sResDist)/2.0,DegRes*PI*Distance/180.0);
 
 	newTestPoint.sNewTP = mNewTP;	
 	mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
@@ -748,13 +753,13 @@ double cPosEstimation::FindAzi(unsigned BIndex, unsigned AIndex)
 				- mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sBeamWidth;
 		LeftIndex = AIndex;
 		RightAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sAzimuth
-				+ mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sBeamWidth;
+						+ mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sBeamWidth;
 		RightIndex = BIndex;
 	}
 	else
 	{
 		LeftAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sAzimuth
-				- mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sBeamWidth;
+						- mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sBeamWidth;
 		LeftIndex = BIndex;
 		RightAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sAzimuth
 				+ mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sBeamWidth;
@@ -795,7 +800,7 @@ double cPosEstimation::FindAzi(unsigned BIndex, unsigned AIndex)
 		Delta = fabs (RxLevDiff - mPosSets[mCurrentPosSetIndex].sMeasurements[LeftIndex].sEIRP + LeftAntValue
 				+ mPosSets[mCurrentPosSetIndex].sMeasurements[RightIndex].sEIRP - RightAntValue);
 
-	 	if ((Delta<minDelta)&&(LeftAntValue<20)&&(RightAntValue<20))
+	 	if ((Delta<minDelta)&&(LeftAntValue<14)&&(RightAntValue<14)&&((LeftAntValue>6)||(RightAntValue>6)))
 	 	{
 	 		minDelta = Delta;
 	 		minAzi = Azimuth;
@@ -861,33 +866,36 @@ bool cPosEstimation::CoSinRule()
 				(mPosSets[mCurrentPosSetIndex].sMeasurements[FirstOtherSite].sSiteLocation));
 		if (beta >180) beta -=360;
 		if (beta <-180) beta += 360;
-		if (beta <0) beta = 0;
+		if (beta <0) beta *= -1;
 		
 		cosB = cos(beta*PI/180);
 		sinB = sin(beta*PI/180);
 		
 		if (k==1)
 			A = C / (2*cosB); 
-		else if (k<fabs(sinB))
-			A = C / (k+1);
+		else if (k<fabs(sinB)) // non-real solution not possible change k for solution to be real
+		{
+			k = fabs(sinB);
+			A = C *cosB/(1-k*k);
+		}
 		else
 		{
 			double A1 = C*(cosB + sqrt(k*k-sinB*sinB))/(1-k*k);
 			double A2 = C*(cosB - sqrt(k*k-sinB*sinB))/(1-k*k);
-			if (A1<0) A1=A2;
-			else if (A2<0) A2=A1;
+			cout << "beta=" << beta << "	A1=" << A1 << "	A2=" << A2 << endl;
+			if (A1<0) A1=A2; // negative answer is non-sensicle
+			else if (A2<0) A2=A1; // negative answer is non-sensicle
 			else if (fabs((A1-mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance)/	
-				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist)>0.6)
-				A1 = A2;
+				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist)>1.0)
+				A1 = A2; // choose solution that fit range
 			else if (fabs((A2-mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance)/	
-				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist)>0.6)
+				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist)>1.0)
 				A2 = A1;
-			if (cosB>0) A=max(A1,A2);
-			else A = min(A1,A2);
-
+			A=min(A1,A2);
+			if (A<=0) A = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance;
 		}
 		if ((fabs((A-mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance)/	
-			mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist)>0.6)
+			mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist)>1.0)
 			&&(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance<120000))
 		{
 			if ((A - mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance) < 0)
@@ -1060,34 +1068,70 @@ bool cPosEstimation::CoSinRule()
 			+ mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sEIRP
 			- 20*log10(mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sFrequency);
 
-		double k = pow(10, (OwnPathL - OtherPathL)/(10*GAMMA));
+		double k = pow(10, (OtherPathL - OwnPathL)/(10*GAMMA));
 
 		cout << "k = " << k << endl;
 		
 		if (k==1)
-			B = C / (2*cosA); 
-		else if (k<fabs(sinA))
-			B = C / (k+1);
+			A = C / (2*k*cosA); 
+		else if (1<fabs(k*sinA)) /// non-real solution not possible change k such that solution is real
+		{
+			k= 1.0/fabs(sinA);
+			A = C*k*cosA/(k*k-1); 
+		}
 		else
 		{
-			double B1 = C*(cosA + sqrt(k*k-sinA*sinA))/(1-k*k);
-			double B2 = C*(cosA - sqrt(k*k-sinA*sinA))/(1-k*k);
-			if (B1<0) B1=B2;
-			else if (B2<0) B2=B1;
-			if (cosA>0) B =max(B1,B2);
-			else B = min(B1,B2);
+			double A1 = C*(k*cosA + sqrt(1-k*k*sinA*sinA))/(k*k-1);
+			double A2 = C*(k*cosA - sqrt(1-k*k*sinA*sinA))/(k*k-1);
+			cout << "alpha=" << alpha << "	A1=" << A1 << "	A2=" << A2 << endl;
+			if (A1<0) A1=A2; // negative distance is non-sensicle
+			else if (A2<0) A2=A1; // negative distance is non-sensicle
+			else if (fabs((A1-mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance)/	
+				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist)>1.0)
+				A1 = A2;
+			else if (fabs((A2-mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance)/	
+				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist)>1.0)
+				A2 = A1;
+			A=min(A1,A2); 
+			if (A<=0) A = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance;
+		}
+		if ((fabs((A-mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance)/	
+			mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist)>1.0)
+			&&(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance<120000))
+		{
+			if ((A - mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance) <0)
+				A = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance 
+					- 0.5* mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist;
+			else 
+				A = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance 
+					+ 0.5* mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist;
 		}
 		
-		newTestPoint.sEstimatedLocation.FromHere(
-			mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sSiteLocation, B, OtherSiteAzi);
-		oldEst = newTestPoint.sEstimatedLocation;
-		newTestPoint.sErrorEstimate = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist;
-	
-		newTestPoint.sNewTP = mNewTP;	
-		mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
-		mNewTP++;
+		if (1.0<fabs(C*sinA/A))
+			worked = false;
+		else
+		{
+			double B1 = C*cosA - sqrt(A*A - C*C*sinA*sinA);
+			double B2 = C*cosA + sqrt(A*A - C*C*sinA*sinA);
 
+			cout <<  "	B1=" << B1 << "	B2=" << B2 << endl;
 
+			if (B1<0) B1=B2;
+				else if (B2<0) B2=B1;
+			B = min(B1,B2);
+			if (B<=0) worked=false;
+			else
+			{
+				newTestPoint.sEstimatedLocation.FromHere(
+					mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sSiteLocation, B, OtherSiteAzi);
+				oldEst = newTestPoint.sEstimatedLocation;
+				newTestPoint.sErrorEstimate = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist;
+			
+				newTestPoint.sNewTP = mNewTP;	
+				mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
+				mNewTP++;
+			}
+	}
 		if (haveOwnAngle)
 		{
 			worked =true;
@@ -1173,6 +1217,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				/mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist-0.5)
 				*mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist-50.0);
 	}	
+	if (rho_max<6*mPlotResolution) rho_max = 6*mPlotResolution;
 	cout << "rho_min=" << rho_min << "	rho_max=" << rho_max << endl; 
 
     	std::random_device RhoRD;
@@ -1273,6 +1318,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 	bool stop = false;
 	bool change = false;
 	LastChangedN = 0;
+	double rhoR=0, phiR=0;
 
 	iterationN = 0;
 	while (!stop)
@@ -1306,7 +1352,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				if (pbestValue[i] < gbestValue)
 				{
 					cout << "Found better" << endl;
-					stop = (( ( (pbestValue[i]-oldBestValue) < DELTA) &&(iterationN>5))|| ((iterationN-LastChangedN)>STOPN));
+					stop = (( ( (pbestValue[i]-oldBestValue) < DELTA) &&(iterationN>STOPN/3))|| ((iterationN-LastChangedN)>STOPN));
 					oldBestValue = gbestValue;
 					oldBestRho = gbestRho;
 					oldBestPhi = gbestPhi;
@@ -1314,8 +1360,6 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					gbestValue = pbestValue[i];					
 					gbestRho = pbestRho[i];
 					gbestPhi = pbestPhi[i];
-//					if (stop) cout << "stopping... rho=" << gbestRho << "	phi=" << gbestPhi << endl;
-//					else cout << "not stopping... rho=" << gbestRho << "	phi=" << gbestPhi << endl;
 				}
 			}
 
@@ -1343,20 +1387,19 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					phi[i]-=180.0;
 				else phi[i]+=180.0;
 			}
-			if ((rho[i]>rho_max*4)||(rho[i]>120000))
+			if ((rho[i]>rho_max*4)||(rho[i]>120000)||(rho[i]<3*mPlotResolution))
 			{
 				tempvalue = 2;
 				while (tempvalue>1)
-					tempvalue = rho_distU(Rho_engine);
+					tempvalue = rho_distE(Rho_engine);
 				rho[i] = rho_min + (1.0 - tempvalue) * (rho_max - rho_min);	
 				rho_snelheid[i] = 0;
 				phi[i] = phi_dist(Phi_engine);
 				phi_snelheid[i] = 0;		
 			}
-			if (rho[i]<2.0*mPlotResolution) rho[i] = 2.0*mPlotResolution;
-
+			if (rho[i]<3.0*mPlotResolution) rho[i] = 3.0*mPlotResolution;
 			value[i] = CostFunction(rho[i], phi[i]);
-//			cout << iterationN <<"		i=" <<i << "		rho=" << rho[i] << "		phi=" << phi[i] << "		value=" << value[i] << endl;
+			cout << iterationN <<"		i=" <<i << "		rho=" << rho[i] << "		phi=" << phi[i] << "		value=" << value[i] << endl;
 
 		}// end for
 	}// end while
@@ -1456,7 +1499,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 
 	Pexp = pow(Sexp, (double)(1.0/(double)NumUsed));
 
-//	cout << Sexp << "	mNumInsts=" << mNumInsts << "	" << Pexp << endl;
+	cout <<"	Cost=" << Cost << "	Sexp=" << Sexp << "	mNumInsts=" << mNumInsts << "		Pexp=" << Pexp << endl;
 	double Pcost = 1.0 - Pexp;
 
 	delete [] Delta;

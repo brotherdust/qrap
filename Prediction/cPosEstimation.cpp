@@ -1399,7 +1399,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			}
 			if (rho[i]<3.0*mPlotResolution) rho[i] = 3.0*mPlotResolution;
 			value[i] = CostFunction(rho[i], phi[i]);
-			cout << iterationN <<"		i=" <<i << "		rho=" << rho[i] << "		phi=" << phi[i] << "		value=" << value[i] << endl;
+//			cout << iterationN <<"		i=" <<i << "		rho=" << rho[i] << "		phi=" << phi[i] << "		value=" << value[i] << endl;
 
 		}// end for
 	}// end while
@@ -1499,7 +1499,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 
 	Pexp = pow(Sexp, (double)(1.0/(double)NumUsed));
 
-	cout <<"	Cost=" << Cost << "	Sexp=" << Sexp << "	mNumInsts=" << mNumInsts << "		Pexp=" << Pexp << endl;
+//	cout <<"	Cost=" << Cost << "	Sexp=" << Sexp << "	mNumInsts=" << mNumInsts << "		Pexp=" << Pexp << endl;
 	double Pcost = 1.0 - Pexp;
 
 	delete [] Delta;

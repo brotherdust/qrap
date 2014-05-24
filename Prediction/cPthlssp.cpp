@@ -289,14 +289,18 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	mCalcMarker++;
 //	cout << endl << mCalcMarker << "	";
 //	InputProfile.Display();
+	
 	mLinkLength = CalcDist(InputProfile);
+	if (mLinkLength<10)
+		return 0.0;
+	
 	FreeSpace = CalcFreeSpaceLoss(mLinkLength);
 	PlaneEarth = CalcPlaneEarthLoss(mLinkLength);
 	m_Loss = FreeSpace ;
 
 
 	DiffLoss = 0;
-	if (InputProfile.GetSize()>2)
+	if (InputProfile.GetSize()>3)
 	{
 		InitEffectEarth(InputProfile, ClutterProfile);
 		FindElevAngles(ElevAngleTX,ElevAngleRX);
@@ -367,6 +371,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		}
 	}
 
+//	cout << "FLoss=" << m_Loss << "	DiffL=" << DiffLoss << endl;
 // The following 2 commands should mostly be commented out. It is when a emperical model is tuned:
 //	m_Loss = 0;
 //	DiffLoss = 0;
@@ -384,8 +389,12 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		
 //		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
 //		cout << "	" << mLinkLength << ".";
-		if (NUMTERMS>1) mCterms[1] = TERM1;
-		if (NUMTERMS>3) mCterms[3] = TERM3;
+		if (NUMTERMS>1) 
+			if (mLinkLength>0.0) mCterms[1] = TERM1;
+			else mCterms[1] = 0.0;
+		if (NUMTERMS>3) 
+			if (mLinkLength>0.0) mCterms[3] = TERM3;
+			else mCterms[3] = 0.0;
 //		if (Cheight < (m_htx+0.1))
 //			mCterms[8] = TERM8;
 //		else mCterms[8] = 100;

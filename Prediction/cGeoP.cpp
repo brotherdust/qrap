@@ -530,73 +530,90 @@ void cGeoP::FromHere(cGeoP here, double distance, double direction)
 	// direction in degrees
 //	cout << " In cGeoP FromHere " << endl;
 	cGeoP tempT(*this);
-	
+
  	double s = distance;
- 	if (direction<-180) direction = 360 + direction; 
-  	double alpha1 = direction * rd; 
+	if (direction<-180) direction = 360 + direction;
+	else if  (direction>180) direction = direction - 360;
+ 	double alpha1 = direction * rd; 
 	double sinAlpha1 = sin(alpha1);
 	double cosAlpha1 = cos(alpha1);
-	
-	mType = here.mType;
-	if (mType==UTM)
-	{
-		mCentMer = here.mCentMer;
-		mSouth = here.mSouth;
-		mLat = here.mLat + s*cosAlpha1;
-		mLon = here.mLon + s*sinAlpha1;
-	}
-	else if (mType==WGS84GC)
-	{
-		mCentMer = here.mCentMer;
-		mSouth = here.mSouth;
-		mLat = here.mLat + s*cosAlpha1;
-		mLon = here.mLon - s*sinAlpha1;			
-	}
-	else // hence DEG
-	{
 
-		double tanU1 = (1.0-f) * tan(here.mLat*rd);
-		double cosU1 = 1.0 / sqrt((1.0 + tanU1*tanU1));
-		double sinU1 = tanU1*cosU1;
-		double sigma1 = atan2(tanU1, cosAlpha1);
-		double sinAlpha = cosU1 * sinAlpha1;
-		double cosSqAlpha = 1.0 - sinAlpha*sinAlpha;
-		double uSq = cosSqAlpha * eprime2;
-		double A = 1 + (uSq/16384)*(4096+uSq*(-768+uSq*(320-175*uSq)));
-		double B = (uSq/1024) * (256+uSq*(-128+uSq*(74-47*uSq)));
-		double sigma = s / (b*A);
-		double sigmaP = 1.99*PI;
-		double cos2SigmaM, sinSigma, cosSigma, deltaSigma;
-		// TODO change tolerance from 1e-12 to 1e-9
-		while (fabs(sigma-sigmaP) > 1e-9) 
+	if (s<50)
+	{
+		cGeoP HereT(here);
+		int centMer = HereT.DefaultCentMer(WGS84GC);
+		HereT.SetGeoType(WGS84GC,centMer);
+		mCentMer = HereT.mCentMer;
+		mSouth = HereT.mSouth;
+		mLat = HereT.mLat + s*cosAlpha1;
+		mLon = HereT.mLon - s*sinAlpha1;
+		mType = WGS84GC;
+//		cout << "In 	cGeoP::FromHere short distance:  s=" << s << "	dir=" << direction<< endl;
+//		Display();
+	}
+	else
+	{
+		mType = here.mType;
+		if (mType==UTM)
 		{
-			cos2SigmaM = cos(2.0*sigma1 + sigma);
-			sinSigma = sin(sigma);
-			cosSigma = cos(sigma);
-			deltaSigma = B*sinSigma*(cos2SigmaM+B/4.0*(cosSigma*(-1.0+2.0*cos2SigmaM*cos2SigmaM)-
-      			B/6.0*cos2SigmaM*(-3.0+4.0*sinSigma*sinSigma)*(-3.0+4.0*cos2SigmaM*cos2SigmaM)));
-			sigmaP = sigma;
-			sigma = s / (b*A) + deltaSigma;
+			mCentMer = here.mCentMer;
+			mSouth = here.mSouth;
+			mLat = here.mLat + s*cosAlpha1;
+			mLon = here.mLon + s*sinAlpha1;
 		}
-
-		double tmp = sinU1*sinSigma - cosU1*cosSigma*cosAlpha1;
-		double lat2 = atan2((sinU1*cosSigma + cosU1*sinSigma*cosAlpha1),(
-      					(1-f)*sqrt(sinAlpha*sinAlpha + tmp*tmp)));
-		double lambda = atan2(sinSigma*sinAlpha1, cosU1*cosSigma - sinU1*sinSigma*cosAlpha1);
-		double C = (f/16.0)*cosSqAlpha*(4.0+f*(4.0-3.0*cosSqAlpha));
-		double L = lambda - (1-C) * f * sinAlpha *
-					(sigma + C*sinSigma*(cos2SigmaM+C*cosSigma*(-1.0+2.0*cos2SigmaM*cos2SigmaM)));
-//		double revAz = atan2(sinAlpha, -tmp);  // final bearing
-		mLat=lat2/rd;
-		mLon=here.mLon +L/rd;
-//  	cout << "R: "<< distance << "   B: "<< revAz/rd 
-//	  		<< "  Here.lat: "<< here.mLat<< "  Here.lon: "<< here.mLon
-//  		<< "  Lat: " << mLat << "  Long: " << mLon << endl;
-		mType = DEG;
-		DefaultCentMer(WGS84GC);
-		mSouth = (mLat<0);
+		else if (mType==WGS84GC)
+		{
+			mCentMer = here.mCentMer;
+			mSouth = here.mSouth;
+			mLat = here.mLat + s*cosAlpha1;
+			mLon = here.mLon - s*sinAlpha1;			
+		}
+		else // hence DEG
+		{
+			double tanU1 = (1.0-f) * tan(here.mLat*rd);
+			double cosU1 = 1.0 / sqrt((1.0 + tanU1*tanU1));
+			double sinU1 = tanU1*cosU1;
+			double sigma1 = atan2(tanU1, cosAlpha1);
+			double sinAlpha = cosU1 * sinAlpha1;
+			double cosSqAlpha = 1.0 - sinAlpha*sinAlpha;
+			double uSq = cosSqAlpha * eprime2;
+			double A = 1 + (uSq/16384)*(4096+uSq*(-768+uSq*(320-175*uSq)));
+			double B = (uSq/1024) * (256+uSq*(-128+uSq*(74-47*uSq)));
+			double sigma = s / (b*A);
+			double sigmaP = 1.99*PI;
+			double cos2SigmaM, sinSigma, cosSigma, deltaSigma;
+			// TODO change tolerance from 1e-12 to 1e-9
+			while (fabs(sigma-sigmaP) > 1e-10) 
+			{
+				cos2SigmaM = cos(2.0*sigma1 + sigma);
+				sinSigma = sin(sigma);
+				cosSigma = cos(sigma);
+				deltaSigma = B*sinSigma*(cos2SigmaM+B/4.0*(cosSigma*(-1.0+2.0*cos2SigmaM*cos2SigmaM)-
+   	   			B/6.0*cos2SigmaM*(-3.0+4.0*sinSigma*sinSigma)*(-3.0+4.0*cos2SigmaM*cos2SigmaM)));
+				sigmaP = sigma;
+				sigma = s / (b*A) + deltaSigma;
+			}
+	
+			double tmp = sinU1*sinSigma - cosU1*cosSigma*cosAlpha1;
+			double lat2 = atan2((sinU1*cosSigma + cosU1*sinSigma*cosAlpha1),(
+   	   					(1-f)*sqrt(sinAlpha*sinAlpha + tmp*tmp)));
+			double lambda = atan2(sinSigma*sinAlpha1, cosU1*cosSigma - sinU1*sinSigma*cosAlpha1);
+			double C = (f/16.0)*cosSqAlpha*(4.0+f*(4.0-3.0*cosSqAlpha));
+			double L = lambda - (1-C) * f * sinAlpha *
+						(sigma + C*sinSigma*(cos2SigmaM+C*cosSigma*(-1.0+2.0*cos2SigmaM*cos2SigmaM)));
+//			double revAz = atan2(sinAlpha, -tmp);  // final bearing
+			mLat=lat2/rd;
+			mLon=here.mLon +L/rd;
+// 	 	cout << "R: "<< distance << "   B: "<< revAz/rd 
+//		  		<< "  Here.lat: "<< here.mLat<< "  Here.lon: "<< here.mLon
+// 	 		<< "  Lat: " << mLat << "  Long: " << mLon << endl;
+			DefaultCentMer(WGS84GC);
+			mType = DEG;
+			mSouth = (mLat<0);
+		}
 	}
 	SetGeoType(tempT.mType,tempT.mCentMer);
+
 }
 
 

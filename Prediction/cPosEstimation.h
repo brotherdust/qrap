@@ -76,8 +76,11 @@ struct tTestPoint
 	unsigned	sOriginalTP;
 	cGeoP		sEstimatedLocation;
 	cGeoP		sOriginalLocation;
-	eMethod		sMethodUsed;
+	eMethod	sMethodUsed;
 	double		sErrorEstimate;
+	double		sErrorActual;
+	double		sAzimuth; //with respect to serving cell/site
+	double		sDistance; //with respect to serving cell/site
 };
 
 typedef	vector<tTestPoint> vTestPoint;

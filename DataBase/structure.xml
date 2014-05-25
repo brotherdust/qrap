@@ -2386,6 +2386,37 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table> <!-- testpointauxUTRAN -->
 
+
+<!-- *************************************************************************************************************************** -->
+	<table name="PositionEstimate" label="PositionEstimate">
+	       <field name="id"
+		      type="bigserial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+
+		<field name = "tp"
+		       type = "integer references testpoint(id) on delete cascade"
+		       label = "TestPoint"/>
+
+		<field name = "azimuth"
+		       type = "real"
+		       label = "Azimuth"
+		       description="The horisontal direction the measurement is from the serving cell/site" />		
+
+		<field name = "distance"
+		       type = "real"
+		       label = "Distance"
+		       description="The distance measurement point is from the serving cell/site in meter" />
+
+		<field name = "error"
+		       type = "real"
+		       label = "Error"
+		       description="Distance between GPS location and estimation in meter" />
+	       
+	</table> <!-- PositionEstimate -->
+
+
 <!-- *************************************************************************************************************************** -->
 	<table name="measurement" label="Measurement">
 	       <field name="id"
@@ -2443,6 +2474,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		       label = "Simulated Value"
 		       description="The estimated received signal strength in simulation in dBm" />
 	</table> <!-- measurement -->
+
 
 <!-- *************************************************************************************************************************** -->
 	<table name="Celllist" label="List of cells with pilot frequencies and codes (i.e. BCCH and BSIC for GSM and ARFCN and SCN for UMTS">

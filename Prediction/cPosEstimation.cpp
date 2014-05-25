@@ -368,6 +368,10 @@ void cPosEstimation::EstimatePositions()
 		if ((mPosSets[mCurrentPosSetIndex].sMeasurements.size()>0)
 			&&(mPosSets[mCurrentPosSetIndex].sTestPoints.size()>0))
 		{
+			mPosSets[mCurrentPosSetIndex].sTestPoints[0].sAzimuth = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation.
+																													Bearing(mPosSets[mCurrentPosSetIndex].sTestPoints[0].sOriginalLocation);
+			mPosSets[mCurrentPosSetIndex].sTestPoints[0].sDistance = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation.
+																													Bearing(mPosSets[mCurrentPosSetIndex].sTestPoints[0].sOriginalLocation);
 			mNumInsts = mPosSets[mCurrentPosSetIndex].sMeasurements.size();
 			delete [] mFixedAnts;
 			mNumInsts = mPosSets[mCurrentPosSetIndex].sMeasurements.size();
@@ -1399,12 +1403,12 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					gbestValue = pbestValue[i];					
 					gbestRho = pbestRho[i];
 					gbestPhi = pbestPhi[i];
-					stop = ((gbestValue<0.00001) || ((iterationN-LastChangedN)>STOPN));
+					stop = ((gbestValue<0.005) || ((iterationN-LastChangedN)>STOPN*10*gbestValue));
 					LastChangedN = iterationN;
 				}
 			}
 
-			stop = stop||((iterationN-LastChangedN) > STOPN); 
+			stop = (stop || ((iterationN-LastChangedN)>STOPN*10*gbestValue));
 
 			rho_snelheid[i] = INERTIA*rho_snelheid[i] 
 					+ Cp*RpRho_dist(RpRho_engine)*(pbestValue[i] - value[i])
@@ -1457,7 +1461,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 	mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
 	mNewTP++;
 
-//	cout << "BestValue= " << gbestValue << "		rho=" <<	gbestRho << "	phi="	<<	gbestPhi << endl;;
+	cout << "BestValue= " << gbestValue << "		rho=" <<	gbestRho << "	phi="	<<	gbestPhi << endl;;
 	delete [] rho;
 	delete [] phi;
 	delete [] pbestRho;
@@ -1585,58 +1589,86 @@ int cPosEstimation::SaveResults()
 
 	for (i=0; i<mNumPoints; i++)
 	{
+
+		PQuery = queryP;
+		gcvt(mPosSets[i].sTestPoints[0].sNewTP,9,temp);
+		PQuery +=temp;
+		PQuery +=",";
+		PQuery +=temp;
+
+		PQuery += ", ";
+		gcvt(mPosSets[i].sTestPoints[0].sAzimuth,9,temp);
+		PQuery += temp;
+		PQuery += ", ";
+		gcvt(mPosSets[i].sTestPoints[0].sDistance,9,temp);
+		PQuery += temp;
+
+		PQuery += ", 0); ";
+
+		if (!gDb.PerformRawSql(PQuery))
+		{
+			string err = "Error inserting TestPoint by running query: ";
+			err += PQuery;
+			cout << err <<endl; 
+			QRAP_WARN(err.c_str());
+			return false;
+		}		
+
 		for (j=1; j < mPosSets[i].sTestPoints.size(); j++)
 		{
-			query = queryM;
-			PQuery = queryP;
-			gcvt(mPosSets[i].sTestPoints[j].sNewTP,9,temp);
-			query += temp;
-			PQuery +=temp;
-			PQuery +=",";
-			PQuery +=temp;
-	
-			query += ", ";
-			gcvt(mPosSets[i].sTestPoints[j].sOriginalTP,9,temp);
-			query += temp;
-	
-			query += ", ";
-			gcvt(mPosSets[i].sTestPoints[j].sMethodUsed+1,9,temp);
-			query += temp;
-	
-			mPosSets[i].sTestPoints[j].sEstimatedLocation.Get(Lat,Lon);
-			PosString=QString(",ST_GeomFromText('POINT(%1 %2)',4326)").arg(Lon).arg(Lat);
-			query += PosString.toStdString();
-			query +=");";
-
-			if (!gDb.PerformRawSql(query))
+			if (mPosSets[i].sTestPoints[j].sErrorActual > 0)
 			{
-				string err = "Error inserting TestPoint by running query: ";
-				err += query;
-				cout << err <<endl; 
-				QRAP_WARN(err.c_str());
-				return false;
-			}
+				query = queryM;
+				PQuery = queryP;
+				gcvt(mPosSets[i].sTestPoints[j].sNewTP,9,temp);
+				query += temp;
+				PQuery +=temp;
+				PQuery +=",";
+				PQuery +=temp;
 	
-			PQuery += ", ";
-			gcvt(mPosSets[i].sTestPoints[j].sAzimuth,9,temp);
-			PQuery += temp;
+				query += ", ";
+				gcvt(mPosSets[i].sTestPoints[j].sOriginalTP,9,temp);
+				query += temp;
+	
+				query += ", ";
+				gcvt(mPosSets[i].sTestPoints[j].sMethodUsed+1,9,temp);
+				query += temp;
+	
+				mPosSets[i].sTestPoints[j].sEstimatedLocation.Get(Lat,Lon);
+				PosString=QString(",ST_GeomFromText('POINT(%1 %2)',4326)").arg(Lon).arg(Lat);
+				query += PosString.toStdString();
+				query +=");";
 
-			PQuery += ", ";
-			gcvt(mPosSets[i].sTestPoints[j].sDistance,9,temp);
-			PQuery += temp;
+				if (!gDb.PerformRawSql(query))
+				{
+					string err = "Error inserting TestPoint by running query: ";
+					err += query;
+					cout << err <<endl; 
+					QRAP_WARN(err.c_str());
+					return false;
+				}
+	
+				PQuery += ", ";
+				gcvt(mPosSets[i].sTestPoints[j].sAzimuth,9,temp);
+				PQuery += temp;
 
-			PQuery += ", ";
-			gcvt(mPosSets[i].sTestPoints[j].sErrorActual,9,temp);
-			PQuery += temp;
-			PQuery += "); ";
-
-			if (!gDb.PerformRawSql(PQuery))
-			{
-				string err = "Error inserting TestPoint by running query: ";
-				err += PQuery;
-				cout << err <<endl; 
-				QRAP_WARN(err.c_str());
-				return false;
+				PQuery += ", ";
+				gcvt(mPosSets[i].sTestPoints[j].sDistance,9,temp);
+				PQuery += temp;
+	
+				PQuery += ", ";
+				gcvt(mPosSets[i].sTestPoints[j].sErrorActual,9,temp);
+				PQuery += temp;
+				PQuery += "); ";
+	
+				if (!gDb.PerformRawSql(PQuery))
+				{
+					string err = "Error inserting TestPoint by running query: ";
+					err += PQuery;
+					cout << err <<endl; 
+					QRAP_WARN(err.c_str());
+					return false;
+				}
 			}
 
 		}

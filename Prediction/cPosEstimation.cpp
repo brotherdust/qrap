@@ -440,6 +440,9 @@ bool cPosEstimation::CI()
 	newTestPoint.sErrorEstimate = Distance /mPosSets[mCurrentPosSetIndex].sMeasurements.size()/4;
 
 	newTestPoint.sEstimatedLocation =  mPosSets[mCurrentPosSetIndex].sMeasurements[0].sCentroid;
+	newTestPoint.sErrorActual = newTestPoint.sEstimatedLocation.Distance(newTestPoint.sOriginalLocation);	
+	newTestPoint.sAzimuth = 0.0;
+	newTestPoint.sDistance = 0.0;
 
 	newTestPoint.sNewTP = mNewTP;	
 	mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
@@ -499,6 +502,9 @@ bool cPosEstimation::CI_TA()
 	
 	newTestPoint.sEstimatedLocation.FromHere(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, 
 						Distance, mPosSets[mCurrentPosSetIndex].sMeasurements[0].sAzimuth);
+	newTestPoint.sErrorActual = newTestPoint.sEstimatedLocation.Distance(newTestPoint.sOriginalLocation);	
+	newTestPoint.sAzimuth = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sAzimuth;
+	newTestPoint.sDistance = Distance;
 
 	newTestPoint.sNewTP = mNewTP;	
 	mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
@@ -573,6 +579,9 @@ bool cPosEstimation::SecondSite()
 					mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist);
 
 	newTestPoint.sEstimatedLocation.FromHere(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, Distance, Azimuth);
+	newTestPoint.sErrorActual = newTestPoint.sEstimatedLocation.Distance(newTestPoint.sOriginalLocation);	
+	newTestPoint.sAzimuth = Azimuth;
+	newTestPoint.sDistance = Distance;
 
 	newTestPoint.sNewTP = mNewTP;	
 	mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
@@ -693,9 +702,10 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 		
 	cout << "Distance = " << Distance << endl;
 
-	if (Distance > 20)
-		newTestPoint.sEstimatedLocation.FromHere(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, Distance, minAzi);
-	else newTestPoint.sEstimatedLocation = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation;
+	newTestPoint.sEstimatedLocation.FromHere(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, Distance, minAzi);
+	newTestPoint.sErrorActual = newTestPoint.sEstimatedLocation.Distance(newTestPoint.sOriginalLocation);	
+	newTestPoint.sAzimuth = minAzi;
+	newTestPoint.sDistance = Distance;
 
 	double DegRes = min(5.0,max(90.0*mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sResDist/Distance/PI,1.0));
 	newTestPoint.sErrorEstimate = max(((double)mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sResDist) /2.0,DegRes*PI*Distance/180.0);
@@ -920,6 +930,9 @@ bool cPosEstimation::CoSinRule()
 		newTestPoint.sEstimatedLocation.FromHere(
 				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, A, servSiteAzi);
 		newTestPoint.sErrorEstimate = oldEst.Distance(newTestPoint.sEstimatedLocation);
+		newTestPoint.sErrorActual = newTestPoint.sEstimatedLocation.Distance(newTestPoint.sOriginalLocation);	
+		newTestPoint.sAzimuth = servSiteAzi;
+		newTestPoint.sDistance = A;
 
 		newTestPoint.sNewTP = mNewTP;	
 		mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
@@ -1022,6 +1035,9 @@ bool cPosEstimation::CoSinRule()
 		
 		newTestPoint.sEstimatedLocation.FromHere(
 				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, A, SiteAzi);
+		newTestPoint.sErrorActual = newTestPoint.sEstimatedLocation.Distance(newTestPoint.sOriginalLocation);	
+		newTestPoint.sAzimuth = SiteAzi;
+		newTestPoint.sDistance = A;
 		newTestPoint.sErrorEstimate = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist;
 		oldEst = newTestPoint.sEstimatedLocation;
 		newTestPoint.sNewTP = mNewTP;	
@@ -1045,6 +1061,9 @@ bool cPosEstimation::CoSinRule()
 			newTestPoint.sEstimatedLocation.FromHere(
 				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, A, servSiteAzi);
 			newTestPoint.sErrorEstimate = oldEst.Distance(newTestPoint.sEstimatedLocation);
+			newTestPoint.sErrorActual = newTestPoint.sEstimatedLocation.Distance(newTestPoint.sOriginalLocation);	
+			newTestPoint.sAzimuth = servSiteAzi;
+			newTestPoint.sDistance = A;
 		}
 */
 	}
@@ -1062,9 +1081,11 @@ bool cPosEstimation::CoSinRule()
 		double Site2SiteDist = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation.Distance
 					(mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sSiteLocation);
 
+		double OtherSiteBearing = mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sSiteLocation.Bearing
+					(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation);
+
 		C = Site2SiteDist;
-		alpha = (OtherSiteAzi-mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sSiteLocation.Bearing
-					(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation));
+		alpha = (OtherSiteAzi-OtherSiteBearing);
 		if (alpha>180) alpha-=360;
 		if (alpha<-180) alpha+=360;
 		if (alpha<0) alpha*=-1;
@@ -1137,6 +1158,12 @@ bool cPosEstimation::CoSinRule()
 					mPosSets[mCurrentPosSetIndex].sMeasurements[OtherSiteIndex].sSiteLocation, B, OtherSiteAzi);
 				oldEst = newTestPoint.sEstimatedLocation;
 				newTestPoint.sErrorEstimate = mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist;
+				newTestPoint.sErrorActual = newTestPoint.sEstimatedLocation.Distance(newTestPoint.sOriginalLocation);	
+				double beta = 180*acos((A*A+C*C-B*B)/(2*A*C))/PI;
+				if (OtherSiteBearing>180)
+					newTestPoint.sAzimuth = beta + OtherSiteBearing-180;
+				else newTestPoint.sAzimuth = beta + OtherSiteBearing+180;
+				newTestPoint.sDistance = A;
 			
 				newTestPoint.sNewTP = mNewTP;	
 				mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
@@ -1164,6 +1191,9 @@ bool cPosEstimation::CoSinRule()
 			newTestPoint.sEstimatedLocation.FromHere(
 				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, A, servSiteAzi);
 			newTestPoint.sErrorEstimate = oldEst.Distance(newTestPoint.sEstimatedLocation);
+			newTestPoint.sErrorActual = newTestPoint.sEstimatedLocation.Distance(newTestPoint.sOriginalLocation);
+			newTestPoint.sAzimuth = servSiteAzi;
+			newTestPoint.sDistance = A;
 			newTestPoint.sNewTP = mNewTP;	
 			mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
 			mNewTP++;
@@ -1419,6 +1449,10 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, gbestRho, gbestPhi);
 	BeforeLast.FromHere(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation, oldBestRho, oldBestPhi);
 	newTestPoint.sErrorEstimate = newTestPoint.sEstimatedLocation.Distance(BeforeLast);	
+	newTestPoint.sErrorActual = newTestPoint.sEstimatedLocation.Distance(newTestPoint.sOriginalLocation);	
+	newTestPoint.sAzimuth = gbestPhi;
+	newTestPoint.sDistance = gbestRho;
+
 	newTestPoint.sNewTP = mNewTP;	
 	mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
 	mNewTP++;
@@ -1526,7 +1560,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //cout <<"	Cost=" << Cost << "	Sexp=" << Sexp << "	mNumInsts=" << mNumInsts << "		Pexp=" << Pexp << "	CorrC=" << CorrC << endl;
 	double Pcost = 1.0 - Pexp;
 
-	altCost =  0.9*Pcost+(1.0-CorrC)*0.1;
+	altCost =  0.95*Pcost+(1.0-CorrC)*0.05;
 
 	delete [] Delta;
 	delete [] Prediction;
@@ -1540,21 +1574,26 @@ double cPosEstimation::CostFunction(double rho, double phi)
 int cPosEstimation::SaveResults()
 {
 	unsigned i,j;
-	string query;
+	string query, PQuery;
 	char * temp;
 	temp = new char[33];
 	double Lat, Lon;
 	QString PosString;
 
 	string queryM = "INSERT into testpoint (id, originaltp, positionsource, location) Values (";
+	string queryP = "INSERT into PositionEstimate (id, tp, azimuth, distance, error) Values (";
 
 	for (i=0; i<mNumPoints; i++)
 	{
 		for (j=1; j < mPosSets[i].sTestPoints.size(); j++)
 		{
 			query = queryM;
+			PQuery = queryP;
 			gcvt(mPosSets[i].sTestPoints[j].sNewTP,9,temp);
 			query += temp;
+			PQuery +=temp;
+			PQuery +=",";
+			PQuery +=temp;
 	
 			query += ", ";
 			gcvt(mPosSets[i].sTestPoints[j].sOriginalTP,9,temp);
@@ -1577,6 +1616,29 @@ int cPosEstimation::SaveResults()
 				QRAP_WARN(err.c_str());
 				return false;
 			}
+	
+			PQuery += ", ";
+			gcvt(mPosSets[i].sTestPoints[j].sAzimuth,9,temp);
+			PQuery += temp;
+
+			PQuery += ", ";
+			gcvt(mPosSets[i].sTestPoints[j].sDistance,9,temp);
+			PQuery += temp;
+
+			PQuery += ", ";
+			gcvt(mPosSets[i].sTestPoints[j].sErrorActual,9,temp);
+			PQuery += temp;
+			PQuery += "); ";
+
+			if (!gDb.PerformRawSql(PQuery))
+			{
+				string err = "Error inserting TestPoint by running query: ";
+				err += PQuery;
+				cout << err <<endl; 
+				QRAP_WARN(err.c_str());
+				return false;
+			}
+
 		}
 
 	}

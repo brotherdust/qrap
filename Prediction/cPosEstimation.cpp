@@ -458,7 +458,7 @@ bool cPosEstimation::CI()
 // Can only be used if a sectorised site is used
 bool cPosEstimation::CI_TA()
 {
-	unsigned i;
+	unsigned i,j;
 	double pathloss;
 	if (mPosSets[mCurrentPosSetIndex].sMeasurements[0].sBeamWidth > 270)
 		return false;
@@ -469,7 +469,7 @@ bool cPosEstimation::CI_TA()
 	int ClosestIndex =-1;
 	double ClosestValue = MAXDOUBLE;
 
-	if (Distance>120000)
+/*	if (Distance>120000)
 	{
 		for (i=1; i < mPosSets[mCurrentPosSetIndex].sMeasurements.size(); i++)
 		{
@@ -493,6 +493,42 @@ bool cPosEstimation::CI_TA()
 		}
 		else Distance = 17500;
 	}
+*/
+	double minDist = mPlotResolution;
+	double maxDist = 17500;
+	if (Distance>120000)
+	{	
+		if (mPosSets[mCurrentPosSetIndex].sMeasurements.size()>1)
+		{
+			j=0;
+			while ((j<mPosSets[mCurrentPosSetIndex].sMeasurements.size()-1)
+						&&(	mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteID==
+								mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteID))
+				j++;
+		
+			if ((mPosSets[mCurrentPosSetIndex].sMeasurements.size()<j)
+				||(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteID!=
+								mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteID))
+			{		
+				maxDist = 
+				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sSiteLocation.Distance
+								(mPosSets[mCurrentPosSetIndex].sMeasurements[j].sSiteLocation);
+			}
+		}
+	}
+	else
+	{
+		maxDist = (mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance
+				/mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist+0.5)*
+				mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist+50.0;
+		minDist = max(mPlotResolution,(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sDistance
+				/mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist-0.5)
+				*mPosSets[mCurrentPosSetIndex].sMeasurements[0].sResDist-50.0);
+	}
+
+	if (maxDist>120000) maxDist=17500;
+	if (maxDist>3.0*mPlotResolution) 
+		Distance = SearchDistance(mPosSets[mCurrentPosSetIndex].sMeasurements[0].sAzimuth,minDist, maxDist); 
 
 	tTestPoint newTestPoint;
 	newTestPoint.sOriginalTP = mPosSets[mCurrentPosSetIndex].sTestPoints[0].sOriginalTP;
@@ -755,6 +791,9 @@ double cPosEstimation::FindAzi(unsigned BIndex, unsigned AIndex)
 	
 	double DeltaAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sAzimuth
 			- mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sAzimuth;
+	cout << "DeltaAngle=" << DeltaAngle 
+		<< "	AziA=" << mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sAzimuth
+		<<	"	AziB="<< mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sAzimuth;
 
 	if (fabs(DeltaAngle)>180)
 	{
@@ -769,23 +808,23 @@ double cPosEstimation::FindAzi(unsigned BIndex, unsigned AIndex)
 	if (DeltaAngle < 0)
 	{
 		LeftAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sAzimuth
-				- mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sBeamWidth;
+				- mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sBeamWidth/2;
 		LeftIndex = AIndex;
-//		RightAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sAzimuth;
-		RightAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sAzimuth
-				+ mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sBeamWidth;
+		RightAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sAzimuth;
+//		RightAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sAzimuth
+//				+ mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sBeamWidth/2;
 		RightIndex = BIndex;
 	}
 	else
 	{
-		LeftAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sAzimuth
-				- mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sBeamWidth;
-//		LeftAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sAzimuth;
+//		LeftAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sAzimuth
+//				- mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sBeamWidth/2;
+		LeftAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[BIndex].sAzimuth;
 		LeftIndex = BIndex;
 //		RightAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sAzimuth
 //				+ mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sBeamWidth;
 		RightAngle = mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sAzimuth
-				+ mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sBeamWidth;
+				+ mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sBeamWidth/2;
 		RightIndex = AIndex;
 	} 
 
@@ -815,7 +854,7 @@ double cPosEstimation::FindAzi(unsigned BIndex, unsigned AIndex)
 	double DegRes = min(5.0,max(90*mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sResDist/Distance/PI,0.25));
 	unsigned NumSteps = (int)((RightAngle - LeftAngle)/DegRes)+1; 
 
-	cout << "mAzimuth = " << mPosSets[mCurrentPosSetIndex].sMeasurements[AIndex].sAzimuth << "		Left=" << LeftAngle << "	Right=" << RightAngle << endl;
+	cout <<  "		Left=" << LeftAngle << "	Right=" << RightAngle << endl;
 	for (i=0; i<NumSteps ; i++)
 	{
 		Azimuth = LeftAngle + DegRes*i;
@@ -1403,12 +1442,12 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					gbestValue = pbestValue[i];					
 					gbestRho = pbestRho[i];
 					gbestPhi = pbestPhi[i];
-					stop = ((gbestValue<0.005) || ((iterationN-LastChangedN)>STOPN*10*gbestValue));
+					stop = ((gbestValue<0.005) || ((iterationN-LastChangedN)>STOPN));
 					LastChangedN = iterationN;
 				}
 			}
 
-			stop = (stop || ((iterationN-LastChangedN)>STOPN*10*gbestValue));
+			stop = (stop || ((iterationN-LastChangedN)>STOPN));
 
 			rho_snelheid[i] = INERTIA*rho_snelheid[i] 
 					+ Cp*RpRho_dist(RpRho_engine)*(pbestValue[i] - value[i])
@@ -1461,7 +1500,8 @@ bool cPosEstimation::DCM_ParticleSwarm()
 	mPosSets[mCurrentPosSetIndex].sTestPoints.push_back(newTestPoint);
 	mNewTP++;
 
-	cout << "BestValue= " << gbestValue << "		rho=" <<	gbestRho << "	phi="	<<	gbestPhi << endl;;
+	cout << "iterationN=" << iterationN<< "	BestValue= " << gbestValue << "		rho=" <<	gbestRho << "	phi="	<<	gbestPhi << endl;
+
 	delete [] rho;
 	delete [] phi;
 	delete [] pbestRho;
@@ -1590,28 +1630,31 @@ int cPosEstimation::SaveResults()
 	for (i=0; i<mNumPoints; i++)
 	{
 
-		PQuery = queryP;
-		gcvt(mPosSets[i].sTestPoints[0].sNewTP,9,temp);
-		PQuery +=temp;
-		PQuery +=",";
-		PQuery +=temp;
-
-		PQuery += ", ";
-		gcvt(mPosSets[i].sTestPoints[0].sAzimuth,9,temp);
-		PQuery += temp;
-		PQuery += ", ";
-		gcvt(mPosSets[i].sTestPoints[0].sDistance,9,temp);
-		PQuery += temp;
-
-		PQuery += ", 0); ";
-
-		if (!gDb.PerformRawSql(PQuery))
+		if (mPosSets[i].sTestPoints.size()>0)
 		{
-			string err = "Error inserting TestPoint by running query: ";
-			err += PQuery;
-			cout << err <<endl; 
-			QRAP_WARN(err.c_str());
-			return false;
+			PQuery = queryP;
+			gcvt(mPosSets[i].sTestPoints[0].sNewTP,9,temp);
+			PQuery +=temp;
+			PQuery +=",";
+			PQuery +=temp;
+
+			PQuery += ", ";
+			gcvt(mPosSets[i].sTestPoints[0].sAzimuth,9,temp);
+			PQuery += temp;
+			PQuery += ", ";
+			gcvt(mPosSets[i].sTestPoints[0].sDistance,9,temp);
+			PQuery += temp;
+	
+			PQuery += ", 0); ";
+
+			if (!gDb.PerformRawSql(PQuery))
+			{
+				string err = "Error inserting TestPoint by running query: ";
+				err += PQuery;
+				cout << err <<endl; 
+				QRAP_WARN(err.c_str());
+				return false;
+			}
 		}		
 
 		for (j=1; j < mPosSets[i].sTestPoints.size(); j++)

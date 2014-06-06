@@ -101,7 +101,7 @@ www.QRap.org.za
 		       description="A descriptive name for this site. Try to make this unique" />
 		
 		<field name="status"
-		       type="varchar(15)"
+		       type="varchar(30)"
 		       label="Status"
 		       description="This site status in the planning process. Options can be altered in structure.xml"
 		       ui="dropdown(fixed, {'Used', 'Not Used', 'Experimental', 'Planned', 'Active', 'Released', 'Operational', 'CoreNode', 'Ready for Service', 'Repeater', 'Default'})" />
@@ -2503,7 +2503,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		<field name = "Code"
 		       type = "int"
 		       label = "Code"
-		       description="Indetifying code of Pilot, i.e. BSIV in GSM and SCN in UMTS" />
+		       description="Indetifying code of Pilot, i.e. BSIC in GSM and SCN ID in UMTS" />
 
 	</table> <!-- Celllist -->
 

@@ -10,6 +10,11 @@ longitude decimal,
 latitude decimal,
 groundheight decimal);
 
+delete from site where id in
+(select id from tempsite);
+
+
+
 drop table tempcell;
 
 truncate table radioinstallation cascade;

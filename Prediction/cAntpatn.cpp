@@ -94,6 +94,8 @@ cAntennaPattern::~cAntennaPattern()
 // Set antenna pattern file
 bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, double MechTilt)
 {	
+
+//	cout << "PatternKey = "	<< Ant_PatternKey << "	Bearing = " << Bearing << "	Tilt = " << MechTilt << endl;
 	pqxx::result r;
 
 	string QueryResult;
@@ -127,6 +129,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	{
 		string err = "Get AntennaPattern Parameters Failed. Query Failed: ";
 		err+=CmdStr1;
+		cout << err << endl;
 		QRAP_ERROR(err.c_str());
 		return false;
 	}
@@ -140,20 +143,31 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 			mGain = atof(r[0]["gain"].c_str());
 			mBeamW = atof(r[0]["azibeamwidth"].c_str());
 			strcpy(mPatternFile, r[0]["patternFile"].c_str());
+//			cout << mPatternFile << endl;
 		}
 		else
 		{
 			string err = "AntennaPattern Entry not found, assuming zero gain. Empty Query: ";
 			err += CmdStr1;
+			cout << err << endl;
 			QRAP_WARN(err.c_str());
 			return false;
 		}
 	}
 	
-	string CmdStr("SELECT numazipoints, azimuthangles, azimuthpattern,");
+//	cout << "After got basic info. Ant_PatternKey := " << Ant_PatternKey << endl;
+	
+	string CmdStr;
+//   cout << "After declaring CmdStr"  << endl;
+
+	CmdStr = "SELECT numazipoints, azimuthangles, azimuthpattern,";
 	CmdStr+=" numelevpoints, elevationangles, elevationpattern ";
 	CmdStr+="FROM AntennaPattern WHERE ID =";
+
+//   cout << "After setting basic CmdStr"  << endl;
+ 
 	gcvt(Ant_PatternKey, 8, Temp);
+//	cout << Temp << endl;
 	CmdStr += Temp;
 	CmdStr += ";";
 	
@@ -162,15 +176,19 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	{
 		string err = "Get AntennaPattern Failed. Query Failed: ";
 		err+=CmdStr;
+		cout << err << endl;
 		QRAP_ERROR(err.c_str());
 		return false;
 	}
 	else
 	{
+//		cout << "Before get Query results " << endl;
 		gDb.GetLastResult(r);
 		if(r.size()!=0)
 		{
+//			cout << "Before get mNAA " << endl;
 			mNAA = atoi(r[0]["numazipoints"].c_str());
+//			cout << "mNAA = " << mNAA << endl;
 			delete [] mAziAngles;
 			delete [] mAziValues;
 			mAziAngles = new float[mNAA];
@@ -301,6 +319,8 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 			return false;	
 		} // else r.size()
 	}//else !gDb->PerformRawSql(CmdStr1)
+
+//	cout << "After read database" << endl;
 	
 	// Prepare angular values for mask
 	TempAziAngles = new float[mNAA+3];
@@ -375,6 +395,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 		if (fabs(mAziAngles[k]-180.0)<0.1) mRef180az = k;
 	}
 	
+
 /*	for (k=0; k<mNAA+3; k++)
 	{
 		cout << k << ":  " << TempRef_mAzi[k] << "  h: " 
@@ -382,6 +403,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	}
 	cout << endl;
 */
+
 	TempElevAngles = new float[mNEA+3];
 	TempRef_mElev = new unsigned[mNEA+3];
 	TempAgterAngles = new float[mNEA+3]; 

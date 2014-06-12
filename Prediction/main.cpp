@@ -96,34 +96,7 @@ int main (int argc, char **argv)
 	cout << endl << "Wrote Measurements to DataBase" << endl;
 */
 
-	cPosEstimation Positioning;
-	vPoints Punte;
-	cGeoP *Hoek;
-	Hoek = new cGeoP[4];
 
-	Hoek[0].Set(-25.78, 28.29);
-	Punte.push_back(Hoek[0]);
-	Hoek[1].Set(-25.60, 28.29);
-	Punte.push_back(Hoek[1]);
-	Hoek[2].Set(-25.60, 28.15);
-	Punte.push_back(Hoek[2]);
-	Hoek[3].Set(-25.78, 28.15);
-	Punte.push_back(Hoek[3]);
-	
-	delete [] Hoek;
-	
-	Positioning.LoadMeasurements(Punte,2,5,1,1);
-
-	cout << " Clearing Punte " << endl;
-	Punte.clear();
-
-	cout << " Estimating Positions " << endl;
-	Positioning.EstimatePositions();
-
-	cout << " Saving Results " << endl;
-	Positioning.SaveResults();
-
-/*
    string query = "update coefficients set coefficient=0.0;";
 
 	double Mean, MSE, StDev, CorrC;
@@ -135,16 +108,64 @@ int main (int argc, char **argv)
 	}
 
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas. LoadMeasurements(0,0,5);
+	cout << "Loading measurements ... in main()" << endl;
+	Meas. LoadMeasurements(0,0,6);
+	cout << "Before PerformAnalysis ... in main()" << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 //	Meas.OptimiseSeekWidth();
+cout << "Starting Optimisation ... in main()" << endl; 
 
- Meas.OptimiseHeights(5);
-*/
+ 	Meas.OptimiseHeights(6);
+
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+	Meas.mPathLoss.mClutter.Reset(1);
+	Meas. LoadMeasurements(0,0,6);
+	Meas.OptimiseModelCoefAllTotal(6);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Na6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
+	Meas.OptimiseModelCoefD(6);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nach6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 
+/*
+	cPosEstimation Positioning;
+	vPoints Punte;
+	cGeoP *Hoek;
+	Hoek = new cGeoP[4];
+
+	Hoek[0].Set(-26.06, 28.26);
+	Punte.push_back(Hoek[0]);
+	Hoek[1].Set(-25.94, 28.26);
+	Punte.push_back(Hoek[1]);
+	Hoek[2].Set(-25.94, 28.113);
+	Punte.push_back(Hoek[2]);
+	Hoek[3].Set(-26.06, 28.113);
+	Punte.push_back(Hoek[3]);
+	
+	delete [] Hoek;
+	
+	Positioning.LoadMeasurements(Punte,2,6,1,1);
+
+// bool cPosEstimation::LoadMeasurements(vPoints Points,
+//					unsigned MeasType, 
+//					unsigned MeasSource,
+//					unsigned PosSource,
+//					unsigned Technology)
+
+	cout << " Clearing Punte " << endl;
+	Punte.clear();
+
+	cout << " Estimating Positions " << endl;
+	Positioning.EstimatePositions();
+
+	cout << " Saving Results " << endl;
+	Positioning.SaveResults();
 /*
 
 	if (!gDb.PerformRawSql(query))
@@ -296,21 +317,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-/*
-	if (!gDb.PerformRawSql(query))
-	{
-		cout << "Error clearing coefficients" << endl;
-	}
-	Meas.mPathLoss.mClutter.Reset(1);
-	Meas. LoadMeasurements(0,0,5);
-	Meas.OptimiseModelCoefAllTotal(5);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Na5" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
-	Meas.OptimiseModelCoefD(5);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nach5" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-*/
 /*
 {
 cMeasImportCSV MeasImport(-120, 390,8, 1, 1, 1);

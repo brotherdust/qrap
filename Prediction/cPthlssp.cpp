@@ -404,8 +404,10 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 
 	}
 
+//cout << "Na clutter in TotPathloss" << endl;
 
-//	m_Loss = max(m_Loss,min(FreeSpace,PlaneEarth));
+
+	m_Loss = max(m_Loss,min(FreeSpace,PlaneEarth));
 /*
 #ifndef NO_DEBUG
 	m_counter++;

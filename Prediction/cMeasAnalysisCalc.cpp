@@ -385,7 +385,9 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					cout << "FixedNum reached limit ... ending measurement analysis" <<endl;
 					return 0;
 				}
+//				cout << "Setting Mobile Antenna" << endl;
 				MobileAnt.SetAntennaPattern(mMobiles[MobileNum].sPatternKey, 0, 0);
+//				cout << "Setting Path loss parameters" << endl;
 				mPathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
 								mFixedInsts[FixedNum].sTxHeight,
 								mMobiles[MobileNum].sMobileHeight,
@@ -395,6 +397,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			//Change settings if the Fixed Installation changed
 			if (mMeasPoints[i].sInstKeyFixed!=currentInst)
 			{
+//				cout << "NextInst = " << mMeasPoints[i].sInstKeyFixed << endl;
 				if (CNumUsed>0)
 				{
 					CMean = CTotalError/CNumUsed;
@@ -409,7 +412,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-*/			}
+*/
+			}
 
 				CNumUsed = 0;
 				CError=0;
@@ -435,11 +439,14 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					cout << "FixedNum reached limit ... ending measurement analysis" <<endl;			
 					return 0;
 				}
+
+//				cout << "Setting Fixed Antenna" << endl;
 				FixedAnt.SetAntennaPattern(mFixedInsts[FixedNum].sTxPatternKey, 
 								mFixedInsts[FixedNum].sTxAzimuth,  
 								mFixedInsts[FixedNum].sTxMechTilt);
 				EIRP = mFixedInsts[FixedNum].sTxPower 
 					- mFixedInsts[FixedNum].sTxSysLoss + FixedAnt.mGain + MobileAnt.mGain;
+//				cout << "Setting Prediction parameters to match FixedInstallation" << endl;
 				mPathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
 								mFixedInsts[FixedNum].sTxHeight,
 								mMobiles[MobileNum].sMobileHeight,
@@ -483,7 +490,9 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 */
 				}			
 //				tPathLoss = mMeasPoints[i].sPathLoss;
+//				cout << "cMeasAnalysisCalc::PerformAnalysis ... before prediction" << endl;
 				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter,DiffLoss);
+//				cout << "cMeasAnalysisCalc::PerformAnalysis ... after prediction" << endl;
 				if ((NUMTERMS>6)&&(mUseClutter)) terms[6]=DiffLoss;
  
 				mMeasPoints[i].sClutter = mPathLoss.get_Clutter();
@@ -508,10 +517,12 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 //					DEM.Display();
 				}
 */
+//				cout << "cMeasAnalysisCalc::PerformAnalysis ... before antenna effect" << endl;
 				mMeasPoints[i].sAzimuth = mFixedInsts[FixedNum].sSitePos.Bearing(mMeasPoints[i].sPoint);
 				AntValue = FixedAnt.GetPatternValue(mMeasPoints[i].sAzimuth, mMeasPoints[i].sTilt)
 						+ MobileAnt.GetPatternValue(0, -mMeasPoints[i].sTilt);
 				mMeasPoints[i].sPredValue = -mMeasPoints[i].sPathLoss + EIRP - AntValue;
+//				cout << "cMeasAnalysisCalc::PerformAnalysis ... after antenna effect" << endl;
 
 //				cout << "	M="<< mMeasPoints[i].sMeasValue << "	P=" << mMeasPoints[i].sPredValue;
 
@@ -581,7 +592,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
 		double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 		CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
-/*		cout << "Inst: " << currentInst << "	#: " << CNumUsed <<"	M: " << CMean 
+/*  	cout << "Inst: " << currentInst << "	#: " << CNumUsed <<"	M: " << CMean 
 			<< "	MSE: " << CMeanSquareError 
 			<< "	StDev: " << CStDev
 			<< "	Corr: " << CCorrC << endl;
@@ -1112,7 +1123,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	double Mean, MeanSq, StDev, CorrC;
 	int NumUsed;
 	bool stop = false, redo=false;
-	bool first = true, ExhaustiveSearch=false;
+	bool first = true, ExhaustiveSearch=true;
 	bool StopStepSize=false;
 	double cost, costOld, costMin, costMinTemp, cost1, cost2;
 	double dCost1,dCost2,ddCost;
@@ -1147,7 +1158,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		Up[i] = true;
 		CHeightDiff[i] = 0.5;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
-		DeltaH[i] = 0.2;
+		DeltaH[i] = -0.2;
 		NumClut[i] = 0;
 		Passed[i] = false;
 	}
@@ -1191,12 +1202,12 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		{
 			cout << "Starting Exhaustive search " << endl;
 			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
-				DeltaH[i] =-1;
+				DeltaH[i] =1;
 			if (0<mClutterCount[i]) Change[i] =true;
 			smallStepSize = 0;
 			StepSize = 0.0004;
  			ExhaustiveSearch=true;
-			stop = true;
+			stop = false;
 		}	
 		
 		if (!stop)

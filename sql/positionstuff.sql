@@ -35,7 +35,6 @@ where AOA.originaltp=AO1.id
 group by positionsource
 order by DistError;
 
-
 select * from positionsource;
 
 delete from testpoint where id in

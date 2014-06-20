@@ -136,7 +136,8 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 		query += "txantennaheight, EIRP, txbearing, txmechtilt, txantpatternkey, azibeamwidth, ";
 		query += "ci, ST_AsText(centriod) as centriod, measurement.frequency as frequency, ";
 		query += "max(measvalue) as measvalue, min(pathloss) as pathloss, ";
-		query += "min(testpointauxUTRAN.RxTxDiff) as timeDiff1, min(testpointauxUTRAN.RxTxDiff2) as timeDiff2, ";
+		query += "min(testpointauxUTRAN.RxTxDiff) as timeDiff1, ";
+		query += "min(testpointauxUTRAN.RxTxDiff2) as timeDiff2, ";
 		query += "min(testpointauxGSM.TA) as TA, technology.DistRes as DistRes ";
 		query += "from measurement left join testpointauxUTRAN ";
 		query += "on (measurement.tp=testpointauxUTRAN.tp and measurement.ci=testpointauxUTRAN.servci)"; 
@@ -144,11 +145,12 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 		query += "on (measurement.tp=testpointauxGSM.tp and measurement.ci=testpointauxGSM.servci) ";
 		query += "cross join testpoint cross join cell cross join radioinstallation  ";
 		query += "cross join antennapattern cross join site ";
-		query += " LEFT OUTER JOIN technology ON (radioinstallation.techkey=technology.id) ";
+		query += "LEFT OUTER JOIN technology ON (radioinstallation.techkey=technology.id) ";
 		query += "where measurement.tp=testpoint.id and measurement.ci=cell.id and siteid=site.id ";
-		query += "and cell.risector=radioinstallation.id and radioinstallation.txantpatternkey = antennapattern.id ";
+		query += "and cell.risector=radioinstallation.id ";
+		query += "and radioinstallation.txantpatternkey = antennapattern.id ";
 		query += "and testpoint.positionsource<2 ";
-		query += " and site.Location @ ST_GeomFromText('POLYGON((";
+		query += "and site.Location @ ST_GeomFromText('POLYGON((";
 		for (int i = 0 ; i < Points.size();i++)
 	        {
 			Points[i].Get(Lat, Lon);

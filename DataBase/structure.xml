@@ -18,7 +18,7 @@ www.QRap.org.za
 -->
 
 <structure>  
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="serverupdates" label="Server Updates"
 	description="This table provides a log for the last time a machine has been synchronised with the server. It is logged at both the main-server and the independant machine.">
 
@@ -42,7 +42,7 @@ www.QRap.org.za
 
 	</table> <!---serverupdates-->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="machine" label="machine" fulldownload="true" customsequence="true"
 	description="The Machine Table gives a list of all the QRap installation that share the same data(base). Its information is used in synchronisation of the different machines">
 	       <field name="id"
@@ -73,7 +73,7 @@ www.QRap.org.za
 
 	</table> <!-- machine -->
   
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="site" label="Site"  fulldownload="true"
 	description="The site table merely identifies a location for (potential) radio installations. It does not imply any installation" >
 	
@@ -127,7 +127,7 @@ www.QRap.org.za
 
 	</table> <!-- site -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="sitedescription" label="Site description" 
 	description="This table gives information about the site, particularly regarding the feasibility of the site. It needs to be completed for all planned and active sites.">
 		<field name="id"
@@ -233,7 +233,8 @@ www.QRap.org.za
 
 	</table> <!-- sitedescription -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ********************************************************************************************************************* -->
+
 	<table name="sitecontacts" label="Site contacts"
 	description="This table gives information about the site owner and contact details for site sharing, rental deals and site access. It needs to be completed for all planned and active sites." >
 		<field name="id"
@@ -330,7 +331,8 @@ www.QRap.org.za
 		</view>
 	</table> <!-- sitecontacts -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ******************************************************************************************************************** -->
+
 	<table name="btl" label="BTL"
 		description="This table stores a reference to the file which stores the Basic Transmission Loss. This is the loss before any antenna information (gain and pattern) or any transmitted power and system losses are taken into account. It is re-used to speed up subsequent prediction with the same parameters">
 		<field name="id"
@@ -423,7 +425,8 @@ www.QRap.org.za
 
 	</table> <!-- btl -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ********************************************************************************************************************* -->
+	
 	<table name="technology" label="Technology" footer="check (stopfreq >= startfreq)" fulldownload="true" customsequence="true"
 	description="This table stores information regarding the Technology implemented on a site. Each Radio installation should reference a technology">
 		<field name="id"
@@ -554,7 +557,7 @@ www.QRap.org.za
 		
 	</table> <!-- technology -->
 	
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="envelopes" label="Spectral Envelopes" fulldownload="true" customsequence="true"
 	description="This table describes Spectral Envelope of the transmitted signal for a given technology. This is used in the Spectral Analysis Tool. Each entry needs to reference a Technology table entry. ">
 		<field name="id"
@@ -608,7 +611,8 @@ www.QRap.org.za
 		</view>
 	</table> <!-- envelopes -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ********************************************************************************************************************* -->
+
 	<table name="equipmenttype" label="Equipment type" fulldownload="true"
 	description="This table describes different equipment types e.g. base station versions">
 		<field name="id"
@@ -664,7 +668,8 @@ www.QRap.org.za
 
 	</table> <!-- equipmenttype -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ********************************************************************************************************************* -->
+
 	<table name="antennadevice" label="Antenna devices" fulldownload="true"
 	description="This table describes different antenna types. Note that there can be many antenna patterns assigned to antenna device. The antenna could have different patterns at different frequency and at different electrical tilt settings">
 		<field name="id"
@@ -719,7 +724,7 @@ www.QRap.org.za
 
 	</table> <!-- antennadevice -->
 	
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="antennapattern" label="Antenna patterns">
 		<field name="id"
 		       type="serial primary key unique not null"
@@ -832,7 +837,8 @@ www.QRap.org.za
 
 	</table> <!-- antennapattern -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ********************************************************************************************************************* -->
+
 	<table name="radioinstallation" label="Radio Installation"
 	description = "A Radio Installation represents everything that is essential for the effective transmission and/or reception of radiowaves. A site could have many Radio Installations. Each Radio Installation must below to a site.">
 		<field name="id"
@@ -990,7 +996,8 @@ www.QRap.org.za
 		</view>
 	</table> <!-- radioinstallation -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ********************************************************************************************************************* -->
+
 	<table name="projects" label="Projects" customsequence="true" fulldownload="true"
 	description="The project field allow one to distinguish between installations for different project. The project flag can be used in the database filter to display only sites and installations belonging to a specific project">
 
@@ -1026,7 +1033,7 @@ www.QRap.org.za
 
 	</table> <!-- Projects -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="flagx" label="FlagX" customsequence="true" fulldownload="true"
 	description="This flag can be used for what you please to. This flag can be used in the database filter to display only Radio Installations and the sites they belong to that has a given flag.">
 
@@ -1062,7 +1069,7 @@ www.QRap.org.za
 
 	</table> <!-- FlagX -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="flagz" label="FlagZ" customsequence="true" fulldownload="true"
 	description="This flag can be used for what you please to. This flag can be used in the database filter to display only Radio Installations and the sites they belong to that has a given flag.">
 
@@ -1099,7 +1106,7 @@ www.QRap.org.za
 		</view>
 	</table> <!-- FlagZ -->
 
-<!-- **************************************39************************************************************************************* -->
+<!-- ********************************************************************************************************************* -->
 	<table name="mobile" label="Mobile installation"
 	description="The mobile table represents mobile or roaming transmit and receive units used in area predictions">
 		<field name="id"
@@ -1182,7 +1189,7 @@ www.QRap.org.za
 		</view>
 	</table> <!-- mobile -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ********************************************************************************************************************* -->
 	<table name="antenna" label="Antennas"
 	description="This table represents the physical antennas that has been installed or are in stock. A Radio Installation ID of NULL indicates available stock.">
 
@@ -1247,7 +1254,7 @@ www.QRap.org.za
 		</view>
 	</table> <!-- antenna -->
 	
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="equipment" label="Equipment"
 	description="This table represents the physical equipment that has been installed or are in stock. A Radio Installation ID of NULL indicates available stock.">>
 		<field name="id"
@@ -1311,7 +1318,8 @@ www.QRap.org.za
 		</view>
 	</table> <!-- equipment -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ********************************************************************************************************************* -->
+	
 	<table name="cell" label="Cell" fulldownload="true"
 	description="A Cell is a logical entity typically representing traffic carried via a radio installation.">
 		<field name="id"
@@ -1402,7 +1410,7 @@ www.QRap.org.za
 		</view>
 	</table> <!-- cell -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ********************************************************************************************************************* -->
 	<table name="frequencyallocationlist" label="Frequency allocation list" fulldownload="true"
 	description="This table contains the information regarding the frequency channels (as identified in the Technology Table) that is used in a particular cell">
 		<field name="id"
@@ -1449,7 +1457,7 @@ www.QRap.org.za
 		</view>
 	</table> <!-- frequencyallocationlist -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="cellparameters" label="Cell Parameters" fulldownload="true"
 	description="This table contains information and explation of the cell parmeters that can be set.">
 		<field name="id"
@@ -1510,7 +1518,7 @@ www.QRap.org.za
 		</view>
 	</table> <!-- cellparameters -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="parametersettings" label="Cell Parameters Settings" fulldownload="true"
 	description="This table contains the actual values of the cell parameters">
 		<field name="id"
@@ -1558,7 +1566,7 @@ www.QRap.org.za
 		</view>
 	</table> <!-- parametersettings -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="links" label="Links"
 	desription="The link table provides information of all existing links between two Radio Installations">
 	       <field name="id"
@@ -1648,7 +1656,7 @@ www.QRap.org.za
 
 	</table> <!-- links -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="customareafilter" label="Custom Area Filter" description="A list of polygons to filter on">
 		<field name="id"
 		       type="serial primary key unique not null"
@@ -1684,7 +1692,7 @@ www.QRap.org.za
 
 	</table> <!-- areafilter -->
 	
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="servedkeylocations" label="Served key locations" fulldownload="true"
 	description="This table identifies important locations that need to be covered. In fact it can be used / mis-used for any selection of location the user would like to identify">
 		<field name="id"
@@ -1733,7 +1741,7 @@ www.QRap.org.za
 
 	</table> <!-- servedkeylocations  -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="colourmanagement" label="Colour Management"
 	description="This table describes the colour bands used for displaying the different plots">
 	       <field name="id"
@@ -1790,7 +1798,7 @@ www.QRap.org.za
 		</view>	
 	</table> <!-- colourmanagement -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ******************************************************************************************************************** -->
 	<table name="classificationgroup" label="Classification Group" fulldownload="true"
 	description="This table is essentially to manage and allow tuning of propagation modules based on different sets of Land Cover or Clutter raster sources. A Classification Group identify a set of classifications occurring together. This will typically be the same for a File Set." >
 		<field name="id"
@@ -1824,7 +1832,7 @@ www.QRap.org.za
 		</view>
 	</table> <!-- classificationgroup  -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="cluttertype" label="Clutter Types" fulldownload="true" customsequence="true"
 	description="This file identify each different clutter type or land cover type as they occur in the original source file. They can be referenced to a set of Standard clutter types ">
 		<field name="id"
@@ -1886,7 +1894,7 @@ www.QRap.org.za
 		</view>	
 	</table> <!-- cluttertype  -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ********************************************************************************************************************* -->
 <!-- This "clutterterms" table should rather not be edited unless you change the code too. The clutter terms should be reflected 
 in #define statements in qrap/Prediction/cClutter.h -->
 
@@ -1924,9 +1932,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table> <!-- clutterterms  -->
 
-<!-- *************************************************************************************************************************** -->
-
-
+<!-- ********************************************************************************************************************* -->
 	<table name="coefficients" label="Tuned Coefficients/Parameters" fulldownload="true"
 	description="This table presents the coefficients or parameters that was tuned/altered to find the best propagation prediction model." >
 		<field name="id"
@@ -1969,7 +1975,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table> <!-- coefficients  -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="filesets" label="File Sets" fulldownload="true" customsequence="true"
 	description="A File Set combine a number of raster files that have the same origin and resolution and are intended to be used together. E.g. the 90m SRTM data.">
 		<field name="id"
@@ -2062,7 +2068,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table> <!-- filesets  -->
 		
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="filesetsused" label="File sets to use" fulldownload="true" customsequence="true"
 	description="This table is used to set the ranking of first choice for the raster files.">
 	       <field name="id"
@@ -2097,7 +2103,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		</view>
 	</table> <!-- filesetsused  -->
 
-<!-- *************************************************************************************************************************** -->	
+<!-- ******************************************************************************************************************** -->
 	<table name="sourcefiles" label="Source files" fulldownload="true"
 	description="This table contains reference to all raster files (Digital Elevation Models and Land Cover) being used in the predictions.">
 		<field name="id"
@@ -2127,7 +2133,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		<field name = "filename"
 		       type = "text"
 			description="The raster file name."
-		       label = "Description" />
+		       label = "File Name" />
 		
 		<field name = "location"
 		       type = "text"
@@ -2148,7 +2154,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 	</table> <!-- sourcefiles  -->
 
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="measdatasource" label="Data Source" fulldownload="true" customsequence="true">
 	       <field name="id"
 		      type="smallint primary key unique not null default nextval('measdatasource_id_seq')"
@@ -2187,7 +2193,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table><!-- measdatasource -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="positionsource" label="Position Source" fulldownload="true" customsequence="true">
 	       <field name="id"
 		      type="smallint primary key unique not null default nextval('positionsource_id_seq')"
@@ -2215,7 +2221,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		       label = "Description" />
 	</table><!-- positionsource -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="meastype" label="Measurement Type" fulldownload="true" customsequence="true">
 	       <field name="id"
 		      type="smallint primary key unique not null default nextval('meastype_id_seq')"
@@ -2243,7 +2249,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		       label = "Description" />
 	</table><!-- meastype -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="testpoint" label="TestPoint">
 	       <field name="id"
 		      type="bigserial primary key unique not null"
@@ -2290,7 +2296,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table> <!-- testpoint -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="testpointauxGSM" label="GSM Auxiliary Test Point info">
 	       <field name="id"
 		      type="bigserial primary key unique not null"
@@ -2352,10 +2358,22 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		       label = "Mobile Station Received Quality"
 		       description="Downlink Quality indicator. RxQual_sub id DTX was used else RxQual_Full" />
 
+		<view name = "tplist" as = '(select tp, servci, RxTxDiff as ta
+						from testpointauxUTRAN
+						where RxTxDiff is not null
+						union
+						select tp, servci, RxTxDiff2 as ta
+						from testpointauxUTRAN
+						where RxTxDiff2 is not null
+						union
+						select tp, servci, ta
+						from testpointauxGSM)'>
+				</view>
+;
 	</table> <!-- testpointauxGSM -->
 
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="testpointauxUTRAN" label="UTRAN Auxiliary Test Point info">
 
 	       <field name="id"
@@ -2386,8 +2404,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table> <!-- testpointauxUTRAN -->
 
-
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="PositionEstimate" label="PositionEstimate">
 	       <field name="id"
 		      type="bigserial primary key unique not null"
@@ -2417,7 +2434,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 	</table> <!-- PositionEstimate -->
 
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="measurement" label="Measurement">
 	       <field name="id"
 		      type="bigserial primary key unique not null"
@@ -2476,7 +2493,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 	</table> <!-- measurement -->
 
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="Celllist" label="List of cells with pilot frequencies and codes (i.e. BCCH and BSIC for GSM and ARFCN and SCN for UMTS">
 
 	       <field name="id"
@@ -2507,8 +2524,76 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table> <!-- Celllist -->
 
+<!-- ********************************************************************************************************************* -->
+	
+	<table name="NeuralNet" label="List of saved artificial neural nets">
 
-<!-- *************************************************************************************************************************** -->
+	       <field name="id"
+		      type="bigserial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+
+	       <field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised and on which machine the file was generated originally."
+			visible="false"/>
+ 
+		<field name = "siteid"
+		       type = "integer references site(id) on delete cascade"
+			label = "Site ID"
+		       description= "Site ID for which to which this neural net apply"
+		       ui = "dropdown(fromtable,site_view,sitename)" />
+
+		<field name = "filename"
+		       type = "text"
+			description="The name of the file containing the stored ANN."
+		       label = "File Name" />
+
+	</table> <!-- NeuralNet -->
+
+
+<!-- ********************************************************************************************************************* -->
+	<table name="ANNInputlist" label="List of cells related to the inputs of a particular neural net">
+
+	       <field name="id"
+		      type="bigserial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+
+		<field name = "siteid"
+		       type = "integer references site(id) on delete cascade"
+			label = "Site ID"
+		       description= "Site ID for which to which this neural net apply"
+		       ui = "dropdown(fromtable,site_view,sitename)" />
+
+		<field name = "annid"
+		       type = "integer"
+			label = "ANN ID"
+		       description= "ID of artificial neural net to which this apply"/>
+
+		<field name = "index"
+		       type = "integer"
+			description="The index to which measurements of the of the cell is to be entered"
+		       label = "Index" />
+
+		<field name = "cellid"
+		       type = "integer references cell(id) on delete cascade"
+			label = "Cell ID"
+		       description= "Cell ID of the measurements used as input to the particular index"
+		       ui = "dropdown(fromtable,cell_view,sectorname)" />
+
+	</table> <!-- ANNInputlist-->
+
+
+<!-- ********************************************************************************************************************* -->
 	<table name="cable" label="Cable">
 	
 		<field name="id"
@@ -2558,7 +2643,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table> <!-- cable -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="cable_type" label="Cable Type" fulldownload="true">
 	
 		<field name="id"
@@ -2591,7 +2676,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 	</table> <!-- cable_type -->
 
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="combiner_splitter" label="combiner_splitter"  fulldownload="true">
 	
 		<field name="id"
@@ -2633,7 +2718,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		
 	</table> <!-- combiner_splitter -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="combiner_splitter_type" label="Combiner/Splitter Type" fulldownload="true">
 	
 		<field name="id"
@@ -2676,7 +2761,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table> <!-- combiner_splitter_type -->
 
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="receiver_capabilities" label="Receiver Capabilities"  fulldownload="true">
 
 		<field name="id"
@@ -2714,7 +2799,7 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table> <!-- receiver_capabilities -->
         
-<!-- *************************************************************************************************************************** -->
+<!-- ********************************************************************************************************************* -->
 	<table name="height_costs" label="Height Costs"  fulldownload="true">
 
             	<field name="id"

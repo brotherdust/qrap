@@ -35,6 +35,7 @@
 #include "cMeasImportCSV.h"
 #include "cGeoP.h"
 #include "cPosEstimation.h"
+#include "cTrainPosNet.h"
 
 
 using namespace std;
@@ -96,7 +97,7 @@ int main (int argc, char **argv)
 	cout << endl << "Wrote Measurements to DataBase" << endl;
 */
 
-
+/*
    string query = "update coefficients set coefficient=0.0;";
 
 	double Mean, MSE, StDev, CorrC;
@@ -132,6 +133,28 @@ cout << "Starting Optimisation ... in main()" << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
+*/
+	cTrainPosNet NeuralNets;
+	vPoints Punte;
+	cGeoP *Hoek;
+	Hoek = new cGeoP[4];
+
+	Hoek[0].Set(-26.06, 28.26);
+	Punte.push_back(Hoek[0]);
+	Hoek[1].Set(-25.94, 28.26);
+	Punte.push_back(Hoek[1]);
+	Hoek[2].Set(-25.94, 28.113);
+	Punte.push_back(Hoek[2]);
+	Hoek[3].Set(-26.06, 28.113);
+	Punte.push_back(Hoek[3]);
+	
+	delete [] Hoek;
+	
+	cout << "In main Laoding measurements " << endl;
+	NeuralNets.LoadMeasurements(Punte,2,6,1,1);
+
+	cout << "In main training nets " << endl;
+	NeuralNets.TrainANDSave();
 
 /*
 	cPosEstimation Positioning;

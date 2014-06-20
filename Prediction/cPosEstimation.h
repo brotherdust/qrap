@@ -27,7 +27,7 @@
 #define cPosEstimation_h 1
 
 #define GAMMA 2.5
-#define MOBILEHEIGHT 1.5
+#define MOBILEHEIGHT 1
 #define SIGMA2 (14*14)
 #define MARGIN 15
 #define SENSITIVITY -110
@@ -68,6 +68,7 @@ enum eMethod
 	CosRuleAngleAngle,
 	DCM_PSO,
 	DCM_PSObestN,	
+	ANN,
 	None
 };
 
@@ -90,11 +91,11 @@ struct tMeas
 {
 	unsigned	sID;
 	unsigned	sOriginalTP;
-	unsigned sSiteID;
+	unsigned 	sSiteID;
 	cGeoP		sSiteLocation;
 	unsigned	sCellID;
 	cGeoP		sCentroid;
-	bool			sServingCell;
+	bool		sServingCell;
 	unsigned	sInstKeyFixed;
 	double 		sEIRP;
 	unsigned	sAntPatternKey;
@@ -102,7 +103,7 @@ struct tMeas
 	double 		sMeasValue;
 	double		sPathLoss;
 	double 		sPredValue;
-	float			sTilt;
+	float		sTilt;
 	double		sHeight;
 	double		sAzimuth;
 	double 		sBeamWidth;

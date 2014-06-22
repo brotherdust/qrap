@@ -39,15 +39,17 @@ cTrainPosNet::cTrainPosNet() // default constructor
 cTrainPosNet::~cTrainPosNet() // destructor
 {
 	unsigned i,j;
+	cout << "In cTrainPosNet::~cTrainPosNet() " << endl;
 	for (i=0;i<mNumPoints;i++)
 	{
 		mPosSets[i].sTestPoints.clear();
 		mPosSets[i].sMeasurements.clear();
 	}
 	mPosSets.clear();
+
 	for (i=0; i<mNumSites; i++)
 	{
-		mSites[i].sCellSet.clear();
+	cout << "In cTrainPosNet::~cTrainPosNet():  Site=" << i << endl;
 		for (j=0; j<mSites[i].sNumDataRows ;j++)
 		{
 			delete [] mSites[i].sInput[j];
@@ -55,8 +57,11 @@ cTrainPosNet::~cTrainPosNet() // destructor
 		}
 		delete [] mSites[i].sInput;
 		delete [] mSites[i].sOutput;	
+		mSites[i].sCellSet.clear();
+	cout << "In cTrainPosNet::~cTrainPosNet():  Site=" << i << "	done" << endl;
 	}
 	mSites.clear();
+	cout << "In cTrainPosNet::~cTrainPosNet(): mSites cleared " << endl;
 }
 
 //*********************************************************************
@@ -347,6 +352,7 @@ bool cTrainPosNet::LoadMeasurements(vPoints Points,
 		NewPosSet.sNumMeas = NumInPosSet;
 		mPosSets.push_back(NewPosSet);
 		mNumPoints = mPosSets.size();
+		mSites[siteIndex].sNumDataRows = Counter;
 	} // end if query is NOT empty
 	else 
 	{
@@ -428,22 +434,26 @@ bool cTrainPosNet::TrainANDSave()
 
 		for (j=0; j<mSites[i].sNumDataRows; j++)
 		{
+//	if (i>22) cout << i <<"	" << j << "	before input outpot" << endl;
 			mSites[i].sOutput[j][0] = cos(mPosSets[tpIndex].sTestPoints[0].sBearing*PI/180);
 			mSites[i].sOutput[j][1] = sin(mPosSets[tpIndex].sTestPoints[0].sBearing*PI/180);
 			mSites[i].sOutput[j][2] = DIST_SCALE*mPosSets[tpIndex].sTestPoints[0].sDistance;
 
-			mSites[i].sInput[j][0] = cos(mPosSets[tpIndex].sTestPoints[0].sServCellAzimuth*PI/180);
-			mSites[i].sInput[j][1] = sin(mPosSets[tpIndex].sTestPoints[0].sServCellAzimuth*PI/180);
-			mSites[i].sInput[j][2] = TA_SCALE*mPosSets[tpIndex].sTestPoints[0].sTA;
-			mSites[i].sInput[j][3] = mPosSets[tpIndex].sTestPoints[0].sResDist/1000;
+			mSites[i].sInput[j][1] = cos(mPosSets[tpIndex].sTestPoints[0].sServCellAzimuth*PI/180);
+			mSites[i].sInput[j][2] = sin(mPosSets[tpIndex].sTestPoints[0].sServCellAzimuth*PI/180);
+			mSites[i].sInput[j][3] = TA_SCALE*mPosSets[tpIndex].sTestPoints[0].sTA;
+			mSites[i].sInput[j][4] = mPosSets[tpIndex].sTestPoints[0].sResDist/1000;
+			mSites[i].sInput[j][0] = 1;
 
+//	if (i>22) cout << i <<"	" << j << "	after firtst input outpot" << endl;
 			for (q=0; q<mSites[i].sCellSet.size(); q++)
 			{
-				mSites[i].sInput[j][3*q+4] = -1; // scaled
 				mSites[i].sInput[j][3*q+5] = -1; // scaled
-				mSites[i].sInput[j][3*q+6] = (945+FREQ_OFFSET)*FREQ_SCALE; 	
+				mSites[i].sInput[j][3*q+6] = -1; // scaled
+				mSites[i].sInput[j][3*q+7] = (945+FREQ_OFFSET)*FREQ_SCALE; 	
 			}
 
+//	if (i>22) cout << i <<"	" << j << "	after input initialisation " << endl;
 			for (p=0; p<mPosSets[tpIndex].sNumMeas; p++)
 			{
 				q=0;
@@ -452,17 +462,17 @@ bool cTrainPosNet::TrainANDSave()
 					q++;
 				if (mSites[i].sCellSet[q].sCI==mPosSets[tpIndex].sMeasurements[p].sCellID)
 				{
-					mSites[i].sInput[j][3*q+4] = (mPosSets[tpIndex].sMeasurements[p].sRFDistEstimate
+					mSites[i].sInput[j][3*q+5] = (mPosSets[tpIndex].sMeasurements[p].sRFDistEstimate
 									+RFDist_OFFSET)*MEAS_SCALE;
-					if (fabs(mSites[i].sInput[j][3*q+4])>1)
-						mSites[i].sInput[j][3*q+4]/=fabs(mSites[i].sInput[j][3*q+4]);
-					mSites[i].sInput[j][3*q+5] = (mPosSets[tpIndex].sMeasurements[p].sMeasValue 										+MEAS_OFFSET)*MEAS_SCALE;
 					if (fabs(mSites[i].sInput[j][3*q+5])>1)
 						mSites[i].sInput[j][3*q+5]/=fabs(mSites[i].sInput[j][3*q+5]);
-					mSites[i].sInput[j][3*q+6] = (mPosSets[tpIndex].sMeasurements[p].sFrequency
-									+FREQ_OFFSET)*FREQ_SCALE;
+					mSites[i].sInput[j][3*q+6] = (mPosSets[tpIndex].sMeasurements[p].sMeasValue 										+MEAS_OFFSET)*MEAS_SCALE;
 					if (fabs(mSites[i].sInput[j][3*q+6])>1)
 						mSites[i].sInput[j][3*q+6]/=fabs(mSites[i].sInput[j][3*q+6]);
+					mSites[i].sInput[j][3*q+7] = (mPosSets[tpIndex].sMeasurements[p].sFrequency
+									+FREQ_OFFSET)*FREQ_SCALE;
+					if (fabs(mSites[i].sInput[j][3*q+7])>1)
+						mSites[i].sInput[j][3*q+7]/=fabs(mSites[i].sInput[j][3*q+7]);
 //					cout << mPosSets[tpIndex].sMeasurements[p].sRFDistEstimate << "	"
 //						<< mPosSets[tpIndex].sMeasurements[p].sMeasValue << "	"
 //						<< mPosSets[tpIndex].sMeasurements[p].sFrequency << endl;
@@ -486,15 +496,22 @@ bool cTrainPosNet::TrainANDSave()
 					mSites[i].sNumInputs, mSites[i].sInput,
 					mSites[i].sNumOutputs, mSites[i].sOutput);
 
-		ANN.create_standard(4, mSites[i].sNumInputs, 
-					NUMHiddenN, NUMHiddenN, mSites[i].sNumOutputs);
+		unsigned HiddenN = ceil(sqrt(mSites[i].sNumOutputs*(5 + 9 + 2*15)));
+
+//		unsigned HiddenN1 = 5+ceil((mSites[i].sNumInputs-4)/3);
+//		unsigned HiddenN2 = ceil(sqrt(mSites[i].sNumOutputs*(5 + 9 + 2*15)));
+
+//		cout << "HiddenN = " << HiddenN;
+
+		ANN.create_standard(3, mSites[i].sNumInputs+1, 
+										HiddenN, mSites[i].sNumOutputs);
  		ANN.set_train_error_function(FANN::ERRORFUNC_LINEAR);
 		ANN.set_train_stop_function(FANN::STOPFUNC_MSE);
-		ANN.set_training_algorithm(FANN::TRAIN_INCREMENTAL);
+		ANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
 		ANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
 		ANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
 		ANN.randomize_weights(-0.58,0.58);
-		
+
 		ANN.train_on_data(TrainData, MAXepoch,REPORTInt,ERROR);
 
 		gcvt(mSites[i].sSiteID,9,site);
@@ -508,7 +525,6 @@ bool cTrainPosNet::TrainANDSave()
 
 		ANN.save(filename);
 		ANN.destroy();
-
 
 		query = queryM;
 		gcvt(newANNid,9,annid);
@@ -563,6 +579,7 @@ bool cTrainPosNet::TrainANDSave()
 	delete [] site;
 	delete [] annid;
 	delete [] machineid;
+	cout << "tata" << endl;
 	return true;
 }
 

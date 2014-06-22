@@ -39,9 +39,8 @@
 #define MEAS_OFFSET 85
 #define RFDist_OFFSET -80
 
-#define NUMHiddenN 6
-#define MAXepoch 2000
-#define REPORTInt 50
+#define MAXepoch 1000000
+#define REPORTInt 10000
 #define ERROR 3e-4
 
 // include local headers

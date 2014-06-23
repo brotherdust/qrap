@@ -102,7 +102,7 @@ struct tCell
 
 typedef	vector<tCell> vCellSet;
 
-struct tSiteInfo
+struct tSiteInfoNN
 {
 	unsigned 		sSiteID;
 	cGeoP			sPosition;
@@ -113,7 +113,7 @@ struct tSiteInfo
 	double**		sInput;
 	double**		sOutput;
 };
-typedef	vector<tSiteInfo> vSiteInfo;
+typedef	vector<tSiteInfoNN> vSiteInfoNN;
 
 typedef vector<cGeoP> vPoints;
 
@@ -140,7 +140,7 @@ class cTrainPosNet
    private:
 
 	vPosSetNN mPosSets;		/// an array with all the testpoints
-	vSiteInfo mSites;
+	vSiteInfoNN mSites;
 	unsigned mNumSites;
 	unsigned mNumPoints;
 };

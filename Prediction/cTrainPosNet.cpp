@@ -152,7 +152,7 @@ bool cTrainPosNet::LoadMeasurements(vPoints Points,
 	}
 
 	tCell NewCell;
-	tSiteInfo NewSite;
+	tSiteInfoNN NewSite;
 	NewCell.sCI=0;
 	NewSite.sSiteID=0;
 	Counter = 0;
@@ -410,7 +410,8 @@ bool cTrainPosNet::TrainANDSave()
 	gDb.GetLastResult(r);
 	newCIlistID = atoi(r[0]["id"].c_str());
  
-	queryM = "INSERT into NeuralNet (id, Lastmodified, machineid, siteid, filename) Values (";
+	queryM = "INSERT into NeuralNet (id, Lastmodified, machineid, siteid, ";
+	queryM += "numInputs, numOutputs, filename) Values (";
 	queryC = "INSERT into ANNInputlist (id, siteid, annid, index, cellid) Values (";
 
 	tpIndex = 0;
@@ -534,6 +535,12 @@ bool cTrainPosNet::TrainANDSave()
 		query += ",";
 		query +=site;
 		query +=",'";
+		gcvt(mSites[i].sNumInputs,9,temp);
+		query +=temp;
+		query += ",";
+		gcvt(mSites[i].sNumOutputs,9,temp);
+		query +=temp;
+		query += ",";
 		query += filename;
 		query += "');";
 
@@ -557,7 +564,7 @@ bool cTrainPosNet::TrainANDSave()
 			query += ",";
 			query += annid;
 			query += ",";
-			gcvt((j+4),9,temp);
+			gcvt((j+5),9,temp);
 			query +=temp;
 			query += ",";
 			gcvt(mSites[i].sCellSet[j].sCI,9,temp);

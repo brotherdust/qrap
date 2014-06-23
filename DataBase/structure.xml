@@ -2551,6 +2551,16 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		       description= "Site ID for which to which this neural net apply"
 		       ui = "dropdown(fromtable,site_view,sitename)" />
 
+		<field name = "NumInputs"
+		       type = "integer"
+			label = "Number of Inputs"
+		       description= "Number of Inputs to the Artificial Neural Network"/>
+
+		<field name = "NumOutputs"
+		       type = "integer"
+			label = "Number of Inputs"
+		       description= "Number of Inputs to the Artificial Neural Network"/>
+
 		<field name = "filename"
 		       type = "text"
 			description="The name of the file containing the stored ANN."

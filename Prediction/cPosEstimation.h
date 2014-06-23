@@ -38,7 +38,6 @@
 #define STOPN 40
 #define DELTA 5e-10
 
-
 // include local headers
 #include "../DataBase/Config.h"
 #include "../DataBase/cDatabase.h"
@@ -51,6 +50,9 @@
 #include "cRasterFileHandler.h"
 #include <iostream>
 #include <random>
+#include "doublefann.h"
+#include "fann_cpp.h"
+#include "cTrainPosNet.h"
 
 using namespace std;
 using namespace Qrap;
@@ -67,7 +69,7 @@ enum eMethod
 	CosRuleDistAngle,
 	CosRuleAngleAngle,
 	DCM_PSO,
-	DCM_PSObestN,	
+	DCM_PSObestN,
 	ANN,
 	None
 };
@@ -78,7 +80,7 @@ struct tTestPoint
 	unsigned	sOriginalTP;
 	cGeoP		sEstimatedLocation;
 	cGeoP		sOriginalLocation;
-	eMethod	sMethodUsed;
+	eMethod		sMethodUsed;
 	double		sErrorEstimate;
 	double		sErrorActual;
 	double		sAzimuth; //with respect to serving cell/site
@@ -102,12 +104,14 @@ struct tMeas
 	double		sFrequency;
 	double 		sMeasValue;
 	double		sPathLoss;
+	double		sRFDistEstimate; // "pathloss" corrected for frequency and EIRP 
 	double 		sPredValue;
 	float		sTilt;
 	double		sHeight;
 	double		sAzimuth;
 	double 		sBeamWidth;
 	double		sDistance;
+	unsigned	sTA; 		// this could be GSM TA or UMTS timeDiff
 	double 		sResDist;
 };
 
@@ -132,6 +136,17 @@ struct tBand
 typedef	vector<tBand> vBand;
 typedef vector<cGeoP> vPoints;
 
+struct tSiteInfo
+{
+	unsigned	sSiteID;
+	cGeoP		sPosition;
+	vCellSet	sCellSet;
+	unsigned	sNumInputs;
+	unsigned	sNumOutputs;
+	string		sANNfile;		
+
+};
+typedef	vector<tSiteInfo> vSiteInfo;
 
 //## Class cPosEstimation
 
@@ -163,15 +178,19 @@ class cPosEstimation
 	double SearchDistance(double Azimuth, double min, double max);
 	bool CoSinRule();
 	bool DCM_ParticleSwarm();
+	bool ANNrun();
 
 	// In this function the default mobile installation 
 	// with height of MOBILEHEIGHT (#defined) and an isotropic antenna. 
 	double CostFunction(double rho, double phi);
 
 	vPosSet mPosSets;		/// an array with all the testpoints
-	unsigned mCurrentPosSetIndex;
+	unsigned mCurPosI;
+	FANN::neural_net mCurANN;
+	unsigned mCurSiteI;
 	unsigned mNumPoints;
 	unsigned mNewTP;
+	unsigned mNumSites;
 
 	double mPlotResolution;
 	double mkFactor;
@@ -191,7 +210,7 @@ class cPosEstimation
 	cProfile mDEMProfile;
 	vector<tFixed>	mFixedInsts;	///< Information on the fixed installations
 	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
-
+	vSiteInfo mSites;	
 };
 }
 #endif

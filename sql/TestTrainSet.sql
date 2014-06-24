@@ -10,6 +10,12 @@ union
 select tp, servci, ta
 from testpointauxGSM);
 
+update qrap_config set value='/home/maggie/QRapANN/' where name='OutputDir';
+
+
+INSERT into NeuralNet (id, Lastmodified, machineid, siteid, numInputs, numOutputs, filename) 
+Values (0,now(),1,58,'52,3,/home/maggie/QRapANN//58.ann');
+
 
 select distinct siteid from
 (

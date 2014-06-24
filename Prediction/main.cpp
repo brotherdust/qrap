@@ -134,6 +134,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	cout<< "Nach6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 */
+/*
 	cTrainPosNet NeuralNets;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -155,8 +156,8 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSave();
+*/
 
-/*
 	cPosEstimation Positioning;
 	vPoints Punte;
 	cGeoP *Hoek;

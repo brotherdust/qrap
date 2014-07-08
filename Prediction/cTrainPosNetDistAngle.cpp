@@ -601,6 +601,9 @@ bool cTrainPosNetDistAngle::TrainANDSave()
 		query += ",";
 		query +=site;
 		query +=",";
+		gcvt(mSites[i].sMaxDist,9,temp);
+		query +=temp;
+		query +=",";
 		gcvt(mSites[i].sNumInputs,9,temp);
 		query +=temp;
 		query += ",";

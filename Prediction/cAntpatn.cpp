@@ -778,14 +778,18 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 	ref_Azi=0;
 	minDelta = 360.0;
 	for (kk=0;(kk<mNAA-1); kk++)
+	{
 		if (fabs(Az-mAziAngles[kk])<minDelta)
 		{
 			ref_Azi=kk;
 			minDelta = fabs(Az-mAziAngles[kk]);
 		}
+	}
 	if ((Az-mAziAngles[ref_Azi])<0)
+	{
 		if (ref_Azi>0)  ref_Azi--;
 		else ref_Azi=mNAA-1; // Because the azimuth values rap around
+	}
 	
 	// What happens if value lies just before ref0??
 	ref_El=0;
@@ -797,8 +801,10 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 			minDelta = fabs(El-mElevAngles[ll]);
 		}
 	if ((El-mElevAngles[ref_El])<0)
+	{
 		if (ref_El>0) ref_El--;
 		else ref_El=mNEA-1;
+	}
 	
 	if (ref_El>mNEA-2)
 	{

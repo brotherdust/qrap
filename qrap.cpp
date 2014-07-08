@@ -672,7 +672,6 @@ void QRap::UpdateSiteLayer()
 {
 	int LayerCount = mQGisIface->mapCanvas()->layerCount();
 	QString temp = QString("%1").arg(LayerCount);
-	QgsLegend *Legend;
 	QMessageBox::information(mQGisIface->mainWindow(), "Q-Rap", temp);
 }
 

@@ -282,7 +282,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	double radius = 0.0;
 	double alpha = 0.1;
 	int PeakIndex = 0;
-	int OldPeakIndex = 0;
+	int OldPeakIndex;
 	int IfTooManyPeaks = 0;
 	int i;
 
@@ -308,8 +308,12 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		ReffHeight = Horizontalize(0,1);
 		PeakIndex = FindMainPeak(0,1,ReffHeight, MinClearance,sqrtD1D2);
 		if (mUseClutter) 
-			if ((MinClearance<1.0)&&(PeakIndex!=0)) mClutterIndex = mClutterProfile[PeakIndex];
-			else    mClutterIndex = mClutterProfile[m_size-1];
+		{
+			if ((MinClearance<1.0)&&(PeakIndex!=0)) 
+					mClutterIndex = mClutterProfile[PeakIndex];
+			else
+			    mClutterIndex = mClutterProfile[m_size-1];
+		}
 
 		if ((MinClearance<1.0)&&(PeakIndex!=0))
 		{
@@ -390,11 +394,15 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
 //		cout << "	" << mLinkLength << ".";
 		if (NUMTERMS>1) 
+		{
 			if (mLinkLength>0.0) mCterms[1] = TERM1;
 			else mCterms[1] = 0.0;
+		}
 		if (NUMTERMS>3) 
+		{
 			if (mLinkLength>0.0) mCterms[3] = TERM3;
 			else mCterms[3] = 0.0;
+		}		
 //		if (Cheight < (m_htx+0.1))
 //			mCterms[8] = TERM8;
 //		else mCterms[8] = 100;

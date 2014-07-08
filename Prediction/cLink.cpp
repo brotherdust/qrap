@@ -322,9 +322,10 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	if (Length < 2)
 		return false;
 
-	int j;
+	unsigned j;
 	
-	double LinkOtherGain, TxAntValue=0.0, RxAntValue=0.0;
+	double LinkOtherGain, TxAntValue=0.0;
+//	double RxAntValue=0.0;
 
 	bool AfterReceiver = (mUnits!=dBWm2Hz) && (mUnits!=dBWm2);	
 
@@ -358,7 +359,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	delete [] mPropLoss;
 	mPropLoss = new float[Length];
 	double DiffLoss=0;
-	for (j=0;j<Length; j++)
+	for (j=0; j<Length; j++)
 	{
 		Tilt[j]=0;
 		mRxLev[j]=0;
@@ -379,7 +380,13 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	PathLoss.setParameters(mkFactor,mFrequency,mTxInst.sTxHeight,mRxInst.sRxHeight,
 				mUseClutter,mClutterClassGroup);
 	cout << "cLink::DoLink( ... ) After PathLoss.setParameters" << endl;
-	j=(Length-1);
+	if (Length>0)	
+		j=(Length-1);
+	else
+	{
+		cout << "In cLink::DoLink Link has 0 lenght" << endl;
+		return false;
+	}
 	mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss);
 	mTxBearing = mTxInst.sSitePos.Bearing(mRxInst.sSitePos);
 	if (mTxBearing < 180.0)

@@ -31,11 +31,11 @@
 #define SIGMA2 (14*14)
 #define MARGIN 15
 #define SENSITIVITY -110
-#define NUMPARTICLES 40
+#define NUMPARTICLES 30
 #define INERTIA 0.72
 #define Cp 1.4
 #define Cg 1.4
-#define STOPN 40
+#define STOPN 30
 #define DELTA 5e-10
 
 // include local headers
@@ -52,7 +52,7 @@
 #include <random>
 #include "doublefann.h"
 #include "fann_cpp.h"
-#include "cTrainPosNet.h"
+#include "cTrainPosNetDistAngle.h"
 
 using namespace std;
 using namespace Qrap;
@@ -129,8 +129,8 @@ typedef	vector<tPosSet> vPosSet;
 struct tBand
 {
 	double sFrequency;
-	unsigned sAIndex;
-	unsigned sBIndex;
+	int sAIndex;
+	int sBIndex;
 	double sMaxMeasValue;
 };
 typedef	vector<tBand> vBand;
@@ -141,11 +141,14 @@ struct tSiteInfo
 	unsigned	sSiteID;
 	cGeoP		sPosition;
 	vCellSet	sCellSet;
-	unsigned	sNumInputs;
-	unsigned	sNumOutputs;
-	string		sANNfile;		
-
+	double			sMaxDist;
+	unsigned		sNumInputs;
+	unsigned		sNumOutputsA;
+	unsigned		sNumOutputsD;
+	string				sANNfileA;	
+	string				sANNfileD;		
 };
+
 typedef	vector<tSiteInfo> vSiteInfo;
 
 //## Class cPosEstimation
@@ -186,7 +189,8 @@ class cPosEstimation
 
 	vPosSet mPosSets;		/// an array with all the testpoints
 	unsigned mCurPosI;
-	FANN::neural_net mCurANN;
+	FANN::neural_net *mCurANNa;
+	FANN::neural_net *mCurANNd;
 	unsigned mCurSiteI;
 	unsigned mNumPoints;
 	unsigned mNewTP;

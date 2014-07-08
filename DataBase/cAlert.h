@@ -180,6 +180,7 @@ namespace Qrap
 		cAlert (AlertCode code, const std::string& param = "", AlertLevel level = alError):
 			mAlertCode(code), mAlertLevel(level), mUseCode(true)
 		{
+			mParam = param;		// just to stop the warning ...
 		};
 		
 		/**
@@ -187,7 +188,10 @@ namespace Qrap
 		 */
 		cAlert (AlertLevel level, const std::string& msg, const std::string& param = ""):
 			mAlertLevel(level), mAlertMsg(msg),
-			mUseCode(false) { };
+			mUseCode(false) 
+		{ 
+					mParam = param; // just to stop the warning ...
+		};
 		
 		/**
 		 * Destructor.
@@ -233,6 +237,7 @@ namespace Qrap
 		AlertLevel  mAlertLevel;          ///< The alert level associated with this object.
 		std::string mAlertMsg;            ///< A message associated with this alert object.
 		bool        mUseCode;             ///< Is the mAlertCode member in use?
+		std::string			mParam;
 	};
 
 }

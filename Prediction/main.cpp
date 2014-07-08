@@ -35,7 +35,7 @@
 #include "cMeasImportCSV.h"
 #include "cGeoP.h"
 #include "cPosEstimation.h"
-#include "cTrainPosNet.h"
+#include "cTrainPosNetDistAngle.h"
 
 
 using namespace std;
@@ -97,8 +97,8 @@ int main (int argc, char **argv)
 	cout << endl << "Wrote Measurements to DataBase" << endl;
 */
 
-/*
-   string query = "update coefficients set coefficient=0.0;";
+
+/*   string query = "update coefficients set coefficient=0.0;";
 
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
@@ -118,7 +118,7 @@ int main (int argc, char **argv)
 //	Meas.OptimiseSeekWidth();
 cout << "Starting Optimisation ... in main()" << endl; 
 
- 	Meas.OptimiseHeights(6);
+// 	Meas.OptimiseHeights(6);
 
 	if (!gDb.PerformRawSql(query))
 	{
@@ -132,10 +132,10 @@ cout << "Starting Optimisation ... in main()" << endl;
 	Meas.OptimiseModelCoefD(6);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
 */
-/*
-	cTrainPosNet NeuralNets;
+
+
+	cTrainPosNetDistAngle NeuralNets;
 	vPoints Punte;
 	cGeoP *Hoek;
 	Hoek = new cGeoP[4];
@@ -151,13 +151,39 @@ cout << "Starting Optimisation ... in main()" << endl;
 	
 	delete [] Hoek;
 	
-	cout << "In main Laoding measurements " << endl;
+	cout << "In main Loading measurements " << endl;
 	NeuralNets.LoadMeasurements(Punte,2,6,1,1);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSave();
-*/
 
+/*
+	double hoek = 45;
+	double x=cos(hoek/180*PI);
+	double y=sin(hoek/180*PI);
+	double angle = 180*atan2(y,x)/PI;
+	cout << hoek << "		" << angle << endl;
+
+	hoek = 135;
+	x=cos(hoek/180*PI);
+	y=sin(hoek/180*PI);
+	angle = 180*atan2(y,x)/PI;
+	cout << hoek << "		" << angle << endl;
+
+	hoek = -45;
+	x=cos(hoek/180*PI);
+	y=sin(hoek/180*PI);
+	angle = 180*atan2(y,x)/PI;
+	cout << hoek << "		" << angle << endl;
+
+	hoek = -135;
+	x=cos(hoek/180*PI);
+	y=sin(hoek/180*PI);
+	angle = 180*atan2(y,x)/PI;
+	cout << hoek << "		" << angle << endl;
+
+*/
+/*
 	cPosEstimation Positioning;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -190,6 +216,8 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
+*/
+
 /*
 
 	if (!gDb.PerformRawSql(query))
@@ -313,6 +341,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nacb2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC <<endl<< endl << endl << endl << endl;
 */
+
 /*
 	if (!gDb.PerformRawSql(query))
 	{

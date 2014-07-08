@@ -2529,9 +2529,9 @@ in #define statements in qrap/Prediction/cClutter.h -->
 	<table name="NeuralNet" label="List of saved artificial neural nets">
 
 	       <field name="id"
-		      type="bigserial primary key unique not null"
+		      type="serial not null"
 		      label="ID"
-		      description="Primary key"
+		      description="Identifier, forms primary key with type"
 		      readonly="true" />
 
 	       <field name="lastmodified"
@@ -2544,12 +2544,23 @@ in #define statements in qrap/Prediction/cClutter.h -->
 			label="MachineID"
 			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised and on which machine the file was generated originally."
 			visible="false"/>
+
+		<field name = "type"
+		       type = "integer references anntype(id) on delete cascade"
+			label = "Neural Net Type"
+		       description= "Foreign key pointing to describtion of the Neural Net"
+		       ui = "dropdown(fromtable,anntype,Name)" />
  
 		<field name = "siteid"
 		       type = "integer references site(id) on delete cascade"
 			label = "Site ID"
 		       description= "Site ID for which to which this neural net apply"
 		       ui = "dropdown(fromtable,site_view,sitename)" />
+
+		<field name = "maxDist"
+		       type = "real"
+			label = "Maximum Distance"
+		       description= "This value is used in the scaling and descaling of the distance output parameter. It is the maximum distance that a sample in the training et occured" />
 
 		<field name = "NumInputs"
 		       type = "integer"
@@ -2568,6 +2579,35 @@ in #define statements in qrap/Prediction/cClutter.h -->
 
 	</table> <!-- NeuralNet -->
 
+
+<!-- ********************************************************************************************************************* -->
+	<table name="anntype" label="Neural Network Describtion" fulldownload="true" customsequence="true">
+	       <field name="id"
+		      type="smallint primary key unique not null default nextval('anntype_id_seq')"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+	       
+	       <field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+	       <field name = "name"
+		      type = "varchar(20)"
+		      label = "Name" />
+
+		<field name = "description"
+		       type = "text"
+		       label = "Description" />
+
+	</table><!-- meastype -->
 
 <!-- ********************************************************************************************************************* -->
 	<table name="ANNInputlist" label="List of cells related to the inputs of a particular neural net">

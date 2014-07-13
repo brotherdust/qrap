@@ -96,7 +96,7 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 	double longitude, latitude;
 	string PointString;
 	unsigned spacePos;
-	unsigned siteIndex = 0;
+	unsigned siteIndex=0;
 	unsigned NumInPosSet = 0; 
 	unsigned siteid, tp;
 	
@@ -162,23 +162,24 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 	NewSite.sMaxDist = 0;
 
 	gDb.GetLastResult(r);
+	cout << "cTrainPosNetDistAngle::LoadMeasurements: Na query." << endl;
+
 	if (r.size() >0)
 	{
 		for (i=0; i<r.size(); i++)
 		{
 			siteid = atoi(r[i]["siteid"].c_str());
+//			cout << "cTrainPosNetDistAngle::LoadMeasurements: siteid = " << siteid << endl;
 			if (siteid != NewSite.sSiteID)
 			{
 				if (NewSite.sSiteID>0)
 				{
 					cout << "cTrainPosNetDistAngle::LoadMeasurements: Site in list. SiteID = " << NewSite.sSiteID << endl;
-					Counter = 0;
 					NewSite.sNumInputs = 3*NewSite.sCellSet.size() + 5;
-					NewSite.sNumOutputsA = 2;
-					NewSite.sNumOutputsD = 1;
 					mSites.push_back(NewSite);
 					NewSite.sCellSet.clear();
 					NewSite.sMaxDist = 0;
+					Counter = 0;
 				}
 				NewSite.sSiteID = siteid;
 				PointString = r[i]["siteLocation"].c_str();
@@ -186,6 +187,9 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 				longitude = atof((PointString.substr(6,spacePos).c_str())); 
 				latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
 				NewSite.sPosition.Set(latitude,longitude,DEG);
+				NewSite.sNumOutputsA = 2;
+				NewSite.sNumOutputsD = 1;
+				NewSite.sNumDataRows = 0;
 			}
 			NewCell.sI =Counter;
 			NewCell.sCI= atoi(r[i]["ci"].c_str());
@@ -196,8 +200,6 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 		{
 			cout << "cTrainPosNetDistAngle::LoadMeasurements: Site in list. SiteID = " << NewSite.sSiteID << endl;
 			NewSite.sNumInputs = 3*NewSite.sCellSet.size() + 5;
-			NewSite.sNumOutputsA = 2;
-			NewSite.sNumOutputsD = 1;
 			mSites.push_back(NewSite);
 			NewSite.sCellSet.clear();
 		}
@@ -214,7 +216,19 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 	}
 	mNumSites = mSites.size();
 
-	cout << "cTrainPosNetDistAngle::LoadMeasurements  Done with Site List. mNumSites = " << mNumSites << endl;
+/*	cout << "cTrainPosNetDistAngle::LoadMeasurements  Done with Site List. mNumSites = " << mNumSites << endl;
+	for (i=0; i<mNumSites; i++)
+	{
+		cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;
+		cout << "		mSites[i].sNumInputs = " << mSites[i].sNumInputs;
+		cout << "		mSites[i].sNumOutputsA = " << mSites[i].sNumOutputsA;
+		cout << "		mSites[i].sNumDataRows = " << mSites[i].sNumDataRows << endl;
+		mSites[i].sPosition.Display();
+	}
+*/
+
+
+
 
 	query = "select distinct siteid, min(txbearing) as antbearing, ci, ";
 	query += "testpoint.id as tp, ST_AsText(testpoint.location) as origLocation, ";
@@ -276,7 +290,6 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 		tTestPointNN NewTestPoint;
 		tPosSetNN NewPosSet;
 		tMeasNN NewMeasurement; 
-
 		NewTestPoint.sOriginalTP=0;
 
 		for (i=0; i<r.size(); i++)
@@ -301,6 +314,7 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 						return false;
 					}
 				}
+//				cout << "siteIndex = " << siteIndex << endl;
 			}
 			tp = atoi(r[i]["tp"].c_str());
 			if (tp != NewTestPoint.sOriginalTP)
@@ -417,10 +431,10 @@ bool cTrainPosNetDistAngle::TrainANDSave()
 
 	tpIndex = 0;
 
-	for (i=0; i<mNumSites; i++)
+	for (i=14; i<18; i++)
 	{
-		cout << "mSites[i].sSiteID = " << mSites[i].sSiteID;
-		cout << "		mSites[i].sNumOutputsA = " << mSites[i].sNumOutputsA << endl;
+		cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;
+		cout << "		mSites[i].sNumOutputsA = " << mSites[i].sNumOutputsA;
 		cout << "		mSites[i].sNumDataRows = " << mSites[i].sNumDataRows << endl;
 		mSites[i].sNumOutputsA = 2;
 		mSites[i].sNumOutputsD = 1;
@@ -502,7 +516,7 @@ bool cTrainPosNetDistAngle::TrainANDSave()
 		ANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
 		ANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
 		ANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
-		ANN.randomize_weights(-0.58,0.58);
+		ANN.randomize_weights(-0.53,0.53);
 
 		ANN.train_on_data(TrainDataAngle, MAXepoch,REPORTInt,ERROR);
 
@@ -569,9 +583,9 @@ bool cTrainPosNetDistAngle::TrainANDSave()
 		ANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
 		ANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
 		ANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
-		ANN.randomize_weights(-0.58,0.58);
+		ANN.randomize_weights(-0.53,0.53);
 
-		ANN.train_on_data(TrainDataDist, 2*MAXepoch,REPORTInt,ERROR/5);
+		ANN.train_on_data(TrainDataDist, MAXepoch,REPORTInt,ERROR/3);
 
 		cout << "saving ANN: site = " << mSites[i].sSiteID << "	i=" << i << endl;
 		gcvt(mSites[i].sSiteID,9,site);

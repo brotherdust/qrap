@@ -37,7 +37,7 @@
 #define MEAS_OFFSET 85
 #define RFDist_OFFSET -80
 
-#define MAXepoch 200000
+#define MAXepoch 1000000
 #define REPORTInt 10000
 #define ERROR 1e-4
 

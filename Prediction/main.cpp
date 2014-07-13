@@ -133,7 +133,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-
+/*
 
 	cTrainPosNetDistAngle NeuralNets;
 	vPoints Punte;
@@ -156,7 +156,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSave();
-
+*/
 /*
 	double hoek = 45;
 	double x=cos(hoek/180*PI);
@@ -183,7 +183,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	cout << hoek << "		" << angle << endl;
 
 */
-/*
+
 	cPosEstimation Positioning;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -216,7 +216,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-*/
+
 
 /*
 

@@ -170,7 +170,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
    areaQuery += "))',4326) ";
 
 	query = "select distinct site.id as siteid, ST_AsText(location) as siteLocation, ";
-	query += "type, maxdist, NumInputs, NumOutputs, filename, index, cellid, ";
+	query += "type, maxdist, NumInputs, NumOutputs, filename, index, cellid ";
 	query += "from site cross join NeuralNet cross join anninputlist ";
 	query += "where NeuralNet.siteid=site.id ";
 	query += "and anninputlist.annid= NeuralNet.id ";
@@ -201,6 +201,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 	gDb.GetLastResult(r);
 	if (r.size() >0)
 	{
+		cout << "cPosEstimation::LoadMeasurements:  r.size() = " <<  r.size() << endl;
 		for (i=0; i<r.size(); i++)
 		{
 			type = atoi(r[i]["type"].c_str());
@@ -271,6 +272,8 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 		return false;
 	}
 	mNumSites = mSites.size();
+
+	cout << "cPosEstimation::LoadMeasurements: mNumSites = " <<  mNumSites << endl;
 
 	if (Points.size() > 1)
 	{
@@ -655,6 +658,8 @@ bool cPosEstimation::CI_TA()
 		else Distance = 17500;
 	}
 */
+
+	cout << "cPosEstimation::CI_TA() : Kry maxDist" << endl;
 	double minDist = mPlotResolution;
 	double maxDist = 17500;
 	if (Distance>120000)
@@ -690,6 +695,8 @@ bool cPosEstimation::CI_TA()
 	if (maxDist>120000) maxDist=17500;
 	if (maxDist>3.0*mPlotResolution) 
 		Distance = SearchDistance(mPosSets[mCurPosI].sMeasurements[0].sAzimuth,minDist, maxDist); 
+
+	cout << "cPosEstimation::CI_TA() : Na kry maxDist" << endl;
 
 	tTestPoint newTestPoint;
 	newTestPoint.sOriginalTP = mPosSets[mCurPosI].sTestPoints[0].sOriginalTP;

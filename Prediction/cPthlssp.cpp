@@ -46,6 +46,7 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	m_size = 2;
 	mCalcMarker = 0;
 	mTuning=false;
+	mClutterIndex = 0;
 
 	delete [] m_profile;
 	m_profile = new float[m_size];
@@ -97,6 +98,7 @@ cPathLossPredictor::cPathLossPredictor(const cPathLossPredictor &right)
 {
 	int i;
 
+	mClutterIndex = right.mClutterIndex;
 	mUseClutter = right.mUseClutter ;
 	if (mUseClutter) mClutter = right.mClutter;
 
@@ -172,6 +174,7 @@ const cPathLossPredictor & cPathLossPredictor::operator=
 
 	mUseClutter = right.mUseClutter ;
 	if (mUseClutter) mClutter = right.mClutter;
+	mClutterIndex = right.mClutterIndex;
 
 	m_kFactor = right.m_kFactor;
 	m_freq = right.m_freq;
@@ -230,6 +233,8 @@ int cPathLossPredictor::setParameters(double k, double f,
 	m_freq = f;
 	m_htx = TxHeight;
 	m_hrx = RxHeight;
+	
+	mClutterIndex = 0;
 
 	mUseClutter = UseClutter;
 	if ((ClutterClassGroup!=mClutter.mClassificationGroup)&&(mUseClutter))
@@ -381,9 +386,11 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //	DiffLoss = 0;
 
 
-	if ((NUMTERMS>6)&&(mUseClutter))
+	if ((NUMTERMS>6)&&(mUseClutter)&&(mClutterIndex>=0)&&(mClutterIndex<100))
+	{
 		if (( mClutter.mClutterTypes[mClutterIndex].sCoefficients[6]>0)||(mTuning))	mCterms[6] = DiffLoss;
 		else m_Loss+=DiffLoss;
+	}
 	else m_Loss+=DiffLoss;
 	
 	if (mUseClutter)
@@ -407,8 +414,11 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //			mCterms[8] = TERM8;
 //		else mCterms[8] = 100;
 
-		for (i=0; i<NUMTERMS; i++)
-			m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
+		if ((mClutterIndex>=0)&&(mClutterIndex<100))
+		{
+			for (i=0; i<NUMTERMS; i++)
+				m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
+		}
 
 	}
 

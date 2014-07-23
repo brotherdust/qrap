@@ -98,9 +98,9 @@ int main (int argc, char **argv)
 */
 
 
-/*   string query = "update coefficients set coefficient=0.0;";
 
-	double Mean, MSE, StDev, CorrC;
+
+/*	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 
 	if (!gDb.PerformRawSql(query))
@@ -133,7 +133,6 @@ cout << "Starting Optimisation ... in main()" << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-/*
 
 	cTrainPosNetDistAngle NeuralNets;
 	vPoints Punte;
@@ -156,7 +155,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSave();
-*/
+
 /*
 	double hoek = 45;
 	double x=cos(hoek/180*PI);
@@ -181,8 +180,10 @@ cout << "Starting Optimisation ... in main()" << endl;
 	y=sin(hoek/180*PI);
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
-
 */
+
+/*
+   string query = "update coefficients set coefficient=0.0;";
 
 	cPosEstimation Positioning;
 	vPoints Punte;
@@ -216,7 +217,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-
+*/
 
 /*
 

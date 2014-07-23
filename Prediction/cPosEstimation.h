@@ -31,11 +31,12 @@
 #define SIGMA2 (14*14)
 #define MARGIN 15
 #define SENSITIVITY -110
-#define NUMPARTICLES 30
+#define NUMPARTICLES 40
 #define INERTIA 0.72
 #define Cp 1.4
 #define Cg 1.4
-#define STOPN 30
+#define STOPN 40
+#define MAXITER 500
 #define DELTA 5e-10
 
 // include local headers

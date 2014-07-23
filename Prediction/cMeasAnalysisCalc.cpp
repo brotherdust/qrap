@@ -877,7 +877,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 			<< "	MeanSquare: " << MeanSquareError << "	StDev: "<< StDev
 			<< "	CorrC: " << CorrC << endl;
 		// Only optimise if enough points are involved
-		if ((NumUsed > 1000)||(NumUsed/TotalNumUsed > 0.1))
+		if ((NumUsed > 1000)&&(NumUsed/TotalNumUsed > 0.02))
 		{
 			for (i=0; i<NUMTERMS; i++)
 			{

@@ -174,9 +174,15 @@ select tempRawGSMTEMS.id as id, now(), ST_SetSRID(ST_MakePoint(Longitudedd_text,
 from tempRawGSMTEMS cross join tpUsed
 where id = tpUsed.tp;
 
+select count(*) from tempRawGSMTEMS;
+select count(*) from tempGSMaux;
+
 insert into tpUsed
-(select tp from testpointauxGSM
-where TA is not null);
+select tp from testpointauxGSM;
+
+truncate table tpUsed;
+
+select count(*) from tpUsed;
 
 delete from tpUsed
 where tp in
@@ -225,6 +231,8 @@ select tempRawGSMTEMS.id as id, now(), ST_SetSRID(ST_MakePoint(Longitudedd_text,
 from tempRawGSMTEMS cross join tpUsed
 where id = tpUsed.tp;
 
+delete 
+
 drop table TPsequence;
 
 create table TPsequence
@@ -234,6 +242,23 @@ tp bigint);
 insert into TPsequence (tp)
 select id from testpoint
 order by id; 
+
+delete from testpoint where id in
+(select tpt from testlist);
+
+drop table testlist;
+
+create table testlist as
+select tp as tpt from TPsequence
+where sq%10=0;
+
+create table testpointauxGSMTest as
+select * from testpointauxGSM 
+where tp in
+(select tpt from testlist);
+
+select * from testpoint;
+
 
 drop table Temptestpoint;
 
@@ -590,3 +615,5 @@ drop table tpUsed;
 create table tpUsed
 as select distinct tp from GSMtempmeas
 order by tp;
+
+create table testlist 

@@ -60,18 +60,18 @@ using namespace Qrap;
 
 enum eMethod
 {
-	GPS,
-	CellID,
-	CellID_TA,
-	SSiteDir, // The direction is based on the direction of the second strongest cell
-	CoSiteSecDir,
-	CosRuleAngleDistRatio,
-	CosRuleDistDist,
-	CosRuleDistAngle,
-	CosRuleAngleAngle,
-	DCM_PSO,
-	DCM_PSObestN,
-	ANN,
+	GPS, //1
+	CellID, //2
+	CellID_TA, //3
+	SSiteDir, // 4 The direction is based on the direction of the second strongest cell
+	CoSiteSecDir, //5
+	CosRuleAngleDistRatio, //6
+	CosRuleDistDist, //7
+	CosRuleDistAngle, //8
+	CosRuleAngleAngle, //9
+	DCM_PSO, //10
+	DCM_PSObestN, //11
+	ANN, //12
 	None
 };
 

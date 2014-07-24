@@ -151,10 +151,12 @@ cout << "Starting Optimisation ... in main()" << endl;
 	delete [] Hoek;
 	
 	cout << "In main Loading measurements " << endl;
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1);
+	NeuralNets.LoadSites(Punte,2,6,1,1);
+	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"TrainList",true);
+	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"TestList",false);
 
 	cout << "In main training nets " << endl;
-	NeuralNets.TrainANDSave();
+	NeuralNets.TrainANDSaveANDTest();
 
 /*
 	double hoek = 45;

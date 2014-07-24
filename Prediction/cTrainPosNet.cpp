@@ -137,7 +137,7 @@ bool cTrainPosNet::LoadMeasurements(vPoints Points,
 	query += areaQuery;
 	query += "group by siteid, ci, site.location ";
 	query += "order by siteid, numPoints desc) as lys ";
-	query += "where numPoints>190 ";
+//	query += "where numPoints>190 ";
 
 	query += "order by siteid, numPoints desc;";
 	if (!gDb.PerformRawSql(query))

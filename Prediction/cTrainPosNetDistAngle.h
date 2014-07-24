@@ -109,11 +109,16 @@ struct tSiteInfoNN
 	unsigned		sNumInputs;
 	unsigned		sNumOutputsA;
 	unsigned		sNumOutputsD;
-	unsigned		sNumDataRows;
-	double**		sInput;
-	double**		sOutputAngle;
-	double**		sOutputDist;
+	unsigned		sNumDataRowsTrain;
+	unsigned		sNumDataRowsTest;
+	double**		sInputTrain;
+	double**		sOutputAngleTrain;
+	double**		sOutputDistTrain;
+	double**		sInputTest;
+	double**		sOutputAngleTest;
+	double**		sOutputDistTest;
 };
+
 typedef	vector<tSiteInfoNN> vSiteInfoNN;
 
 typedef vector<cGeoP> vPoints;
@@ -129,21 +134,31 @@ class cTrainPosNetDistAngle
 	cTrainPosNetDistAngle(); // default constructor
 	~cTrainPosNetDistAngle(); // destructor
 
-	bool LoadMeasurements(vPoints Points,
+	bool LoadSites(vPoints Points,
 				unsigned MeasType=0, 
 				unsigned MeasSource=0,
 				unsigned PosSource=0,
 				unsigned Technology=0);
 
-	bool TrainANDSave();
+	bool LoadMeasurements(vPoints Points,
+				unsigned MeasType=0, 
+				unsigned MeasSource=0,
+				unsigned PosSource=0,
+				unsigned Technology=0,
+				string list="Trainlist",
+				bool Train=true /* Train: true, Test: False*/);
+
+	bool TrainANDSaveANDTest();
 
 
    private:
 
-	vPosSetNN mPosSets;		/// an array with all the testpoints
+	vPosSetNN mPosSetsTrain;	/// an array with all the training points
+	vPosSetNN mPosSetsTest;		/// an array with all the training points
 	vSiteInfoNN mSites;
 	unsigned mNumSites;
-	unsigned mNumPoints;
+	unsigned mNumTrain;
+	unsigned mNumTest;
 };
 }
 #endif

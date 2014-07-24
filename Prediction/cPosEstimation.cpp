@@ -1840,12 +1840,12 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //			mPosSets[mCurPosI].sMeasurements[i].sSiteLocation.Display();
 //			cout << "i = " << i << "	mCurPosI =" << mCurPosI << endl;
 			mDEM.GetForLink(mPosSets[mCurPosI].sMeasurements[i].sSiteLocation,
-													ParticlePosition, mPlotResolution, mDEMProfile);
+						ParticlePosition, mPlotResolution, mDEMProfile);
 
 			if (mUseClutter)
 			{
 				mClutter.GetForLink(mPosSets[mCurPosI].sMeasurements[i].sSiteLocation,
-															ParticlePosition, mPlotResolution, mClutterProfile);
+						ParticlePosition, mPlotResolution, mClutterProfile);
 			}
 
 //			cout << "Voor pathloss setParameter" << endl;
@@ -1860,16 +1860,17 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //			cout << "Get antvalue" << endl;
 			AntValue = mFixedAnts[i].GetPatternValue(Azimuth, Tilt);
 			Prediction[i] =  mPosSets[mCurPosI].sMeasurements[i].sEIRP 
-										- mCellPathLoss[i] - AntValue;
+							- mCellPathLoss[i] - AntValue;
 
 			sumPred+=Prediction[i];
 			sumMeas+=mPosSets[mCurPosI].sMeasurements[i].sMeasValue;
-				Delta[i] = (mPosSets[mCurPosI].sMeasurements[i].sMeasValue - Prediction[i]) 
-								* (mPosSets[mCurPosI].sMeasurements[i].sMeasValue - Prediction[i]);
+			Delta[i] = (mPosSets[mCurPosI].sMeasurements[i].sMeasValue - Prediction[i]) 
+					* (mPosSets[mCurPosI].sMeasurements[i].sMeasValue - Prediction[i]);
 
-//			cout << "	i="<< i 	 << "Tilt = " << Tilt << "	Azimuth = " << Azimuth << "	AntValue=" << AntValue
-//						<< "	meas=" << mPosSets[mCurPosI].sMeasurements[i].sMeasValue
-//						<< "	pmCellPathLoss[i]=" << mCellPathLoss[i] << "	Delta[i]=" << Delta[i] << endl;
+//			cout << "	i="<< i 	 << "Tilt = " << Tilt << "	Azimuth = " << Azimuth 
+//				<< "	AntValue=" << AntValue
+//				<< "	meas=" << mPosSets[mCurPosI].sMeasurements[i].sMeasValue
+//				<< "	pmCellPathLoss[i]=" << mCellPathLoss[i] << "	Delta[i]=" << Delta[i] << endl;
 	}
 	meanPred=sumPred/mNumInsts;
 	meanMeas=sumMeas/mNumInsts;
@@ -1890,7 +1891,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 		teller += (mPosSets[mCurPosI].sMeasurements[i].sMeasValue - meanMeas)*
 						(Prediction[i] - meanPred);
 		varMeas +=  (mPosSets[mCurPosI].sMeasurements[i].sMeasValue - meanMeas)*
-									 (mPosSets[mCurPosI].sMeasurements[i].sMeasValue - meanMeas);
+				 (mPosSets[mCurPosI].sMeasurements[i].sMeasValue - meanMeas);
 		varPred += (Prediction[i] - meanPred)*(Prediction[i] - meanPred);
 
 /*		if (i>0) Aexp = Aexp*exp(Delta[i-1] + Delta[i] 
@@ -1898,13 +1899,13 @@ double cPosEstimation::CostFunction(double rho, double phi)
 			*(mPosSets[mCurPosI].sMeasurements[i].sMeasValue-Prediction[i]))/SIGMA2);
 		cout << SIGMA2 << "	"	<<exp(-Delta[i]/(SIGMA2)) << endl;
 */
-				Sexp = Sexp*exp(-Delta[i]/(SIGMA2));
+		Sexp = Sexp*exp(-Delta[i]/(SIGMA2));
 	}
 	
 	if ((varMeas>0)&&(varPred>0))
 		CorrC = teller/sqrt(varMeas*varPred);
 	else CorrC=1.0;
-		Pexp = pow(Sexp, (double)(1.0/(double)mNumInsts));
+	Pexp = pow(Sexp, (double)(1.0/(double)mNumInsts));
 
 //cout <<"	Cost=" << Cost << "	Sexp=" << Sexp << "	mNumInsts=" << mNumInsts << "		Pexp=" << Pexp << "	CorrC=" << CorrC << endl;
 	double Pcost = 1.0 - Pexp;

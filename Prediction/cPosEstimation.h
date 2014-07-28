@@ -31,7 +31,7 @@
 #define SIGMA2 (14*14)
 #define MARGIN 15
 #define SENSITIVITY -110
-#define NUMPARTICLES 40
+#define NUMPARTICLES 45
 #define INERTIA 0.72
 #define Cp 1.4
 #define Cg 1.4

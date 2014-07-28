@@ -252,6 +252,16 @@ create table testlist as
 select tp as tpt from TPsequence
 where sq%10=0;
 
+select * from tplist;
+
+create table train as select
+distinct testpointauxGSM.tp as tp, servci, ta
+from testpointauxGSM cross join trainlist
+where testpointauxGSM.tp = trainlist.tp;
+
+
+select count(*) from trainlist;
+
 create table testpointauxGSMTest as
 select * from testpointauxGSM 
 where tp in

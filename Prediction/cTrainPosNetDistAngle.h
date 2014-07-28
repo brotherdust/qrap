@@ -37,7 +37,7 @@
 #define MEAS_OFFSET 85
 #define RFDist_OFFSET -80
 
-#define MAXepoch 1000000
+#define MAXepoch 700000
 #define REPORTInt 10000
 #define ERROR 1e-4
 
@@ -145,7 +145,7 @@ class cTrainPosNetDistAngle
 				unsigned MeasSource=0,
 				unsigned PosSource=0,
 				unsigned Technology=0,
-				string list="Trainlist",
+				string list="Train",
 				bool Train=true /* Train: true, Test: False*/);
 
 	bool TrainANDSaveANDTest();

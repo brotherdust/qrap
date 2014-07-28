@@ -152,8 +152,8 @@ cout << "Starting Optimisation ... in main()" << endl;
 	
 	cout << "In main Loading measurements " << endl;
 	NeuralNets.LoadSites(Punte,2,6,1,1);
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"TrainList",true);
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"TestList",false);
+	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Train",true);
+	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Test",false);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
@@ -183,9 +183,8 @@ cout << "Starting Optimisation ... in main()" << endl;
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-
 /*
-   string query = "update coefficients set coefficient=0.0;";
+  string query = "update coefficients set coefficient=0.0;";
 
 	cPosEstimation Positioning;
 	vPoints Punte;
@@ -204,12 +203,6 @@ cout << "Starting Optimisation ... in main()" << endl;
 	delete [] Hoek;
 	
 	Positioning.LoadMeasurements(Punte,2,6,1,1);
-
-// bool cPosEstimation::LoadMeasurements(vPoints Points,
-//					unsigned MeasType, 
-//					unsigned MeasSource,
-//					unsigned PosSource,
-//					unsigned Technology)
 
 	cout << " Clearing Punte " << endl;
 	Punte.clear();

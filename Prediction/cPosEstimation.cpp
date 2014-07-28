@@ -518,8 +518,8 @@ void cPosEstimation::EstimatePositions()
 																													Bearing(mPosSets[mCurPosI].sTestPoints[0].sOriginalLocation);
 			mPosSets[mCurPosI].sTestPoints[0].sDistance = mPosSets[mCurPosI].sMeasurements[0].sSiteLocation.
 																													Distance(mPosSets[mCurPosI].sTestPoints[0].sOriginalLocation);
-			mNumInsts = mPosSets[mCurPosI].sMeasurements.size();
-		delete [] mFixedAnts;
+
+			delete [] mFixedAnts;
 			mNumInsts = mPosSets[mCurPosI].sMeasurements.size();
 			mFixedAnts = new cAntennaPattern[mNumInsts];
 			for (j=0; j < mNumInsts; j++)
@@ -538,7 +538,7 @@ void cPosEstimation::EstimatePositions()
 				if (!CI_TA())
 					SecondSite();
 			}
-//			else SecondSite();
+			else SecondSite();
 			CI();
 			DCM_ParticleSwarm();
 			ANNrun();

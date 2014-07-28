@@ -30,6 +30,9 @@ and testpointauxGSM.tp=testpoint.id
 and testpoint.positionsource=1) as temp
 where delta <0);
 
+delete from anninputlist where id<65;
+select * from neuralnet
+order by siteid,id;
 
 select delta, count(*) from
 (select servci, testpoint.id as tp, distance, floor(distance/553.5) as pta, ta, (ta - floor(distance/553.5)) as delta

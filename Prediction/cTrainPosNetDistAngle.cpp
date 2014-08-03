@@ -673,8 +673,8 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 					mSites[i].sNumInputs, mSites[i].sInputTest,
 					mSites[i].sNumOutputsA, mSites[i].sOutputAngleTest);
 
-		unsigned HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsA*(5 + 9 + 3*max(0,(int)mSites[i].sCellSet.size() -3) )));
-		unsigned HiddenN2 = 8;
+		unsigned HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsA*(5 + 2.7*max(0,(int)mSites[i].sCellSet.size()) )));
+		unsigned HiddenN2 = 7;
 
 		ANN.create_standard(4, mSites[i].sNumInputs, 
 					HiddenN1 ,HiddenN2, mSites[i].sNumOutputsA);
@@ -775,8 +775,8 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 					mSites[i].sNumInputs, mSites[i].sInputTest,
 					mSites[i].sNumOutputsD, mSites[i].sOutputDistTest);
 
-		HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsD*(5 + 9 + 3*max(0,(int)mSites[i].sCellSet.size() -3) )));
-		HiddenN2 = 4;
+//		HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsD*(5 +2.8*max(0,(int)mSites[i].sCellSet.size()) )));
+		HiddenN2 = 7;
 
 		ANN.create_standard(4, mSites[i].sNumInputs, 
 				HiddenN1 ,HiddenN2, mSites[i].sNumOutputsD);

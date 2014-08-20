@@ -36,7 +36,7 @@
 #include <iomanip>
 #include <errno.h>
 #include <math.h>
-#include <openssl/md5.h>
+//#include <openssl/md5.h>
 
 #include <Poco/RegularExpression.h>
 
@@ -672,7 +672,7 @@ string IntToHex (int val, unsigned digits = 2)
 }
 
 //****************************************************************
-string Qrap::ComputeMD5 (const string& fileName)
+/*string Qrap::ComputeMD5 (const string& fileName)
 {
 	FILE*         fp;
 	unsigned char buf[65536], hash[16];
@@ -708,7 +708,7 @@ string Qrap::ComputeMD5 (const string& fileName)
 	
 	return ret;
 }
-
+*/
 //********************************************************************
 string Qrap::FormatSqlArray (const StringArray& arr)
 {

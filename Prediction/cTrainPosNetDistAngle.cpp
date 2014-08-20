@@ -673,7 +673,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 					mSites[i].sNumInputs, mSites[i].sInputTest,
 					mSites[i].sNumOutputsA, mSites[i].sOutputAngleTest);
 
-		unsigned HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsA*(5 + 2.7*max(0,(int)mSites[i].sCellSet.size()) )));
+		unsigned HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsA*(5 + 2.8*max(0,(int)mSites[i].sCellSet.size()) )));
 		unsigned HiddenN2 = 7;
 
 		ANN.create_standard(4, mSites[i].sNumInputs, 
@@ -707,24 +707,26 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 		while ((k<MAXepoch)&&(!stop))
 		{
 			TrainError = ANN.train_epoch(TrainDataAngle);
+			TestError = ANN.test_data(TestDataAngle);
 			if (0==k%REPORTInt)
 			{
-				TestError = ANN.test_data(TestDataAngle);
-				TestError = ANN.get_MSE();
+//				TestError = ANN.test_data(TestDataAngle);
+//				TestError = ANN.get_MSE();
 				cout << "siteid = " << mSites[i].sSiteID << "	k=" << k 
 					<< "	TrainErr = " << TrainError 
 					<< "	TestErr = " << TestError << endl;
 			}
-			if ((TrainError < minTrainError)&&(k>MAXepoch/3))
+			if ((TrainError <= minTrainError)&&(TestError<=minTestError)&&(k>MAXepoch/4))
 			{
 				ANN.save(filename);
-				TestError = ANN.test_data(TestDataAngle);
-				TestError = ANN.get_MSE();
+//				TestError = ANN.test_data(TestDataAngle);
+//				TestError = ANN.get_MSE();
 /*				cout << "siteid = " << mSites[i].sSiteID << "	k=" << k 
 					<< "	TrainErr = " << TrainError 
 					<< "	TestErr = " << TestError << endl;
 */				stop = (TestError < ERROR)&&(TrainError < ERROR);
 				minTrainError = TrainError;
+				minTestError = TestError;
 			}
 //			else if (TestError>minTestError*1.05) stop = true;
 			k++;
@@ -775,8 +777,8 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 					mSites[i].sNumInputs, mSites[i].sInputTest,
 					mSites[i].sNumOutputsD, mSites[i].sOutputDistTest);
 
-//		HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsD*(5 +2.8*max(0,(int)mSites[i].sCellSet.size()) )));
-		HiddenN2 = 7;
+//		HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsD*(5 +2.6*max(0,(int)mSites[i].sCellSet.size()) )));
+//		HiddenN2 = 7;
 
 		ANN.create_standard(4, mSites[i].sNumInputs, 
 				HiddenN1 ,HiddenN2, mSites[i].sNumOutputsD);
@@ -809,24 +811,24 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 		while ((k<MAXepoch)&&(!stop))
 		{
 			TrainError = ANN.train_epoch(TrainDataDist);
+			TestError = ANN.test_data(TestDataDist);
 			if (0==k%REPORTInt)
 			{
-				TestError = ANN.test_data(TestDataDist);
 //				TestError = ANN.get_MSE();
 				cout << "siteid = " << mSites[i].sSiteID << "	k=" << k 
 						<< "	TrainErr = " << TrainError 
 						<< "	TestErr = " << TestError << endl;
 			}
-			if ((TrainError < minTrainError)&&(k>MAXepoch/3))
+			if ((TrainError <= minTrainError)&&(TestError<=minTestError)&&(k>MAXepoch/2))
 			{
 				ANN.save(filename);
-				TestError = ANN.test_data(TestDataDist);
 //				TestError = ANN.get_MSE();
 /*				cout << "siteid = " << mSites[i].sSiteID << "	k=" << k 
 					<< "	TrainErr = " << TrainError 
 					<< "	TestErr = " << TestError << endl;
 */				stop = (TestError < ERROR/3)&&(TrainError < ERROR/3);
 				minTrainError = TrainError;
+				minTestError = TestError;
 			}
 //			else if (TestError > minTestError*1.05) stop = true; 
 			k++;

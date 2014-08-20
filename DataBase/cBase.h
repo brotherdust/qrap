@@ -266,7 +266,7 @@ namespace Qrap
 	/**
 	 * Computes the MD5 hash of the given file.
 	 */
-	std::string ComputeMD5 (const std::string& fileName);
+//	std::string ComputeMD5 (const std::string& fileName);
 	
 	/**
 	 * Converts the given string array into a single string capable of being inserted into

@@ -9,7 +9,7 @@ all: rap makefile
 #	$(CC) main.cpp 
 
 rap: $(OBJECTS) makefile
-	g++ -g -o rap $(OBJECTS) -L/usr/local/pgsql/lib -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal1.7.0 -lproj  -lssl -lPocoXML  -lPocoFoundation -lQtCore -ldoublefann -lfann
+	g++ -g -o rap $(OBJECTS) -L/usr/local/pgsql/lib -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal -lproj  -lssl -lPocoXML  -lPocoFoundation -lQtCore -ldoublefann -lfann
 
 
 main.o: ../DataBase/Config.h main.cpp makefile

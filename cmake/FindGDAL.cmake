@@ -24,7 +24,7 @@ IF(WIN32)
        )
     SET (
        GDAL_LIBRARY 
-       "$ENV{LIB_DIR}/lib/gdal.lib";odbc32;odbccp32 
+       "$ENV{LIB_DIR}/lib/gdal.lib"
        CACHE STRING INTERNAL)
   ENDIF (MSVC)
   

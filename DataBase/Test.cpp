@@ -205,7 +205,7 @@ int main (int argc, char** argv)
 				} else
 				{
 					cout << "Computing MD5 hash..." << endl;
-					cout << ComputeMD5(argv[2]) << endl;
+//					cout << ComputeMD5(argv[2]) << endl;
 				}
 				break;
 			case 'e':

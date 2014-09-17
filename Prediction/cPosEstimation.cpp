@@ -912,9 +912,9 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 		maxDist = (mPosSets[mCurPosI].sMeasurements[0].sDistance
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist+0.5)*
 				mPosSets[mCurPosI].sMeasurements[0].sResDist+50.0;
-//		minDist = max(mPlotResolution,(mPosSets[mCurPosI].sMeasurements[0].sDistance
-//				/mPosSets[mCurPosI].sMeasurements[0].sResDist-0.5)
-//				*mPosSets[mCurPosI].sMeasurements[0].sResDist-50.0);
+		minDist = max(mPlotResolution,(mPosSets[mCurPosI].sMeasurements[0].sDistance
+				/mPosSets[mCurPosI].sMeasurements[0].sResDist-0.5)
+				*mPosSets[mCurPosI].sMeasurements[0].sResDist-50.0);
 	}
 
 	if (maxDist>120000) maxDist=17500;
@@ -1335,7 +1335,7 @@ bool cPosEstimation::CoSinRule()
 
 		cosA = cos(alpha*PI/180);
 		sinA = sin(alpha*PI/180);
-
+/*
 		double OwnPathL = - mPosSets[mCurPosI].sMeasurements[0].sMeasValue
 			+ mPosSets[mCurPosI].sMeasurements[0].sEIRP
 			- 20*log10(mPosSets[mCurPosI].sMeasurements[0].sFrequency);
@@ -1381,7 +1381,7 @@ bool cPosEstimation::CoSinRule()
 				A = mPosSets[mCurPosI].sMeasurements[0].sDistance 
 					+ 0.5* mPosSets[mCurPosI].sMeasurements[0].sResDist;
 		}
-
+*/
 //*********************************************************************************************
 // The following statement voids the preceeding
 		A = mPosSets[mCurPosI].sMeasurements[0].sDistance;
@@ -1515,10 +1515,10 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist+0.5)*
 				mPosSets[mCurPosI].sMeasurements[0].sResDist+50.0;
 		rho_min = max(mPlotResolution,(mPosSets[mCurPosI].sMeasurements[0].sDistance
-				/mPosSets[mCurPosI].sMeasurements[0].sResDist-1.5)
+				/mPosSets[mCurPosI].sMeasurements[0].sResDist-0.5)
 				*mPosSets[mCurPosI].sMeasurements[0].sResDist-50.0);
 	}	
-	if (rho_max<6*mPlotResolution) rho_max = 6*mPlotResolution;
+	if (rho_max<4*mPlotResolution) rho_max = 4*mPlotResolution;
 	cout << "rho_min=" << rho_min << "	rho_max=" << rho_max << endl; 
 
     	std::random_device RhoRD;
@@ -1668,8 +1668,8 @@ bool cPosEstimation::DCM_ParticleSwarm()
 //					if (change) cout << "changing" << endl;
 //					else cout << "not changing" << endl;
 				}
-
 			}
+
 			if (change)
 			{
 				pbestValue[i] = value[i];
@@ -1704,6 +1704,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				}
 				stop = ((gbestValue<0.00005) || ((iterationN-LastChangedN)>STOPN));
 				LastChangedN = iterationN;
+				change = false;
 			}
 
 			stop = (stop || ((iterationN-LastChangedN)>STOPN)||(finalstop>MAXITER));
@@ -1742,7 +1743,6 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			}
 			value[i] = CostFunction(rho[i], phi[i]);
 //			cout << iterationN <<"		i=" <<i << "		rho=" << rho[i] << "		phi=" << phi[i] << "		value=" << value[i] << endl;
-
 		}// end for
 	}// end while
 

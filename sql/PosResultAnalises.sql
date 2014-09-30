@@ -59,7 +59,7 @@ select * from testpoint where originaltp is not null;
 create table Results as
 select servci, tp1.id as tp, tp2.id as origtp, tp1.positionsource, 
 (pe1.azimuth-pe2.azimuth) as aziErr, 
-(pe1.Distance-pe2.Distance) as distErr, pe1.error as Error
+abs(pe1.Distance-pe2.Distance) as distErr, pe1.error as Error
 from testpoint as tp1 cross join positionestimate as pe1
 cross join testpoint as tp2 cross join positionestimate as pe2
 cross join testpointauxGSM
@@ -73,6 +73,14 @@ drop table Results;
 
 select * from Results;
 
+drop table AziErrorDistribution;
+
+update results set aziErr= aziErr - 360
+where aziErr>180;
+
+update positionestimate set Distance = abs(Distance);
+
+
 create table AziErrorDistribution as
 select positionsource, aziError, count(*) from 
 (select positionsource, tp, 2*round(azierr/2) as aziError
@@ -80,17 +88,21 @@ from Results) as temp
 group by positionsource, aziError
 order by positionsource, aziError;
 
+drop table DistErrorDistribution;
+
 create table DistErrorDistribution as
 select positionsource, distError, count(*) from 
-(select positionsource, tp, 20*round(disterr/20) as distError
+(select positionsource, tp, 10*round(disterr/10) as distError
 from Results) as temp
 group by positionsource, distError
 order by positionsource, distError;
 
-create table CosRuleErrorDistribution as
+drop table errordistribution;
+
+create table ErrorDistribution as
 select positionsource, Error, count(*) from 
 (select positionsource, tp, 10*round(error/10) as Error
-from CosruleResults) as temp
+from Results) as temp
 group by positionsource, Error
 order by positionsource, Error;
 
@@ -104,6 +116,29 @@ and servci=cell.id
 and cell.risector= radioinstallation.id) as temp
 group by siteid, Error
 order by siteid, Error;
+
+delete from testpoint where id in
+(select originaltp from
+(select originaltp, averror from
+(select originaltp, avg(error) as averror
+from testpoint cross join positionestimate
+where positionestimate.tp = testpoint.id
+and positionsource=12
+group by originaltp) as interim
+where averror>1000) as buite)
+
+
+
+
+
+select siteid, avg(error) 
+from Results 
+cross join cell cross join radioinstallation 
+where positionsource=12
+and servci=cell.id
+and cell.risector= radioinstallation.id
+group by siteid
+order by siteid;
 
 
 select positionsource, count(*) as num from
@@ -140,3 +175,25 @@ select * from neuralnet
 order by siteid;
 
 delete from anninputlist where annid in (26,27,28,29);
+
+
+select positionsource, count(testpoint.id) from 
+testpoint cross join positionestimate cross join 
+(select originaltp, min(error) as minerror
+from testpoint cross join positionestimate
+where positionestimate.tp=testpoint.id
+and positionsource<12 and positionsource>1
+and originaltp in 
+(select originaltp from testpoint 
+where positionsource=11) 
+and originaltp is not null
+group by originaltp) as minlist
+where testpoint.originaltp = minlist.originaltp
+and positionestimate.tp=testpoint.id
+and error=minerror
+and positionsource<12 and positionsource>1
+group by positionsource
+order by positionsource;
+
+
+

@@ -31,6 +31,7 @@
 //*********************************************************************
 cPosEstimation::cPosEstimation() // default constructor
 {
+	mLTEsim = false;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -122,6 +123,12 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 					unsigned PosSource,
 					unsigned Technology)
 {
+	
+    	std::random_device Distance;
+    	std::mt19937_64 LTEdistance(Distance());
+//  	std::exponential_distribution<double> distError(1.5);
+	std::normal_distribution<double> distError(0,1);
+
 	pqxx::result r;
 	double Lat, Lon, mNorth, mSouth, mEast, mWest;
 	char *text= new char[33];
@@ -142,32 +149,32 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 	
 	areaQuery += " @ ST_GeomFromText('POLYGON((";
 	for (i = 0 ; i < Points.size();i++)
-   {
+   	{
 		Points[i].Get(Lat, Lon);
-     	mNorth = max(mNorth,Lat);
-     	mSouth = min(mSouth,Lat);
-     	mEast = max(mEast,Lon);
-     	mWest = min(mWest,Lon);
+     		mNorth = max(mNorth,Lat);
+     		mSouth = min(mSouth,Lat);
+     		mEast = max(mEast,Lon);
+     		mWest = min(mWest,Lon);
 		gcvt(Lon,12,text);
-     	areaQuery += text;
-     	areaQuery += " ";
+     		areaQuery += text;
+     		areaQuery += " ";
 		gcvt(Lat,12,text);
-     	areaQuery += text;
-     	areaQuery += ",";
-   }
-   NorthWestCorner.Set(mNorth,mWest,DEG);
-   SouthEastCorner.Set(mSouth,mEast,DEG);
+     		areaQuery += text;
+     		areaQuery += ",";
+   	}
+   	NorthWestCorner.Set(mNorth,mWest,DEG);
+   	SouthEastCorner.Set(mSouth,mEast,DEG);
 	cout << "North West corner: " << endl;
 	NorthWestCorner.Display();
 	cout << "South East corner: " << endl;
 	SouthEastCorner.Display();
 	Points[0].Get(Lat,Lon);
 	gcvt(Lon,12,text);
-   areaQuery += text;
-   areaQuery += " ";
+   	areaQuery += text;
+   	areaQuery += " ";
 	gcvt(Lat,12,text);
-   areaQuery += text;
-   areaQuery += "))',4326) ";
+   	areaQuery += text;
+   	areaQuery += "))',4326) ";
 
 	query = "select distinct site.id as siteid, ST_AsText(location) as siteLocation, ";
 	query += "type, maxdist, NumInputs, NumOutputs, filename, index, cellid ";
@@ -300,32 +307,32 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 		query += "and testpoint.positionsource<2 ";
 		query += "and site.Location @ ST_GeomFromText('POLYGON((";
 		for ( i = 0 ; i < Points.size();i++)
-	   {
+	   	{
 			Points[i].Get(Lat, Lon);
-	      mNorth = max(mNorth,Lat);
-	      mSouth = min(mSouth,Lat);
-	      mEast = max(mEast,Lon);
-	      mWest = min(mWest,Lon);
+	      		mNorth = max(mNorth,Lat);
+	      		mSouth = min(mSouth,Lat);
+	      		mEast = max(mEast,Lon);
+	      		mWest = min(mWest,Lon);
 			gcvt(Lon,12,text);
-	      query += text;
-	      query += " ";
+	      		query += text;
+	      		query += " ";
 			gcvt(Lat,12,text);
-	      query += text;
-	      query += ",";
-	   }
-	   NorthWestCorner.Set(mNorth,mWest,DEG);
-	   SouthEastCorner.Set(mSouth,mEast,DEG);
+	      		query += text;
+	      		query += ",";
+	   	}
+	   	NorthWestCorner.Set(mNorth,mWest,DEG);
+	   	SouthEastCorner.Set(mSouth,mEast,DEG);
 		cout << "North West corner: " << endl;
 		NorthWestCorner.Display();
 		cout << "South East corner: " << endl;
 		SouthEastCorner.Display();
 		Points[0].Get(Lat,Lon);
 		gcvt(Lon,12,text);
-	   query += text;
-	   query += " ";
+	   	query += text;
+	   	query += " ";
 		gcvt(Lat,12,text);
-	   query += text;
-	   query += "))',4326) ";
+	   	query += text;
+	   	query += "))',4326) ";
 
 		if (MeasType>0)
 		{
@@ -444,6 +451,17 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 						Distance = (atoi(r[i]["TA"].c_str())+0.5)*NewMeasurement.sResDist;
 						if (Distance<NewMeasurement.sDistance)
 							NewMeasurement.sDistance = Distance;
+						if (mLTEsim)
+						{
+							NewMeasurement.sResDist = 4.88;
+							Distance =NewMeasurement.sSiteLocation.Distance
+									(NewTestPoint.sOriginalLocation);
+							Distance = Distance + 50.0*distError(LTEdistance);
+							Distance = (floor(Distance/4.88)+0.5)*4.88;
+							if (Distance<NewMeasurement.sDistance)
+								NewMeasurement.sDistance = Distance;
+
+						}
 					}
 	
 					NewMeasurement.sPathLoss = - NewMeasurement.sMeasValue + NewMeasurement.sEIRP;
@@ -1602,6 +1620,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					NbestPhi[j-1]= sbestPhi;
 				}
 			}
+			for (j=0;j<NumBest;j++
 		}
 		if (pbestValue[i]<gbestValue)
 		{
@@ -1718,12 +1737,6 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			rho[i] = rho[i] + rho_snelheid[i];
 			phi[i] = phi[i] + phi_snelheid[i];
 
-			phi[i] = fmod(phi[i],360);		
-			if (phi[i]>180)
-				phi[i]-=360;
-			else if (phi[i]<-180)
-				phi[i]+=360;
-
 			if (rho[i]<0)
 			{
 				rho[i]*=-1;
@@ -1731,6 +1744,13 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					phi[i]-=180.0;
 				else phi[i]+=180.0;
 			}
+
+			phi[i] = fmod(phi[i],360);		
+			if (phi[i]>180)
+				phi[i]-=360;
+			else if (phi[i]<-180)
+				phi[i]+=360;
+
 			if ((rho[i]>rho_max*4)||(rho[i]>120000)||(rho[i]<mPlotResolution))
 			{
 				tempvalue = 2;

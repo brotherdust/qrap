@@ -215,7 +215,8 @@ class cPosEstimation
 	cProfile mDEMProfile;
 	vector<tFixed>	mFixedInsts;	///< Information on the fixed installations
 	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
-	vSiteInfo mSites;	
+	vSiteInfo mSites;
+	bool mLTEsim;	
 };
 }
 #endif

@@ -31,7 +31,7 @@
 //*********************************************************************
 cPosEstimation::cPosEstimation() // default constructor
 {
-	mLTEsim = false;
+	mLTEsim = true;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -903,7 +903,7 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 
 	double Distance= mPosSets[mCurPosI].sMeasurements[0].sDistance;
 
-/*	double minDist = mPlotResolution;
+	double minDist = 2*mPlotResolution;
 	double maxDist = 17500;
 	if (Distance>120000)
 	{	
@@ -938,7 +938,7 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 	if (maxDist>120000) maxDist=17500;
 	if (maxDist>4.0*mPlotResolution) 
 		Distance = SearchDistance(minAzi,minDist, maxDist); 
-*/
+
 	cout << "In cPosEstimation::CoSecAz:  Distance = " << Distance << endl;
 	cout << "In cPosEstimation::CoSecAz:  minAzi = " << minAzi << endl;
 
@@ -1535,7 +1535,9 @@ bool cPosEstimation::DCM_ParticleSwarm()
 		rho_min = max(mPlotResolution,(mPosSets[mCurPosI].sMeasurements[0].sDistance
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist-0.5)
 				*mPosSets[mCurPosI].sMeasurements[0].sResDist-50.0);
-	}	
+	}
+	rho_min = 2*mPlotResolution;
+
 	if (rho_max<4*mPlotResolution) rho_max = 4*mPlotResolution;
 	cout << "rho_min=" << rho_min << "	rho_max=" << rho_max << endl; 
 
@@ -1620,7 +1622,6 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					NbestPhi[j-1]= sbestPhi;
 				}
 			}
-			for (j=0;j<NumBest;j++
 		}
 		if (pbestValue[i]<gbestValue)
 		{

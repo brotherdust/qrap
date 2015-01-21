@@ -165,8 +165,14 @@ RxLev real);
 
 select setval(ID, 1)
 from GSMtempmeas;
+select count(*)/48 from anninputlist;
 
-truncate table testpoint cascade;
+truncate table positionestimate cascade;
+
+select * from positionsource;
+
+insert into positionsource values
+(13, now(),1, 'Combined', 'Using ANN direction, but do line search on distance');
 
 insert into testpoint
 (id, timeofmeas, location, measdatasource, positionsource, meastype)
@@ -176,6 +182,16 @@ where id = tpUsed.tp;
 
 select count(*) from tempRawGSMTEMS;
 select count(*) from tempGSMaux;
+
+delete from testpoint where id in
+(select tp from train);
+
+INSERT into testpoint (id, originaltp, positionsource, location) Values (2072233, 52849, 13,ST_GeomFromText('POINT(28.1705 -26.0492)',4326));
+
+
+truncate table positionestimate;
+
+select count(*) from neuralnet;
 
 insert into tpUsed
 select tp from testpointauxGSM;
@@ -188,7 +204,9 @@ delete from tpUsed
 where tp in
 (select tp from 
 
-
+delete from testpoint
+where id in
+(select tp from train);
 
 select count(*) from temptestpoint;
 
@@ -240,8 +258,8 @@ create table TPsequence
 tp bigint);
 
 insert into TPsequence (tp)
-select id from testpoint
-order by id; 
+select tp from tpUsed
+order by tp; 
 
 delete from testpoint where id in
 (select tpt from testlist);
@@ -250,17 +268,73 @@ drop table testlist;
 
 create table testlist as
 select tp as tpt from TPsequence
-where sq%10=0;
+where sq%8=0;
 
-select * from tplist;
+select count(*) from trainlist;
+
+drop table trainlist;
+
+select count(*) from measurement;
+
+create table trainlist as 
+select tp from tpUsed where 
+tp not in (select tpt from testlist);
+
+drop table temptestpoint;
+
+select count(*) from tpUsed;
+
+delete from testpointauxGSM 
+where tp not in
+(select tp from tpUsed);
+
+create table alles as select * from train;
+insert into alles select * from test;
+
+truncate table test;
+
+truncate table neuralnet;
+
+insert into train select * from alles
+where tp in (select tp from trainlist);
+
+create table temptestpoint as select * from testpoint;
+
+truncate table testpoint cascade;
+
+select * from testpoint;
+
+truncate table neuralnet;
+
+insert into testpoint 
+select id, timeofmeas, originaltp, measdatasource, positionsource, meastype, height, location
+from temptestpoint cross join testlist
+where tpt = id;
+
+
+delete from testpoint
+where id not in 
+(select tp from testpointauxGSM);
+
+truncate table measurement;
+
+select count(*) from testpoint;
+
+select count(*) from tplist;
 
 create table train as select
 distinct testpointauxGSM.tp as tp, servci, ta
 from testpointauxGSM cross join trainlist
 where testpointauxGSM.tp = trainlist.tp;
 
+delete from positionestimate where tp in
+(select id from testpoint where positionsource>1);
+
+select * from positionestimate;
 
 select count(*) from trainlist;
+
+truncate table neuralnet cascade;
 
 create table testpointauxGSMTest as
 select * from testpointauxGSM 
@@ -275,10 +349,11 @@ drop table Temptestpoint;
 create TABLE  Temptestpoint as
 select sq, testpoint.*, 
 testpointauxGSM.servci as servci, testpointauxGSM.ta as ta
-from testpoint cross join TPsequence
+from testpoint cross join TPsequence cross join tpUsed
 cross join testpointauxGSM
 where testpoint.id=TPsequence.tp
-and testpoint.id=testpointauxGSM.tp;
+and testpoint.id=testpointauxGSM.tp
+and testpoint.id=tpUsed.tp;
 
 drop table tpDistance;
 
@@ -297,11 +372,11 @@ where m0.tp=t0.id
 and m1.tp=t1.id
 and t0.sq=t1.sq+1);
 
-select avg(distance) from tpDistance;
+select min(distance) from tpDistance;
 
 insert into toDeleteTPlist
 select tp0 as tp from tpDistance
-where distance<1e-4
+where distance<2e-4
 and sq0%2=0
 and distance is not null
 and num0<=num1
@@ -310,12 +385,22 @@ and ci0=ci1;
 
 delete from tpUsed where tp in
 (select tp0 as tp from tpDistance
-where distance<1e-4
+where distance<1e-3
 and sq0%2=0
 and distance is not null
 and num0<=num1
 and ta0=ta1
 and ci0=ci1);
+
+delete from testpointauxGSM where tp not in
+(select tp from tpUsed);
+
+drop table tpUsed;
+
+select count from
+
+create table tpUsed as
+select id as tp from testpoint;
 
 drop table DeleteTPlist;
 

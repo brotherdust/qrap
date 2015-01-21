@@ -32,6 +32,8 @@
 cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 {
 	
+	mLTEsim = true;
+	mOriginal = false; 
 
 }
 
@@ -261,6 +263,12 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 					bool Train /* Traindata: true; Testdata: false */)
 {
 
+    	std::random_device Dist;
+    	std::mt19937_64 LTEdistance(Dist());
+//  	std::exponential_distribution<double> distError(1.5);
+		std::normal_distribution<double> distError(0,1);
+		double addDist;
+
 	if (Points.size() < 2)
 	{
 		cout << "cTrainPosNetDistAngle::LoadMeasurements   Not enough points to define area. " << endl;
@@ -286,7 +294,7 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 	NewSite.sSiteID=0;
 	NewSite.sMaxDist = 0;
 
-	double longitude, latitude;
+	double longitude, latitude, Distance;
 	string PointString;
 	unsigned spacePos;
 	unsigned siteIndex=0;
@@ -432,9 +440,23 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 				latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
 				NewTestPoint.sOriginalLocation.Set(latitude,longitude,DEG);
 				NewTestPoint.sServCellAzimuth = atof(r[i]["antbearing"].c_str());
+
+				Distance =mSites[siteIndex].sPosition.Distance(NewTestPoint.sOriginalLocation);
 				NewTestPoint.sResDist = atof(r[i]["DistRes"].c_str());
-				NewTestPoint.sTA = atoi(r[i]["TA"].c_str());
 				
+				if (mLTEsim)
+				{
+					NewTestPoint.sResDist = 4.88;
+					addDist =  50.0*distError(LTEdistance);
+					while ((Distance + addDist)<=0)
+						addDist = 50.0*distError(LTEdistance);
+					Distance = Distance + addDist;
+				}
+				cout << " Distance = " << Distance << endl;
+				NewTestPoint.sTA = floor(Distance/NewTestPoint.sResDist);
+				
+				if (mOriginal) NewTestPoint.sTA = atoi(r[i]["TA"].c_str());
+
 				tempdist = (NewTestPoint.sTA+0.5)*NewTestPoint.sResDist;
 				if (tempdist > mSites[siteIndex].sMaxDist)
 					mSites[siteIndex].sMaxDist = tempdist;

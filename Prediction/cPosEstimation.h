@@ -72,6 +72,7 @@ enum eMethod
 	DCM_PSO, //10
 	DCM_PSObestN, //11
 	ANN, //12
+	ANNangleLineSearch, //13
 	None
 };
 
@@ -217,6 +218,7 @@ class cPosEstimation
 	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
 	vSiteInfo mSites;
 	bool mLTEsim;	
+	bool mOriginal;
 };
 }
 #endif

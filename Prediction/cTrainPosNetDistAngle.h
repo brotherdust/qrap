@@ -49,7 +49,6 @@
 #include "doublefann.h"
 #include "fann_cpp.h"
 #include <iostream>
-#include <random>
 #include <ctime>
 
 using namespace std;
@@ -159,6 +158,8 @@ class cTrainPosNetDistAngle
 	unsigned mNumSites;
 	unsigned mNumTrain;
 	unsigned mNumTest;
+	bool mLTEsim;
+	bool mOriginal;
 };
 }
 #endif

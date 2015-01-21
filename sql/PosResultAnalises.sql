@@ -18,9 +18,6 @@ update antennapattern set azibeamwidth=360 where id>315 and id <344;
 
 INSERT into PositionEstimate (id, tp, azimuth, distance, error) Values (52389,52389, 173.571006, 1817.37605, 0); 
 
-
-
-delete from testpoint where id in 
 (select  tp from
 (select servci, testpoint.id as tp, distance, floor(distance/553.5) as pta, ta, (ta - floor(distance/553.5)) as delta
 from positionestimate 
@@ -30,7 +27,9 @@ and testpointauxGSM.tp=testpoint.id
 and testpoint.positionsource=1) as temp
 where delta <0);
 
-delete from anninputlist where id<65;
+delete from neuralnet where id<25;
+
+delete from anninputlist where annid<25;
 select * from neuralnet
 order by siteid,id;
 
@@ -76,7 +75,7 @@ select * from Results;
 drop table AziErrorDistribution;
 
 update results set aziErr= aziErr - 360
-where aziErr>180;
+where aziErr >180;
 
 update positionestimate set Distance = abs(Distance);
 
@@ -84,6 +83,15 @@ update positionestimate set Distance = abs(Distance);
 create table AziErrorDistribution as
 select positionsource, aziError, count(*) from 
 (select positionsource, tp, 2*round(azierr/2) as aziError
+from Results) as temp
+group by positionsource, aziError
+order by positionsource, aziError;
+
+drop table AziOnsSidedErrorDistribution;
+
+create table AziOnsSidedErrorDistribution as
+select positionsource, aziError, count(*) from 
+(select positionsource, tp, 2*round(abs(azierr)/2) as aziError
 from Results) as temp
 group by positionsource, aziError
 order by positionsource, aziError;

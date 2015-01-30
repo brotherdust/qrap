@@ -1,6 +1,6 @@
 CC = g++ -g -Wall -W -D_REENTRANT -c -std=c++0x -std=gnu++0x -I/usr/include  -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4  -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/eigen3 -I/usr/include/c++/4.8.2/
 
-OBJECTS = cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cClutter.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o cMeasAnalysisCalc.o cMeasImportSpace.o cMeasImportCSV.o cPosEstimation.o cTrainPosNetDistAngle.o cMeas.o cCellList.o cTPoint.o main.o
+OBJECTS = cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cClutter.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o cMeasAnalysisCalc.o cMeasImportSpace.o cMeasImportCSV.o cPosEstimation.o cTrainPosNetDistAngle.o cMeas.o cCellList.o cTPoint.o cTrainAntPattern.o main.o
 
 all: rap makefile
 
@@ -29,6 +29,9 @@ cMeas.o: cMeas.h cMeas.cpp makefile
 
 cCellList.o: cCellList.h cCellList.cpp makefile
 	$(CC) cCellList.cpp
+
+cTrainAntPattern.o: cTrainAntPattern.h cTrainAntPattern.cpp makefile
+	$(CC) cTrainAntPattern.cpp
 	
 #cMeasImportOldTEMS.o: cMeasImportOldTEMS.h cMeasImportOldTEMS.cpp makefile
 #	$(CC) cMeasImportOldTEMS.cpp

@@ -36,6 +36,7 @@
 #include "cGeoP.h"
 #include "cPosEstimation.h"
 #include "cTrainPosNetDistAngle.h"
+#include "cTrainAntPattern.h"
 
 
 using namespace std;
@@ -133,7 +134,10 @@ cout << "Starting Optimisation ... in main()" << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
+
+
 /*
+
 	cTrainPosNetDistAngle NeuralNets;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -158,6 +162,29 @@ cout << "Starting Optimisation ... in main()" << endl;
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
 */
+
+	cTrainAntPattern NeuralNets;
+	vPoints Punte;
+	cGeoP *Hoek;
+	Hoek = new cGeoP[4];
+
+	Hoek[0].Set(-26.06, 28.26);
+	Punte.push_back(Hoek[0]);
+	Hoek[1].Set(-25.94, 28.26);
+	Punte.push_back(Hoek[1]);
+	Hoek[2].Set(-25.94, 28.113);
+	Punte.push_back(Hoek[2]);
+	Hoek[3].Set(-26.06, 28.113);
+	Punte.push_back(Hoek[3]);
+	
+	delete [] Hoek;
+	
+	cout << "In main Loading measurements " << endl;
+	NeuralNets.LoadMeasurements(Punte,2,6,1,1);
+
+	cout << "In main training nets " << endl;
+	NeuralNets.TrainANDSaveANDTest();
+
 /*
 	double hoek = 45;
 	double x=cos(hoek/180*PI);
@@ -183,7 +210,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-
+/*
   string query = "update coefficients set coefficient=0.0;";
 
 	cPosEstimation Positioning;
@@ -212,7 +239,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-
+*/
 
 /*
 

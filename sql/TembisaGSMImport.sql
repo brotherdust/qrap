@@ -186,6 +186,7 @@ select count(*) from tempGSMaux;
 delete from testpoint where id in
 (select tp from train);
 
+
 INSERT into testpoint (id, originaltp, positionsource, location) Values (2072233, 52849, 13,ST_GeomFromText('POINT(28.1705 -26.0492)',4326));
 
 
@@ -518,6 +519,12 @@ create table CellsFoundButNoLocation as
 from foundCells where CI not in
 (select id from cell));
 
+select * from neuralnet where id < 24;
+
+select * from anninputlist;
+
+delete from anninputlist where annid < 24;
+
 drop table tempMTR;
  
 create table tempMTR as
@@ -712,3 +719,12 @@ as select distinct tp from GSMtempmeas
 order by tp;
 
 create table testlist 
+
+select ta, count(*) 
+from testpoint cross join testpointauxGSM
+where testpoint.id=tp
+group by ta
+order by ta;
+
+delete from testpoint where id in 
+(select tp from train);

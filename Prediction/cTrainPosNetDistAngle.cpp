@@ -32,7 +32,7 @@
 cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 {
 	
-	mLTEsim = true;
+	mLTEsim = false;
 	mOriginal = false; 
 
 }
@@ -78,9 +78,9 @@ cTrainPosNetDistAngle::~cTrainPosNetDistAngle() // destructor
 		delete [] mSites[i].sInputTrain;
 		delete [] mSites[i].sOutputAngleTrain;	
 		delete [] mSites[i].sOutputDistTrain;
-		delete [] mSites[i].sInputTrain;
-		delete [] mSites[i].sOutputAngleTrain;	
-		delete [] mSites[i].sOutputDistTrain;
+		delete [] mSites[i].sInputTest;
+		delete [] mSites[i].sOutputAngleTest;	
+		delete [] mSites[i].sOutputDistTest;
 		mSites[i].sCellSet.clear();
 		cout << "In cTrainPosNetDistAngle::~cTrainPosNetDistAngle():  Site=" << i << "	done" << endl;
 	}
@@ -104,7 +104,6 @@ bool cTrainPosNetDistAngle::LoadSites(vPoints Points,
 
 	pqxx::result r;
 	double Lat, Lon, mNorth, mSouth, mEast, mWest;
-	double tempdist;
 	char *text= new char[33];
 	cGeoP NorthWestCorner,SouthEastCorner; 
 	Points[0].Get(mNorth,mEast);
@@ -117,9 +116,8 @@ bool cTrainPosNetDistAngle::LoadSites(vPoints Points,
 	double longitude, latitude;
 	string PointString;
 	unsigned spacePos;
-	unsigned siteIndex=0;
 	unsigned NumInPosSet = 0; 
-	unsigned siteid, tp;
+	unsigned siteid;
 	
 	areaQuery += " @ ST_GeomFromText('POLYGON((";
 	for (i = 0 ; i < Points.size();i++)
@@ -443,6 +441,7 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 
 				Distance =mSites[siteIndex].sPosition.Distance(NewTestPoint.sOriginalLocation);
 				NewTestPoint.sResDist = atof(r[i]["DistRes"].c_str());
+				NewTestPoint.sResDist = 553.5;
 				
 				if (mLTEsim)
 				{

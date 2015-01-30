@@ -31,7 +31,7 @@
 //*********************************************************************
 cPosEstimation::cPosEstimation() // default constructor
 {
-	mLTEsim = true;
+	mLTEsim = false;
 	mOriginal = false;
 	mCurSiteI = 0;
 	mCurPosI = 0;
@@ -446,6 +446,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 					NewMeasurement.sHeight = atof(r[i]["txantennaheight"].c_str());
 					NewMeasurement.sDistance = 999999;
 					NewMeasurement.sServingCell = false;
+					NewMeasurement.sResDist = 553.5;
 					if (strlen(r[i]["TA"].c_str())>0)
 					{
 						NewMeasurement.sServingCell = true;

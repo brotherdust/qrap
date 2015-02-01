@@ -187,14 +187,17 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
    	areaQuery += text;
    	areaQuery += "))',4326) ";
 
-	query = "ci, ST_AsText(site.location) as siteLocation, radioinstallation.txantennaheight as height, tp ";
+	query = "select ci, ST_AsText(site.location) as siteLocation, ";
+	query += "radioinstallation.txantennaheight as height, tp, ";
 	query += "ST_AsText(testpoint.location) as measLocation, measvalue, frequency ";
 	query += "from measurement cross join testpoint ";
 	query += "cross join cell cross join radioinstallation  cross join site ";
-	query += "where tp=testpoint.id  and ci = cell.id";
-	query += "and risector = radioinstallation.id and siteid = site.id";
+	query += "cross join technology  ";
+	query += "where tp=testpoint.id  and ci = cell.id ";
+	query += "and risector = radioinstallation.id and siteid = site.id ";
+	query += "and techkey = technology.id  ";
 	query += "and testpoint.positionsource < 2 ";
-	query += "and testpoint.location";
+	query += "and testpoint.location ";
 	query += areaQuery;
 	
 	if (MeasType>0)
@@ -221,7 +224,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 		gcvt(Technology,9,text);
 		query += text;
 	}
-	query += "order ci, tp";
+	query += " order by ci, tp;";
 	cout << query << endl;
 
 	if (!gDb.PerformRawSql(query))
@@ -361,7 +364,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 
 	mNumCells = mCells.size();
 
-	for (i=0; i<mNumCells; i++)
+	for (i=0; i<1/*mNumCells*/; i++)
 	{
 		mCells[i].sNumOutputs = 1;
 		mCells[i].sNumInputs = 5;
@@ -513,7 +516,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 
 		if (!gDb.PerformRawSql(query))
 		{
-			string err = "Error inserting NeuralNet by running query: ";
+			string err = "Error inserting AntNeuralNet by running query: ";
 			err += query;
 			cout << err <<endl; 
 			QRAP_WARN(err.c_str());

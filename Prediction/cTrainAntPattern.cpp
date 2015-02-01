@@ -292,7 +292,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 			{
 					Delta = PathLoss + NewMeasurement.sMeasValue;
 					Total +=Delta;
-					if ((double)i/10*10 == floor((double)i/10)*10)
+					if (((double)i/10*10 == floor((double)i/10)*10)&&(i>0))
 					{
 							NewCell.sMeasTest.push_back(NewMeasurement);
 							NewCell.sNumTest++;
@@ -340,11 +340,12 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 	char * temp;
 	temp = new char[33];
 	char * cell;
-	cell = new char[33];
+	cell = new char[12];
 	char * annid;
-	annid = new char[33];
+	annid = new char[12];
 	char * machineid;
-	machineid = new char[33];
+	machineid = new char[12];
+
 	gcvt(gDb.globalMachineID,8,machineid);
 
 //	time_t now;
@@ -364,7 +365,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 
 	mNumCells = mCells.size();
 
-	for (i=0; i<1/*mNumCells*/; i++)
+	for (i=0; i<mNumCells; i++)
 	{
 		mCells[i].sNumOutputs = 1;
 		mCells[i].sNumInputs = 5;
@@ -456,7 +457,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 		ANN.randomize_weights(-0.50,0.50);
 
 		cout << "saving ANN: Cell = " << mCells[i].sCI << "	i=" << i << endl;
-		gcvt(mCells[i].sCI,9,cell);
+		gcvt(mCells[i].sCI,8,cell);
 		filename = outdir;
 		filename += "/";
 		filename += cell;

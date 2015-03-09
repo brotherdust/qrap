@@ -1,3 +1,5 @@
+
+
 SELECT distinct measurement.tp as tp, ST_AsText(testpoint.location) as origLocation,siteid, 
 ST_AsText(site.location) as siteLocation, radioinstallation.id as InstKeyFixed, txantennaheight, 
 EIRP, txbearing, txmechtilt, txantpatternkey, azibeamwidth, ci, ST_AsText(centriod) as centriod, 
@@ -14,7 +16,6 @@ and meastype=2 and measdatasource=6 and positionsource=1 and Technology.id=1
 group by siteid, InstKeyFixed, azibeamwidth, origLocation,  measurement.frequency, measurement.tp, tp1.TA, ci, siteLocation, centriod, DistRes  
 order by measurement.tp, TA, measvalue desc;
 
-update antennapattern set azibeamwidth=360 where id>315 and id <344;
 
 INSERT into PositionEstimate (id, tp, azimuth, distance, error) Values (52389,52389, 173.571006, 1817.37605, 0); 
 
@@ -44,14 +45,65 @@ and testpoint.positionsource=1) as temp
 group by delta
 order by delta;
 
-update testpointauxGSM set ta = floor(distance/553.5) from
-positionestimate where testpointauxGSM.tp =positionestimate.tp;
+select count(*) from testpoint;
 
-select * from technology;
+select * from positionestimate;
 
-update technology set distres=553.5 where distres>=554;
+select * from testpointauxGSM;
 
 select count(*) from test;
+
+Create table TPtoDELETE
+(tp bigint);
+
+drop table TPtoDELETE;
+ 
+insert into TPtoDELETE 
+select TP1ID from
+(select aux1.servci as sCI1, aux2.servci as sCI2, TP1.id as TP1ID, TP2.id as TP2ID, 
+PE1.distance as Dist1, raw1.ta as TA1, PE2.distance as Dist2, raw2.ta as TA2,
+PE1.azimuth as Azi1, PE2.azimuth as Azi2, 
+abs(PE1.distance- PE2.distance) as delta, raw1.meastime, raw2.meastime, 
+raw1.latitude, raw2.latitude, raw1.longitude, raw2.longitude,
+raw1.bcch as BCCH1, raw1.bsic_num as BSIC1, raw1.cellid as CI1, 
+raw1.neighborarfcn_1 as NB1BCCH1, raw1.neighbor_bsic_num_1 as NB1BSIC1, raw1.neighborcellid_1 as NB1CI1,
+raw1.neighborarfcn_2 as NB2BCCH1 , raw1.neighborbsic_num_2 as NB2BSIC1, raw1.neighborcellid_2 as NB2CI1,
+raw1.neighborarfcn_3 as NB3BCCH1, raw1.neighborbsic_num_3 as NB3BSIC1, raw1.neighborcellid_3 as NB3CI1,
+raw2.bcch, raw2.bsic_num, raw2.cellid, 
+raw2.neighborarfcn_1, raw2.neighbor_bsic_num_1, raw2.neighborcellid_1,
+raw2.neighborarfcn_2, raw2.neighborbsic_num_2, raw2.neighborcellid_2,
+raw2.neighborarfcn_3, raw2.neighborbsic_num_3, raw2.neighborcellid_3
+ from seqTP as sTP1 
+cross join seqTP as sTP2
+cross join testpointauxGSM as aux1
+cross join testpointauxGSM as aux2
+cross join testpoint as TP1
+cross join testpoint as TP2
+cross join positionestimate as PE1
+cross join positionestimate as PE2
+cross join temprawgsmtems as raw1
+cross join temprawgsmtems as raw2
+where sTP1.seq=sTP2.seq+1
+and sTP1.tp = TP1.id
+and sTP2.tp = TP2.id
+and TP1.id = PE1.tp
+and TP2.id = PE2.tp
+and sTP1.tp = aux1.tp
+and sTP2.tp = aux2.tp
+and raw1.id = TP1.id
+and raw2.id = TP2.id
+and raw1.neighbor_bsic_num_1 is null 
+and raw1.neighborbsic_num_2 is null
+and raw1.neighborbsic_num_3 is null
+order by sTP1.seq
+) as err
+where dist1>=dist2;
+
+
+select distinct servci from testpointauxGSM; 
+
+delete from testpoint where id in
+(select tp from TPtoDELETE);
 
 select count(*) from positionestimate;
 select * from testpointauxGSM;
@@ -79,12 +131,14 @@ drop table AziErrorDistribution;
 update results set aziErr= aziErr - 360
 where aziErr > 180;
 
+update results set aziErr= abs(aziErr);
+
 update positionestimate set Distance = abs(Distance);
 
 
 create table AziErrorDistribution as
 select positionsource, aziError, count(*) from 
-(select positionsource, tp, 2*round(azierr/2) as aziError
+(select positionsource, tp, round(azierr) as aziError
 from Results) as temp
 group by positionsource, aziError
 order by positionsource, aziError;
@@ -102,7 +156,7 @@ drop table DistErrorDistribution;
 
 create table DistErrorDistribution as
 select positionsource, distError, count(*) from 
-(select positionsource, tp, 10*round(disterr/10) as distError
+(select positionsource, tp, 5*round(disterr/5) as distError
 from Results) as temp
 group by positionsource, distError
 order by positionsource, distError;
@@ -111,7 +165,7 @@ drop table errordistribution;
 
 create table ErrorDistribution as
 select positionsource, Error, count(*) from 
-(select positionsource, tp, 10*round(error/10) as Error
+(select positionsource, tp, 5*round(error/5) as Error
 from Results) as temp
 group by positionsource, Error
 order by positionsource, Error;

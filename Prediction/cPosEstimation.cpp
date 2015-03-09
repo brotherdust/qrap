@@ -99,6 +99,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	mNumInsts = 2;
 	mCurANNa = new FANN::neural_net();
 	mCurANNd = new FANN::neural_net();
+
 }
 
 //*********************************************************************
@@ -111,10 +112,15 @@ cPosEstimation::~cPosEstimation() // destructor
 		mPosSets[i].sMeasurements.clear();
 	}
 	mPosSets.clear();
+	for (i=0;i<mNumSites;i++)
+	{
+		mSites[i].sCellSet.clear();
+	}
+	mSites.clear();
+	mCurANNa->destroy();
+	mCurANNd->destroy();
 	delete [] mFixedAnts;
 	delete [] mCellPathLoss;
-	delete mCurANNa;
-	delete mCurANNd;
 }
 
 //*********************************************************************
@@ -523,14 +529,14 @@ void cPosEstimation::EstimatePositions()
 	if (mUseClutter)
 		cout << "cPosEstimation::EstimatePositions(): Using Clutter " <<  endl;
 	else cout << "cPosEstimation::EstimatePositions(): NOT Using Clutter " <<  endl;
-
+/*
 	if (mNumSites>0)
 	{
 		mCurSiteI = 0;
 		mCurANNa->create_from_file(mSites[0].sANNfileA);
 		mCurANNd->create_from_file(mSites[0].sANNfileD);
 	}
-
+*/
 	for (i=0; i< mNumPoints; i++)
 	{
 		mCurPosI = i;
@@ -575,20 +581,20 @@ void cPosEstimation::EstimatePositions()
 				cout << distance << "	";
 				switch (mPosSets[mCurPosI].sTestPoints[j].sMethodUsed)
 				{
-					case GPS: 											cout << "GPS" << endl;		break;  
-					case CellID: 										cout << "CellID" << endl;	break; 
-					case CellID_TA: 								cout << "CellID_TA" << endl;	break; 
-					case SSiteDir:									cout << "SSiteDir" << endl;	break; 
-					case CoSiteSecDir:							cout << "CoSiteSecDir" << endl;	break; 
-					case CosRuleAngleDistRatio:		cout << "CosRuleAngleDistRatio" << endl; break; 
-					case CosRuleDistDist:					cout << "CosRuleDistDist" << endl; break; 
-					case CosRuleDistAngle:					cout << "CosRuleDistAngle" << endl; break; 
-					case CosRuleAngleAngle:				cout << "CosRuleAngleAngle" << endl; break; 
-					case DCM_PSO:								cout << "DCM_PSO" << endl;	break; 
-					case DCM_PSObestN:					cout << "DCM_PSObestN" << endl;	break; 
-					case ANN:											cout << "ANN" << endl;	break; 
-					case ANNangleLineSearch:			cout << "ANNangleLineSearch" << endl;	break; 
-					default: 												cout << "None" << endl;
+					case GPS: 			cout << "GPS" << endl;			break;  
+					case CellID: 			cout << "CellID" << endl;		break; 
+					case CellID_TA: 		cout << "CellID_TA" << endl;		break; 
+					case SSiteDir:			cout << "SSiteDir" << endl;		break; 
+					case CoSiteSecDir:		cout << "CoSiteSecDir" << endl;		break; 
+					case CosRuleAngleDistRatio:	cout << "CosRuleAngleDistRatio" << endl; break; 
+					case CosRuleDistDist:		cout << "CosRuleDistDist" << endl; 	break; 
+					case CosRuleDistAngle:		cout << "CosRuleDistAngle" << endl; 	break; 
+					case CosRuleAngleAngle:		cout << "CosRuleAngleAngle" << endl; 	break; 
+					case DCM_PSO:			cout << "DCM_PSO" << endl;		break; 
+					case DCM_PSObestN:		cout << "DCM_PSObestN" << endl;		break; 
+					case ANN:			cout << "ANN" << endl;			break; 
+					case ANNangleLineSearch:	cout << "ANNangleLineSearch" << endl;	break; 
+					default:			cout << "None" << endl;
 				}
 				
 				mPosSets[mCurPosI].sTestPoints[j].sOriginalLocation.Display();

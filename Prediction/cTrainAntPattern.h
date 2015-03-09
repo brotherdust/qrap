@@ -36,16 +36,18 @@
 #define MEAS_SCALE (0.5/(85-65))
 #define MEAS_OFFSET 85
 #define RFDist_OFFSET -80
+#define SCALE 30.0
 
-#define MAXepoch 500000
-#define REPORTInt 10000
-#define ERROR 1e-6
+#define antMAXepoch 200000
+#define antREPORTInt 10000
+#define antERROR 1e-6
 
 // include local headers
 #include "../DataBase/Config.h"
 #include "../DataBase/cDatabase.h"
 #include "cGeoP.h"
 #include "cPthlssp.h"
+#include "cAntpatn.h"
 #include "cProfile.h"
 #include "cAntpatn.h"
 #include "cMemmngr.h"
@@ -77,9 +79,12 @@ struct tCellAnt
 	unsigned sCI;
 	cGeoP			sPosition;
 	float			sHeight;
+	int			sAntPatternKey;
+	double			sBearing;
+	double			sTilt;
 	unsigned		sNumInputs;
 	unsigned		sNumOutputs;
-	unsigned   sNumTrain;
+	unsigned   		sNumTrain;
 	unsigned		sNumTest;
 	double			sMean;
 	double**		sInputTrain;
@@ -114,6 +119,8 @@ class cTrainAntPattern
 
 	bool TrainANDSaveANDTest();
 
+	bool Output(string Outputfile, unsigned currentCell);
+
 
    private:
 
@@ -133,8 +140,8 @@ class cTrainAntPattern
 	cProfile mDEMProfile;
 	double mPlotResolution;
 	double mkFactor;
-	eOutputUnits mUnits;
-
+	FANN::neural_net mANN;
+	double mMAXANNOutput;
 };
 }
 #endif

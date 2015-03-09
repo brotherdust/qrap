@@ -4,7 +4,7 @@ OBJECTS = cSettings.o cAlert.o cBase.o cDatabase.o Test.o cSiteEditTools.o cRast
 all: qraputil makefile
 
 qraputil: $(OBJECTS) makefile 
-	g++ -g -o qraputil $(OBJECTS) -L/usr/local/pgsql/lib -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal1.7.0 -lcrypto -lproj  -lssl -lPocoXML  -lPocoFoundation -lQtCore
+	g++ -g -o qraputil $(OBJECTS) -L/usr/local/pgsql/lib -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal -lcrypto -lproj  -lssl -lPocoXML  -lPocoFoundation -lQtCore
 
 Test.o: Config.h Test.cpp makefile
 	$(CC) Test.cpp

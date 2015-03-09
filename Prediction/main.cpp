@@ -135,9 +135,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	cout<< "Nach6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
 
-
 /*
-
 	cTrainPosNetDistAngle NeuralNets;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -211,7 +209,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	cout << hoek << "		" << angle << endl;
 */
 /*
-  string query = "update coefficients set coefficient=0.0;";
+  	string query = "update coefficients set coefficient=0.0;";
 
 	cPosEstimation Positioning;
 	vPoints Punte;
@@ -239,8 +237,8 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-*/
 
+*/
 /*
 
 	if (!gDb.PerformRawSql(query))

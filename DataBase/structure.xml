@@ -1344,7 +1344,7 @@ www.QRap.org.za
 		       type = "integer references cell(id) on delete cascade"
 		       label = "Master cell"
 			description="Normally NULL. In a overlay-underlay cell structure this will be the reference from the overlaying cell to the under-laying cell."
-		       ui = "dropdown(fromtable,cell_view,id)" />
+		       ui = "dropdown(fromtable,cell_view,sectorname)" />
 		
 		<field name = "risector"
 		       type = "integer references radioinstallation(id) on delete cascade"
@@ -2523,6 +2523,42 @@ in #define statements in qrap/Prediction/cClutter.h -->
 		       description="Indetifying code of Pilot, i.e. BSIC in GSM and SCN ID in UMTS" />
 
 	</table> <!-- Celllist -->
+
+
+<!-- ********************************************************************************************************************* -->
+	
+	<table name="AntNeuralNet" label="List of saved artificial neural nets for antenna patterns">
+
+	       <field name="id"
+		      type="serial not null"
+		      label="ID"
+		      description="Identifier, forms primary key with type"
+		      readonly="true" />
+
+	       <field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+		      visible="false" />
+
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised and on which machine the file was generated originally."
+			visible="false"/>
+ 
+		<field name = "cellid"
+		       type = "integer references cell(id) on delete cascade"
+			label = "Cell ID"
+		       description= "Site ID for which to which this neural net apply"
+		       ui = "dropdown(fromtable,cell_view,cellname)" />
+
+		<field name = "filename"
+		       type = "text"
+			description="The name of the file containing the stored ANN."
+		       label = "File Name" />
+
+	</table> <!-- AntNeuralNet -->
+
 
 <!-- ********************************************************************************************************************* -->
 	

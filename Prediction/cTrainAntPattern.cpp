@@ -33,7 +33,6 @@ cTrainAntPattern::cTrainAntPattern() // default constructor
 {
 	
 	double kS, kI;
-	mUnits = dBm;
 	string setting;
 	setting = gDb.GetSetting("kFactorServer");
 	if(setting!="")
@@ -88,6 +87,7 @@ cTrainAntPattern::cTrainAntPattern() // default constructor
 	cout << "mDEMsource = " << mDEMsource << endl;
 	mDEM.SetRasterFileRules(mDEMsource);
 	mDEM.SetSampleMethod(2); 
+	mMAXANNOutput = 0;
 
 }
 
@@ -96,6 +96,7 @@ cTrainAntPattern::~cTrainAntPattern() // destructor
 {
 	unsigned i,j;
 	cout << "In cTrainAntPattern::~cTrainAntPattern() " << endl;
+	cout << "mMAXANNOutput = " << mMAXANNOutput << endl;
 
 	for (i=0; i<mNumCells; i++)
 	{
@@ -166,29 +167,30 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
         	mSouth = min(mSouth,Lat);
         	mEast = max(mEast,Lon);
         	mWest = min(mWest,Lon);
-			gcvt(Lon,12,text);
+		gcvt(Lon,12,text);
         	areaQuery += text;
         	areaQuery += " ";
-			gcvt(Lat,12,text);
+		gcvt(Lat,12,text);
         	areaQuery += text;
         	areaQuery += ",";
    	}
    	NorthWestCorner.Set(mNorth,mWest,DEG);
    	SouthEastCorner.Set(mSouth,mEast,DEG);
-		cout << "North West corner: " << endl;
-		NorthWestCorner.Display();
-		cout << "South East corner: " << endl;
-		SouthEastCorner.Display();
-		Points[0].Get(Lat,Lon);
-		gcvt(Lon,12,text);
+	cout << "North West corner: " << endl;
+	NorthWestCorner.Display();
+	cout << "South East corner: " << endl;
+	SouthEastCorner.Display();
+	Points[0].Get(Lat,Lon);
+	gcvt(Lon,12,text);
    	areaQuery += text;
    	areaQuery += " ";
-		gcvt(Lat,12,text);
+	gcvt(Lat,12,text);
    	areaQuery += text;
    	areaQuery += "))',4326) ";
 
 	query = "select ci, ST_AsText(site.location) as siteLocation, ";
-	query += "radioinstallation.txantennaheight as height, tp, ";
+	query += "radioinstallation.txantennaheight as height, ";
+	query += "txantpatternkey, txbearing, txmechtilt, tp, ";
 	query += "ST_AsText(testpoint.location) as measLocation, measvalue, frequency ";
 	query += "from measurement cross join testpoint ";
 	query += "cross join cell cross join radioinstallation  cross join site ";
@@ -260,6 +262,9 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 				}
 				NewCell.sCI = cellid;
 				NewCell.sHeight = atof(r[i]["height"].c_str());
+				NewCell.sAntPatternKey = (unsigned)atoi(r[i]["txantpatternkey"].c_str());
+				NewCell.sBearing = atof(r[i]["txbearing"].c_str());
+				NewCell.sTilt = atof(r[i]["txmechtilt"].c_str());
 				PointString = r[i]["sitelocation"].c_str();
 				spacePos = PointString.find_first_of(' ');
 				longitude = atof((PointString.substr(6,spacePos).c_str())); 
@@ -279,7 +284,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 			NewMeasurement.sFrequency = atof(r[i]["frequency"].c_str());
 			NewMeasurement.sMeasValue = atof(r[i]["measvalue"].c_str());
 		
-			mDEM.GetForLink(NewCell.sPosition,	NewMeasurement.sLocation, mPlotResolution, mDEMProfile);
+			mDEM.GetForLink(NewCell.sPosition,NewMeasurement.sLocation, mPlotResolution, mDEMProfile);
 			if (mUseClutter)
 			{
 				mClutter.GetForLink(NewCell.sPosition,	NewMeasurement.sLocation, mPlotResolution, mClutterProfile);
@@ -290,7 +295,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 
 			if (DiffLoss < 6)
 			{
-					Delta = PathLoss + NewMeasurement.sMeasValue;
+					Delta =  PathLoss + NewMeasurement.sMeasValue;
 					Total +=Delta;
 					if (((double)i/10*10 == floor((double)i/10)*10)&&(i>0))
 					{
@@ -317,6 +322,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 	} //end query is empty
 
 	delete [] text;
+	cout << "mMAXANNOutput = " << mMAXANNOutput << endl;
 	cout << "cTrainAntPattern::LoadMeasurement: leaving ... happy ... " << endl << endl;
 	return true;
 }
@@ -325,7 +331,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 //**************************************************************************************************************************
 bool cTrainAntPattern::TrainANDSaveANDTest()
 {
-	FANN::neural_net	ANN;
+	
 	FANN::training_data	TrainData;
 	FANN::training_data	TestData;
 	double PathLoss, Delta;
@@ -336,7 +342,9 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 	float Tilt;
 	double Azimuth,  DiffLoss;
 	bool stop = false;
-	string query, queryM, queryC, outdir, filename, queryD;
+	string query, queryM, queryC, queryD;
+	string outdir, filename, outputfile;
+	
 	char * temp;
 	temp = new char[33];
 	char * cell;
@@ -360,7 +368,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 	gDb.GetLastResult(r);
 	newANNid = atoi(r[0]["id"].c_str());
 
-	queryM = "INSERT into AntNeuralNet (id, Lastmodified, machineid, ci, ";
+	queryM = "INSERT into AntNeuralNet (id, Lastmodified, machineid, cellid, ";
 	queryM += "filename) Values (";
 
 	mNumCells = mCells.size();
@@ -390,10 +398,12 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 			for (j=0; j<mCells[i].sNumTrain; j++)
 			{
 
-				mDEM.GetForLink(mCells[i].sPosition,	mCells[i].sMeasTrain[j].sLocation, mPlotResolution, mDEMProfile);
+				mDEM.GetForLink(mCells[i].sPosition,mCells[i].sMeasTrain[j].sLocation, 
+						mPlotResolution, mDEMProfile);
 				if (mUseClutter)
 				{
-					mClutter.GetForLink(mCells[i].sPosition,	mCells[i].sMeasTrain[j].sLocation, mPlotResolution, mClutterProfile);
+					mClutter.GetForLink(mCells[i].sPosition,mCells[i].sMeasTrain[j].sLocation,
+								mPlotResolution,mClutterProfile);
 				}
 				mPathLoss.setParameters(mkFactor,mCells[i].sMeasTrain[j].sFrequency,
 							mCells[i].sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
@@ -408,7 +418,9 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 
 				Delta = PathLoss + mCells[i].sMeasTrain[j].sMeasValue;
 			
-				mCells[i].sOutputTrain[j][0]  = (Delta - mCells[i].sMean) / 60;
+				mCells[i].sOutputTrain[j][0]  = (Delta - mCells[i].sMean) / SCALE;
+				if (fabs(mCells[i].sOutputTrain[j][0])>mMAXANNOutput)
+					mMAXANNOutput = fabs(mCells[i].sOutputTrain[j][0]);
 			}
 
 			mCells[i].sInputTest = new double*[mCells[i].sNumTest];
@@ -422,10 +434,12 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 			for (j=0; j<mCells[i].sNumTest; j++)
 			{
 	
-				mDEM.GetForLink(mCells[i].sPosition,	mCells[i].sMeasTest[j].sLocation, mPlotResolution, mDEMProfile);
+				mDEM.GetForLink(mCells[i].sPosition,mCells[i].sMeasTest[j].sLocation, 
+						mPlotResolution, mDEMProfile);
 				if (mUseClutter)
 				{
-					mClutter.GetForLink(mCells[i].sPosition,	mCells[i].sMeasTest[j].sLocation, mPlotResolution, mClutterProfile);
+					mClutter.GetForLink(mCells[i].sPosition,mCells[i].sMeasTest[j].sLocation, 
+								mPlotResolution, mClutterProfile);
 				}
 				mPathLoss.setParameters(mkFactor,mCells[i].sMeasTest[j].sFrequency,
 							mCells[i].sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
@@ -438,10 +452,14 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				mCells[i].sInputTest[j][3] = cos(Tilt*PI/180);
 				mCells[i].sInputTest[j][4] = sin(Tilt*PI/180);
 	
-				Delta = PathLoss + mCells[i].sMeasTest[j].sMeasValue;
+				Delta =   PathLoss + mCells[i].sMeasTest[j].sMeasValue;
 				
-				mCells[i].sOutputTest[j][0]  = (Delta - mCells[i].sMean) / 60;
+				mCells[i].sOutputTest[j][0]  = (Delta - mCells[i].sMean) / SCALE;
+				if (fabs(mCells[i].sOutputTest[j][0])>mMAXANNOutput)
+					mMAXANNOutput = fabs(mCells[i].sOutputTest[j][0]);
 			}
+
+			cout << "mMAXANNOutput = " << mMAXANNOutput << endl;
 			
 			TrainData.set_train_data(mCells[i].sNumTrain, 
 						mCells[i].sNumInputs, mCells[i].sInputTrain,
@@ -452,57 +470,51 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 						mCells[i].sNumOutputs, mCells[i].sOutputTest);
 
 			unsigned HiddenN1 = 3;
-			unsigned HiddenN2 = 2;
+			unsigned HiddenN2 = 3;
 
-			ANN.create_standard(3, mCells[i].sNumInputs, 
+			mANN.create_standard(3, mCells[i].sNumInputs, 
 						HiddenN1, HiddenN2, mCells[i].sNumOutputs);
- 			ANN.set_train_error_function(FANN::ERRORFUNC_LINEAR);
-			ANN.set_train_stop_function(FANN::STOPFUNC_MSE);
-			ANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
-			ANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
-			ANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
-			ANN.randomize_weights(-0.50,0.50);
+ 			mANN.set_train_error_function(FANN::ERRORFUNC_LINEAR);
+			mANN.set_train_stop_function(FANN::STOPFUNC_MSE);
+			mANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
+			mANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
+			mANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
+			mANN.randomize_weights(-0.50,0.50);
 
-			cout << "saving ANN: Cell = " << mCells[i].sCI << "	i=" << i << endl;
+			cout << "saving mANN: Cell = " << mCells[i].sCI << "	i=" << i << endl;
 			gcvt(mCells[i].sCI,8,cell);
 			filename = outdir;
 			filename += "/";
 			filename += cell;
 //			time (&now);
 //			filename += ctime(&now);
+			outputfile = filename;
+			outputfile += ".csv";
 			filename += ".ann";
-	
-//			ANN.train_on_data(TrainDataAngle, MAXepoch,REPORTInt,ERROR);
 	
 			minTestError = MAXDOUBLE;
 			minTrainError = MAXDOUBLE;
 			stop = false;	
 			k=0;
-			while ((k<MAXepoch)&&(!stop))
+			while ((k<antMAXepoch)&&(!stop))
 			{
-				TrainError = ANN.train_epoch(TrainData);
-				TestError = ANN.test_data(TestData);
-				if (0==k%REPORTInt)
+				TrainError = mANN.train_epoch(TrainData);
+				TestError = mANN.test_data(TestData);
+				if (0==k%antREPORTInt)
 				{
-//					TestError = ANN.test_data(TestData);
-//					TestError = ANN.get_MSE();
+					TestError = mANN.test_data(TestData);
+					TestError = mANN.get_MSE();
 					cout << "celld = " << mCells[i].sCI << "	k=" << k 
 						<< "	TrainErr = " << TrainError 
 						<< "	TestErr = " << TestError << endl;
 				}
-				if ((TrainError <= minTrainError)&&(TestError<=minTestError)&&(k>MAXepoch/4))
+				if ((TrainError <= minTrainError)&&(TestError<=minTestError)&&(k>antMAXepoch/4))
 				{
-					ANN.save(filename);
-//					TestError = ANN.test_data(TestData);
-//					TestError = ANN.get_MSE();
-/*					cout << "cellid = " << mCells[i].sCI << "	k=" << k 
-						<< "	TrainErr = " << TrainError 
-						<< "	TestErr = " << TestError << endl;
-*/					stop = (TestError < ERROR)&&(TrainError < ERROR);
+					mANN.save(filename);
+					stop = (TestError < antERROR)&&(TrainError < antERROR);
 					minTrainError = TrainError;
 					minTestError = TestError;
 				}
-//				else if (TestError>minTestError*1.05) stop = true;
 				k++;
 				
 			} 	
@@ -517,7 +529,6 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 			query += ",'";
 			query += filename;
 			query += "');";
-	
 
 			if (!gDb.PerformRawSql(query))
 			{
@@ -527,12 +538,20 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				QRAP_WARN(err.c_str());
 				return false;
 			}
+
+//****************************************************************************************************
+// The following code is to compare the antenna pattern of the ANN with the antennapattern file.
+			cout << outputfile << endl;
+			if (!Output(outputfile, i))
+				return false;
+
+//****************************************************************************************************
 	
-			ANN.save(filename);
-			ANN.destroy();
+			mANN.save(filename);
+			mANN.destroy();
 
 			newANNid++;
-			cout << "saved ANN: cell = " << mCells[i].sCI << "	i=" << i << endl;
+			cout << "saved mANN: cell = " << mCells[i].sCI << "	i=" << i << endl;
 		}
 	}
 	delete [] temp;
@@ -543,5 +562,82 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 	return true;
 }
 
+//*****************************************************************************************************
+//To write ouput for showing results;
+bool cTrainAntPattern::Output(string Outputfile, unsigned currentCell)
+{
+	unsigned i;
+	double FileValue, azimuth, tilt;
+	double *ANNInput;
+	ANNInput = new double[5];
+	ANNInput[0] = 1;
+	double *ANNOutput;
+	cAntennaPattern AntPatternFromFile; 
+	AntPatternFromFile.SetAntennaPattern(mCells[currentCell].sAntPatternKey, 
+						mCells[currentCell].sBearing, 
+						mCells[currentCell].sTilt);
 
+	bool WriteFile = true;
+	if (WriteFile)
+	{
+		FILE *fp = fopen(Outputfile.c_str(),"w");
+		if (fp!=NULL)
+		{
 
+			fprintf(fp,"\n");
+			fprintf(fp,"Tilt=, %f,",0.0);
+			fprintf(fp,"	Tilt=, %f,",mCells[currentCell].sTilt);
+			fprintf(fp,"	Tilt=, %f",2.0*mCells[currentCell].sTilt);
+			fprintf(fp,"\n");
+			fprintf(fp,"Bearing=, %f,",mCells[currentCell].sBearing);
+			fprintf(fp,"	Bearing=, %f,",mCells[currentCell].sBearing);
+			fprintf(fp,"	Bearing=, %f",mCells[currentCell].sBearing);
+			fprintf(fp,"\n");
+
+			for (i = 0; i < 360 ; i++)
+			{
+				azimuth = double(i);
+				ANNInput[1] = cos(azimuth*PI/180);
+				ANNInput[2] = sin(azimuth*PI/180);
+
+				tilt = 0;
+ 				FileValue = AntPatternFromFile.GetPatternValue(azimuth, tilt);
+				ANNInput[3] = cos(tilt*PI/180);
+				ANNInput[4] = sin(tilt*PI/180);
+				ANNOutput = mANN.run(ANNInput);				
+				fprintf(fp,"%d, %f, %f,",i, -FileValue,ANNOutput[0]* SCALE);
+
+				tilt = mCells[currentCell].sTilt;
+ 				FileValue = AntPatternFromFile.GetPatternValue(azimuth, tilt);
+				ANNInput[3] = cos(tilt*PI/180);
+				ANNInput[4] = sin(tilt*PI/180);
+				ANNOutput = mANN.run(ANNInput);				
+				fprintf(fp,"%d, %f, %f,",i, - FileValue,ANNOutput[0]* SCALE);
+
+				tilt = 2.0*mCells[currentCell].sTilt;
+ 				FileValue = AntPatternFromFile.GetPatternValue(azimuth, tilt);
+				ANNInput[3] = cos(tilt*PI/180);
+				ANNInput[4] = sin(tilt*PI/180);
+				ANNOutput = mANN.run(ANNInput);				
+				fprintf(fp,"%d, %f, %f\n",i, -FileValue,ANNOutput[0]* SCALE);
+			}
+
+			fprintf(fp,"\n");
+			fprintf(fp,"\n");
+			fprintf(fp,"Training data\n");
+			fprintf(fp,"Tilt, Azimuth, Value\n");
+			
+			for (i=0 ; i < mCells[currentCell].sNumTrain; i++)
+			{
+				azimuth = atan2(mCells[currentCell].sInputTrain[i][2],
+						mCells[currentCell].sInputTrain[i][1]) * 180 / PI;
+				tilt = atan2(mCells[currentCell].sInputTrain[i][4],
+						mCells[currentCell].sInputTrain[i][3]) * 180 / PI;
+				fprintf(fp,"%f, %f, %f\n",tilt, azimuth, mCells[currentCell].sOutputTrain[i][0]* SCALE);
+			}
+
+			fclose(fp);
+		} else return false;
+	}
+	return WriteFile;
+}

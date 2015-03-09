@@ -143,12 +143,12 @@ struct tSiteInfo
 	unsigned	sSiteID;
 	cGeoP		sPosition;
 	vCellSet	sCellSet;
-	double			sMaxDist;
-	unsigned		sNumInputs;
-	unsigned		sNumOutputsA;
-	unsigned		sNumOutputsD;
-	string				sANNfileA;	
-	string				sANNfileD;		
+	double		sMaxDist;
+	unsigned	sNumInputs;
+	unsigned	sNumOutputsA;
+	unsigned	sNumOutputsD;
+	string		sANNfileA;	
+	string		sANNfileD;		
 };
 
 typedef	vector<tSiteInfo> vSiteInfo;

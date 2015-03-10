@@ -36,9 +36,9 @@
 #define MEAS_SCALE (0.5/(85-65))
 #define MEAS_OFFSET 85
 #define RFDist_OFFSET -80
-#define SCALE 30.0
+#define SCALE 50.0
 
-#define antMAXepoch 200000
+#define antMAXepoch 100000
 #define antREPORTInt 10000
 #define antERROR 1e-6
 

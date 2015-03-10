@@ -1,3 +1,11 @@
+create table antneuralnet (
+id serial not null,
+lastmodified timestamp without time zone,
+machineid smallint references machine(id),
+cellid integer references cell(id) on delete cascade,
+filename text)
+
+
 
 
 SELECT distinct measurement.tp as tp, ST_AsText(testpoint.location) as origLocation,siteid, 

@@ -516,11 +516,13 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 					TempAgterValues[k] = TempAgterValues[l];
 					TempAgterRef[l]=9999;
 					TempAgterAngles[l]=9999.0;
+					 TempAgterValues[l]=9999.0;
 				}
 				else if (TempAgterRef[l]==7777)
 				{
 					TempAgterRef[l]=9999;
 					TempAgterAngles[l]=9999.0;
+					 TempAgterValues[l]=9999.0;
 				}
 				else
 				{
@@ -528,6 +530,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 					// given that we are dealing with negative log10 values this is probably WRONG!!
 					TempAgterRef[l] = 9999;
 					TempAgterAngles[l] = 9999.0;
+					 TempAgterValues[l]=9999.0;
 				}
 			}
 			else if ((TempAgterAngles[l]<TempAgterAngles[k]))	//swap
@@ -658,10 +661,16 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	{
 		if (k!=mRef0el)
 		{
-
 			if (TempAgterValues[k]<7777.0)
+			{
 				mAntPattern[mRef180az][k]= TempAgterValues[k];
-			else mAntPattern[mRef180az][k] = mAntPattern[mRef180az][mRef0el]+mAntPattern[0][k];                  	
+//				cout << " Normal Agter value = " << mAntPattern[mRef180az][k] << endl;
+			}
+			else 
+			{
+				mAntPattern[mRef180az][k] = max(mAntPattern[mRef180az][mRef0el],mAntPattern[0][k]);
+//				cout << " >7777 Agter value = " << mAntPattern[mRef180az][k] << endl;
+			}
 		}
 	}
 
@@ -700,11 +709,9 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 		mAziValues[k] = mAntPattern[k][mRef0el];
 	for (k=1; k<mNAA-1; k++)
 	{
-		if (k!=mRef180az)
-		{
 			for (l=1; l<mNEA-1; l++)
 			{ 
-				if ((mAntPattern[k][l]>3000.0)&&(l!=mRef0el))
+				if ((mAntPattern[k][l]>3000.0))
 				{
 					Value = 0.0;
 					if (k<mRef180az)
@@ -747,11 +754,11 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 						Value = exp10(-mAntPattern[k][mRef0el]/10.0); 
 				
 					
-					mAntPattern[k][l] = min(Value,tydelik);
+					mAntPattern[k][l] = Value*tydelik;
 					mAntPattern[k][l]= -10.0*log10(mAntPattern[k][l]);
 //					cout << -10.0*log10(tydelik) << "  " << -10.0*log10(Value) << "   " << mAntPattern[k][l] <<"dB" << endl;
 				}
-			}
+			
 		}
 	}
 
@@ -789,10 +796,7 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 
 	if (Az>360.0) Az-=360.0;
 	else if (Az<0.0) Az+=360.0;
-	if ((Az>90)&&(Az<270))
-		 El = Elevation - mMechTilt;
-	else 
-	El = Elevation + mMechTilt;
+	El = Elevation - cos(Az*PI/180)*mMechTilt;
 
 	if (El<-90.0) El+=360.0;
 	else if (El>270.0) El-=360.0;

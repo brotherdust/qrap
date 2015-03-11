@@ -107,7 +107,6 @@ namespace Qrap
 			double mMechTilt;			///< Description
 			unsigned mRef180az;				///< Description
 			unsigned mRef0el;				///< Description
-			unsigned mRefAgterEl;
 			Float2DArray mAntPattern;	///< Description
 	};
 }

@@ -293,7 +293,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
 			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
 
-			if (DiffLoss < 6)
+			if (DiffLoss < 3)
 			{
 					Delta =  PathLoss + NewMeasurement.sMeasValue;
 					Total +=Delta;
@@ -625,7 +625,7 @@ bool cTrainAntPattern::Output(string Outputfile, unsigned currentCell)
 			fprintf(fp,"\n");
 			fprintf(fp,"\n");
 			fprintf(fp,"Training data\n");
-			fprintf(fp,"Tilt, Azimuth, Value\n");
+			fprintf(fp,"Azimuth, Tilt, Value\n");
 			
 			for (i=0 ; i < mCells[currentCell].sNumTrain; i++)
 			{
@@ -633,7 +633,7 @@ bool cTrainAntPattern::Output(string Outputfile, unsigned currentCell)
 						mCells[currentCell].sInputTrain[i][1]) * 180 / PI;
 				tilt = atan2(mCells[currentCell].sInputTrain[i][4],
 						mCells[currentCell].sInputTrain[i][3]) * 180 / PI;
-				fprintf(fp,"%f, %f, %f\n",tilt, azimuth, mCells[currentCell].sOutputTrain[i][0]* SCALE);
+				fprintf(fp,"%f, %f, %f\n",azimuth, tilt, mCells[currentCell].sOutputTrain[i][0]* SCALE);
 			}
 
 			fclose(fp);

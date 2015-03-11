@@ -3,8 +3,15 @@ id serial not null,
 lastmodified timestamp without time zone,
 machineid smallint references machine(id),
 cellid integer references cell(id) on delete cascade,
-filename text)
+filename text);
 
+select * from antneuralnet;
+
+drop table antneuralnet;
+
+update cluttertype set height = 2 where landcoverid=38;
+
+select * from cluttertype;
 
 
 

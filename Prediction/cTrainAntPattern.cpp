@@ -374,7 +374,8 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 	mNumCells = mCells.size();
 	cout << " mNumCells = " << mNumCells << endl;
 
-	for (i=0; i<mNumCells; i++)
+	for (i=0; i<mNumCells; i++) // this should be in
+//	for (i=0; i<2; i++) // for debugging purposes
 	{
 
 		mCells[i].sNumOutputs = 1;

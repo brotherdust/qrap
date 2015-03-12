@@ -38,7 +38,7 @@
 #define RFDist_OFFSET -80
 #define SCALE 50.0
 
-#define antMAXepoch 500000
+#define antMAXepoch 100000
 #define antREPORTInt 10000
 #define antERROR 1e-6
 

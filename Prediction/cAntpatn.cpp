@@ -332,7 +332,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	}
 	TempAziAngles[0] = 0.0;
 	TempAziAngles[1] = 180.0;
-	TempAziAngles[2] = -180.0;
+	TempAziAngles[2] = 360.0;
 	for (k=0; k<mNAA; k++)
 	{
 		if (mAziAngles[k]<0) mAziAngles[k]+=360.0;
@@ -369,7 +369,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	{
 		for (l=k+1;l<mNAA+3;l++)
 		{
-			if ((fabs(TempAziAngles[k]-TempAziAngles[l])<0.1)&&(TempRef_mAzi[k]<mNAA))//merge the two points
+			if ((fabs(TempAziAngles[k]-TempAziAngles[l])<0.1)&&(TempRef_mAzi[k]<mNAA+3))//merge the two points
 			{
 //				cout << "Merge Azi " << k << "  " << TempAziAngles[k] << "    " << l << "  " << TempAziAngles[l] << endl;
 				mAziValues[TempRef_mAzi[k]]= (mAziValues[TempRef_mAzi[k]]+mAziValues[TempRef_mAzi[l]])/2.0;
@@ -470,7 +470,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 
 	for (k=mNEA;k<mNEA+3;k++)
 	{
-		if (TempRef_mElev[k]==9999) 
+		if (TempRef_mElev[k]>8000) 
 		{
 			if (k-3>0)
 			{ 
@@ -494,13 +494,13 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	}
 
 //************************?????????????????????????????????????????????	
-/*	if (TempAgterRef[1]>mNEA)
+ if (TempAgterRef[1]>mNEA)
 	{
 		TempAgterRef[1] = TempRef_mElev[1];
 		TempAgterValues[1] = mAziValues[mRef180az];
-//		cout << TempAgterValues[1] << endl;
+		cout << TempAgterValues[1] << endl;
 	}
-*/
+
 
 	for (k=0;k<mNEA+3;k++)
 	{
@@ -602,14 +602,15 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	cout << endl;
 */	
 	k=0;
-	while ((k<mNAA+3)&&(TempRef_mAzi[k]!=9999))
+	while ((k<mNAA+3)&&((TempRef_mAzi[k]<9999)||TempAziAngles[k]<361))
 		k++;
-	mNAA = k+1;
+	mNAA = k;
 	
 	k=0;
-	while ((k<mNEA+3)&&(TempRef_mElev[k]!=9999))
+	while ((k<mNEA+3)&&((TempRef_mElev[k]<9999)||TempElevAngles[k]<91))
 		k++;
-	mNEA = k+1;
+	mNEA = k;
+	cout << mNEA << "	" << TempRef_mElev[k] << "	" <<TempElevAngles[k] << endl;
 	
 /*	for (k=0;k<mNEA+3;k++)
 		cout << k << "  " << TempRef_mElev[k] << endl;
@@ -664,7 +665,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 			}
 			else 
 			{
-				mAntPattern[mRef180az][k] = max(mAntPattern[mRef180az][mRef0el],mAntPattern[0][k]);
+				mAntPattern[mRef180az][k] = mAntPattern[mRef180az][mRef0el]+mAntPattern[0][k];
 				cout << " >7777 Agter value = " << mAntPattern[mRef180az][k] << endl;
 			}
 		}
@@ -698,75 +699,120 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	mAziValues = new float[mNAA];
 	
 //  populate remaining values
-	for (l=0; l<mNEA; l++)
-		mElevValues[l] = mAntPattern[0][l];
+//	cout << "Azimuth" << endl;
+//	cout << "Azimuth, Value" << endl;
 	for (k=0; k<mNAA; k++)
+	{
 		mAziValues[k] = mAntPattern[k][mRef0el];
-
+//		cout << mAziAngles[k] << ", " << mAziValues[k]<< endl;
+	}
+//	cout << "Elevation" << endl;
+//	cout << "Tilt, Value, Agter" << endl;
+	for (l=0; l<mNEA; l++)
+	{
+		mElevValues[l] = mAntPattern[0][l];
+//		cout << mElevAngles[l] << ", " << mElevValues[l] << ", " << mAntPattern[mRef180az][l] << endl;
+	}
 
 	double ** corners;
 	double DeltaAzi, DeltaEl; 
 	corners = new double*[3];
 	for (i=0;i<3; i++)
 		corners[i] = new double[3];
-/*
-	corners[0][0]=mAntPattern[0][0];
-	corners[0][1]=mAntPattern[0][mRef0el];
-	corners[0][1]=mAntPattern[0][mNEA-1];
-	corners[1][0]=mAntPattern[mRef180az][0];
-	corners[1][1]=mAntPattern[mRef180az][mRef0el];
-	corners[1][2]=mAntPattern[mRef180az][mNEA-1];
-	corners[2][0]=mAntPattern[mNAA-1][0];
-	corners[2][0]=mAntPattern[mNAA-1][mRef0el];
-	corners[2][2]=mAntPattern[mNAA-1][mNEA-1];
-*/
 
+	if (mAntPattern[0][0]>1000)
+		mAntPattern[0][0]=mAntPattern[1][0];
+	if (mAntPattern[0][mRef0el]>1000)
+		mAntPattern[0][mRef0el]=mAntPattern[1][mRef0el];
+	if (mAntPattern[0][mNEA-1]>1000)
+		mAntPattern[0][mNEA-1]=mAntPattern[1][mNEA-1];
+	if (mAntPattern[mRef180az][0]>1000)
+		mAntPattern[mRef180az][0]=(mAntPattern[mRef180az-1][0]+mAntPattern[mRef180az+1][0])/2;
+	if (mAntPattern[mRef180az][mRef0el]>1000)
+		mAntPattern[mRef180az][mRef0el] = (mAntPattern[mRef180az+1][mRef0el] + mAntPattern[mRef180az-1][mRef0el])/2; 
+	if (mAntPattern[mRef180az][mNEA-1]>1000)
+		mAntPattern[mRef180az][mNEA-1] = (mAntPattern[mRef180az-1][mNEA-1] + mAntPattern[mRef180az+1][mNEA-1])/2;
+	if (mAntPattern[mNAA-1][0] > 1000)
+		mAntPattern[mNAA-1][0] = mAntPattern[mNAA-2][0];
+	if (mAntPattern[mNAA-1][mRef0el]>1000)
+		mAntPattern[mNAA-1][mRef0el] = mAntPattern[mNAA-2][mRef0el];
+	if (mAntPattern[mNAA-1][mNEA-1]>1000)
+		mAntPattern[mNAA-1][mNEA-1] = mAntPattern[mNAA-2][mNEA-1];
+
+/*
 	corners[0][0]=exp10(-mAntPattern[0][0]/10);
 	corners[0][1]=exp10(-mAntPattern[0][mRef0el]/10);
-	corners[0][1]=exp10(-mAntPattern[0][mNEA-1]/10);
+	corners[0][2]=exp10(-mAntPattern[0][mNEA-1]/10);
 	corners[1][0]=exp10(-mAntPattern[mRef180az][0]/10);
 	corners[1][1]=exp10(-mAntPattern[mRef180az][mRef0el]/10);
 	corners[1][2]=exp10(-mAntPattern[mRef180az][mNEA-1]/10);
 	corners[2][0]=exp10(-mAntPattern[mNAA-1][0]/10);
-	corners[2][0]=exp10(-mAntPattern[mNAA-1][mRef0el]/10);
+	corners[2][1]=exp10(-mAntPattern[mNAA-1][mRef0el]/10);
 	corners[2][2]=exp10(-mAntPattern[mNAA-1][mNEA-1]/10);
+*/
 
+	corners[0][0]=mAntPattern[0][0];
+	corners[0][1]=mAntPattern[0][mRef0el];
+	corners[0][2]=mAntPattern[0][mNEA-1];
+	corners[1][0]=mAntPattern[mRef180az][0];
+	corners[1][1]=mAntPattern[mRef180az][mRef0el];
+	corners[1][2]=mAntPattern[mRef180az][mNEA-1];
+	corners[2][0]=mAntPattern[mNAA-1][0];
+	corners[2][1]=mAntPattern[mNAA-1][mRef0el];
+	corners[2][2]=mAntPattern[mNAA-1][mNEA-1];
 
-	float tydelikBO, tydelikON;
-	unsigned Bo, Links;
+	for (i=0;i<3; i++)
+		for (k=0; k<3; k++)
+			cout << i << "	"<< k << "		" << (corners[i][k]) << endl;
+
+	double tydelikBO, tydelikON, tydelikL, tydelikR, tydelikV, tydelikH, Value, minEl, minAzi;
+
+//There are 2 valid approximations for mAntPattern[k][l] namely tydelikV and tydelikH
+// The question id how to combine them?
 
 	for (k=1; k<mNAA-1; k++)
 	{
-		if (k<mRef180az)
-		{ 	
-			Links = 0;
-			DeltaAzi = mAziAngles[k];
-		}
-		else
-		{ 
-			Links =1;
-			DeltaAzi = mAziAngles[k] -180;
-		}
-
 		for (l=1; l<mNEA-1; l++)
 		{ 
 			if ((mAntPattern[k][l]>3000.0))
 			{
 				if (l<mRef0el)
 				{
-					Bo = 0;
-					DeltaEl = 90 + mElevAngles[l];
+					tydelikBO = exp10(-mAntPattern[k][0]/10);
+					tydelikON = exp10(-mAntPattern[k][mRef0el]/10);
+					DeltaEl =  90 + mElevAngles[l];
 				}
 				else
 				{
-					Bo = 1;
+					tydelikBO = exp10(-mAntPattern[k][mRef0el]/10);
+					tydelikON = exp10(-mAntPattern[k][mNEA-1]/10);
 					DeltaEl = mElevAngles[l];
 				}
+				tydelikV = tydelikBO+DeltaEl*(tydelikON-tydelikBO)/90;
+				if (DeltaEl>45)
+					minEl = 90-DeltaEl;
+				else minEl=DeltaEl;
 
-				tydelikBO = corners[Links][Bo]+DeltaAzi*(corners[Links+1][Bo]-corners[Links][Bo])/180;
-				tydelikON = corners[Links][Bo+1]+DeltaAzi*(corners[Links+1][Bo+1]-corners[Links][Bo+1])/180;
-				mAntPattern[k][l]  = tydelikBO+ DeltaEl*(tydelikON-tydelikBO)/90;
-				mAntPattern[k][l] = -10.0*log10(mAntPattern[k][l]);
+				if (k<mRef180az)
+				{ 	
+					tydelikL = exp10(-mAntPattern[0][l]/10);
+					tydelikR = exp10(-mAntPattern[mRef180az][l]/10);
+					DeltaAzi = mAziAngles[k];
+				}
+				else
+				{ 
+					tydelikL = exp10(-mAntPattern[mRef180az][l]/10);
+					tydelikR = exp10(-mAntPattern[mNAA-1][l]/10);
+					DeltaAzi = mAziAngles[k] -180;
+				}
+				tydelikH = tydelikL+DeltaAzi*(tydelikR-tydelikL)/180;
+				if (DeltaAzi>90)
+					minAzi = 180-DeltaAzi;
+				else minAzi=DeltaAzi;
+
+				Value = ((180-minAzi)*minEl*tydelikH/90/180 + minAzi*(90-minEl)*tydelikV/90/180)*2;
+	
+				mAntPattern[k][l] = -10.0*log10(Value);
 			} // end if
 		} // end for step through elevation angles
 	} // end for step through Azimuth angles
@@ -805,7 +851,8 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 
 	if (Az>360.0) Az-=360.0;
 	else if (Az<0.0) Az+=360.0;
-	El = Elevation - cos(Az*PI/180)*mMechTilt;
+	
+	El = Elevation;
 
 	if (El<-90.0) El+=360.0;
 	else if (El>270.0) El-=360.0;
@@ -823,6 +870,8 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 		Az = Azz;
 		El = Ell;
 	}
+	El = El - cos(Az*PI/180)*mMechTilt;
+
 	ref_Azi=0;
 	minDelta = 360.0;
 	for (kk=0;(kk<mNAA); kk++)

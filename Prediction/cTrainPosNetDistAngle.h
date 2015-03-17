@@ -37,9 +37,9 @@
 #define MEAS_OFFSET 85
 #define RFDist_OFFSET -80
 
-#define MAXepoch 700000
+#define MAXepoch 300000
 #define REPORTInt 10000
-#define ERROR 1e-4
+#define ERROR 1e-6
 
 // include local headers
 #include "../DataBase/Config.h"

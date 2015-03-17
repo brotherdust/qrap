@@ -498,7 +498,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	{
 		TempAgterRef[1] = TempRef_mElev[1];
 		TempAgterValues[1] = mAziValues[mRef180az];
-		cout << TempAgterValues[1] << endl;
+//		cout << TempAgterValues[1] << endl;
 	}
 
 
@@ -610,7 +610,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	while ((k<mNEA+3)&&((TempRef_mElev[k]<9999)||TempElevAngles[k]<91))
 		k++;
 	mNEA = k;
-	cout << mNEA << "	" << TempRef_mElev[k] << "	" <<TempElevAngles[k] << endl;
+//	cout << mNEA << "	" << TempRef_mElev[k] << "	" <<TempElevAngles[k] << endl;
 	
 /*	for (k=0;k<mNEA+3;k++)
 		cout << k << "  " << TempRef_mElev[k] << endl;
@@ -666,7 +666,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 			else 
 			{
 				mAntPattern[mRef180az][k] = mAntPattern[mRef180az][mRef0el]+mAntPattern[0][k];
-				cout << " >7777 Agter value = " << mAntPattern[mRef180az][k] << endl;
+//				cout << " >7777 Agter value = " << mAntPattern[mRef180az][k] << endl;
 			}
 		}
 	}
@@ -761,10 +761,10 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	corners[2][1]=mAntPattern[mNAA-1][mRef0el];
 	corners[2][2]=mAntPattern[mNAA-1][mNEA-1];
 
-	for (i=0;i<3; i++)
+/*	for (i=0;i<3; i++)
 		for (k=0; k<3; k++)
 			cout << i << "	"<< k << "		" << (corners[i][k]) << endl;
-
+*/
 	double tydelikBO, tydelikON, tydelikL, tydelikR, tydelikV, tydelikH, Value, minEl, minAzi;
 
 //There are 2 valid approximations for mAntPattern[k][l] namely tydelikV and tydelikH

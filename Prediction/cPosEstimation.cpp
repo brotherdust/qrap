@@ -1023,23 +1023,23 @@ double cPosEstimation::FindAzi(unsigned BIndex, unsigned AIndex)
 	if (DeltaAngle < 0)
 	{
 		LeftAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
-				- mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth;
+				- mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth/2;
 		LeftIndex = AIndex;
-		RightAngle = mPosSets[mCurPosI].sMeasurements[BIndex].sAzimuth;
-//		RightAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
-//				+ mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth;
+//		RightAngle = mPosSets[mCurPosI].sMeasurements[BIndex].sAzimuth;
+		RightAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
+				+ mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth;
 		RightIndex = BIndex;
 	}
 	else
 	{
-//		LeftAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
-//				- mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth;
+		LeftAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
+				- mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth/2;
 		LeftAngle = mPosSets[mCurPosI].sMeasurements[BIndex].sAzimuth;
 		LeftIndex = BIndex;
 //		RightAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
 //				+ mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth;
 		RightAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
-				+ mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth;
+				+ mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth/2;
 		RightIndex = AIndex;
 	} 
 
@@ -1566,9 +1566,9 @@ bool cPosEstimation::DCM_ParticleSwarm()
 	double phi_max = 180;
 	cout << "mPosSets[mCurPosI].sMeasurements[0].sBeamWidth = " << mPosSets[mCurPosI].sMeasurements[0].sBeamWidth << endl;
 	phi_min = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
-		- (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth);
+		- (ceil)(2*mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/3);
 	phi_max = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
-		+ (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth);	
+		+ (ceil)(2*mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/3);	
 
     	std::random_device PhiRD;
     	std::mt19937_64 Phi_engine(PhiRD());

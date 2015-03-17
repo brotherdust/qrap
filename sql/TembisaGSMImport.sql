@@ -183,7 +183,7 @@ where id = tpUsed.tp;
 select count(*) from tempRawGSMTEMS;
 select count(*) from tempGSMaux;
 
-delete from testpoint where id in
+delete from testpointauxGSM where id in
 (select tp from train);
 
 
@@ -252,24 +252,18 @@ where id = tpUsed.tp;
 
 delete 
 
-drop table TPsequence;
-
-create table TPsequence
-(sq bigserial primary key unique not null,
-tp bigint);
-
-insert into TPsequence (tp)
-select tp from tpUsed
-order by tp; 
+ 
 
 delete from testpoint where id in
 (select tpt from testlist);
 
 drop table testlist;
 
-create table testlist as
-select tp as tpt from TPsequence
-where sq%8=0;
+create table test as
+select tp from tpSequence
+where sq%7=0;
+
+select * from test;
 
 select count(*) from trainlist;
 
@@ -279,7 +273,7 @@ select count(*) from measurement;
 
 create table trainlist as 
 select tp from tpUsed where 
-tp not in (select tpt from testlist);
+tp not in (select tp from testlist);
 
 drop table temptestpoint;
 
@@ -323,6 +317,15 @@ select count(*) from testpoint;
 
 select count(*) from tplist;
 
+drop table test;
+
+create table test as select
+distinct testpointauxGSM.tp as tp, servci, ta
+from testpointauxGSM cross join testlist
+where testpointauxGSM.tp = testlist.tp;
+
+drop table train;
+
 create table train as select
 distinct testpointauxGSM.tp as tp, servci, ta
 from testpointauxGSM cross join trainlist
@@ -344,6 +347,15 @@ where tp in
 
 select * from testpoint;
 
+drop table TPsequence;
+
+create table TPsequence
+(sq bigserial primary key unique not null,
+tp bigint);
+
+insert into TPsequence (tp)
+select tp from tpUsed
+order by tp;
 
 drop table Temptestpoint;
 
@@ -373,35 +385,69 @@ where m0.tp=t0.id
 and m1.tp=t1.id
 and t0.sq=t1.sq+1);
 
+delete from tpUsed where tp in
+(select tp0 as tp from tpDistance
+where distance<5e-5
+and sq0%2=0
+and distance is not null
+and num0<=num1);
+
+select count(*) from tpused;
+
+delete from testpointauxGSM where tp 
+not in (select tp from tpused);
+
 select min(distance) from tpDistance;
 
 insert into toDeleteTPlist
 select tp0 as tp from tpDistance
-where distance<2e-4
+where distance<1e-4
 and sq0%2=0
 and distance is not null
 and num0<=num1
 and ta0=ta1
 and ci0=ci1;
 
-delete from tpUsed where tp in
-(select tp0 as tp from tpDistance
-where distance<1e-3
-and sq0%2=0
-and distance is not null
-and num0<=num1
-and ta0=ta1
-and ci0=ci1);
+select count(*) from cell;
 
-delete from testpointauxGSM where tp not in
+create table tempmeas as
+(select * from measurement);
+
+truncate table measurement;
+
+insert into measurement
+(select * from tempmeas
+where tp in 
+(select tp from tpused));
+
+drop table tpused;
+
+create table tpused as
+(select distinct tp from measurement);
+
+truncate table testpointauxGSM;
+
+insert into testpointauxGSM
+(select * from temptestaux
+where tp in 
+(select tp from tpused));
+
+create table temptestaux as
+(select * from testpointauxGSM);
+
+
+
+delete from measurement where tp not in
 (select tp from tpUsed);
 
-drop table tpUsed;
+create table todelete 
+as select tp from testpointauxGSM
+where tp not in (select tp from tpUsed);
 
-select count from
+
 
 create table tpUsed as
-select id as tp from testpoint;
+select id as tp from testpointauxGSM;
 
 drop table DeleteTPlist;
 

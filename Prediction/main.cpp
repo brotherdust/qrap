@@ -163,9 +163,9 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
+
 */
-
-
+/*
   	string query = "update coefficients set coefficient=0.0;";
 
 	if (!gDb.PerformRawSql(query))
@@ -194,7 +194,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-
+*/
 /*
 	double hoek = 45;
 	double x=cos(hoek/180*PI);
@@ -220,7 +220,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-/*
+
   	string query = "update coefficients set coefficient=0.0;";
 
 	if (!gDb.PerformRawSql(query))
@@ -255,7 +255,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
 
-*/
+
 /*
 
 	if (!gDb.PerformRawSql(query))

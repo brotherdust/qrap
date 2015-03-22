@@ -33,7 +33,7 @@ cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 {
 	
 	mLTEsim = false;
-	mOriginal = false; 
+	mOriginal = true; 
 
 }
 
@@ -407,7 +407,6 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 			siteid = atoi(r[i]["siteid"].c_str());
 			if (siteid != mSites[siteIndex].sSiteID)
 			{
-				found =false;
 				if (Train) 	mSites[siteIndex].sNumDataRowsTrain = Counter;
 				else		mSites[siteIndex].sNumDataRowsTest = Counter;
 
@@ -592,13 +591,14 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 	for (i=0; i<mNumSites; i++)
 //	for (i=0; i<3; i++)
 	{
+		cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;
+		cout << "		mSites[i].sNumOutputsA = " << mSites[i].sNumOutputsA;
+		cout << "		mSites[i].sNumDataRowsTrain = " << mSites[i].sNumDataRowsTrain;
+		cout << "		mSites[i].sNumDataRowsTest = " << mSites[i].sNumDataRowsTest;
+		cout << "		mSites[i].sMaxDist = " << mSites[i].sMaxDist << endl;
 		if (mSites[i].sNumDataRowsTrain > 130)
 		{
-			cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;
-			cout << "		mSites[i].sNumOutputsA = " << mSites[i].sNumOutputsA;
-			cout << "		mSites[i].sNumDataRowsTrain = " << mSites[i].sNumDataRowsTrain;
-			cout << "		mSites[i].sNumDataRowsTest = " << mSites[i].sNumDataRowsTest;
-			cout << "		mSites[i].sMaxDist = " << mSites[i].sMaxDist << endl;
+
 			mSites[i].sNumOutputsA = 2;
 			mSites[i].sNumOutputsD = 1;
 	

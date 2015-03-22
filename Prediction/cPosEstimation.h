@@ -32,7 +32,7 @@
 #define MARGIN 15
 #define SENSITIVITY -110
 #define NUMPARTICLES 45
-#define INERTIA 0.72
+#define INERTIA 0.7
 #define Cp 1.4
 #define Cg 1.4
 #define STOPN 40

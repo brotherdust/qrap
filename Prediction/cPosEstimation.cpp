@@ -32,7 +32,7 @@
 cPosEstimation::cPosEstimation() // default constructor
 {
 	mLTEsim = false;
-	mOriginal = false;
+	mOriginal = true;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -974,6 +974,7 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 //
 double cPosEstimation::SearchDistance(double Azimuth, double min, double max)
 {
+	
 	unsigned i;
 	unsigned StopNum = ceil((max-min)/mPlotResolution);
 	cout << "StopNum = " << StopNum << "	mPlotResolution = " << mPlotResolution 
@@ -1550,9 +1551,15 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist-0.5)
 				*mPosSets[mCurPosI].sMeasurements[0].sResDist-50.0);
 	}
-	if (mOriginal) rho_min = 2*mPlotResolution;
+	if (mOriginal) rho_min = mPlotResolution;
+	if (rho_max < 4*mPlotResolution)
+		rho_max = 4*mPlotResolution;
+	while (rho_max<=rho_min)
+	{
+		rho_min-=mPlotResolution;
+		rho_max+=mPlotResolution;
+	}
 
-	if (rho_max<4*mPlotResolution) rho_max = 4*mPlotResolution;
 	cout << "rho_min=" << rho_min << "	rho_max=" << rho_max << endl; 
 
     	std::random_device RhoRD;
@@ -1587,7 +1594,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			tempvalue = rho_distU(Rho_engineU);
 		else
 		{
-			while (tempvalue>1)
+			while ((tempvalue>1)||(tempvalue<0))
 				tempvalue = rho_distE(Rho_engine);
 		}
 		rho[i] = rho_min + (1.0 - tempvalue) * (rho_max - rho_min);
@@ -1659,20 +1666,20 @@ bool cPosEstimation::DCM_ParticleSwarm()
 	double oldBestRho = gbestRho;
 	double oldBestPhi = gbestPhi;
 
-    	std::random_device RpRhoRD;
-    	std::mt19937_64 RpRho_engine(RpRhoRD());
-		std::uniform_real_distribution<double> RpRho_dist(0.0,1.0);
+  	std::random_device RpRhoRD;
+  	std::mt19937_64 RpRho_engine(RpRhoRD());
+	std::uniform_real_distribution<double> RpRho_dist(0.0,1.0);
 
-    	std::random_device RgRhoRD;
-    	std::mt19937_64 RgRho_engine(RgRhoRD());
+  	std::random_device RgRhoRD;
+  	std::mt19937_64 RgRho_engine(RgRhoRD());
 	std::uniform_real_distribution<double> RgRho_dist(0.0,1.0);
 
-    	std::random_device RpPhiRD;
-    	std::mt19937_64 RpPhi_engine(RpPhiRD());
+  	std::random_device RpPhiRD;
+  	std::mt19937_64 RpPhi_engine(RpPhiRD());
 	std::uniform_real_distribution<double> RpPhi_dist(0.0,1.0);
 
-    	std::random_device RgPhiRD;
-    	std::mt19937_64 RgPhi_engine(RgPhiRD());
+  	std::random_device RgPhiRD;
+  	std::mt19937_64 RgPhi_engine(RgPhiRD());
 	std::uniform_real_distribution<double> RgPhi_dist(0.0,1.0);
 
 	bool stop = false;
@@ -1742,6 +1749,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			}
 
 			stop = (stop || ((iterationN-LastChangedN)>STOPN)||(finalstop>MAXITER));
+
 
 			rho_snelheid[i] = INERTIA*rho_snelheid[i] 
 					+ Cp*RpRho_dist(RpRho_engine)*(pbestValue[i] - value[i])
@@ -1854,6 +1862,8 @@ bool cPosEstimation::DCM_ParticleSwarm()
 double cPosEstimation::CostFunction(double rho, double phi)
 {
 
+	if (rho>120000)
+		return 1.5*rho/120000;
 	if (0==mNumInsts) return 999999;
 	unsigned i;
 //	unsigned NumUsed = mNumInsts;
@@ -2105,8 +2115,14 @@ bool cPosEstimation::ANNrun()
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist-0.5)
 				*mPosSets[mCurPosI].sMeasurements[0].sResDist-50.0);
 	}
-	if (mOriginal) rho_min = 2*mPlotResolution;
-
+	if (mOriginal) rho_min = mPlotResolution;
+	if (rho_max < 4*mPlotResolution)
+		rho_max = 4*mPlotResolution;
+	while (rho_max<=rho_min)
+	{
+		rho_min-=mPlotResolution;
+		rho_max+=mPlotResolution;
+	}
 	cout << " In cPosEstimation:: Azimuth =" << newTestPoint2.sAzimuth << endl;
 	newTestPoint2.sDistance = SearchDistance(newTestPoint2.sAzimuth, rho_min, rho_max);
 

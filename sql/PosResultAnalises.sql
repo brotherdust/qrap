@@ -253,8 +253,6 @@ order by num desc;
 select * from neuralnet
 order by siteid;
 
-delete from anninputlist where annid in (26,27,28,29);
-
 
 select positionsource, count(testpoint.id) from 
 testpoint cross join positionestimate cross join 

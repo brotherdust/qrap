@@ -32,8 +32,8 @@
 cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 {
 	
-	mLTEsim = false;
-	mOriginal = true; 
+	mLTEsim = true;
+	mOriginal = false; 
 
 }
 
@@ -456,20 +456,22 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 //					mSites[siteIndex].sPosition.Display();
 					Distance =mSites[siteIndex].sPosition.Distance(NewTestPoint.sOriginalLocation);
 					NewTestPoint.sResDist = atof(r[i]["DistRes"].c_str());
-//					NewTestPoint.sResDist = 553.5;
+					NewTestPoint.sResDist = 553.5;
 						
 					if (mLTEsim)
 					{
 						NewTestPoint.sResDist = 4.88;
 						addDist =  50.0*distError(LTEdistance);
 						while ((Distance + addDist)<=0)
-						addDist = 50.0*distError(LTEdistance);
+							addDist = 50.0*distError(LTEdistance);
 						Distance = Distance + addDist;
 					}
 //					cout << " Distance = " << Distance << endl;
-					NewTestPoint.sTA = floor(Distance/NewTestPoint.sResDist);
 				
-					if (mOriginal) NewTestPoint.sTA = atoi(r[i]["TA"].c_str());
+					if (mOriginal) 
+						NewTestPoint.sTA = atoi(r[i]["TA"].c_str());
+					else
+						NewTestPoint.sTA = floor(Distance/NewTestPoint.sResDist);
 
 					tempdist = (NewTestPoint.sTA+0.5)*NewTestPoint.sResDist;
 					if (tempdist > mSites[siteIndex].sMaxDist)
@@ -589,7 +591,6 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 	TestIndex = 0;
 
 	for (i=0; i<mNumSites; i++)
-//	for (i=0; i<3; i++)
 	{
 		cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;
 		cout << "		mSites[i].sNumOutputsA = " << mSites[i].sNumOutputsA;

@@ -774,3 +774,7 @@ order by ta;
 
 delete from testpoint where id in 
 (select tp from train);
+
+truncate table positionestimate;
+
+select * from positionsource;

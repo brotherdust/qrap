@@ -31,8 +31,8 @@
 //*********************************************************************
 cPosEstimation::cPosEstimation() // default constructor
 {
-	mLTEsim = false;
-	mOriginal = true;
+	mLTEsim = true;
+	mOriginal = false;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -467,12 +467,19 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 							Distance = Distance + addDist;
 						}
 
-						Distance = (floor(Distance/NewMeasurement.sResDist)+0.5)*NewMeasurement.sResDist;
 						if (mOriginal)
+						{
 								Distance = (atoi(r[i]["TA"].c_str())+0.5)*NewMeasurement.sResDist;
-						if (Distance<NewMeasurement.sDistance)
-								NewMeasurement.sDistance = Distance;
-						if (!mOriginal) NewMeasurement.sTA = floor(Distance/NewMeasurement.sResDist);
+								NewMeasurement.sTA = atoi(r[i]["TA"].c_str());
+						}
+						else
+						{
+								Distance = (floor(Distance/NewMeasurement.sResDist)+0.5)*NewMeasurement.sResDist;
+								NewMeasurement.sTA = floor(Distance/NewMeasurement.sResDist);
+						}
+
+						NewMeasurement.sDistance = Distance;
+
 						cout<< "Distance = " << Distance << "		TA = " << NewMeasurement.sTA  << endl;
 					}
 	

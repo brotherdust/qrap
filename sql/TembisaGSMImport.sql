@@ -194,7 +194,7 @@ truncate table positionestimate;
 
 select count(*) from neuralnet;
 
-insert into tpUsed
+create table tpUsed as
 select tp from testpointauxGSM;
 
 truncate table tpUsed;
@@ -257,9 +257,9 @@ delete
 delete from testpoint where id in
 (select tpt from testlist);
 
-drop table testlist;
+drop table test;
 
-create table test as
+create table testlist as
 select tp from tpSequence
 where sq%7=0;
 
@@ -293,13 +293,15 @@ truncate table neuralnet;
 insert into train select * from alles
 where tp in (select tp from trainlist);
 
-create table temptestpoint as select * from testpoint;
+drop table temptestpoint;
+create table tempmeasurement as select * from measurement where tp in (select tp from tpused);
 
 truncate table testpoint cascade;
 
 select * from testpoint;
 
 truncate table neuralnet;
+truncate table anninputlist;
 
 insert into testpoint 
 select id, timeofmeas, originaltp, measdatasource, positionsource, meastype, height, location
@@ -319,10 +321,10 @@ select count(*) from tplist;
 
 drop table test;
 
-create table test as select
+create table train as select
 distinct testpointauxGSM.tp as tp, servci, ta
-from testpointauxGSM cross join testlist
-where testpointauxGSM.tp = testlist.tp;
+from testpointauxGSM cross join trainlist
+where testpointauxGSM.tp = trainlist.tp;
 
 drop table train;
 
@@ -387,8 +389,8 @@ and t0.sq=t1.sq+1);
 
 delete from tpUsed where tp in
 (select tp0 as tp from tpDistance
-where distance<5e-5
-and sq0%2=0
+where distance<3.5e-5
+and sq0%2=1
 and distance is not null
 and num0<=num1);
 

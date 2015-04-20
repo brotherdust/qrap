@@ -31,11 +31,11 @@
 #define SIGMA2 (14*14)
 #define MARGIN 15
 #define SENSITIVITY -110
-#define NUMPARTICLES 45
+#define NUMPARTICLES 40
 #define INERTIA 0.7
 #define Cp 1.4
 #define Cg 1.4
-#define STOPN 40
+#define STOPN 50
 #define MAXITER 500
 #define DELTA 5e-10
 
@@ -113,7 +113,7 @@ struct tMeas
 	double		sAzimuth;
 	double 		sBeamWidth;
 	double		sDistance;
-	unsigned	sTA; 		// this could be GSM TA or UMTS timeDiff
+	int	sTA; 		// this could be GSM TA or UMTS timeDiff
 	double 		sResDist;
 };
 

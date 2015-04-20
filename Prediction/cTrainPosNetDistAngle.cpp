@@ -553,6 +553,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 	double TrainError=9999999, TestError=9999999;
 	double minTrainError = MAXDOUBLE;
 	double minTestError = MAXDOUBLE;
+	double FanIn=0.5;
 	unsigned i,j,k, p, q, TrainIndex, TestIndex, type;
 	bool stop = false;
 	string query, queryM, queryC, outdir, filename, queryD;
@@ -591,6 +592,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 	TestIndex = 0;
 
 	for (i=0; i<mNumSites; i++)
+//	for (i=31; i<mNumSites; i++)
 	{
 		cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;
 		cout << "		mSites[i].sNumOutputsA = " << mSites[i].sNumOutputsA;
@@ -619,9 +621,9 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 				mSites[i].sInputTrain[j][1] = cos(mPosSetsTrain[TrainIndex].sTestPoints[0].sServCellAzimuth*PI/180);
 				mSites[i].sInputTrain[j][2] = sin(mPosSetsTrain[TrainIndex].sTestPoints[0].sServCellAzimuth*PI/180);
 				mSites[i].sInputTrain[j][3] = (((double)mPosSetsTrain[TrainIndex].sTestPoints[0].sTA+0.5)
-							*mPosSetsTrain[TrainIndex].sTestPoints[0].sResDist 
-							- mSites[i].sMaxDist/2)/mSites[i].sMaxDist;
-				mSites[i].sInputTrain[j][4] = mPosSetsTrain[TrainIndex].sTestPoints[0].sResDist/1000;
+																	*mPosSetsTrain[TrainIndex].sTestPoints[0].sResDist 
+																	- mSites[i].sMaxDist/2)/mSites[i].sMaxDist;
+				mSites[i].sInputTrain[j][4] = (log10(mPosSetsTrain[TrainIndex].sTestPoints[0].sResDist-1.7))/1.4;
 				mSites[i].sInputTrain[j][0] = 1;
 	
 				for (q=0; q<mSites[i].sCellSet.size(); q++)
@@ -632,7 +634,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 				}
 
 				mSites[i].sOutputDistTrain[j][0] = (mPosSetsTrain[TrainIndex].sTestPoints[0].sDistance 
-								- mSites[i].sMaxDist/2)/mSites[i].sMaxDist;
+																				- mSites[i].sMaxDist/2)/mSites[i].sMaxDist;
 				mSites[i].sOutputAngleTrain[j][0] = cos(mPosSetsTrain[TrainIndex].sTestPoints[0].sBearing*PI/180);
 				mSites[i].sOutputAngleTrain[j][1] = sin(mPosSetsTrain[TrainIndex].sTestPoints[0].sBearing*PI/180);
 	
@@ -682,7 +684,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 				mSites[i].sInputTest[j][3] = (((double)mPosSetsTest[TestIndex].sTestPoints[0].sTA+0.5)
 							*mPosSetsTest[TestIndex].sTestPoints[0].sResDist 
 							- mSites[i].sMaxDist/2)/mSites[i].sMaxDist;
-				mSites[i].sInputTest[j][4] = mPosSetsTest[TestIndex].sTestPoints[0].sResDist/1000;
+				mSites[i].sInputTest[j][4] = (log10(mPosSetsTest[TestIndex].sTestPoints[0].sResDist)-1.7)/1.4;
 				mSites[i].sInputTest[j][0] = 1;
 	
 				for (q=0; q<mSites[i].sCellSet.size(); q++)
@@ -736,15 +738,17 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 
 			unsigned HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsA*(5 + 2.8*max(0,(int)mSites[i].sCellSet.size()) )));
 			unsigned HiddenN2 = 7;
+			FanIn = sqrt(HiddenN1/mSites[i].sNumInputs);
 	
 			ANN.create_standard(4, mSites[i].sNumInputs, 
 					HiddenN1 ,HiddenN2, mSites[i].sNumOutputsA);
- 			ANN.set_train_error_function(FANN::ERRORFUNC_LINEAR);
+			
+// 			ANN.set_train_error_function(FANN::ERRORFUNC_LINEAR);
 			ANN.set_train_stop_function(FANN::STOPFUNC_MSE);
 			ANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
 			ANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
 			ANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
-			ANN.randomize_weights(-0.50,0.50);
+			ANN.randomize_weights(-FanIn,FanIn);
 
 			cout << "saving ANN: site = " << mSites[i].sSiteID << "	i=" << i << endl;
 			gcvt(mSites[i].sSiteID,9,site);
@@ -767,7 +771,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 			minTrainError = 99999999;
 			stop = false;	
 			k=0;
-			while ((k<MAXepoch)&&(!stop))
+			while ((k<MAXepoch+1)&&(!stop))
 			{
 				TrainError = ANN.train_epoch(TrainDataAngle);
 				TestError = ANN.test_data(TestDataAngle);
@@ -845,12 +849,14 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 	
 			ANN.create_standard(4, mSites[i].sNumInputs, 
 					HiddenN1 ,HiddenN2, mSites[i].sNumOutputsD);
- 			ANN.set_train_error_function(FANN::ERRORFUNC_LINEAR);
+// 			ANN.set_train_error_function(FANN::ERRORFUNC_TANH);
+//			ANN.set_learning_rate(
 			ANN.set_train_stop_function(FANN::STOPFUNC_MSE);
 			ANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
+			ANN.set_learning_rate
 			ANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
 			ANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
-			ANN.randomize_weights(-0.50,0.50);
+			ANN.randomize_weights(-FanIn,FanIn);
 
 			cout << "saving ANN: site = " << mSites[i].sSiteID << "	i=" << i << endl;
 			gcvt(mSites[i].sSiteID,9,site);
@@ -876,7 +882,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 			minTestError = 99999999;
 			stop = false;	
 			k=0;
-			while ((k<MAXepoch)&&(!stop))
+			while ((k<MAXepoch+1)&&(!stop))
 			{
 				TrainError = ANN.train_epoch(TrainDataDist);
 				TestError = ANN.test_data(TestDataDist);

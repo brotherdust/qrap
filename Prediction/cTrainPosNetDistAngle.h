@@ -27,7 +27,7 @@
 #define cTrainPosNetDistAngle_h 1
 
 #define GAMMA 2.5
-#define MOBILEHEIGHT 1
+#define MOBILEHEIGHT 1.2
 #define SIGMA2 (14*14)
 #define MARGIN 15
 #define SENSITIVITY -110
@@ -37,8 +37,8 @@
 #define MEAS_OFFSET 85
 #define RFDist_OFFSET -80
 
-#define MAXepoch 300000
-#define REPORTInt 10000
+#define MAXepoch 800000
+#define REPORTInt 20000
 #define ERROR 1e-6
 
 // include local headers

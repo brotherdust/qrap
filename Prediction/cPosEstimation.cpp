@@ -96,7 +96,7 @@ cPosEstimation::cPosEstimation() // default constructor
 
 	mFixedAnts = new cAntennaPattern[2];
 	mCellPathLoss = new double[2];
-	mNumInsts = 2;
+	mNumInsts = 0;
 	mCurANNa = new FANN::neural_net();
 	mCurANNd = new FANN::neural_net();
 
@@ -993,7 +993,7 @@ double cPosEstimation::SearchDistance(double Azimuth, double min, double max)
 	
 	int i;
 	int StopNum = ceil((max-min)/mPlotResolution);
-	cout << "StopNum = " << StopNum << "	mPlotResolution = " << mPlotResolution 
+	cout << "In cPosEstimation::SearchDistance    StopNum = " << StopNum << "	mPlotResolution = " << mPlotResolution 
 				<< "	max = " << max << "	min = " << min << endl;
 	double Distance = (max-min)/2.0;
 	double BestCost = 999999;
@@ -1001,6 +1001,7 @@ double cPosEstimation::SearchDistance(double Azimuth, double min, double max)
 
 	for (i=0; i<StopNum; i++)
 	{
+//		cout << "	i=" << i; 
 		Cost = CostFunction(min + (double)i*mPlotResolution, Azimuth);
 		if (Cost < BestCost)
 		{
@@ -1795,7 +1796,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			else if (phi[i]<-180)
 				phi[i]+=360;
 
-			if ((rho[i]>rho_max*4)||(rho[i]>120000)||(rho[i]<mPlotResolution)||(phi[i]<phi_min*0.8)||(phi[i]>phi_max*1.2))
+			if ((rho[i]>rho_max*4)||(rho[i]>120000)||(rho[i]<mPlotResolution))
 			{
 				tempvalue = 2;
 				while (tempvalue>1)
@@ -1885,14 +1886,15 @@ double cPosEstimation::CostFunction(double rho, double phi)
 
 	if (rho>120000)
 		return 1.5*rho/120000;
-	if (0==mNumInsts) return 999999;
+	if (0>=mNumInsts) return 999999;
 	unsigned i;
-//	unsigned NumUsed = mNumInsts;
+	unsigned NumUsed = mNumInsts;
 	double* Delta;
+//	cout << "Before new" ;
 	Delta = new double[mNumInsts];
 	double* Prediction;
 	Prediction = new double[mNumInsts];
-//	cout << "Before delete" ;
+//	cout << "Before delete"  << endl;
 	if ((mCellPathLoss!=NULL)&&(mNumInsts>0)) delete [] mCellPathLoss;
 //	cout << "	After  delete" << endl;
 	mCellPathLoss = new double[mNumInsts];
@@ -2139,9 +2141,13 @@ bool cPosEstimation::ANNrun()
 	if (mOriginal) rho_min = mPlotResolution;
 	if (rho_max < 4*mPlotResolution)
 		rho_max = 4*mPlotResolution;
-	while (rho_max<=rho_min)
+	while ((rho_max<=rho_min)&&(rho_min>mPlotResolution))
 	{
 		rho_min-=mPlotResolution;
+		rho_max+=mPlotResolution;
+	}
+	while ((rho_max<=rho_min))
+	{
 		rho_max+=mPlotResolution;
 	}
 	cout << " In cPosEstimation:: Azimuth =" << newTestPoint2.sAzimuth << endl;

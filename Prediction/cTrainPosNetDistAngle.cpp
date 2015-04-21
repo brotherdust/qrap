@@ -853,7 +853,6 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 //			ANN.set_learning_rate(
 			ANN.set_train_stop_function(FANN::STOPFUNC_MSE);
 			ANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
-			ANN.set_learning_rate
 			ANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
 			ANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
 			ANN.randomize_weights(-FanIn,FanIn);

@@ -4,7 +4,7 @@
  *    Version     : 0.1
  *    Date        : 2012/04/24
  *    License     : GNU GPLv3
- *    File        : cPosEstimation.h
+ *    File        : cPosEstimation.h 
  *    Copyright   : (c) University of Pretoria
  *    Author      : Magdaleen Ballot (magdaleen.ballot@up.ac.za)
  *    Description : This class does the analysis of the measurements in the 

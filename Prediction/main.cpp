@@ -137,7 +137,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	cout<< "Nach6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
 
-
+/*
 	cTrainPosNetDistAngle NeuralNets;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -163,7 +163,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-
+*/
 
 /*
   	string query = "update coefficients set coefficient=0.0;";
@@ -220,7 +220,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-/*
+
   	string query = "update coefficients set coefficient=0.0;";
 
 	if (!gDb.PerformRawSql(query))
@@ -254,7 +254,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-*/
+
 
 /*
 

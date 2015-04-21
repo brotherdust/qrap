@@ -27,7 +27,7 @@
 #define cTrainPosNetDistAngle_h 1
 
 #define GAMMA 2.5
-#define MOBILEHEIGHT 1.2
+#define MOBILEHEIGHT 1
 #define SIGMA2 (14*14)
 #define MARGIN 15
 #define SENSITIVITY -110

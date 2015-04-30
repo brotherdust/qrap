@@ -31,8 +31,8 @@
 //*********************************************************************
 cPosEstimation::cPosEstimation() // default constructor
 {
-	mLTEsim = true;
-	mOriginal = false;
+	mLTEsim = false;
+	mOriginal = true;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -106,17 +106,17 @@ cPosEstimation::cPosEstimation() // default constructor
 cPosEstimation::~cPosEstimation() // destructor
 {
 	unsigned i;
-	for (i=0;i<mNumPoints;i++)
+/*	for (i=0;i<mNumPoints;i++)
 	{
 		mPosSets[i].sTestPoints.clear();
 		mPosSets[i].sMeasurements.clear();
 	}
-	mPosSets.clear();
-	for (i=0;i<mNumSites;i++)
+*/	mPosSets.clear();
+/*	for (i=0;i<mNumSites;i++)
 	{
 		mSites[i].sCellSet.clear();
 	}
-	mSites.clear();
+*/	mSites.clear();
 	mCurANNa->destroy();
 	mCurANNd->destroy();
 	delete [] mFixedAnts;
@@ -535,14 +535,14 @@ void cPosEstimation::EstimatePositions()
 	if (mUseClutter)
 		cout << "cPosEstimation::EstimatePositions(): Using Clutter " <<  endl;
 	else cout << "cPosEstimation::EstimatePositions(): NOT Using Clutter " <<  endl;
-/*
+
 	if (mNumSites>0)
 	{
 		mCurSiteI = 0;
 		mCurANNa->create_from_file(mSites[0].sANNfileA);
 		mCurANNd->create_from_file(mSites[0].sANNfileD);
 	}
-*/
+
 	for (i=0; i< mNumPoints; i++)
 	{
 		mCurPosI = i;
@@ -1593,11 +1593,33 @@ bool cPosEstimation::DCM_ParticleSwarm()
 
 	double phi_min = -180;
 	double phi_max = 180;
+	double phi_min_back = -180;
+	double phi_max_back = -180;
+
 	cout << "mPosSets[mCurPosI].sMeasurements[0].sBeamWidth = " << mPosSets[mCurPosI].sMeasurements[0].sBeamWidth << endl;
 	phi_min = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
 		- (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/2);
 	phi_max = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
 		+ (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/2);	
+	phi_min_back = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
+		- (ceil)(3*mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/4);
+	phi_max_back = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
+		+ (ceil)(3*mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/4);	
+
+	if (phi_max_back>360)
+	{
+		phi_min-=360;
+		phi_max-=360;
+		phi_min_back-=360;
+		phi_max_back-=360;
+	}
+	else if (phi_min_back<-360)
+	{
+		phi_min+=360;
+		phi_max+=360;
+		phi_min_back+=360;
+		phi_max_back+=360;
+	}
 
     	std::random_device PhiRD;
     	std::mt19937_64 Phi_engine(PhiRD());
@@ -1629,11 +1651,6 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			else phi[i]+=180.0;
 		}
 		if (rho[i]<mPlotResolution) rho[i] = mPlotResolution;
-		if (phi[i]>180)
-			phi[i]-=360;
-		else if (phi[i]<-180)
-			phi[i]+=360;
-
 		value[i] = CostFunction(rho[i], phi[i]);
 		
 //		cout << "i=" << i << "	tempvalue=" << tempvalue <<
@@ -1791,12 +1808,13 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			}
 
 			phi[i] = fmod(phi[i],360);		
-			if (phi[i]>180)
+			if (phi[i]>180+mPosSets[mCurPosI].sMeasurements[0].sAzimuth)
 				phi[i]-=360;
-			else if (phi[i]<-180)
+			else if (phi[i]<mPosSets[mCurPosI].sMeasurements[0].sAzimuth-180)
 				phi[i]+=360;
 
-			if ((rho[i]>rho_max*4)||(rho[i]>120000)||(rho[i]<mPlotResolution))
+			if ((rho[i]>rho_max*3)||(rho[i]>120000)||(rho[i]<mPlotResolution)
+				||(phi[i]<phi_min_back)	||(phi[i]>phi_max_back))
 			{
 				tempvalue = 2;
 				while (tempvalue>1)
@@ -2063,6 +2081,7 @@ bool cPosEstimation::ANNrun()
 		Input[3*q+7] = (945+FREQ_OFFSET)*FREQ_SCALE; 	
 	}
 
+
 	for (p=0; p<mPosSets[mCurPosI].sNumMeas; p++)
 	{
 		q=0;
@@ -2089,7 +2108,7 @@ bool cPosEstimation::ANNrun()
 			cout << Input[3*q+5] << "	"<< Input[3*q+6] << "	"<< Input[3*q+7] << endl;
 */		} 
 	}
-
+	cout << " In cPosEstimation::ANNrun():  Inputs done." << endl;
 
 /*
 	for (q=0; q< mSites[mCurSiteI].sNumInputs; q++)
@@ -2163,7 +2182,7 @@ bool cPosEstimation::ANNrun()
 
 	cout << " In cPosEstimation::ANNrun(): before delete" << endl;
 
-	if (Input!=NULL) delete [] Input;
+//	if (Input!=NULL) delete [] Input;
 //	if (Output!=NULL) delete [] Output;
 	cout << " In cPosEstimation::ANNrun(): tata" << endl;
 	return true;

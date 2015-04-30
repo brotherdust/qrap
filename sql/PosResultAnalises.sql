@@ -13,6 +13,9 @@ update cluttertype set height = 2 where landcoverid=38;
 
 select * from cluttertype;
 
+truncate table neuralnet cascade;
+truncate table anninputlist cascade;
+truncate table positionestimate cascade;
 
 
 SELECT distinct measurement.tp as tp, ST_AsText(testpoint.location) as origLocation,siteid, 
@@ -143,8 +146,8 @@ select * from Results;
 
 drop table AziErrorDistribution;
 
-update results set aziErr= aziErr - 360
-where aziErr > 180;
+update results set aziErr= aziErr + 360
+where aziErr < 180;
 
 update results set aziErr= abs(aziErr);
 
@@ -184,6 +187,7 @@ select positionsource, Error, count(*) from
 from Results) as temp
 group by positionsource, Error
 order by positionsource, Error;
+
 
 create table ANNerrorDistribution as
 select siteid, Error, count(*) from 
@@ -260,9 +264,6 @@ testpoint cross join positionestimate cross join
 from testpoint cross join positionestimate
 where positionestimate.tp=testpoint.id
 and positionsource<12 and positionsource>1
-and originaltp in 
-(select originaltp from testpoint 
-where positionsource=11) 
 and originaltp is not null
 group by originaltp) as minlist
 where testpoint.originaltp = minlist.originaltp
@@ -272,5 +273,17 @@ and positionsource<12 and positionsource>1
 group by positionsource
 order by positionsource;
 
+select * from positionestimate cross join testpoint where tp=testpoint.id
+order by originaltp, positionsource;
 
+insert into todeletetp ( 
+select tp from
+(select testpoint.id as tp, (ta*553.5+553.5/2-distance)/553.2 as delta
+from positionestimate cross join testpoint
+cross join testpointauxGSM
+where testpointauxGSM.tp=testpoint.id
+and positionestimate.tp=testpoint.id
+order by delta desc) as binne
+where delta>3); 
 
+delete from testpoint where id in (select tp from todeletetp);

@@ -32,8 +32,8 @@
 cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 {
 	
-	mLTEsim = true;
-	mOriginal = false; 
+	mLTEsim = false;
+	mOriginal = true; 
 
 }
 
@@ -553,7 +553,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 	double TrainError=9999999, TestError=9999999;
 	double minTrainError = MAXDOUBLE;
 	double minTestError = MAXDOUBLE;
-	double FanIn=0.5;
+
 	unsigned i,j,k, p, q, TrainIndex, TestIndex, type;
 	bool stop = false;
 	string query, queryM, queryC, outdir, filename, queryD;
@@ -738,17 +738,22 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 
 			unsigned HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsA*(5 + 2.8*max(0,(int)mSites[i].sCellSet.size()) )));
 			unsigned HiddenN2 = 7;
-			FanIn = sqrt(HiddenN1/mSites[i].sNumInputs);
+			double FanIn=sqrt(3);
+			FanIn = pow(mSites[i].sNumInputs/HiddenN1,0.5);
+			cout << "FanIn = " << FanIn << endl;
+			cout << "HiddenN1 = " << 	HiddenN1 << endl;
+			cout << "mSites[i].sNumInputs = " << 	mSites[i].sNumInputs << endl;
 	
+
 			ANN.create_standard(4, mSites[i].sNumInputs, 
-					HiddenN1 ,HiddenN2, mSites[i].sNumOutputsA);
-			
-// 			ANN.set_train_error_function(FANN::ERRORFUNC_LINEAR);
+													HiddenN1 ,HiddenN2, mSites[i].sNumOutputsA);
+ 			ANN.set_train_error_function(FANN::ERRORFUNC_LINEAR);
+//			ANN.set_learning_rate(0.7);
 			ANN.set_train_stop_function(FANN::STOPFUNC_MSE);
 			ANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
 			ANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
 			ANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
-			ANN.randomize_weights(-FanIn,FanIn);
+			ANN.randomize_weights(-1/FanIn,1/FanIn);
 
 			cout << "saving ANN: site = " << mSites[i].sSiteID << "	i=" << i << endl;
 			gcvt(mSites[i].sSiteID,9,site);
@@ -783,7 +788,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 							<< "	TrainErr = " << TrainError 
 							<< "	TestErr = " << TestError << endl;
 				}
-				if ((TrainError <= minTrainError)&&(TestError<=minTestError)&&(k>MAXepoch/3))
+				if ((TrainError <= minTrainError)&&(TestError<=minTestError))
 				{
 					ANN.save(filename);
 //					TestError = ANN.test_data(TestDataAngle);
@@ -794,9 +799,12 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 */					stop = (TestError < ERROR)&&(TrainError < ERROR);
 					minTrainError = TrainError;
 					minTestError = TestError;
+//					ANN.set_learning_rate(0.4);
 				}
 //				else if (TestError>minTestError*1.05) stop = true;
 				k++;
+				if (k==ceil(MAXepoch/2))
+					ANN.set_train_error_function(FANN::ERRORFUNC_TANH);
 
 			} 	
 
@@ -848,14 +856,14 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 //			HiddenN2 = 7;
 	
 			ANN.create_standard(4, mSites[i].sNumInputs, 
-					HiddenN1 ,HiddenN2, mSites[i].sNumOutputsD);
-// 			ANN.set_train_error_function(FANN::ERRORFUNC_TANH);
-//			ANN.set_learning_rate(
+			HiddenN1 ,HiddenN2, mSites[i].sNumOutputsD);
+ 			ANN.set_train_error_function(FANN::ERRORFUNC_LINEAR);
 			ANN.set_train_stop_function(FANN::STOPFUNC_MSE);
 			ANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
 			ANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
 			ANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
-			ANN.randomize_weights(-FanIn,FanIn);
+			ANN.randomize_weights(-1/FanIn,1/FanIn);
+//			ANN.set_learning_rate(0.7);
 
 			cout << "saving ANN: site = " << mSites[i].sSiteID << "	i=" << i << endl;
 			gcvt(mSites[i].sSiteID,9,site);
@@ -892,7 +900,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 								<< "	TrainErr = " << TrainError 
 								<< "	TestErr = " << TestError << endl;
 				}
-				if ((TrainError <= minTrainError)&&(TestError<=minTestError)&&(k>MAXepoch/2))
+				if ((TrainError <= minTrainError)&&(TestError<=minTestError))
 				{
 					ANN.save(filename);
 //					TestError = ANN.get_MSE();
@@ -902,9 +910,12 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 */					stop = (TestError < ERROR/3)&&(TrainError < ERROR/3);
 					minTrainError = TrainError;
 					minTestError = TestError;
+//					ANN.set_learning_rate(0.4);
 				}
 //				else if (TestError > minTestError*1.05) stop = true; 
 				k++;
+				if (k==ceil(MAXepoch/2))			
+					ANN.set_train_error_function(FANN::ERRORFUNC_TANH);
 			} 
 
 			ANN.save(filename);

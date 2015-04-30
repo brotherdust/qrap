@@ -143,7 +143,7 @@ select count(*) from tempRawGSMTEMS;
 
 drop table tpUsed;
 
-create table tpUsed as 
+create table tpUsed as
 (select tp from testpointauxGSM
 cross join cell
 cross join radioinstallation
@@ -152,7 +152,7 @@ and risector = radioinstallation.id
 and siteid in
 (select siteid from sitelist));
 
-
+select * from sitelist;
 
 drop table GSMtempmeas;
 create table GSMtempmeas
@@ -257,11 +257,11 @@ delete
 delete from testpoint where id in
 (select tpt from testlist);
 
-drop table test;
+drop table testlist;
 
 create table testlist as
 select tp from tpSequence
-where sq%7=0;
+where sq%8=0;
 
 select * from test;
 
@@ -321,10 +321,10 @@ select count(*) from tplist;
 
 drop table test;
 
-create table train as select
+create table test as select
 distinct testpointauxGSM.tp as tp, servci, ta
-from testpointauxGSM cross join trainlist
-where testpointauxGSM.tp = trainlist.tp;
+from testpointauxGSM cross join testlist
+where testpointauxGSM.tp = testlist.tp;
 
 drop table train;
 
@@ -348,6 +348,10 @@ where tp in
 (select tpt from testlist);
 
 select * from testpoint;
+
+drop table tpused;
+
+create table tpused as select tp from testpointauxGSM;
 
 drop table TPsequence;
 
@@ -411,6 +415,35 @@ and ta0=ta1
 and ci0=ci1;
 
 select count(*) from cell;
+
+drop table todeletelist;
+
+insert into todeletelist 
+(select originaltp as tp from
+(select originaltp, min(error) as kleinste from
+positionestimate cross join testpoint
+where tp=testpoint.id
+group by originaltp
+order by kleinste desc) as foo
+where kleinste>1500);
+
+select count(*) from allcurrent;
+
+truncate table testpoint;
+
+select count(*) from positionestimate;
+
+select count(*) from testpointauxGSM;
+INSERT into PositionEstimate (id, tp, azimuth, distance, error) Values (7559,7559, 282.917324, 1610.4777, 0); 
+
+delete from tpused where tp in
+(select tp from todeletelist);
+
+insert into todeletelist 
+(select tp from testpointauxGSM);
+
+select count(*)
+from testpointauxGSM;
 
 create table tempmeas as
 (select * from measurement);
@@ -777,6 +810,3 @@ order by ta;
 delete from testpoint where id in 
 (select tp from train);
 
-truncate table positionestimate;
-
-select * from positionsource;

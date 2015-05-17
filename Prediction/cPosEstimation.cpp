@@ -31,8 +31,10 @@
 //*********************************************************************
 cPosEstimation::cPosEstimation() // default constructor
 {
+	mUseANNantenna = false;
 	mLTEsim = false;
-	mOriginal = true;
+	mOriginal = false;
+	mUMTS =false;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -99,6 +101,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	mNumInsts = 0;
 	mCurANNa = new FANN::neural_net();
 	mCurANNd = new FANN::neural_net();
+	mAntennasANN = new FANN::neural_net[2];
 
 }
 
@@ -106,36 +109,28 @@ cPosEstimation::cPosEstimation() // default constructor
 cPosEstimation::~cPosEstimation() // destructor
 {
 	unsigned i;
-/*	for (i=0;i<mNumPoints;i++)
-	{
-		mPosSets[i].sTestPoints.clear();
-		mPosSets[i].sMeasurements.clear();
-	}
-*/	mPosSets.clear();
-/*	for (i=0;i<mNumSites;i++)
-	{
-		mSites[i].sCellSet.clear();
-	}
-*/	mSites.clear();
+	mPosSets.clear();
+	mSites.clear();
 	mCurANNa->destroy();
 	mCurANNd->destroy();
+	delete [] mAntennasANN;
 	delete [] mFixedAnts;
 	delete [] mCellPathLoss;
 }
 
 //*********************************************************************
 bool cPosEstimation::LoadMeasurements(vPoints Points,
-					unsigned MeasType, 
-					unsigned MeasSource,
-					unsigned PosSource,
-					unsigned Technology)
+																unsigned MeasType, 
+																unsigned MeasSource,
+																unsigned PosSource,
+																unsigned Technology)
 {
 	
-    	std::random_device Distance;
-    	std::mt19937_64 LTEdistance(Distance());
-//  	std::exponential_distribution<double> distError(1.5);
+   std::random_device Distance;
+   std::mt19937_64 LTEdistance(Distance());
+// std::exponential_distribution<double> distError(1.5);
 	std::normal_distribution<double> distError(0,1);
-		double addDist;
+	double addDist;
 	pqxx::result r;
 	double Lat, Lon, mNorth, mSouth, mEast, mWest;
 	char *text= new char[33];
@@ -156,32 +151,32 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 	
 	areaQuery += " @ ST_GeomFromText('POLYGON((";
 	for (i = 0 ; i < Points.size();i++)
-   	{
+   {
 		Points[i].Get(Lat, Lon);
-     		mNorth = max(mNorth,Lat);
-     		mSouth = min(mSouth,Lat);
-     		mEast = max(mEast,Lon);
-     		mWest = min(mWest,Lon);
+   	mNorth = max(mNorth,Lat);
+   	mSouth = min(mSouth,Lat);
+   	mEast = max(mEast,Lon);
+   	mWest = min(mWest,Lon);
 		gcvt(Lon,12,text);
-     		areaQuery += text;
-     		areaQuery += " ";
+   	areaQuery += text;
+   	areaQuery += " ";
 		gcvt(Lat,12,text);
-     		areaQuery += text;
-     		areaQuery += ",";
-   	}
-   	NorthWestCorner.Set(mNorth,mWest,DEG);
-   	SouthEastCorner.Set(mSouth,mEast,DEG);
+   	areaQuery += text;
+   	areaQuery += ",";
+   }
+   NorthWestCorner.Set(mNorth,mWest,DEG);
+   SouthEastCorner.Set(mSouth,mEast,DEG);
 	cout << "North West corner: " << endl;
 	NorthWestCorner.Display();
 	cout << "South East corner: " << endl;
 	SouthEastCorner.Display();
 	Points[0].Get(Lat,Lon);
 	gcvt(Lon,12,text);
-   	areaQuery += text;
-   	areaQuery += " ";
+   areaQuery += text;
+   areaQuery += " ";
 	gcvt(Lat,12,text);
-   	areaQuery += text;
-   	areaQuery += "))',4326) ";
+   areaQuery += text;
+   areaQuery += "))',4326) ";
 
 	query = "select distinct site.id as siteid, ST_AsText(location) as siteLocation, ";
 	query += "type, maxdist, NumInputs, NumOutputs, filename, index, cellid ";
@@ -288,6 +283,111 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 	mNumSites = mSites.size();
 
 	cout << "cPosEstimation::LoadMeasurements: mNumSites = " <<  mNumSites << endl;
+
+
+/*	query = "select cell.id as ci, antneuralnet.id as antannid,filename ";
+	query += "from site cross join cell cross join antneuralnet ";
+	query += "where cell.siteid=site.id ";
+	query += "and antneuralnet.cellid= cell.id ";
+	query += "and site.location ";
+	query += areaQuery;
+	query += " order by ci; ";
+
+	if (!gDb.PerformRawSql(query))
+	{
+		string err = "cTrainPosNet::LoadMeasurements: ";
+		err +="Problem with database query to get cells with ANN antenna patterns from selected area! Problem with query: ";
+		err += query;
+		cout << err << endl;
+		QRAP_ERROR(err.c_str());
+		delete [] text;
+		return false;
+	}
+
+	NewCell.sCI=0;
+	NewSite.sSiteID=0;
+	Counter = 0;
+	oldtype = 1;
+	type = 0;
+
+	gDb.GetLastResult(r);
+	if (r.size() >0)
+	{
+		cout << "cPosEstimation::LoadMeasurements:  r.size() = " <<  r.size() << endl;
+		for (i=0; i<r.size(); i++)
+		{
+			type = atoi(r[i]["type"].c_str());
+			siteid = atoi(r[i]["siteid"].c_str());
+			if (siteid != NewSite.sSiteID)
+			{
+				if (NewSite.sSiteID>0)
+				{
+					mSites.push_back(NewSite);
+					NewSite.sCellSet.clear();
+				}
+				NewSite.sSiteID = siteid;
+				PointString = r[i]["siteLocation"].c_str();
+				spacePos = PointString.find_first_of(' ');
+				longitude = atof((PointString.substr(6,spacePos).c_str())); 
+				latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
+				NewSite.sPosition.Set(latitude,longitude,DEG);
+				NewSite.sNumInputs= atoi(r[i]["NumInputs"].c_str());
+				NewSite.sMaxDist = atof(r[i]["maxdist"].c_str());
+				Counter=0;
+				if (1==type)	
+				{
+						NewSite.sANNfileA = r[i]["filename"].c_str();
+						NewSite.sNumOutputsA= atoi(r[i]["NumOutputs"].c_str());  
+				}
+				else if (2==type) 
+				{
+					NewSite.sANNfileD = r[i]["filename"].c_str();
+					NewSite.sNumOutputsD= atoi(r[i]["NumOutputs"].c_str()); 
+				} 
+			}
+			else if (type!=oldtype)
+			{
+				if (1==type)	
+				{
+						NewSite.sANNfileA = r[i]["filename"].c_str();
+						NewSite.sNumOutputsA= atoi(r[i]["NumOutputs"].c_str());  
+				}
+				else if (2==type) 
+				{
+					NewSite.sANNfileD = r[i]["filename"].c_str();
+					NewSite.sNumOutputsD= atoi(r[i]["NumOutputs"].c_str()); 
+				} 
+				oldtype=type;
+			}
+			if (1==type)
+			{
+					NewCell.sI =Counter;
+					NewCell.sCI= atoi(r[i]["cellid"].c_str());
+					Counter++;
+					NewSite.sCellSet.push_back(NewCell);
+			}
+		}
+		if (NewSite.sSiteID>0)
+		{
+			mSites.push_back(NewSite);
+			NewSite.sCellSet.clear();
+		}
+	}
+	else
+	{
+		string err = "cTrainPosNet::LoadMeasurements: ";
+		err +="Query to get site info from selected area is empty! Problem with query: ";
+		err += query;
+		cout << err << endl;
+		QRAP_ERROR(err.c_str());
+		delete [] text;
+		return false;
+	}
+	mNumSites = mSites.size();
+
+	cout << "cPosEstimation::LoadMeasurements: mNumCells = " <<  mNumCells << endl;
+*/
+
 
 	if (Points.size() > 1)
 	{
@@ -447,6 +547,10 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 					NewMeasurement.sEIRP = atof(r[i]["EIRP"].c_str());
 					NewMeasurement.sPredValue = 0;
 					NewMeasurement.sAzimuth = atof(r[i]["txbearing"].c_str());
+					if (NewMeasurement.sAzimuth>180)
+						NewMeasurement.sAzimuth -=360;
+					else if (NewMeasurement.sAzimuth<-180)
+						NewMeasurement.sAzimuth+=360;
 					NewMeasurement.sTA = atoi(r[i]["TA"].c_str());
 					NewMeasurement.sBeamWidth = atof(r[i]["azibeamwidth"].c_str());
 					NewMeasurement.sTilt = atof(r[i]["txmechtilt"].c_str());
@@ -462,6 +566,15 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 						if (mLTEsim)
 						{
 							NewMeasurement.sResDist = 4.88;
+							addDist =  50.0*distError(LTEdistance);
+							while ((Distance + addDist)<=0)
+								addDist = 50.0*distError(LTEdistance);
+							Distance = Distance + addDist;
+						}
+
+						if (mUMTS)
+						{
+							NewMeasurement.sResDist = 38;
 							addDist =  50.0*distError(LTEdistance);
 							while ((Distance + addDist)<=0)
 								addDist = 50.0*distError(LTEdistance);
@@ -1043,19 +1156,15 @@ double cPosEstimation::FindAzi(unsigned BIndex, unsigned AIndex)
 		LeftAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
 				- mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth/2;
 		LeftIndex = AIndex;
-//		RightAngle = mPosSets[mCurPosI].sMeasurements[BIndex].sAzimuth;
-		RightAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
-				+ mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth;
+		RightAngle = mPosSets[mCurPosI].sMeasurements[BIndex].sAzimuth;
+//		RightAngle = mPosSets[mCurPosI].sMeasurements[BIndex].sAzimuth
+//				+ mPosSets[mCurPosI].sMeasurements[BIndex].sBeamWidth/2;
 		RightIndex = BIndex;
 	}
 	else
 	{
-		LeftAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
-				- mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth/2;
 		LeftAngle = mPosSets[mCurPosI].sMeasurements[BIndex].sAzimuth;
 		LeftIndex = BIndex;
-//		RightAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
-//				+ mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth;
 		RightAngle = mPosSets[mCurPosI].sMeasurements[AIndex].sAzimuth
 				+ mPosSets[mCurPosI].sMeasurements[AIndex].sBeamWidth/2;
 		RightIndex = AIndex;
@@ -1598,32 +1707,36 @@ bool cPosEstimation::DCM_ParticleSwarm()
 
 	cout << "mPosSets[mCurPosI].sMeasurements[0].sBeamWidth = " << mPosSets[mCurPosI].sMeasurements[0].sBeamWidth << endl;
 	phi_min = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
-		- (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/2);
+		- (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth);
 	phi_max = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
-		+ (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/2);	
+		+ (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth);	
 	phi_min_back = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
-		- (ceil)(3*mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/4);
+		- (ceil)(4*mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/5);
 	phi_max_back = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
-		+ (ceil)(3*mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/4);	
+		+ (ceil)(4*mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/5);	
 
-	if (phi_max_back>360)
+	if (phi_max_back>180)
 	{
 		phi_min-=360;
 		phi_max-=360;
 		phi_min_back-=360;
 		phi_max_back-=360;
+		mPosSets[mCurPosI].sMeasurements[0].sAzimuth-=360;
 	}
-	else if (phi_min_back<-360)
+	if (phi_min_back<-180)
 	{
 		phi_min+=360;
 		phi_max+=360;
 		phi_min_back+=360;
 		phi_max_back+=360;
+		mPosSets[mCurPosI].sMeasurements[0].sAzimuth+=360;
 	}
+
+	cout << "phi ranges: " << phi_min_back << "	" << phi_min << "	" << phi_max << "		" <<  phi_max_back << endl;
 
     	std::random_device PhiRD;
     	std::mt19937_64 Phi_engine(PhiRD());
-	uniform_real_distribution<double> phi_dist(phi_min,phi_max);
+		uniform_real_distribution<double> phi_dist(0,1);
 
 	gbestValue = MAXDOUBLE;
 	for (i=0; i<NumBest; i++)
@@ -1642,14 +1755,12 @@ bool cPosEstimation::DCM_ParticleSwarm()
 				tempvalue = rho_distE(Rho_engine);
 		}
 		rho[i] = rho_min + (1.0 - tempvalue) * (rho_max - rho_min);
-		phi[i] = phi_dist(Phi_engine);
-		if (rho[i]<0)
-		{
-			rho[i]*=-1;
-			if (phi[i]>=180.0)
-				phi[i]-=180.0;
-			else phi[i]+=180.0;
-		}
+
+		tempvalue = phi_dist(Phi_engine);
+		while ((tempvalue>1)||(tempvalue<0))
+				tempvalue = phi_dist(Phi_engine);
+		phi[i] = phi_min + (1.0 - tempvalue) * (phi_max - phi_min);
+
 		if (rho[i]<mPlotResolution) rho[i] = mPlotResolution;
 		value[i] = CostFunction(rho[i], phi[i]);
 		
@@ -1737,8 +1848,8 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			if ((value[i]<pbestValue[i])
 					&&(rho[i]>rho_min)&&(rho[i]<rho_max))
 			{
-				if ((phi[i]>phi_min)
-					&&(phi[i]<phi_max))
+				if ((phi[i]>phi_min_back)
+					&&(phi[i]<phi_max_back))
 				{
 					change = true;
 //					for (j=1; j<mPosSets[mCurPosI].sMeasurements.size(); j++)
@@ -1782,7 +1893,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					gbestRho = pbestRho[i];
 					gbestPhi = pbestPhi[i];
 				}
-				stop = ((gbestValue<0.00005) || ((iterationN-LastChangedN)>STOPN));
+				stop = (iterationN-LastChangedN)>STOPN;
 				LastChangedN = iterationN;
 				change = false;
 			}
@@ -1808,9 +1919,9 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			}
 
 			phi[i] = fmod(phi[i],360);		
-			if (phi[i]>180+mPosSets[mCurPosI].sMeasurements[0].sAzimuth)
+			if (phi[i]>(180+mPosSets[mCurPosI].sMeasurements[0].sAzimuth))
 				phi[i]-=360;
-			else if (phi[i]<mPosSets[mCurPosI].sMeasurements[0].sAzimuth-180)
+			else if (phi[i]<(mPosSets[mCurPosI].sMeasurements[0].sAzimuth-180))
 				phi[i]+=360;
 
 			if ((rho[i]>rho_max*3)||(rho[i]>120000)||(rho[i]<mPlotResolution)
@@ -1821,7 +1932,10 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					tempvalue = rho_distE(Rho_engine);
 				rho[i] = rho_min + (1.0 - tempvalue) * (rho_max - rho_min);	
 				rho_snelheid[i] = 0;
-				phi[i] = phi_dist(Phi_engine);
+				tempvalue = phi_dist(Phi_engine);
+				while ((tempvalue>1)||(tempvalue<0))
+					tempvalue = phi_dist(Phi_engine);
+				phi[i] = phi_min + (1.0 - tempvalue) * (phi_max - phi_min);
 				phi_snelheid[i] = 0;		
 			}
 			value[i] = CostFunction(rho[i], phi[i]);
@@ -2070,7 +2184,7 @@ bool cPosEstimation::ANNrun()
 	Input[0] = 1;	
 	Input[1] = cos(mPosSets[mCurPosI].sMeasurements[0].sAzimuth*PI/180);
 	Input[2] = sin(mPosSets[mCurPosI].sMeasurements[0].sAzimuth*PI/180);
-	Input[3] = (((double)mPosSets[mCurPosI].sMeasurements[0].sTA+0.5)*mPosSets[mCurPosI].sMeasurements[0].sResDist
+	Input[3] = 2*(((double)mPosSets[mCurPosI].sMeasurements[0].sTA+0.5)*mPosSets[mCurPosI].sMeasurements[0].sResDist
 						- mSites[mCurSiteI].sMaxDist/2)/mSites[mCurSiteI].sMaxDist;
 	Input[4] = (log10(mPosSets[mCurPosI].sMeasurements[0].sResDist)-1.7)/1.4;
 
@@ -2120,7 +2234,7 @@ bool cPosEstimation::ANNrun()
 	newTestPoint.sAzimuth = 180*atan2(OutputA[1],OutputA[0])/PI;
 
 	OutputD = mCurANNd->run(Input);
-	newTestPoint.sDistance = OutputD[0]*mSites[mCurSiteI].sMaxDist + mSites[mCurSiteI].sMaxDist/2;
+	newTestPoint.sDistance = (OutputD[0]+1.0)*mSites[mCurSiteI].sMaxDist/2;
 
 	newTestPoint.sEstimatedLocation.FromHere(mSites[mCurSiteI].sPosition, 
 						newTestPoint.sDistance, newTestPoint.sAzimuth);

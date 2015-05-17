@@ -33,13 +33,13 @@
 #define SENSITIVITY -110
 #define FREQ_SCALE (0.3/450)
 #define FREQ_OFFSET (-945-450)
-#define MEAS_SCALE (0.5/(85-65))
+#define MEAS_SCALE (0.5/85-65)
 #define MEAS_OFFSET 85
 #define RFDist_OFFSET -80
 
-#define MAXepoch 100000
+#define MAXepoch 50000
 #define REPORTInt 5000
-#define ERROR 1e-6
+#define ERROR 1e-7
 
 // include local headers
 #include "../DataBase/Config.h"
@@ -159,6 +159,7 @@ class cTrainPosNetDistAngle
 	unsigned mNumTrain;
 	unsigned mNumTest;
 	bool mLTEsim;
+	bool mUMTS;
 	bool mOriginal;
 };
 }

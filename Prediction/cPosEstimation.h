@@ -31,7 +31,7 @@
 #define SIGMA2 (14*14)
 #define MARGIN 15
 #define SENSITIVITY -110
-#define NUMPARTICLES 40
+#define NUMPARTICLES 50
 #define INERTIA 0.7
 #define Cp 1.4
 #define Cg 1.4
@@ -54,6 +54,7 @@
 #include "doublefann.h"
 #include "fann_cpp.h"
 #include "cTrainPosNetDistAngle.h"
+//#include "cTrainAntPattern.h"
 
 using namespace std;
 using namespace Qrap;
@@ -82,7 +83,7 @@ struct tTestPoint
 	unsigned	sOriginalTP;
 	cGeoP		sEstimatedLocation;
 	cGeoP		sOriginalLocation;
-	eMethod		sMethodUsed;
+	eMethod	sMethodUsed;
 	double		sErrorEstimate;
 	double		sErrorActual;
 	double		sAzimuth; //with respect to serving cell/site
@@ -98,23 +99,24 @@ struct tMeas
 	unsigned 	sSiteID;
 	cGeoP		sSiteLocation;
 	unsigned	sCellID;
+	
 	cGeoP		sCentroid;
-	bool		sServingCell;
+	bool			sServingCell;
 	unsigned	sInstKeyFixed;
-	double 		sEIRP;
+	double 	sEIRP;
 	unsigned	sAntPatternKey;
 	double		sFrequency;
-	double 		sMeasValue;
+	double 	sMeasValue;
 	double		sPathLoss;
 	double		sRFDistEstimate; // "pathloss" corrected for frequency and EIRP 
-	double 		sPredValue;
-	float		sTilt;
+	double 	sPredValue;
+	float			sTilt;
 	double		sHeight;
 	double		sAzimuth;
-	double 		sBeamWidth;
+	double 	sBeamWidth;
 	double		sDistance;
-	int	sTA; 		// this could be GSM TA or UMTS timeDiff
-	double 		sResDist;
+	int				sTA; 		// this could be GSM TA or UMTS timeDiff
+	double 	sResDist;
 };
 
 typedef	vector<tMeas> vMeas;
@@ -142,13 +144,13 @@ struct tSiteInfo
 {
 	unsigned	sSiteID;
 	cGeoP		sPosition;
-	vCellSet	sCellSet;
+	vCellSet		sCellSet;
 	double		sMaxDist;
 	unsigned	sNumInputs;
 	unsigned	sNumOutputsA;
 	unsigned	sNumOutputsD;
-	string		sANNfileA;	
-	string		sANNfileD;		
+	string			sANNfileA;	
+	string			sANNfileD;		
 };
 
 typedef	vector<tSiteInfo> vSiteInfo;
@@ -164,10 +166,10 @@ class cPosEstimation
 	~cPosEstimation(); // destructor
 
 	bool LoadMeasurements(vPoints Points,
-				unsigned MeasType=0, 
-				unsigned MeasSource=0,
-				unsigned PosSource=0,
-				unsigned Technology=0);
+									unsigned MeasType=0, 
+									unsigned MeasSource=0,
+									unsigned PosSource=0,
+									unsigned Technology=0);
 
 	void EstimatePositions();
 	int SaveResults();
@@ -193,10 +195,12 @@ class cPosEstimation
 	unsigned mCurPosI;
 	FANN::neural_net *mCurANNa;
 	FANN::neural_net *mCurANNd;
+	FANN::neural_net *mAntennasANN;
 	unsigned mCurSiteI;
 	unsigned mNumPoints;
 	unsigned mNewTP;
 	unsigned mNumSites;
+	unsigned mNum;
 
 	double mPlotResolution;
 	double mkFactor;
@@ -217,8 +221,10 @@ class cPosEstimation
 	vector<tFixed>	mFixedInsts;	///< Information on the fixed installations
 	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
 	vSiteInfo mSites;
-	bool mLTEsim;	
+	bool mLTEsim;
+	bool mUMTS;	
 	bool mOriginal;
+	bool mUseANNantenna;
 };
 }
 #endif

@@ -293,7 +293,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
 			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
 
-//			if (DiffLoss < 3)
+			if (DiffLoss < 3)
 			{
 					Delta =  PathLoss + NewMeasurement.sMeasValue;
 					Total +=Delta;
@@ -496,7 +496,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 			minTrainError = MAXDOUBLE;
 			stop = false;	
 			k=0;
-			while ((k<antMAXepoch)&&(!stop))
+			while ((k<antMAXepoch+1)&&(!stop))
 			{
 				TrainError = mANN.train_epoch(TrainData);
 				TestError = mANN.test_data(TestData);
@@ -508,7 +508,11 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 						<< "	TrainErr = " << TrainError 
 						<< "	TestErr = " << TestError << endl;
 				}
-				if ((TrainError <= minTrainError)&&(TestError<=minTestError)&&(k>antMAXepoch/4))
+				if (k==antREPORTInt)
+				{
+						mANN.set_train_error_function(FANN::ERRORFUNC_TANH);
+				}
+				if ((TrainError <= minTrainError)&&(TestError<=minTestError))
 				{
 					mANN.save(filename);
 					stop = (TestError < antERROR)&&(TrainError < antERROR);

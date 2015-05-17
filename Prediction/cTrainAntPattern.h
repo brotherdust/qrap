@@ -38,8 +38,8 @@
 #define RFDist_OFFSET -80
 #define SCALE 50.0
 
-#define antMAXepoch 500000
-#define antREPORTInt 50000
+#define antMAXepoch 250000
+#define antREPORTInt 10000
 #define antERROR 1e-6
 
 // include local headers

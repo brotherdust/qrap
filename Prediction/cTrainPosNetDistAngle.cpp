@@ -33,7 +33,8 @@ cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 {
 	
 	mLTEsim = false;
-	mOriginal = true; 
+	mOriginal = false; 
+	mUMTS =false;
 
 }
 
@@ -466,6 +467,15 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 							addDist = 50.0*distError(LTEdistance);
 						Distance = Distance + addDist;
 					}
+
+					if (mUMTS)
+					{
+						NewTestPoint.sResDist = 38;
+						addDist =  50.0*distError(LTEdistance);
+						while ((Distance + addDist)<=0)
+							addDist = 50.0*distError(LTEdistance);
+						Distance = Distance + addDist;
+					}
 //					cout << " Distance = " << Distance << endl;
 				
 					if (mOriginal) 
@@ -620,7 +630,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 			{
 				mSites[i].sInputTrain[j][1] = cos(mPosSetsTrain[TrainIndex].sTestPoints[0].sServCellAzimuth*PI/180);
 				mSites[i].sInputTrain[j][2] = sin(mPosSetsTrain[TrainIndex].sTestPoints[0].sServCellAzimuth*PI/180);
-				mSites[i].sInputTrain[j][3] = (((double)mPosSetsTrain[TrainIndex].sTestPoints[0].sTA+0.5)
+				mSites[i].sInputTrain[j][3] = 2*(((double)mPosSetsTrain[TrainIndex].sTestPoints[0].sTA+0.5)
 																	*mPosSetsTrain[TrainIndex].sTestPoints[0].sResDist 
 																	- mSites[i].sMaxDist/2)/mSites[i].sMaxDist;
 				mSites[i].sInputTrain[j][4] = (log10(mPosSetsTrain[TrainIndex].sTestPoints[0].sResDist-1.7))/1.4;
@@ -681,7 +691,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 			{
 				mSites[i].sInputTest[j][1] = cos(mPosSetsTest[TestIndex].sTestPoints[0].sServCellAzimuth*PI/180);
 				mSites[i].sInputTest[j][2] = sin(mPosSetsTest[TestIndex].sTestPoints[0].sServCellAzimuth*PI/180);
-				mSites[i].sInputTest[j][3] = (((double)mPosSetsTest[TestIndex].sTestPoints[0].sTA+0.5)
+				mSites[i].sInputTest[j][3] = 2*(((double)mPosSetsTest[TestIndex].sTestPoints[0].sTA+0.5)
 							*mPosSetsTest[TestIndex].sTestPoints[0].sResDist 
 							- mSites[i].sMaxDist/2)/mSites[i].sMaxDist;
 				mSites[i].sInputTest[j][4] = (log10(mPosSetsTest[TestIndex].sTestPoints[0].sResDist)-1.7)/1.4;
@@ -694,7 +704,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 					mSites[i].sInputTest[j][3*q+7] = (945+FREQ_OFFSET)*FREQ_SCALE; 	
 				}
 
-				mSites[i].sOutputDistTest[j][0] = (mPosSetsTest[TestIndex].sTestPoints[0].sDistance 
+				mSites[i].sOutputDistTest[j][0] = 2*(mPosSetsTest[TestIndex].sTestPoints[0].sDistance 
 								- mSites[i].sMaxDist/2)/mSites[i].sMaxDist;
 				mSites[i].sOutputAngleTest[j][0] = cos(mPosSetsTest[TestIndex].sTestPoints[0].sBearing*PI/180);
 				mSites[i].sOutputAngleTest[j][1] = sin(mPosSetsTest[TestIndex].sTestPoints[0].sBearing*PI/180);
@@ -889,7 +899,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 			minTestError = 99999999;
 			stop = false;	
 			k=0;
-			while ((k<MAXepoch+1)&&(!stop))
+			while ((k<2*MAXepoch+1)&&(!stop))
 			{
 				TrainError = ANN.train_epoch(TrainDataDist);
 				TestError = ANN.test_data(TestDataDist);
@@ -907,14 +917,14 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 /*					cout << "siteid = " << mSites[i].sSiteID << "	k=" << k 
 						<< "	TrainErr = " << TrainError 
 						<< "	TestErr = " << TestError << endl;
-*/					stop = (TestError < ERROR/3)&&(TrainError < ERROR/3);
+*/					stop = (TestError < ERROR)&&(TrainError < ERROR);
 					minTrainError = TrainError;
 					minTestError = TestError;
 //					ANN.set_learning_rate(0.4);
 				}
 //				else if (TestError > minTestError*1.05) stop = true; 
 				k++;
-				if (k==ceil(MAXepoch/2))			
+				if (k==MAXepoch)			
 					ANN.set_train_error_function(FANN::ERRORFUNC_TANH);
 			} 
 

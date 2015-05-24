@@ -98,8 +98,8 @@ int main (int argc, char **argv)
 	cout << endl << "Wrote Measurements to DataBase" << endl;
 */
 
-
 /*
+
 
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
@@ -122,7 +122,8 @@ int main (int argc, char **argv)
 cout << "Starting Optimisation ... in main()" << endl; 
 
  	Meas.OptimiseHeights(6);
-
+*/
+/*
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -133,11 +134,11 @@ cout << "Starting Optimisation ... in main()" << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
 	Meas.OptimiseModelCoefD(6);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+ 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
 
-/*
+
 	cTrainPosNetDistAngle NeuralNets;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -154,16 +155,16 @@ cout << "Starting Optimisation ... in main()" << endl;
 	Hoek[4].Set(-26.06, 28.26);
 	Punte.push_back(Hoek[4]);
 	
-	delete [] Hoek;
+	delete [] Hoek; 
 	
 	cout << "In main Loading measurements " << endl;
 	NeuralNets.LoadSites(Punte,2,6,1,1);
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Train",true);
 	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Test",false);
+	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Train",true);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
+
 
 /*
   	string query = "update coefficients set coefficient=0.0;";
@@ -220,7 +221,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-
+/*
   	string query = "update coefficients set coefficient=0.0;";
 
 	if (!gDb.PerformRawSql(query))
@@ -254,7 +255,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-
+*/
 
 /*
 

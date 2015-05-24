@@ -33,9 +33,9 @@
 #define SENSITIVITY -110
 #define FREQ_SCALE (0.3/450)
 #define FREQ_OFFSET (-945-450)
-#define MEAS_SCALE (0.5/(85-65))
-#define MEAS_OFFSET 85
-#define RFDist_OFFSET -80
+#define MEAS_SCALE (2.0/(100-50))
+#define MEAS_OFFSET 75
+#define RFDist_OFFSET -65
 #define SCALE 50.0
 
 #define antMAXepoch 250000

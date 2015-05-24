@@ -33,13 +33,13 @@
 #define SENSITIVITY -110
 #define FREQ_SCALE (0.3/450)
 #define FREQ_OFFSET (-945-450)
-#define MEAS_SCALE (0.5/85-65)
-#define MEAS_OFFSET 85
-#define RFDist_OFFSET -80
+#define MEAS_SCALE (2.0/(100-50))
+#define MEAS_OFFSET 75
+#define RFDist_OFFSET -65
 
-#define MAXepoch 50000
-#define REPORTInt 5000
-#define ERROR 1e-7
+#define MAXepoch 300000
+#define REPORTInt 10000
+#define ERROR (0.0015/5000)
 
 // include local headers
 #include "../DataBase/Config.h"
@@ -105,6 +105,7 @@ struct tSiteInfoNN
 	cGeoP			sPosition;
 	vCellSet 		sCellSet;
 	double			sMaxDist;
+	double			sMedianDist;
 	unsigned		sNumInputs;
 	unsigned		sNumOutputsA;
 	unsigned		sNumOutputsD;

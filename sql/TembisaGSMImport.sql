@@ -328,6 +328,11 @@ where testpointauxGSM.tp = testlist.tp;
 
 drop table train;
 
+create table test(
+tp integer,
+servci integer,
+ta smallint);
+
 create table train as select
 distinct testpointauxGSM.tp as tp, servci, ta
 from testpointauxGSM cross join trainlist
@@ -807,6 +812,25 @@ where testpoint.id=tp
 group by ta
 order by ta;
 
+create table sitelist as select siteid from neuralnet;
+
 delete from testpoint where id in 
 (select tp from train);
 
+INSERT into testpoint (id, originaltp, positionsource, location) 
+Values (2073373, 11559, 13,ST_GeomFromText('POINT(28.1347 -26.0272)',4326));
+
+select * from positionsource;
+
+insert into positionsource values (13, now(), 1, 'ANNLineSearch', 'ANN Angle + Line Search');
+
+select median(mindist) from
+(select siteid, round(min(distance)) as mindist from 
+(select site1.id as siteid, site2.id, 
+st_distance(st_transform(site1.location,32726), st_transform(site2.location, 32726)) as distance
+from site as site1 cross join site as site2
+where site1.id<>site2.id
+and site1.id in (select siteid from sitelist)
+and site2.id in (select siteid from sitelist)) as lys
+group by siteid
+order by mindist) as afstande;

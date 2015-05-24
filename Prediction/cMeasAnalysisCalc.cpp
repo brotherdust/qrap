@@ -1158,7 +1158,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		Up[i] = true;
 		CHeightDiff[i] = 0.5;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
-		DeltaH[i] = -0.2;
+		DeltaH[i] = 0.2;
 		NumClut[i] = 0;
 		Passed[i] = false;
 	}

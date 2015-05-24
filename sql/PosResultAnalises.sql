@@ -147,12 +147,10 @@ select * from Results;
 drop table AziErrorDistribution;
 
 update results set aziErr= aziErr + 360
-where aziErr < 180;
+where aziErr < - 180;
 
-update results set aziErr= abs(aziErr);
 
 update positionestimate set Distance = abs(Distance);
-
 
 create table AziErrorDistribution as
 select positionsource, aziError, count(*) from 
@@ -188,6 +186,15 @@ from Results) as temp
 group by positionsource, Error
 order by positionsource, Error;
 
+select * from measurement;
+
+drop table measedist;
+create table measdist as
+select meas, count(*) from
+(select round(measvalue) as meas
+from measurement) as temp
+group by meas
+order by meas;
 
 create table ANNerrorDistribution as
 select siteid, Error, count(*) from 
@@ -287,3 +294,14 @@ order by delta desc) as binne
 where delta>3); 
 
 delete from testpoint where id in (select tp from todeletetp);
+
+Select distinct id, landcoverid, height, width from 
+(SELECT this.id as id, this.landcoverid as landcoverid, 
+standard.height as height, standard.width as width 
+FROM cluttertype as this CROSS JOIN cluttertype standard  
+WHERE standard.id=this.standardtype  
+AND this.classgroup=1 
+UNION  
+SELECT id, landcoverid, height, width  
+FROM cluttertype WHERE standardtype is NULL  AND classgroup=1 ) 
+as alles order by landcoverid;

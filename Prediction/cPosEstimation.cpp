@@ -32,9 +32,9 @@
 cPosEstimation::cPosEstimation() // default constructor
 {
 	mUseANNantenna = false;
-	mLTEsim = false;
+	mLTEsim = true;
 	mOriginal = false;
-	mUMTS =false;
+	mUMTS = false;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -183,7 +183,6 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 	query += "from site cross join NeuralNet cross join anninputlist ";
 	query += "where NeuralNet.siteid=site.id ";
 	query += "and anninputlist.annid= NeuralNet.id ";
-	query += "and anninputlist.siteid=site.id ";
 	query += "and site.location ";
 	query += areaQuery;
 	query += " order by siteid, type, index; ";
@@ -1707,9 +1706,9 @@ bool cPosEstimation::DCM_ParticleSwarm()
 
 	cout << "mPosSets[mCurPosI].sMeasurements[0].sBeamWidth = " << mPosSets[mCurPosI].sMeasurements[0].sBeamWidth << endl;
 	phi_min = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
-		- (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth);
+		- (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/2);
 	phi_max = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
-		+ (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth);	
+		+ (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/2);	
 	phi_min_back = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
 		- (ceil)(4*mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/5);
 	phi_max_back = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
@@ -1736,7 +1735,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 
     	std::random_device PhiRD;
     	std::mt19937_64 Phi_engine(PhiRD());
-		uniform_real_distribution<double> phi_dist(0,1);
+		uniform_real_distribution<double> phi_dist(phi_min,phi_max);
 
 	gbestValue = MAXDOUBLE;
 	for (i=0; i<NumBest; i++)
@@ -1756,10 +1755,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 		}
 		rho[i] = rho_min + (1.0 - tempvalue) * (rho_max - rho_min);
 
-		tempvalue = phi_dist(Phi_engine);
-		while ((tempvalue>1)||(tempvalue<0))
-				tempvalue = phi_dist(Phi_engine);
-		phi[i] = phi_min + (1.0 - tempvalue) * (phi_max - phi_min);
+		phi[i] = phi_dist(Phi_engine);
 
 		if (rho[i]<mPlotResolution) rho[i] = mPlotResolution;
 		value[i] = CostFunction(rho[i], phi[i]);
@@ -1932,10 +1928,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					tempvalue = rho_distE(Rho_engine);
 				rho[i] = rho_min + (1.0 - tempvalue) * (rho_max - rho_min);	
 				rho_snelheid[i] = 0;
-				tempvalue = phi_dist(Phi_engine);
-				while ((tempvalue>1)||(tempvalue<0))
-					tempvalue = phi_dist(Phi_engine);
-				phi[i] = phi_min + (1.0 - tempvalue) * (phi_max - phi_min);
+				phi[i] = phi_dist(Phi_engine);
 				phi_snelheid[i] = 0;		
 			}
 			value[i] = CostFunction(rho[i], phi[i]);
@@ -2186,7 +2179,7 @@ bool cPosEstimation::ANNrun()
 	Input[2] = sin(mPosSets[mCurPosI].sMeasurements[0].sAzimuth*PI/180);
 	Input[3] = 2*(((double)mPosSets[mCurPosI].sMeasurements[0].sTA+0.5)*mPosSets[mCurPosI].sMeasurements[0].sResDist
 						- mSites[mCurSiteI].sMaxDist/2)/mSites[mCurSiteI].sMaxDist;
-	Input[4] = (log10(mPosSets[mCurPosI].sMeasurements[0].sResDist)-1.7)/1.4;
+	Input[4] = (mPosSets[mCurPosI].sMeasurements[0].sResDist)/600;
 
 	for (q=0; q<mSites[mCurSiteI].sCellSet.size(); q++)
 	{

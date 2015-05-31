@@ -32,9 +32,9 @@
 cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 {
 	
-	mLTEsim = true;
+	mLTEsim = false;
 	mOriginal = false; 
-	mUMTS = false;
+	mUMTS = true;
 
 }
 
@@ -411,10 +411,11 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 			siteid = atoi(r[i]["siteid"].c_str());
 			if (siteid != mSites[siteIndex].sSiteID)
 			{
-				cout << "Max = " << mSites[siteIndex].sMaxDist << "	Median = " << mSites[siteIndex].sMedianDist;
+				mSites[siteIndex].sMaxDist = mSites[siteIndex].sMaxDist+60;
+/*				cout << "Max = " << mSites[siteIndex].sMaxDist << "	Median = " << mSites[siteIndex].sMedianDist;
 				mSites[siteIndex].sMaxDist = min (mSites[siteIndex].sMaxDist+60, 2*mSites[siteIndex].sMedianDist);
 				cout << "	mSites[siteIndex].sMaxDist = " << mSites[siteIndex].sMaxDist << endl;
-				if (Train) 	mSites[siteIndex].sNumDataRowsTrain = Counter;
+*/				if (Train) 	mSites[siteIndex].sNumDataRowsTrain = Counter;
 				else		mSites[siteIndex].sNumDataRowsTest = Counter;
 
 				onder = 0;
@@ -932,7 +933,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 			while ((k<MAXepoch+1)&&(!stop))
 			{
 				TrainError = ANN.train_epoch(TrainDataDist);
-				TestError = ANN.test_data(TestDataDist);
+				TestError  = ANN.test_data(TestDataDist);
 				if (0==k%REPORTInt)
 				{
 //					TestError = ANN.get_MSE();

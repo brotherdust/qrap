@@ -32,9 +32,9 @@
 cPosEstimation::cPosEstimation() // default constructor
 {
 	mUseANNantenna = false;
-	mLTEsim = true;
+	mLTEsim = false;
 	mOriginal = false;
-	mUMTS = false;
+	mUMTS = true;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;

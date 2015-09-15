@@ -64,13 +64,15 @@ cAntennaPattern::cAntennaPattern()
 	for (unsigned i=0; i<mNAA; i++)
 		for (unsigned j=0; j<mNEA; j++)
 			mAntPattern[i][j]=0.0;
-	mPatternFile = new char[DB_FILE_SIZE];
+	mFile = new char[DB_FILE_SIZE];
 	mName = new char[DB_NAME_SIZE];
 	mMake = new char[DB_MAKE_SIZE];
 	mDescription = new char[DB_DESCRIB_SIZE];
 	mPol = new char[2];
 	mPol[0] ='V';
 	mPol[1] ='\0'; 
+	mAntennasANN = new FANN::neural_net[2];
+	mUseANN = false;
 }/* end CAntennaPattern:: Default Constructor */
 
 
@@ -83,28 +85,76 @@ cAntennaPattern::~cAntennaPattern()
 	delete [] mElevAngles;
 	delete [] mElevValues;
 	delete_Float2DArray(mAntPattern);
-	delete [] mPatternFile;
+	delete [] mFile;
 	delete [] mName;
 	delete [] mMake;
 	delete [] mDescription;
 	delete [] mPol; 
+	mAntennasANN->destroy();
 }/* end CAntennaPattern:: Destructor */
 
 // ********************************************************************
 // Set antenna pattern file
-bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, double MechTilt)
+bool cAntennaPattern::SetAntennaPattern(int Key, bool UseANN, eAnt Type, 
+																					double Bearing, double MechTilt)
 {	
 
-//	cout << "PatternKey = "	<< Ant_PatternKey << "	Bearing = " << Bearing << "	Tilt = " << MechTilt << endl;
+//	cout << "RadKey = "	<< Key << "	Bearing = " << Bearing << "	Tilt = " << MechTilt << endl;
 	pqxx::result r;
 
-	string QueryResult;
+	string QueryResult, query, filename;
 	string Result;
 	unsigned NumBytes;
 	unsigned i,k,l;
 //	int DeviceKey;
+	unsigned AntKey;
 	char* Temp;
-	Temp = new char[33];
+	Temp = new char[12];
+
+	mUseANN = UseANN;
+
+//	cout << "cAntennaPattern::SetAntennaPattern. Before if (mUseANN) " << endl;
+	if (mUseANN)
+	{
+		query = "select filename from AntNeuralNet cross join radioinstallation ";
+		query += "where radid=cell.id and radioinstallation.id = ";
+		gcvt(Key, 8, Temp);
+		query += Temp;
+		query += ";";	
+
+		if(!gDb.PerformRawSql(query))
+		{
+				string err = "cAntennaPattern::SetAntennaPattern: Query to antenna ANN file failed. Failed query: ";
+				err+=query;
+				cout << err << endl;
+				QRAP_WARN(err.c_str());
+				mUseANN = false;
+		}
+		else
+		{
+			gDb.GetLastResult(r);
+			if(r.size()>0)
+			{
+				filename = r[0]["filename"].c_str();
+				mAntennasANN->destroy();
+				mAntennasANN->create_from_file(filename);
+				mGain = 0;
+			}
+			else
+			{
+				string err = "cAntennaPattern::SetAntennaPattern: Empty query to antenna ANN file. Empty query: ";
+				err+=query;
+				cout << err << endl;
+				QRAP_WARN(err.c_str());
+				mUseANN = false;
+			}
+		}
+	}
+	
+	if (mUseANN) return true;
+
+//	cout << "cAntennaPattern::SetAntennaPattern. Na if (mUseANN) " << endl;
+
 	int pp, ss, sign; 	//point position
 	float *TempAziAngles;
 	float *TempElevAngles;
@@ -118,44 +168,66 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 	
 	mBearing = Bearing;
 	mMechTilt = MechTilt;
-	
-	string CmdStr1("SELECT AntDeviceKey, Frequency, Gain, AziBeamwidth, patternFile");
-	CmdStr1+=" FROM AntennaPattern WHERE ID =";
-	gcvt(Ant_PatternKey, 8, Temp);
-	CmdStr1 += Temp;
-	CmdStr1 += ";";
-	
-	if(!gDb.PerformRawSql(CmdStr1))
+
+	query = "select antdevicekey, antennapattern.id as antid, Frequency, Gain, AziBeamwidth, patternFile ";
+	if (Type	==Mobile )
+	{
+		query += "from mobile cross join antennapattern where " ;
+		query += "mobile.antpatternkey = AntennaPattern.id ";
+ 		query += "and mobile.id = ";
+	}
+	else
+	{
+		query+=" FROM AntennaPattern cross join radioinstallation WHERE " ;
+		query += "AntennaPattern.ID = radioinstallation.";
+		if (Type==Tx)
+			query += "tx";
+		else
+			query += "rx";
+		query += "antpatternkey AND radioinstallation.ID = ";
+	}
+	gcvt(Key, 8, Temp);
+	query += Temp;
+	query += ";";
+
+//	cout << query << endl;	
+//	cout << "cAntennaPattern::SetAntennaPattern. Query prepared. Before run query " << endl;
+
+	if(!gDb.PerformRawSql(query))
 	{
 		string err = "Get AntennaPattern Parameters Failed. Query Failed: ";
-		err+=CmdStr1;
+		err+=query;
 		cout << err << endl;
 		QRAP_ERROR(err.c_str());
 		return false;
 	}
 	else
 	{
+//		cout << "cAntennaPattern::SetAntennaPattern. No Err " << endl;
 		gDb.GetLastResult(r);
-		if(r.size()!=0)
+		if(r.size()>0)
 		{
+//			cout << "cAntennaPattern::SetAntennaPattern. Size > 0 " << endl;
 //			DeviceKey = atoi(r[0]["antdevicekey"].c_str());
+//			cout << "cAntennaPattern::SetAntennaPattern. Before AntID " << endl;
+			AntKey = atoi(r[0]["antid"].c_str());
 			mFreq = atof(r[0]["frequency"].c_str());
 			mGain = atof(r[0]["gain"].c_str());
 			mBeamW = atof(r[0]["azibeamwidth"].c_str());
-			strcpy(mPatternFile, r[0]["patternFile"].c_str());
-//			cout << mPatternFile << endl;
+			strcpy(mFile, r[0]["patternFile"].c_str());
+//			cout << mFile << endl;
 		}
 		else
 		{
 			string err = "AntennaPattern Entry not found, assuming zero gain. Empty Query: ";
-			err += CmdStr1;
+			err += query;
 			cout << err << endl;
 			QRAP_WARN(err.c_str());
 			return false;
 		}
 	}
 	
-//	cout << "After got basic info. Ant_PatternKey := " << Ant_PatternKey << endl;
+//	cout << "After got basic info. RadKey := " << Key << endl;
 	
 	string CmdStr;
 //   cout << "After declaring CmdStr"  << endl;
@@ -166,7 +238,7 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 
 //   cout << "After setting basic CmdStr"  << endl;
  
-	gcvt(Ant_PatternKey, 8, Temp);
+	gcvt(AntKey, 8, Temp);
 //	cout << Temp << endl;
 	CmdStr += Temp;
 	CmdStr += ";";
@@ -834,6 +906,25 @@ bool cAntennaPattern::SetAntennaPattern(int Ant_PatternKey, double Bearing, doub
 //***********************************************************************
 double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 {
+	
+	if (mUseANN)
+	{
+		double *AntANNInput;
+		AntANNInput = new double[5];
+		double *AntANNValue;
+		double AntValue;
+		AntANNInput[0]  = 1;
+		AntANNInput[1] = cos(Azimuth*PI/180);
+		AntANNInput[2] = sin(Azimuth*PI/180);
+		AntANNInput[3] = cos(Elevation*PI/180);
+		AntANNInput[4] = sin(Elevation*PI/180);
+		AntANNValue = mAntennasANN->run(AntANNInput);
+		AntValue = (AntANNValue[0]+0.5)*ANTENNASCALE;
+		delete [] AntANNValue;
+		delete [] AntANNInput;
+		return AntValue;
+	}
+
 	if ((mNAA>9990)||(mNEA>9990)
 			||(Azimuth>500)||(Azimuth<-500)||(Elevation>180)||(Elevation<-180))
 	{
@@ -849,7 +940,7 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 	
 	Az = Azimuth - mBearing;
 
-	if (Az>360.0) Az-=360.0;
+	if (Az>=360.0) Az-=360.0;
 	else if (Az<0.0) Az+=360.0;
 	
 	El = Elevation;
@@ -885,7 +976,11 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 	if ((Az-mAziAngles[ref_Azi])<0)
 	{
 		if (ref_Azi>0)  ref_Azi--;
-		else ref_Azi=mNAA-1; // Because the azimuth values rap around
+		else 
+		{
+			cout << "Azi rap around" << endl;
+			ref_Azi=mNAA-1; // Because the azimuth values rap around
+		}
 	}
 	
 	// What happens if value lies just before ref0??
@@ -923,11 +1018,18 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 	}
 	else if (ref_Azi>mNAA-2)
 	{
-		cout << "Azi_ref: " << ref_Azi <<  endl; 
-		ValueAz1 = mAntPattern[ref_Azi][ref_El];
-		Value = ValueAz1 + (El-mElevAngles[ref_El])
-				*(mAntPattern[ref_Azi][ref_El+1]-ValueAz1)
-				/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
+		cout<< "Az="<< Az << "	Azi_ref=" << ref_Azi;
+		cout << "	El_ref=" << ref_El << endl; 
+			ValueAz1 = mAntPattern[ref_Azi][ref_El];
+			ValueAz1 = ValueAz1 + (El-mElevAngles[ref_El])
+									*(mAntPattern[ref_Azi][ref_El+1]-ValueAz1)
+									/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
+			ValueAz2 = mAntPattern[0][ref_El];
+			ValueAz2 = ValueAz2 + (El-mElevAngles[ref_El])
+									*(mAntPattern[0][ref_El+1]-ValueAz2)
+										/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
+			Value = ValueAz1 + (Az-mAziAngles[ref_Azi])*(ValueAz2-ValueAz1)
+						/(360+mAziAngles[0]-mAziAngles[ref_Azi]);
 	}
 	else
 	{

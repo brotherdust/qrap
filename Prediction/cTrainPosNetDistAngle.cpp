@@ -34,7 +34,7 @@ cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 	
 	mLTEsim = false;
 	mOriginal = false; 
-	mUMTS = true;
+	mUMTS = false;
 
 }
 
@@ -631,8 +631,8 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 	TrainIndex = 0;
 	TestIndex = 0;
 
-	for (i=0; i<mNumSites; i++)
-//	for (i=29; i<mNumSites; i++)
+//	for (i=0; i<mNumSites; i++)
+	for (i=29; i<mNumSites; i++)
 	{
 		cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;
 		cout << "		mSites[i].sNumOutputsA = " << mSites[i].sNumOutputsA;
@@ -776,8 +776,12 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 						mSites[i].sNumInputs, mSites[i].sInputTest,
 						mSites[i].sNumOutputsA, mSites[i].sOutputAngleTest);
 
-			unsigned HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsA*(5 + 2.8*max(0,(int)mSites[i].sCellSet.size()) )));
-			unsigned HiddenN2 = 7;
+			unsigned n = (5 + 3*max(0,(int)mSites[i].sCellSet.size()));
+			unsigned HiddenN1 = (4.0*n*n+3)/(n*n-8);
+			unsigned HiddenN2 = (4.0*HiddenN1*HiddenN1+3)/(HiddenN1*HiddenN1-8);
+//			unsigned HiddenN2 = 7;
+//			unsigned HiddenN1 = ceil(sqrt(mSites[i].sNumOutputsA*(5 + 2.8*max(0,(int)mSites[i].sCellSet.size()) )));
+//			unsigned HiddenN2 = 7;
 //			double FanIn=sqrt(3);
 			double FanIn = 2.0;
 			FanIn = pow(mSites[i].sNumInputs/HiddenN1,0.5);

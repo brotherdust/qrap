@@ -102,6 +102,11 @@ cLink::cLink()
 	mRxInst.sRange=0;
 	mRxInst.sFEdge=0;
 	mRxInst.sBEdge=0;
+
+	mUseAntennaANN=false;
+	string setting = gDb.GetSetting("UseAntennaANN");
+	if (setting=="true")
+		mUseAntennaANN=true;
 }
 
 //**************************************************************************
@@ -329,19 +334,16 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 
 	bool AfterReceiver = (mUnits!=dBWm2Hz) && (mUnits!=dBWm2);	
 
-	if (mDownlink)
-	{
-		mTxAnt.SetAntennaPattern(mTxInst.sTxPatternKey, mTxInst.sTxAzimuth,  mTxInst.sTxMechTilt);
-		mRxAnt.SetAntennaPattern(mRxInst.sRxPatternKey, mRxInst.sRxAzimuth,  mRxInst.sRxMechTilt);
-		EIRP = mTxInst.sTxPower - mTxInst.sTxSysLoss + mTxAnt.mGain;
-	}
-	else
-	{
-		mTxAnt.SetAntennaPattern(mTxInst.sRxPatternKey, mTxInst.sRxAzimuth,  mTxInst.sRxMechTilt);
-		mRxAnt.SetAntennaPattern(mRxInst.sTxPatternKey, mRxInst.sTxAzimuth,  mRxInst.sTxMechTilt);
-		EIRP = mRxInst.sTxPower - mRxInst.sTxSysLoss + mRxAnt.mGain;
-	}
-	
+	eAnt Which;
+	if (mDownlink) Which =Tx;
+	else Which = Rx;
+	mTxAnt.SetAntennaPattern(mTxInst.sInstKey, mUseAntennaANN, Which, mTxInst.sTxAzimuth,  mTxInst.sTxMechTilt);
+	if (mDownlink) Which =Rx;
+	else Which = Tx;
+	mRxAnt.SetAntennaPattern(mRxInst.sInstKey, mUseAntennaANN, Which, mRxInst.sRxAzimuth,  mRxInst.sRxMechTilt);
+	if (mDownlink) EIRP = mTxInst.sTxPower - mTxInst.sTxSysLoss + mTxAnt.mGain;
+	else mRxInst.sTxPower - mRxInst.sTxSysLoss + mRxAnt.mGain;
+
 	AfterReceiver = (mUnits==dBW)||(mUnits==dBm)||(mUnits==dBuV);
 	if (AfterReceiver)
 	{

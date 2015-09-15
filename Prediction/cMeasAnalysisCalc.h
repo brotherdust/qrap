@@ -79,7 +79,7 @@ class cMeasAnalysisCalc
 				unsigned MeasSource=0, unsigned Cell=0);
 
 	int PerformAnalysis(double &Mean, double &MeanSquareError,
-				double &StDev, double &CorrC, unsigned Clutterfilter=0);
+				double &StDev, double &CorrC, unsigned Clutterfilter=0, bool UseAntANN=false);
 
 	int SaveResults();
 

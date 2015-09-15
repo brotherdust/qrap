@@ -28,7 +28,7 @@
 
 #define GAMMA 2.5
 #define MOBILEHEIGHT 1
-#define SIGMA2 (14*14)
+#define SIGMA2 (8.4*8.4)
 #define MARGIN 15
 #define SENSITIVITY -110
 #define FREQ_SCALE (0.3/450)

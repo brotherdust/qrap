@@ -28,7 +28,7 @@
 
 #define GAMMA 2.5
 #define MOBILEHEIGHT 1
-#define SIGMA2 (14*14)
+#define SIGMA2 (8.4*8.4)
 #define MARGIN 15
 #define SENSITIVITY -110
 #define NUMPARTICLES 35  
@@ -36,7 +36,7 @@
 #define Cp 1.4
 #define Cg 1.4
 #define STOPN 50
-#define MAXITER 200
+#define MAXITER 300
 #define DELTA 5e-10
 
 // include local headers
@@ -224,7 +224,7 @@ class cPosEstimation
 	bool mLTEsim;
 	bool mUMTS;	
 	bool mOriginal;
-	bool mUseANNantenna;
+	bool mUseAntennaANN;
 };
 }
 #endif

@@ -95,6 +95,7 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 	cout << "mDEMsource = " << mDEMsource << endl;
 	mDEM.SetRasterFileRules(mDEMsource);
 	mDEM.SetSampleMethod(2);
+
 }
 
 //*********************************************************************
@@ -112,7 +113,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 					unsigned MeasSource, unsigned CI)
 {
 
-//	cout << " In cMeasAnalysisCalc::LoadMeasurements " << endl;
+	cout << " In cMeasAnalysisCalc::LoadMeasurements " << endl;
 	char * text = new char[10];		
 	pqxx::result r, rMobile, rFixed;
 
@@ -193,7 +194,6 @@ bool cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 				mMeasPoints[i].sAzimuth = atof(r[i]["azimuth"].c_str());
 				mMeasPoints[i].sTilt = atof(r[i]["tilt"].c_str());
 				mMeasPoints[i].sClutter = 0;
-
 				
 				if (mMeasPoints[i].sInstKeyMobile != currentMobile)
 				{
@@ -236,7 +236,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 					mMeasPoints[i].sInstKeyFixed = currentFixedInst;
 				else
 				{
-//					cout << "New Cell = " << mMeasPoints[i].sCell << endl;
+					cout << "New Cell = " << mMeasPoints[i].sCell << endl;
 					gcvt(mMeasPoints[i].sCell,8,text);
 					query = "SELECT risector, siteid, ST_AsText(location) as location, eirp,";
 					query += "radioinstallation.txpower as txpower,txlosses,rxlosses";
@@ -244,7 +244,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 					query += "rxbearing,rxmechtilt,txantennaheight,rxantennaheight ";
 					query += "FROM cell CROSS JOIN radioinstallation CROSS JOIN site ";
 					query += "WHERE risector=radioinstallation.id and siteid=site.id ";
-					query += " and cell.id="; 
+					query += "and cell.id="; 
 					query += text;
 					query += ";";
 				
@@ -287,7 +287,6 @@ bool cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 							tempInst.sRxMechTilt = atof(rFixed[0]["rxmechtilt"].c_str());
 							tempInst.sTxHeight = atof(rFixed[0]["txantennaheight"].c_str());
 							tempInst.sRxHeight = atof(rFixed[0]["rxantennaheight"].c_str());
-
 							mFixedInsts.push_back(tempInst);
 						} // if the query was not empty	
 					}// else ... hence the query was successful
@@ -296,14 +295,14 @@ bool cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 		}// if there are measurements
 	} // else ... hence the query was successful
 	
-//	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
+	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
 	return true;
 }
 
 
 //******************************************************************************
 int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
-					double &StDev, double &CorrC, unsigned Clutterfilter)
+					double &StDev, double &CorrC, unsigned Clutterfilter, bool UseAntANN)
 {
 
 	float *TempClutter;
@@ -326,6 +325,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	unsigned currentMobile=0;
 	cAntennaPattern FixedAnt, MobileAnt;
 	double *terms;
+
 	double DiffLoss =0;
 	terms = new double[NUMTERMS];
 	double CMean = 0, CMeanSquareError=0, CStDev = 0, CCorrC = 0;
@@ -346,7 +346,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	
 	for (j=0;j<mPathLoss.mClutter.mNumber;j++)
 	{
-		mClutterCount[j]=0;
+		if (mUseClutter)	mClutterCount[j]=0;
 		LOS[j]=0;
 		NLOS[j]=0;
 	}
@@ -368,6 +368,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	}
 
 //	cout <<"cMeasAnalysisCalc::PerformAnalysis: Na Terms initialisation" << endl;
+	if (0==mFixedInsts.size()) return 0;
+
 	NumUsed = 0;
 	for (i=0; i<mNumMeas; i++) 
 	{
@@ -382,12 +384,15 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					MobileNum++;
 				if (MobileNum == mMobiles.size())
 				{
-					cout << "FixedNum reached limit ... ending measurement analysis" <<endl;
+					cout << "MobileNum reached limit ... ending measurement analysis" <<endl;
 					return 0;
 				}
 //				cout << "Setting Mobile Antenna" << endl;
-				MobileAnt.SetAntennaPattern(mMobiles[MobileNum].sPatternKey, 0, 0);
+				MobileAnt.SetAntennaPattern(mMobiles[MobileNum].sInstKey, false, Mobile, 0, 0);
+
 //				cout << "Setting Path loss parameters" << endl;
+//				cout << "FixedNum = " << FixedNum << endl;
+
 				mPathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
 								mFixedInsts[FixedNum].sTxHeight,
 								mMobiles[MobileNum].sMobileHeight,
@@ -440,12 +445,13 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					return 0;
 				}
 
-//				cout << "Setting Fixed Antenna" << endl;
-				FixedAnt.SetAntennaPattern(mFixedInsts[FixedNum].sTxPatternKey, 
-								mFixedInsts[FixedNum].sTxAzimuth,  
-								mFixedInsts[FixedNum].sTxMechTilt);
+//				cout << "Setting Antenna Pattern to match FixedInstallation" << endl;
+				FixedAnt.SetAntennaPattern(mFixedInsts[FixedNum].sInstKey, UseAntANN, Tx,
+															mFixedInsts[FixedNum].sTxAzimuth,  mFixedInsts[FixedNum].sTxMechTilt);
 				EIRP = mFixedInsts[FixedNum].sTxPower 
-					- mFixedInsts[FixedNum].sTxSysLoss + FixedAnt.mGain + MobileAnt.mGain;
+								- mFixedInsts[FixedNum].sTxSysLoss + FixedAnt.mGain + MobileAnt.mGain;
+
+
 //				cout << "Setting Prediction parameters to match FixedInstallation" << endl;
 				mPathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
 								mFixedInsts[FixedNum].sTxHeight,
@@ -519,8 +525,10 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 */
 //				cout << "cMeasAnalysisCalc::PerformAnalysis ... before antenna effect" << endl;
 				mMeasPoints[i].sAzimuth = mFixedInsts[FixedNum].sSitePos.Bearing(mMeasPoints[i].sPoint);
+
 				AntValue = FixedAnt.GetPatternValue(mMeasPoints[i].sAzimuth, mMeasPoints[i].sTilt)
-						+ MobileAnt.GetPatternValue(0, -mMeasPoints[i].sTilt);
+										+ MobileAnt.GetPatternValue(0, -mMeasPoints[i].sTilt);
+
 				mMeasPoints[i].sPredValue = -mMeasPoints[i].sPathLoss + EIRP - AntValue;
 //				cout << "cMeasAnalysisCalc::PerformAnalysis ... after antenna effect" << endl;
 
@@ -877,7 +885,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 			<< "	MeanSquare: " << MeanSquareError << "	StDev: "<< StDev
 			<< "	CorrC: " << CorrC << endl;
 		// Only optimise if enough points are involved
-		if ((NumUsed > 1000)&&(NumUsed/TotalNumUsed > 0.02))
+		if ((NumUsed > 2000))
 		{
 			for (i=0; i<NUMTERMS; i++)
 			{
@@ -1202,7 +1210,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		{
 			cout << "Starting Exhaustive search " << endl;
 			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
-				DeltaH[i] =1;
+				DeltaH[i] =-1;
 			if (0<mClutterCount[i]) Change[i] =true;
 			smallStepSize = 0;
 			StepSize = 0.0004;

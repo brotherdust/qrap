@@ -2546,11 +2546,11 @@ in #define statements in qrap/Prediction/cClutter.h -->
 			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised and on which machine the file was generated originally."
 			visible="false"/>
  
-		<field name = "cellid"
-		       type = "integer references cell(id) on delete cascade"
-			label = "Cell ID"
-		       description= "Site ID for which to which this neural net apply"
-		       ui = "dropdown(fromtable,cell_view,cellname)" />
+		<field name = "RadID"
+		       type = "integer references radioinstallation(id) on delete cascade"
+				label = "Radio Installation"
+		       description= "RadioInstallation ID for which to which this neural net 'contain' the antenna pattern"
+		       ui = "dropdown(fromtable,radioinstallation_view,sectorname)" />
 
 		<field name = "filename"
 		       type = "text"

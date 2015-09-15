@@ -229,8 +229,12 @@ bool cDatabase::PerformRawSql (const string& command)
 	try
 	{
 		cDatabase::cTransactor trans(this, command);
+
+//cout << "cDatabase::PerformRawSql: After construct trans" << endl;
 		
 		mConnection->perform(trans);
+//cout << "cDatabase::PerformRawSql: executing trans" << endl;
+
 	} catch (pqxx::broken_connection& e)
 	{
 		QRAP_FATAL_CODE("Broken connection while attempting query.", acBrokenConnection);

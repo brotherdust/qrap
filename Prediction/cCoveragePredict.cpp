@@ -37,10 +37,10 @@ cCoveragePredict::cCoveragePredict()
 	mTxSysLoss = 0;	// in dB
 	mRxSysLoss = 0;	// in dB
 	mRxSens = -104;		// in dBm
-	mFixedPatternKey = 1;
+	mFixedInst = 1;
 	mFixedAzimuth = 0;	// in degrees 0 North, positive clockwise
 	mFixedMechTilt = 0;	// in degrees with 0 on horizon and positive down
-	mMobilePatternKey = 1; 
+	mMobileInst = 1; 
 	mBTLloaded = false;
 	mAngleRes = 1; 	// in degees
 	mNumAngles = 360;
@@ -48,6 +48,11 @@ cCoveragePredict::cCoveragePredict()
 	mBTL = new_Float2DArray(mNumAngles,mNumRadialPoints);
 	mTilt = new_Float2DArray(mNumAngles,mNumRadialPoints);
 	mRxLev = new_Float2DArray(mNumAngles,mNumRadialPoints);
+
+	mUseAntennaANN=false;
+	string setting = gDb.GetSetting("UseAntennaANN");
+	if (setting=="true")
+		mUseAntennaANN=true;
 }
 
 
@@ -68,10 +73,10 @@ int cCoveragePredict::SetCommunicationLink(	int		SiteID,
 						double		TxSysLoss,
 						double		RxSysLoss,
 						double		RxSens,
-						int		FixedPatternKey,
+						int		FixedInst,
 						double		FixedAzimuth,
 						double		FixedMechTilt,
-						int		MobilePatternKey,
+						int		MobileInst,
 						double 		FixedHeight, // in meters
 						double 		MobileHeight, // 
 						double 		&Frequency, // in MHz
@@ -94,11 +99,15 @@ int cCoveragePredict::SetCommunicationLink(	int		SiteID,
 	mAngleRes = 360.0/(double)mNumAngles;
 	mDistRes = DistanceRes;
 	
-	mFixedPatternKey = FixedPatternKey;
-	mMobilePatternKey = MobilePatternKey;
+	mFixedInst = FixedInst;
+	mMobileInst = MobileInst;
 
-	mFixedAntenna.SetAntennaPattern(mFixedPatternKey, mFixedAzimuth, mFixedMechTilt);
-	mMobileAntenna.SetAntennaPattern(mFixedPatternKey, 0, 0);
+	eAnt Which;
+
+	if (DownLink) Which = Tx;
+	else Which = Rx;
+	mFixedAntenna.SetAntennaPattern(mFixedInst, mUseAntennaANN, Which, mFixedAzimuth, mFixedMechTilt);
+	mMobileAntenna.SetAntennaPattern(mMobileInst, false, Mobile, 0, 0);
 	
 	// \TODO :
 	if (EIRP<=0.00000001)

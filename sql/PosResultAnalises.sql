@@ -146,9 +146,10 @@ select * from Results;
 
 drop table AziErrorDistribution;
 
+update results set aziErr= aziErr - 360
+where aziErr > 180;
 update results set aziErr= aziErr + 360
-where aziErr < - 180;
-
+where aziErr <- 180;
 
 update positionestimate set Distance = abs(Distance);
 

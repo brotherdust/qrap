@@ -32,6 +32,7 @@
 
 #define QRAP_ALERT_DEFAULT_CALLBACK Qrap::ConsoleAlert
 #define QRAP_DEBUG
+#define ANTENNASCALE 52.0
 
 #include <iostream>
 #include <string.h>
@@ -41,6 +42,8 @@
 #include <pqxx/pqxx>
 #include <pqxx/transaction>
 #include <pqxx/transactor>
+#include "doublefann.h"
+#include "fann_cpp.h"
 #include "Types.h"
 #include "cAlert.h"
 #include "cBase.h"

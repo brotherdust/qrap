@@ -31,10 +31,9 @@
 //*********************************************************************
 cPosEstimation::cPosEstimation() // default constructor
 {
-	mUseANNantenna = false;
 	mLTEsim = false;
 	mOriginal = false;
-	mUMTS = true;
+	mUMTS = false;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -95,6 +94,11 @@ cPosEstimation::cPosEstimation() // default constructor
 	cout << "mDEMsource = " << mDEMsource << endl;
 	mDEM.SetRasterFileRules(mDEMsource);
 	mDEM.SetSampleMethod(2);
+
+	mUseAntennaANN=false;
+	setting = gDb.GetSetting("UseAntennaANN");
+	if (setting=="true")
+		mUseAntennaANN=true;
 
 	mFixedAnts = new cAntennaPattern[2];
 	mCellPathLoss = new double[2];
@@ -672,13 +676,13 @@ void cPosEstimation::EstimatePositions()
 			mFixedAnts = new cAntennaPattern[mNumInsts];
 			for (j=0; j < mNumInsts; j++)
 			{
-				mFixedAnts[j].SetAntennaPattern(mPosSets[mCurPosI].sMeasurements[j].sAntPatternKey, 
-					mPosSets[mCurPosI].sMeasurements[j].sAzimuth, 
-					mPosSets[mCurPosI].sMeasurements[j].sTilt);
+				mFixedAnts[j].SetAntennaPattern(mPosSets[mCurPosI].sMeasurements[j].sInstKeyFixed, 
+																				mUseAntennaANN, Tx, mPosSets[mCurPosI].sMeasurements[j].sAzimuth, 
+																				mPosSets[mCurPosI].sMeasurements[j].sTilt);
 			}
 			mPathLoss.setParameters(mkFactor,mPosSets[mCurPosI].sMeasurements[0].sFrequency,
-					mPosSets[mCurPosI].sMeasurements[0].sHeight, MOBILEHEIGHT,
-					mUseClutter, mClutterClassGroup);
+														mPosSets[mCurPosI].sMeasurements[0].sHeight, MOBILEHEIGHT,
+														mUseClutter, mClutterClassGroup);
 	
 			if (mPosSets[mCurPosI].sMeasurements[0].sDistance<120001)		
 			{
@@ -838,10 +842,10 @@ bool cPosEstimation::CI_TA()
 	{
 		maxDist = (mPosSets[mCurPosI].sMeasurements[0].sDistance
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist+0.5)*
-				mPosSets[mCurPosI].sMeasurements[0].sResDist+50.0;
+				mPosSets[mCurPosI].sMeasurements[0].sResDist+98.0;
 //		minDist = max(mPlotResolution,(mPosSets[mCurPosI].sMeasurements[0].sDistance
 //				/mPosSets[mCurPosI].sMeasurements[0].sResDist-0.5)
-//				*mPosSets[mCurPosI].sMeasurements[0].sResDist-50.0);
+//				*mPosSets[mCurPosI].sMeasurements[0].sResDist-98.0);
 	}
 
 	if (maxDist>120000) maxDist=17500;
@@ -1019,7 +1023,7 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 		if ((j>=Bands.size()-1)&&(-1==Bands[j].sBIndex))
 		{
 			Bands.clear();
-//			SecondSite();
+			SecondSite();
 			cout << "In cPosEstimation::CoSecAzi: ... did not work  tata" << endl;
 		 	return false;
 		}
@@ -1057,7 +1061,7 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 				j++;
 		
 			if ((mPosSets[mCurPosI].sMeasurements.size()<j)
-				||(mPosSets[mCurPosI].sMeasurements[0].sSiteID!=
+				&&(mPosSets[mCurPosI].sMeasurements[0].sSiteID!=
 								mPosSets[mCurPosI].sMeasurements[j].sSiteID))
 			{		
 				maxDist = 
@@ -1070,11 +1074,13 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 	{
 		maxDist = (mPosSets[mCurPosI].sMeasurements[0].sDistance
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist+0.5)*
-				mPosSets[mCurPosI].sMeasurements[0].sResDist+50.0;
+				mPosSets[mCurPosI].sMeasurements[0].sResDist+98.0;
 		minDist = max(mPlotResolution,(mPosSets[mCurPosI].sMeasurements[0].sDistance
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist-0.5)
-				*mPosSets[mCurPosI].sMeasurements[0].sResDist-50.0);
+				*mPosSets[mCurPosI].sMeasurements[0].sResDist-98.0);
 	}
+	if (mOriginal)
+		minDist = 2*mPlotResolution;
 
 	if (maxDist>120000) maxDist=17500;
 	if (maxDist>4.0*mPlotResolution) 
@@ -1171,12 +1177,12 @@ double cPosEstimation::FindAzi(unsigned BIndex, unsigned AIndex)
 
 
 	cAntennaPattern LeftAnt, RightAnt;
-	LeftAnt.SetAntennaPattern(mPosSets[mCurPosI].sMeasurements[LeftIndex].sAntPatternKey, 
-				mPosSets[mCurPosI].sMeasurements[LeftIndex].sAzimuth, 
-				mPosSets[mCurPosI].sMeasurements[LeftIndex].sTilt);
-	RightAnt.SetAntennaPattern(mPosSets[mCurPosI].sMeasurements[RightIndex].sAntPatternKey, 
-				mPosSets[mCurPosI].sMeasurements[RightIndex].sAzimuth, 
-				mPosSets[mCurPosI].sMeasurements[RightIndex].sTilt);
+	LeftAnt.SetAntennaPattern(mPosSets[mCurPosI].sMeasurements[LeftIndex].sInstKeyFixed, 
+										mUseAntennaANN, Tx,mPosSets[mCurPosI].sMeasurements[LeftIndex].sAzimuth, 
+										mPosSets[mCurPosI].sMeasurements[LeftIndex].sTilt);
+	RightAnt.SetAntennaPattern(mPosSets[mCurPosI].sMeasurements[RightIndex].sInstKeyFixed, 
+									mUseAntennaANN, Tx,mPosSets[mCurPosI].sMeasurements[RightIndex].sAzimuth, 
+									mPosSets[mCurPosI].sMeasurements[RightIndex].sTilt);
 
 	double RxLevDiff = mPosSets[mCurPosI].sMeasurements[LeftIndex].sMeasValue 
 				- mPosSets[mCurPosI].sMeasurements[RightIndex].sMeasValue;
@@ -1615,7 +1621,8 @@ bool cPosEstimation::CoSinRule()
 bool cPosEstimation::DCM_ParticleSwarm()
 {
 //	cout << "In cPosEstimation::DCM_ParticleSwarm()" << endl;	
-	unsigned i,j;
+	unsigned i;
+	int j;
 
 	unsigned finalstop = 0;
 
@@ -1671,10 +1678,10 @@ bool cPosEstimation::DCM_ParticleSwarm()
 	{
 		rho_max = (mPosSets[mCurPosI].sMeasurements[0].sDistance
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist+0.5)*
-				mPosSets[mCurPosI].sMeasurements[0].sResDist+50.0;
+				mPosSets[mCurPosI].sMeasurements[0].sResDist+98.0;
 		rho_min = max(mPlotResolution,(mPosSets[mCurPosI].sMeasurements[0].sDistance
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist-0.5)
-				*mPosSets[mCurPosI].sMeasurements[0].sResDist-50.0);
+				*mPosSets[mCurPosI].sMeasurements[0].sResDist-98.0);
 	}
 	if (mOriginal) rho_min = mPlotResolution;
 	if (rho_max < 4*mPlotResolution)
@@ -1710,9 +1717,9 @@ bool cPosEstimation::DCM_ParticleSwarm()
 	phi_max = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
 		+ (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/2);	
 	phi_min_back = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
-		- (ceil)(4*mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/5);
+		- (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth);
 	phi_max_back = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
-		+ (ceil)(4*mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/5);	
+		+ (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth);	
 
 	if (phi_max_back>180)
 	{
@@ -1722,7 +1729,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 		phi_max_back-=360;
 		mPosSets[mCurPosI].sMeasurements[0].sAzimuth-=360;
 	}
-	if (phi_min_back<-180)
+	else if (phi_min_back<-180)
 	{
 		phi_min+=360;
 		phi_max+=360;
@@ -1740,7 +1747,8 @@ bool cPosEstimation::DCM_ParticleSwarm()
 	gbestValue = MAXDOUBLE;
 	for (i=0; i<NumBest; i++)
 		NbestValue[i]=MAXDOUBLE;
-
+	for (i=0; i< NUMPARTICLES; i++)
+		pbestValue[i] =	MAXDOUBLE;
 
 //	cout << " cPosEstimation::DCM_ParticleSwarm() VOOR initialisation loop" << endl; 
 	for (i=0; i<NUMPARTICLES; i++)
@@ -1774,7 +1782,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			NbestValue[NumBest-1] = pbestValue[i];
 			NbestRho[NumBest-1] = pbestRho[i];
 			NbestPhi[NumBest-1] = pbestPhi[i];
-			for (j=NumBest-1; j>0; j--)
+			for (j=NumBest-1; j>=0; j--)
 			{
 				if (NbestValue[j]<NbestValue[j-1])
 				{
@@ -1867,7 +1875,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					NbestValue[NumBest-1] = pbestValue[i];
 					NbestRho[NumBest-1] = pbestRho[i];
 					NbestPhi[NumBest-1] = pbestPhi[i];
-					for (j=NumBest-1; j>0; j--)
+					for (j=NumBest-1; j>=0; j--)
 					{
 						if (NbestValue[j]<NbestValue[j-1])
 						{
@@ -1889,7 +1897,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					gbestRho = pbestRho[i];
 					gbestPhi = pbestPhi[i];
 				}
-				stop = (iterationN-LastChangedN)>STOPN;
+				stop = ((iterationN-LastChangedN)>STOPN)||(gbestValue<1e-9);
 				LastChangedN = iterationN;
 				change = false;
 			}
@@ -1898,11 +1906,11 @@ bool cPosEstimation::DCM_ParticleSwarm()
 
 
 			rho_snelheid[i] = INERTIA*rho_snelheid[i] 
-					+ Cp*RpRho_dist(RpRho_engine)*(pbestValue[i] - value[i])
-					+ Cg*RgRho_dist(RgRho_engine)*(gbestValue - value[i]);
+					+ Cp*RpRho_dist(RpRho_engine)*(pbestRho[i] - rho[i])
+					+ Cg*RgRho_dist(RgRho_engine)*(gbestRho - rho[i]);
 			phi_snelheid[i] = INERTIA*phi_snelheid[i] 
-					+ Cp*RpPhi_dist(RpPhi_engine)*(pbestValue[i] - value[i])
-					+ Cg*RgPhi_dist(RgPhi_engine)*(gbestValue - value[i]);			
+					+ Cp*RpPhi_dist(RpPhi_engine)*(pbestPhi[i] - phi[i])
+					+ Cg*RgPhi_dist(RgPhi_engine)*(gbestPhi - phi[i]);			
 			rho[i] = rho[i] + rho_snelheid[i];
 			phi[i] = phi[i] + phi_snelheid[i];
 
@@ -1959,7 +1967,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 	unsigned N=NumBest;
 	for (i=0; i<NumBest; i++)
 	{
-		if (NbestValue[i] < 0.4)
+		if (NbestValue[i] < 1.0)
 		{
 			x+=  NbestRho[i]*cos(NbestPhi[i]*PI/180.0);
 			y+=  NbestRho[i]*sin(NbestPhi[i]*PI/180.0);
@@ -2119,7 +2127,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //	return Cost;
 //	return (1.0-CorrC);
 	return Pcost;
-	return altCost;
+//	return altCost;
 }
 
 //*******************************************************************
@@ -2259,10 +2267,10 @@ bool cPosEstimation::ANNrun()
 	{
 		rho_max = (mPosSets[mCurPosI].sMeasurements[0].sDistance
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist+0.5)*
-				mPosSets[mCurPosI].sMeasurements[0].sResDist+50.0;
+				mPosSets[mCurPosI].sMeasurements[0].sResDist+98.0;
 		rho_min = max(mPlotResolution,(mPosSets[mCurPosI].sMeasurements[0].sDistance
 				/mPosSets[mCurPosI].sMeasurements[0].sResDist-0.5)
-				*mPosSets[mCurPosI].sMeasurements[0].sResDist-50.0);
+				*mPosSets[mCurPosI].sMeasurements[0].sResDist-98.0);
 	}
 	if (mOriginal) rho_min = mPlotResolution;
 	if (rho_max < 4*mPlotResolution)

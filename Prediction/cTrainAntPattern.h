@@ -26,19 +26,11 @@
 #ifndef cTrainAntPattern_h
 #define cTrainAntPattern_h 1
 
-#define GAMMA 2.5
 #define MOBILEHEIGHT 1
-#define SIGMA2 (14*14)
-#define MARGIN 15
-#define SENSITIVITY -110
-#define FREQ_SCALE (0.3/450)
-#define FREQ_OFFSET (-945-450)
-#define MEAS_SCALE (2.0/(100-50))
-#define MEAS_OFFSET 75
-#define RFDist_OFFSET -65
-#define SCALE 50.0
-
-#define antMAXepoch 250000
+#define AntFileInt	0.5 // the interval in degrees of samples that are included for the training from the supplied antenna file.
+#define SUB 10 // every SUB sample will be used as a test point
+// ANTSCALE is #defined in DataBase/Config.h
+#define antMAXepoch 100000
 #define antREPORTInt 10000
 #define antERROR 1e-6
 
@@ -68,8 +60,8 @@ struct tMeasNNAnt
 	unsigned	sOriginalTP;
 	cGeoP		sLocation;
 	unsigned	sCellID;
-	float		sFrequency;
-	float 		sMeasValue;
+	float			sFrequency;
+	float 			sMeasValue;
 };
 
 typedef	vector<tMeasNNAnt> vMeasNNAnt;
@@ -77,16 +69,20 @@ typedef	vector<tMeasNNAnt> vMeasNNAnt;
 struct tCellAnt
 {
 	unsigned sCI;
+	unsigned sRI;
+	double			sTxPwr;
+	double			sTxSysLoss;
 	cGeoP			sPosition;
-	float			sHeight;
-	int			sAntPatternKey;
+	float				sHeight;
+	int					sAntPatternKey;
 	double			sBearing;
 	double			sTilt;
 	unsigned		sNumInputs;
 	unsigned		sNumOutputs;
-	unsigned   		sNumTrain;
+	unsigned   	sNumTrain;
 	unsigned		sNumTest;
 	double			sMean;
+	double			sMin;			// Actually the value at maximum gain
 	double**		sInputTrain;
 	double**		sOutputTrain;
 	double**		sInputTest;
@@ -142,6 +138,7 @@ class cTrainAntPattern
 	double mkFactor;
 	FANN::neural_net mANN;
 	double mMAXANNOutput;
+	unsigned mNumAzifFile, mNumElevfFile;
 };
 }
 #endif

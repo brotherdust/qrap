@@ -69,6 +69,11 @@ string MakeDBFromArray(vector<float> &input)
 cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey, 
 				unsigned int &TxKey, double &Resol, double &kFactor)
 {
+	mUseAntennaANN=false;
+	string setting = gDb.GetSetting("UseAntennaANN");
+	if (setting=="true")
+		mUseAntennaANN=true;
+
 	mUseClutter = mClutter.SetRasterFileRules(mClutterSource);
 	if (mUseClutter) 
 		mClutterClassGroup = mClutter.GetClutterClassGroup();
@@ -203,34 +208,22 @@ bool cSpectralLink::DoLink()
 	else
 		mRxBearing = mTxBearing - 180.0;
 
-	if (mDownlink)
-	{
-		//cout<<"TX pat : "<<mTxInst.sTxPatternKey<<endl;
-		//cout<<"RX pat : "<<mRxInst.sRxPatternKey<<endl;mkFactor
-		mTxAnt.SetAntennaPattern(mTxInst.sTxPatternKey, mTxInst.sTxAzimuth,
-				mTxInst.sTxMechTilt);
-		mRxAnt.SetAntennaPattern(mRxInst.sRxPatternKey, mRxInst.sRxAzimuth,
-				mRxInst.sRxMechTilt);
-		EIRP = mTxInst.sTxPower - mTxInst.sTxSysLoss
-				+ mTxAnt.mGain;
-	}
-	else
-	{
-		//cout<<"TX pat : "<<mTxInst.sRxPatternKey<<endl;
-		//cout<<"RX pat : "<<mRxInst.sTxPatternKey<<endl;
-		mTxAnt.SetAntennaPattern(mTxInst.sRxPatternKey, mTxInst.sRxAzimuth,
-				mTxInst.sRxMechTilt);
-		mRxAnt.SetAntennaPattern(mRxInst.sTxPatternKey, mRxInst.sTxAzimuth,
-				mRxInst.sTxMechTilt);
-		EIRP =mRxInst.sTxPower - mRxInst.sTxSysLoss
-				+ mRxAnt.mGain;
-	}
+	eAnt Which;
+	if (mDownlink) Which = Tx;
+	else Which = Rx;
+	mTxAnt.SetAntennaPattern(mTxInst.sInstKey, mUseAntennaANN, Which, 
+														mTxInst.sTxAzimuth, mTxInst.sTxMechTilt);
+	if (mDownlink) Which = Rx;
+	else Which = Tx;
+	mRxAnt.SetAntennaPattern(mRxInst.sInstKey, mUseAntennaANN, Which, 
+														mRxInst.sRxAzimuth, mRxInst.sRxMechTilt);
+	EIRP = mTxInst.sTxPower - mTxInst.sTxSysLoss + mTxAnt.mGain;
 
 	PathLoss.setParameters(mkFactor, mTxInst.sFrequency,
 					mTxInst.sTxHeight, mRxInst.sRxHeight, 
 					mUseClutter, mClutterClassGroup);
 	//\\TODO Check and verify this
-	LinkOtherGain = EIRP+20.0*log10(mTxInst.sFrequency)+32.44;
+	LinkOtherGain = EIRP + 20.0*log10(mTxInst.sFrequency) + 32.44;
 	//Loss_qrap -20log(f) - 32.44 + 10log(4*PI)
 	cout<<"PreDEM"<<endl;
 	mDEM->GetForLink(mTxInst.sSitePos, mRxInst.sSitePos, mPlotResolution, DEM);

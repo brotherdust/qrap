@@ -81,6 +81,7 @@ private:
 	cClutter		mClutterset;
 	cRasterFileHandler 	*mDEM;		///< Description
 	bool			mUseClutter;	///< Description
+	bool mUseAntennaANN; ///< 
 	cRasterFileHandler 	mClutter;	///< Description
 	tFixed			mTxInst;		///< Description
 	tFixed			mRxInst;		///< Description

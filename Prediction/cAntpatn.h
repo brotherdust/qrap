@@ -27,7 +27,6 @@
 
 // Include local headers
 #include "cMemmngr.h"
-#include <pqxx/pqxx>
 #include <string>
 #include <iostream>
 #include <math.h>
@@ -44,6 +43,14 @@ using namespace std;
 
 namespace Qrap
 {
+
+	enum eAnt
+	{
+		Tx,
+		Rx,
+		Mobile
+	};
+
 	/**
 	 * This is to read the antenna file structures and import it into the database.
 	 */
@@ -64,50 +71,53 @@ namespace Qrap
 			/**
 			 * Description of SetAntPattern
 			 * 
-			 * @param DBase Description
-			 * @param Ant_PatternKey Description
-			 * @param Bearing Description
-			 * @param MechTilt Description
+			 * @param Key: The CellID
+			 * @param UseANN: Use result of the antenna neural net for the cell to get the antenna values
+			 * @param Bearing: Azimuth direction of the antenna. In the case of a neural net, it is assumed that the antenna is still directed in direction it was when it was trained then Bearing = 0
+			 * @param MechTilt: The mechanical tilt of the antenna. In the case of a neural net, it is assumed that the antenna is still directed in direction it was when it was trained then MechTilt = 0
 			 *
 			 * @return An integer.
 			 */
-			bool SetAntennaPattern(int Ant_PatternKey, double Bearing, double MechTilt);
+			bool SetAntennaPattern(int RadKey,  bool UseANN = false, eAnt Type = Tx, 
+															double Bearing=0, double MechTilt=0);
 			
 			/**
 			 * Description of GetPatternValue
 			 * 
-			 * @param Azimuth Description
-			 * @param Elevation Description
+			 * @param Azimuth: The direction of the mobile (relative to north)  with respect to the site
+			 * @param Elevation: The angle from the horizon that the mobile is with respect to the fixed installation antenna. Down is possitive.
 			 *
-			 * @return A double
+			 * @return A double: the value of the antenna pattern in that direction. 
 			 */
 			double GetPatternValue(double Azimuth, double Elevation);
 			
 			
-			char *mPatternFile;		///< Filename containing antenna pattern
+			char *mFile;				///< Filename containing antenna pattern or neural net
 			char *mName; 			///< Antenna Pattern unique name
 			char *mMake; 			///< Manufacturer
 			char *mDescription;		///< Describtion of antenna pattern 
-			char *mPol;			///< Polarisation of transmitted/received E-field
+			char *mPol;					///< Polarisation of transmitted/received E-field
 			double mFreq;			///< Frequency where antenna was measured
 			double mGain;			///< Maximum Gain of antenna pattern
 			double mBeamW;			///< Azimuth beamwidth
 			double mVBeamW;			///< Elevation beamwidth
 			double mFtoB;			///< Front to Back ratio			
 			double mPrice;			///< Price of antenna
-			float *mAziAngles;		///< Description
-			float *mAziValues;		///< Description
-			float *mElevAngles;		///< Description
-			float *mElevValues;		///< Description
+			float *mAziAngles;	///< Array linked to mAziValues that indicate the angle[i] at which the azimuth pattern is mAziValues[i]
+			float *mAziValues;	///< The relative value[i] of the antenna pattern at azimuth mAziAngles[i]. (Antenna Radiation Level = Gain - mAziValues[i])
+			float *mElevAngles;	///< Array linked to mElevValues that indicate the angle[i] at which the elevation pattern is mElevValues[i]
+			float *mElevValues;	///< The relative value[i] of the antenna pattern at elevation mElevAngles[i]. (Antenna Radiation Level = Gain - mElevValues[i])
 			unsigned mNAA;			///< Number of Elevation Values
 			unsigned mNEA;			///< Number of Azimuth Values
 		
 		private:	
-			double mBearing;			///< Description
-			double mMechTilt;			///< Description
-			unsigned mRef180az;				///< Description
-			unsigned mRef0el;				///< Description
-			Float2DArray mAntPattern;	///< Description
+			double mBearing;				///< The bearing /azimuth direction the antenna is pointing at
+			double mMechTilt;			///< The mechanical downtilt of the antanna
+			unsigned mRef180az;		///< Reference index of the "back" of the antenna
+			unsigned mRef0el;			///< Reference index to the "horizon" of the antanna
+			Float2DArray mAntPattern;	///< Matrix containing the values of the antenna pattern at all mAziAngles and mElevAngles
+			FANN::neural_net *mAntennasANN;
+			bool mUseANN;
 	};
 }
 

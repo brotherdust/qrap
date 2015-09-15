@@ -86,10 +86,10 @@ namespace Qrap
 						double	TxSysLoss,
 						double	RxSysLoss,
 						double	RxSens,
-						int	FixedPatternKey,
+						int	FixedInst,
 						double	FixedAzimuth,
 						double	FixedMechTilt,
-						int	MobilePatternKey,
+						int	MobileInst,
 						double 	FixedHeight,
 						double 	MobileHeight,
 						double 	&Frequency,
@@ -132,15 +132,16 @@ namespace Qrap
 		
 			int			mSiteID;		///< Description
 			bool 		mDownLink;		///< Are we calculating the downlink (TRUE) or uplink (False)
+			bool 		mUseAntennaANN;
 			double 		mEIRP;			///< In dBm
 			double		mTxPower;		///< In Watt
 			double		mTxSysLoss;		///< In dB
 			double		mRxSysLoss;		///< In dB
 			double		mRxSens;		///< In dBm
-			int			mFixedPatternKey;	///< Description
+			int			mFixedInst;	///< Description
 			double		mFixedAzimuth;		///< In degrees 0 North, positive clockwise
 			double		mFixedMechTilt;		///< Description
-			int			mMobilePatternKey; 	///< Description
+			int			mMobileInst; 	///< Description
 			cAntennaPattern mFixedAntenna;		///< Description
 			cAntennaPattern mMobileAntenna;		///< Description
 			bool		mBTLloaded;		///< Description

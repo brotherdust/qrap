@@ -98,9 +98,9 @@ int main (int argc, char **argv)
 	cout << endl << "Wrote Measurements to DataBase" << endl;
 */
 
+
+
 /*
-
-
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 
@@ -113,31 +113,31 @@ int main (int argc, char **argv)
 
 	Meas.mPathLoss.mClutter.Reset(1);
 	cout << "Loading measurements ... in main()" << endl;
-	Meas. LoadMeasurements(0,0,6);
+	Meas.LoadMeasurements(2,0,6);
 	cout << "Before PerformAnalysis ... in main()" << endl;
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 //	Meas.OptimiseSeekWidth();
-cout << "Starting Optimisation ... in main()" << endl; 
+	cout << "Starting Optimisation ... in main()" << endl; 
 
- 	Meas.OptimiseHeights(6);
-*/
-/*
+	Meas.OptimiseHeights(6);
+
+
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas. LoadMeasurements(0,0,6);
-	Meas.OptimiseModelCoefAllTotal(6);
+	Meas. LoadMeasurements(0,0,0);
+	Meas.OptimiseModelCoefAllTotal(0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Na6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
-	Meas.OptimiseModelCoefD(6);
+	cout<< "Na0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
+   Meas.OptimiseModelCoefD(0);
  	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nach6" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-
 /*
 	cTrainPosNetDistAngle NeuralNets;
 	vPoints Punte;
@@ -173,11 +173,32 @@ cout << "Starting Optimisation ... in main()" << endl;
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
+*/
+
+
+
 
 	cTrainAntPattern NeuralNets;
 	vPoints Punte;
 	cGeoP *Hoek;
+	double Azimuth;
 	Hoek = new cGeoP[4];
+
+	Hoek[0].Set(-26.0, 28.0);
+	Hoek[1].Set(-26.5, 28.0);
+	Hoek[2].Set(-26.0, 28.5);
+	Hoek[3].Set(-25.5, 28.0);
+/*
+	Azimuth = Hoek[0].Bearing( Hoek[1]);	
+	cout << "Suid: " << Azimuth  << endl;
+	Azimuth = Hoek[0].Bearing( Hoek[2]);	
+	cout << "Oos: " << Azimuth  << endl;
+	Azimuth = Hoek[0].Bearing( Hoek[3]);	
+	cout << "Noord: " << Azimuth  << endl;
+	Hoek[3].Set(-26.0, 27.5);
+	Azimuth = Hoek[0].Bearing( Hoek[3]);	
+	cout << "Wes: " << Azimuth  << endl;
+*/
 
 	Hoek[0].Set(-26.06, 28.26);
 	Punte.push_back(Hoek[0]);
@@ -195,7 +216,8 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
+
+
 /*
 	double hoek = 45;
 	double x=cos(hoek/180*PI);
@@ -221,14 +243,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-
-  	string query = "update coefficients set coefficient=0.0;";
-
-	if (!gDb.PerformRawSql(query))
-	{
-		cout << "Error clearing coefficients" << endl;
-	}
-
+/*
 	cPosEstimation Positioning;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -255,8 +270,7 @@ cout << "Starting Optimisation ... in main()" << endl;
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-
-
+*/
 /*
 
 	if (!gDb.PerformRawSql(query))

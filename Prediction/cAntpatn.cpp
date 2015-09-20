@@ -682,7 +682,9 @@ bool cAntennaPattern::SetAntennaPattern(int Key, bool UseANN, eAnt Type,
 	while ((k<mNEA+3)&&((TempRef_mElev[k]<9999)||TempElevAngles[k]<91))
 		k++;
 	mNEA = k;
-//	cout << mNEA << "	" << TempRef_mElev[k] << "	" <<TempElevAngles[k] << endl;
+
+//	cout << "cAntennaPattern::SetAntennaPattern:	"<< mNEA << "	" << TempRef_mElev[k] << "	" <<TempAziAngles[k]<< endl;
+//	cout << "cAntennaPattern::SetAntennaPattern:	" << mNAA << "	" << TempRef_mAzi[k]<< "	" <<TempAziAngles[k] << endl;
 	
 /*	for (k=0;k<mNEA+3;k++)
 		cout << k << "  " << TempRef_mElev[k] << endl;
@@ -840,8 +842,9 @@ bool cAntennaPattern::SetAntennaPattern(int Key, bool UseANN, eAnt Type,
 	double tydelikBO, tydelikON, tydelikL, tydelikR, tydelikV, tydelikH, Value, minEl, minAzi;
 
 //There are 2 valid approximations for mAntPattern[k][l] namely tydelikV and tydelikH
-// The question id how to combine them?
+// The question is how to combine them?
 
+/*
 	for (k=1; k<mNAA-1; k++)
 	{
 		for (l=1; l<mNEA-1; l++)
@@ -882,19 +885,74 @@ bool cAntennaPattern::SetAntennaPattern(int Key, bool UseANN, eAnt Type,
 					minAzi = 180-DeltaAzi;
 				else minAzi=DeltaAzi;
 
-				Value = ((180-minAzi)*minEl*tydelikH/90/180 + minAzi*(90-minEl)*tydelikV/90/180)*2;
+				Value = ((180-minAzi)*tydelikH/180 + minAzi*tydelikV/180 + (90-minEl)*tydelikV/90 + minEl*tydelikH/90)/2 ;
 	
 				mAntPattern[k][l] = -10.0*log10(Value);
 			} // end if
 		} // end for step through elevation angles
 	} // end for step through Azimuth angles
 
+*/
+
+	for (k=1; k<mNAA-1; k++)
+	{
+		for (l=1; l<mNEA-1; l++)
+		{ 
+			if ((mAntPattern[k][l]>3000.0))
+			{
+				if (l<mRef0el)
+				{
+					tydelikBO = mAntPattern[k][0];
+					tydelikON = mAntPattern[k][mRef0el];
+					DeltaEl =  - mElevAngles[l];
+				}
+				else
+				{
+					tydelikBO = mAntPattern[k][mRef0el];
+					tydelikON = mAntPattern[k][mNEA-1];
+					DeltaEl = 90 - mElevAngles[l];
+				}
+				tydelikV = tydelikON+DeltaEl*(tydelikBO-tydelikON)/90;
+//				cout <<"V: " << tydelikV << "	BO:" << tydelikBO << "	ON: " << tydelikON << "		ElevAngles: "	<< mElevAngles[l] << "	DeltaEl:	" << DeltaEl << endl;
+
+				if (fabs(DeltaEl)>45)
+					minEl = 90-fabs(DeltaEl);
+				else minEl=fabs(DeltaEl);
+
+				if (k<mRef180az)
+				{ 	
+					tydelikL = mAntPattern[0][l];
+					tydelikR = mAntPattern[mRef180az][l];
+					DeltaAzi = mAziAngles[k];
+				}
+				else
+				{ 
+					tydelikL = mAntPattern[mRef180az][l];
+					tydelikR = mAntPattern[mNAA-1][l];
+					DeltaAzi = mAziAngles[k] -180;
+				}
+				tydelikH = tydelikL+DeltaAzi*(tydelikR-tydelikL)/180;
+				if (fabs(DeltaAzi)>90)
+					minAzi = 180-fabs(DeltaAzi);
+				else minAzi=fabs(DeltaAzi);
+//				cout << "H: "<< tydelikH << "	R:" << tydelikR << "	L: " << tydelikL << "		AziAngles: "	<< mAziAngles[k] << "	DeltaAzi:	" << DeltaAzi << endl;
+
+				Value = ((180-minAzi)*tydelikH/180 + minAzi*tydelikV/180 + (90-minEl)*tydelikV/90 + minEl*tydelikH/90)/2 ;
+
+//				cout << "Value: "<< Value << "	minAzi:" << minAzi << "	minEl" << minEl << endl;
+	
+				mAntPattern[k][l] = Value;
+			} // end if
+		} // end for step through elevation angles
+	} // end for step through Azimuth angles
+
+
 
 /*	for (k=0; k< mNAA; k++)
 	{
 		cout << k << " k:: ";
 		for (l=0; l<mNEA; l++)
-			cout << "   " << mAntPattern[k][l];
+			cout << "   " << mAntPattern[k][l] << ",";
 		cout << endl;
 	}	
 */
@@ -1001,7 +1059,7 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 	if (ref_El>mNEA-2)
 	{
 		cout << "El_ref: " << ref_El << endl; 
-		if (ref_Azi>mNAA-2)
+		if (ref_Azi>mNAA-3)
 		{
 			ValueAz1 = mAntPattern[ref_Azi][ref_El];
 			ValueAz2 = mAntPattern[0][ref_El];

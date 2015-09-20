@@ -303,7 +303,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
 			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
 
-//			if (DiffLoss < 20)
+			if (DiffLoss < 25)
 			{
 					Delta =  - NewMeasurement.sMeasValue - PathLoss;
 					Total +=Delta;
@@ -405,7 +405,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 		cout << " NumTest = " <<  mCells[i].sNumTest << endl;
 		cout << " NumTrain = " <<  mCells[i].sNumTrain << endl;
 
-		if (mCells[i].sNumTrain>700)
+		if (mCells[i].sNumTrain>199)
 		{
 			mCells[i].sInputTrain = new double*[mCells[i].sNumTrain + mNumAzifFile+mNumElevfFile];
 			mCells[i].sOutputTrain = new double*[mCells[i].sNumTrain+ mNumAzifFile+mNumElevfFile];
@@ -516,7 +516,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 
 			cout << "mMAXANNOutput = " << mMAXANNOutput << endl;
 			
-			TrainData.set_train_data(mCells[i].sNumTrain, 
+			TrainData.set_train_data(mCells[i].sNumTrain+mNumAzifFile +mNumElevfFile, 
 						mCells[i].sNumInputs, mCells[i].sInputTrain,
 						mCells[i].sNumOutputs, mCells[i].sOutputTrain);
 	
@@ -524,7 +524,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 						mCells[i].sNumInputs, mCells[i].sInputTest,
 						mCells[i].sNumOutputs, mCells[i].sOutputTest);
 
-			unsigned HiddenN1 = 4;
+			unsigned HiddenN1 =8;
 			unsigned HiddenN2 = 4;
 
 			mANN.create_standard(3, mCells[i].sNumInputs, 

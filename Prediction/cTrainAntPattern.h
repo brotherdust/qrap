@@ -27,7 +27,7 @@
 #define cTrainAntPattern_h 1
 
 #define MOBILEHEIGHT 1
-#define AntFileInt	0.5 // the interval in degrees of samples that are included for the training from the supplied antenna file.
+#define AntFileInt	5 // the interval in degrees of samples that are included for the training from the supplied antenna file.
 #define SUB 10 // every SUB sample will be used as a test point
 // ANTSCALE is #defined in DataBase/Config.h
 #define antMAXepoch 100000

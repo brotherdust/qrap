@@ -100,7 +100,7 @@ int main (int argc, char **argv)
 
 
 
-/*
+
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 
@@ -122,7 +122,7 @@ int main (int argc, char **argv)
 //	Meas.OptimiseSeekWidth();
 	cout << "Starting Optimisation ... in main()" << endl; 
 
-	Meas.OptimiseHeights(6);
+//	Meas.OptimiseHeights(6);
 
 
 	if (!gDb.PerformRawSql(query))
@@ -137,7 +137,7 @@ int main (int argc, char **argv)
    Meas.OptimiseModelCoefD(0);
  	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-*/
+
 /*
 	cTrainPosNetDistAngle NeuralNets;
 	vPoints Punte;
@@ -177,7 +177,7 @@ int main (int argc, char **argv)
 
 
 
-
+/*
 	cTrainAntPattern NeuralNets;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -199,7 +199,7 @@ int main (int argc, char **argv)
 	Azimuth = Hoek[0].Bearing( Hoek[3]);	
 	cout << "Wes: " << Azimuth  << endl;
 */
-
+/*
 	Hoek[0].Set(-26.06, 28.26);
 	Punte.push_back(Hoek[0]);
 	Hoek[1].Set(-25.94, 28.26);
@@ -216,7 +216,7 @@ int main (int argc, char **argv)
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-
+*/
 
 /*
 	double hoek = 45;
@@ -243,7 +243,7 @@ int main (int argc, char **argv)
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-/*
+
 	cPosEstimation Positioning;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -270,7 +270,7 @@ int main (int argc, char **argv)
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-*/
+
 /*
 
 	if (!gDb.PerformRawSql(query))

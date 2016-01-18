@@ -205,7 +205,6 @@ namespace Qrap
                         double                  EIRP;
 			double 			mMinimum;
 			double 			mMaximum;
-			bool mUseAntennaANN;
 	};
 }
 #endif 

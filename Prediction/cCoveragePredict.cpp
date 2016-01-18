@@ -48,11 +48,6 @@ cCoveragePredict::cCoveragePredict()
 	mBTL = new_Float2DArray(mNumAngles,mNumRadialPoints);
 	mTilt = new_Float2DArray(mNumAngles,mNumRadialPoints);
 	mRxLev = new_Float2DArray(mNumAngles,mNumRadialPoints);
-
-	mUseAntennaANN=false;
-	string setting = gDb.GetSetting("UseAntennaANN");
-	if (setting=="true")
-		mUseAntennaANN=true;
 }
 
 
@@ -106,15 +101,17 @@ int cCoveragePredict::SetCommunicationLink(	int		SiteID,
 
 	if (DownLink) Which = Tx;
 	else Which = Rx;
-	mFixedAntenna.SetAntennaPattern(mFixedInst, mUseAntennaANN, Which, mFixedAzimuth, mFixedMechTilt);
-	mMobileAntenna.SetAntennaPattern(mMobileInst, false, Mobile, 0, 0);
+	mFixedAntenna.SetAntennaPattern(mFixedInst, Which, mFixedAzimuth, mFixedMechTilt);
+	mMobileAntenna.SetAntennaPattern(mMobileInst, Mobile, 0, 0);
 	
 	// \TODO :
 	if (EIRP<=0.00000001)
+	{
 		if (DownLink)
 			EIRP = TxPower - TxSysLoss + mFixedAntenna.mGain; 
 		else 
-			EIRP = TxPower - TxSysLoss + mMobileAntenna.mGain; 
+			EIRP = TxPower - TxSysLoss + mMobileAntenna.mGain;
+	}
 	mEIRP = EIRP;
 	
 	cout << "Freq: " << Frequency << endl;

@@ -78,8 +78,13 @@ namespace Qrap
 			 *
 			 * @return An integer.
 			 */
-			bool SetAntennaPattern(int RadKey,  bool UseANN = false, eAnt Type = Tx, 
+			bool SetAntennaPattern(int RadKey, eAnt Type = Tx, 
 															double Bearing=0, double MechTilt=0);
+
+			void SetUseAntANN( bool UseAntANN) { mUseANN = UseAntANN;};
+
+			bool ResetUseAntANN();
+		
 			
 			/**
 			 * Description of GetPatternValue

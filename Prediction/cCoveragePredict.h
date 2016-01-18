@@ -132,7 +132,6 @@ namespace Qrap
 		
 			int			mSiteID;		///< Description
 			bool 		mDownLink;		///< Are we calculating the downlink (TRUE) or uplink (False)
-			bool 		mUseAntennaANN;
 			double 		mEIRP;			///< In dBm
 			double		mTxPower;		///< In Watt
 			double		mTxSysLoss;		///< In dB

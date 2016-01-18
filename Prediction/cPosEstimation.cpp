@@ -95,29 +95,21 @@ cPosEstimation::cPosEstimation() // default constructor
 	mDEM.SetRasterFileRules(mDEMsource);
 	mDEM.SetSampleMethod(2);
 
-	mUseAntennaANN=false;
-	setting = gDb.GetSetting("UseAntennaANN");
-	if (setting=="true")
-		mUseAntennaANN=true;
-
-	mFixedAnts = new cAntennaPattern[2];
 	mCellPathLoss = new double[2];
-	mNumInsts = 0;
-	mCurANNa = new FANN::neural_net();
-	mCurANNd = new FANN::neural_net();
-	mAntennasANN = new FANN::neural_net[2];
+	mFixedAnts = new cAntennaPattern[2];
+
+	mCurANNa = new 	FANN::neural_net();
+	mCurANNd = new 	FANN::neural_net();
 
 }
 
 //*********************************************************************
 cPosEstimation::~cPosEstimation() // destructor
 {
-	unsigned i;
 	mPosSets.clear();
 	mSites.clear();
 	mCurANNa->destroy();
 	mCurANNd->destroy();
-	delete [] mAntennasANN;
 	delete [] mFixedAnts;
 	delete [] mCellPathLoss;
 }
@@ -654,6 +646,7 @@ void cPosEstimation::EstimatePositions()
 
 	if (mNumSites>0)
 	{
+		cout << "File name: "	 << mSites[0].sANNfileA << "	" << mSites[0].sANNfileD << endl;
 		mCurSiteI = 0;
 		mCurANNa->create_from_file(mSites[0].sANNfileA);
 		mCurANNd->create_from_file(mSites[0].sANNfileD);
@@ -676,8 +669,9 @@ void cPosEstimation::EstimatePositions()
 			mFixedAnts = new cAntennaPattern[mNumInsts];
 			for (j=0; j < mNumInsts; j++)
 			{
+				mFixedAnts[j].SetUseAntANN (mUseAntANN);
 				mFixedAnts[j].SetAntennaPattern(mPosSets[mCurPosI].sMeasurements[j].sInstKeyFixed, 
-																				mUseAntennaANN, Tx, mPosSets[mCurPosI].sMeasurements[j].sAzimuth, 
+																				Tx, mPosSets[mCurPosI].sMeasurements[j].sAzimuth, 
 																				mPosSets[mCurPosI].sMeasurements[j].sTilt);
 			}
 			mPathLoss.setParameters(mkFactor,mPosSets[mCurPosI].sMeasurements[0].sFrequency,
@@ -777,7 +771,7 @@ bool cPosEstimation::CI()
 bool cPosEstimation::CI_TA()
 {
 //	cout << "In cPosEstimation::CI_TA()" << endl;
-	unsigned j;
+
 	if (mPosSets[mCurPosI].sMeasurements[0].sBeamWidth > 180)
 	{
 		cout << "sBeamWidth = " << mPosSets[mCurPosI].sMeasurements[0].sBeamWidth << endl;
@@ -1177,11 +1171,13 @@ double cPosEstimation::FindAzi(unsigned BIndex, unsigned AIndex)
 
 
 	cAntennaPattern LeftAnt, RightAnt;
+	LeftAnt.SetUseAntANN(mUseAntANN);
 	LeftAnt.SetAntennaPattern(mPosSets[mCurPosI].sMeasurements[LeftIndex].sInstKeyFixed, 
-										mUseAntennaANN, Tx,mPosSets[mCurPosI].sMeasurements[LeftIndex].sAzimuth, 
+										Tx,mPosSets[mCurPosI].sMeasurements[LeftIndex].sAzimuth, 
 										mPosSets[mCurPosI].sMeasurements[LeftIndex].sTilt);
+	RightAnt.SetUseAntANN(mUseAntANN);
 	RightAnt.SetAntennaPattern(mPosSets[mCurPosI].sMeasurements[RightIndex].sInstKeyFixed, 
-									mUseAntennaANN, Tx,mPosSets[mCurPosI].sMeasurements[RightIndex].sAzimuth, 
+									Tx,mPosSets[mCurPosI].sMeasurements[RightIndex].sAzimuth, 
 									mPosSets[mCurPosI].sMeasurements[RightIndex].sTilt);
 
 	double RxLevDiff = mPosSets[mCurPosI].sMeasurements[LeftIndex].sMeasValue 
@@ -1875,7 +1871,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 					NbestValue[NumBest-1] = pbestValue[i];
 					NbestRho[NumBest-1] = pbestRho[i];
 					NbestPhi[NumBest-1] = pbestPhi[i];
-					for (j=NumBest-1; j>=0; j--)
+					for (j=NumBest-1; j>0; j--)
 					{
 						if (NbestValue[j]<NbestValue[j-1])
 						{
@@ -2021,7 +2017,6 @@ double cPosEstimation::CostFunction(double rho, double phi)
 		return 1.5*rho/120000;
 	if (0>=mNumInsts) return 999999;
 	unsigned i;
-	unsigned NumUsed = mNumInsts;
 	double* Delta;
 //	cout << "Before new" ;
 	Delta = new double[mNumInsts];
@@ -2030,8 +2025,9 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //	cout << "Before delete"  << endl;
 	if ((mCellPathLoss!=NULL)&&(mNumInsts>0)) delete [] mCellPathLoss;
 //	cout << "	After  delete" << endl;
-	mCellPathLoss = new double[mNumInsts];
-	double sumMeas, sumPred, meanMeas, meanPred, teller, varMeas, varPred, CorrC, altCost;
+	if (mNumInsts>0) mCellPathLoss = new double[mNumInsts];
+	else return 0;
+	double sumMeas, sumPred, meanMeas, meanPred, teller, varMeas, varPred, CorrC;
 	double DiffLoss=0, Azimuth, AntValue;
 	float Tilt=0;
 	cGeoP ParticlePosition(-25.7, 28.2, DEG);

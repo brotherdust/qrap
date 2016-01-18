@@ -47,6 +47,7 @@ int main (int argc, char **argv)
 {
 //	bool error = false;
 	cout << "Main 1" << endl;
+	string query;
 	
 	if (!gSettings.LoadFromFile("/usr/lib/qgis/plugins/settings.xml"))
 		return 0;
@@ -98,46 +99,54 @@ int main (int argc, char **argv)
 	cout << endl << "Wrote Measurements to DataBase" << endl;
 */
 
-
-
-
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 
-  	string query = "update coefficients set coefficient=0.0;";
-
+/*
+  	query = "update coefficients set coefficient=0.0;";
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
+*/
+/*
+  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
 
+	Meas.SetUseAntANN(false);
 	Meas.mPathLoss.mClutter.Reset(1);
 	cout << "Loading measurements ... in main()" << endl;
 	Meas.LoadMeasurements(2,0,6);
+	
 	cout << "Before PerformAnalysis ... in main()" << endl;
-
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
+
 //	Meas.OptimiseSeekWidth();
 	cout << "Starting Optimisation ... in main()" << endl; 
-
+*/
 //	Meas.OptimiseHeights(6);
-
-
+/*
+  	query = "update coefficients set coefficient=0.0;";
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
+
+	Meas.SetUseAntANN(false);
 	Meas.mPathLoss.mClutter.Reset(1);
 	Meas. LoadMeasurements(0,0,0);
 	Meas.OptimiseModelCoefAllTotal(0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
    Meas.OptimiseModelCoefD(0);
- 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
+*/
 /*
 	cTrainPosNetDistAngle NeuralNets;
 	vPoints Punte;
@@ -174,9 +183,6 @@ int main (int argc, char **argv)
 		cout << "Error clearing coefficients" << endl;
 	}
 */
-
-
-
 /*
 	cTrainAntPattern NeuralNets;
 	vPoints Punte;
@@ -188,7 +194,8 @@ int main (int argc, char **argv)
 	Hoek[1].Set(-26.5, 28.0);
 	Hoek[2].Set(-26.0, 28.5);
 	Hoek[3].Set(-25.5, 28.0);
-/*
+
+
 	Azimuth = Hoek[0].Bearing( Hoek[1]);	
 	cout << "Suid: " << Azimuth  << endl;
 	Azimuth = Hoek[0].Bearing( Hoek[2]);	
@@ -198,8 +205,8 @@ int main (int argc, char **argv)
 	Hoek[3].Set(-26.0, 27.5);
 	Azimuth = Hoek[0].Bearing( Hoek[3]);	
 	cout << "Wes: " << Azimuth  << endl;
-*/
-/*
+
+
 	Hoek[0].Set(-26.06, 28.26);
 	Punte.push_back(Hoek[0]);
 	Hoek[1].Set(-25.94, 28.26);
@@ -217,6 +224,25 @@ int main (int argc, char **argv)
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
 */
+
+	Meas.SetUseAntANN(true);
+	cout << "Before PerformAnalysis ... in main()" << endl;
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
+	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+  	query = "update coefficients set coefficient=0.0;";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+	Meas.mPathLoss.mClutter.Reset(1);
+	Meas. LoadMeasurements(0,0,0);
+	Meas.OptimiseModelCoefAllTotal(0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Na0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
+   Meas.OptimiseModelCoefD(0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 /*
 	double hoek = 45;
@@ -259,7 +285,8 @@ int main (int argc, char **argv)
 	Punte.push_back(Hoek[3]);
 	
 	delete [] Hoek;
-	
+
+	Positioning.SetUseAntANN(true);	
 	Positioning.LoadMeasurements(Punte,2,6,1,1);
 
 	cout << " Clearing Punte " << endl;
@@ -272,7 +299,6 @@ int main (int argc, char **argv)
 	Positioning.SaveResults();
 
 /*
-
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;

@@ -30,8 +30,8 @@
 #define AntFileInt	5 // the interval in degrees of samples that are included for the training from the supplied antenna file.
 #define SUB 10 // every SUB sample will be used as a test point
 // ANTSCALE is #defined in DataBase/Config.h
-#define antMAXepoch 100000
-#define antREPORTInt 10000
+#define antMAXepoch 200000
+#define antREPORTInt 20000
 #define antERROR 1e-6
 
 // include local headers

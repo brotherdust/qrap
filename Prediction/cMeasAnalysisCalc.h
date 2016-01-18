@@ -79,7 +79,9 @@ class cMeasAnalysisCalc
 				unsigned MeasSource=0, unsigned Cell=0);
 
 	int PerformAnalysis(double &Mean, double &MeanSquareError,
-				double &StDev, double &CorrC, unsigned Clutterfilter=0, bool UseAntANN=false);
+				double &StDev, double &CorrC, unsigned Clutterfilter=0);
+
+	void SetUseAntANN( bool UseAntANN) { mUseAntANN = UseAntANN;};
 
 	int SaveResults();
 
@@ -97,6 +99,7 @@ class cMeasAnalysisCalc
 	unsigned mNumMeas;
 	double mkFactor;
 	bool mUseClutter;
+	bool mUseAntANN;
 	unsigned mClutterClassGroup;
 	unsigned mClutterFilter;
 	unsigned *mClutterCount;

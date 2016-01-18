@@ -171,6 +171,8 @@ class cPosEstimation
 									unsigned PosSource=0,
 									unsigned Technology=0);
 
+	void SetUseAntANN( bool UseAntANN) { mUseAntANN = UseAntANN;};
+
 	void EstimatePositions();
 	int SaveResults();
 
@@ -195,7 +197,6 @@ class cPosEstimation
 	unsigned mCurPosI;
 	FANN::neural_net *mCurANNa;
 	FANN::neural_net *mCurANNd;
-	FANN::neural_net *mAntennasANN;
 	unsigned mCurSiteI;
 	unsigned mNumPoints;
 	unsigned mNewTP;
@@ -224,7 +225,7 @@ class cPosEstimation
 	bool mLTEsim;
 	bool mUMTS;	
 	bool mOriginal;
-	bool mUseAntennaANN;
+	bool mUseAntANN;
 };
 }
 #endif

@@ -102,11 +102,6 @@ cLink::cLink()
 	mRxInst.sRange=0;
 	mRxInst.sFEdge=0;
 	mRxInst.sBEdge=0;
-
-	mUseAntennaANN=false;
-	string setting = gDb.GetSetting("UseAntennaANN");
-	if (setting=="true")
-		mUseAntennaANN=true;
 }
 
 //**************************************************************************
@@ -337,10 +332,10 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	eAnt Which;
 	if (mDownlink) Which =Tx;
 	else Which = Rx;
-	mTxAnt.SetAntennaPattern(mTxInst.sInstKey, mUseAntennaANN, Which, mTxInst.sTxAzimuth,  mTxInst.sTxMechTilt);
+	mTxAnt.SetAntennaPattern(mTxInst.sInstKey, Which, mTxInst.sTxAzimuth,  mTxInst.sTxMechTilt);
 	if (mDownlink) Which =Rx;
 	else Which = Tx;
-	mRxAnt.SetAntennaPattern(mRxInst.sInstKey, mUseAntennaANN, Which, mRxInst.sRxAzimuth,  mRxInst.sRxMechTilt);
+	mRxAnt.SetAntennaPattern(mRxInst.sInstKey, Which, mRxInst.sRxAzimuth,  mRxInst.sRxMechTilt);
 	if (mDownlink) EIRP = mTxInst.sTxPower - mTxInst.sTxSysLoss + mTxAnt.mGain;
 	else mRxInst.sTxPower - mRxInst.sTxSysLoss + mRxAnt.mGain;
 

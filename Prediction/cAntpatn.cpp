@@ -72,8 +72,19 @@ cAntennaPattern::cAntennaPattern()
 	mPol[0] ='V';
 	mPol[1] ='\0'; 
 	mAntennasANN = new FANN::neural_net[2];
-	mUseANN = false;
+	ResetUseAntANN();
+
 }/* end CAntennaPattern:: Default Constructor */
+
+//*********************************************************************
+bool cAntennaPattern:: ResetUseAntANN()
+{
+	string setting = gDb.GetSetting("UseAntANN");
+	if (setting=="true")
+		mUseANN = true;
+	else mUseANN = false;
+	return mUseANN;
+}/* end CAntennaPattern:: ResetUseAntANN */
 
 
 //*********************************************************************
@@ -95,9 +106,12 @@ cAntennaPattern::~cAntennaPattern()
 
 // ********************************************************************
 // Set antenna pattern file
-bool cAntennaPattern::SetAntennaPattern(int Key, bool UseANN, eAnt Type, 
+bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type, 
 																					double Bearing, double MechTilt)
 {	
+
+	if (Type ==Mobile)
+		mUseANN = false;
 
 //	cout << "RadKey = "	<< Key << "	Bearing = " << Bearing << "	Tilt = " << MechTilt << endl;
 	pqxx::result r;
@@ -111,13 +125,11 @@ bool cAntennaPattern::SetAntennaPattern(int Key, bool UseANN, eAnt Type,
 	char* Temp;
 	Temp = new char[12];
 
-	mUseANN = UseANN;
-
 //	cout << "cAntennaPattern::SetAntennaPattern. Before if (mUseANN) " << endl;
 	if (mUseANN)
 	{
 		query = "select filename from AntNeuralNet cross join radioinstallation ";
-		query += "where radid=cell.id and radioinstallation.id = ";
+		query += "where radid=radioinstallation.id and radioinstallation.id = ";
 		gcvt(Key, 8, Temp);
 		query += Temp;
 		query += ";";	
@@ -127,7 +139,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, bool UseANN, eAnt Type,
 				string err = "cAntennaPattern::SetAntennaPattern: Query to antenna ANN file failed. Failed query: ";
 				err+=query;
 				cout << err << endl;
-				QRAP_WARN(err.c_str());
+//				QRAP_WARN(err.c_str());
 				mUseANN = false;
 		}
 		else
@@ -136,23 +148,21 @@ bool cAntennaPattern::SetAntennaPattern(int Key, bool UseANN, eAnt Type,
 			if(r.size()>0)
 			{
 				filename = r[0]["filename"].c_str();
-				mAntennasANN->destroy();
+//				cout << "cAntennaPattern::SetAntennaPattern: file name = " << filename << endl;
+//				mAntennasANN->destroy();
 				mAntennasANN->create_from_file(filename);
 				mGain = 0;
 			}
 			else
 			{
-				string err = "cAntennaPattern::SetAntennaPattern: Empty query to antenna ANN file. Empty query: ";
-				err+=query;
-				cout << err << endl;
-				QRAP_WARN(err.c_str());
+				cout << "Antenna ANN not found for radioinstallation " << Temp;
+				cout << "	Antenna pattern in supplied file is used instead."  << endl;
 				mUseANN = false;
 			}
 		}
+		return true;
 	}
 	
-	if (mUseANN) return true;
-
 //	cout << "cAntennaPattern::SetAntennaPattern. Na if (mUseANN) " << endl;
 
 	int pp, ss, sign; 	//point position
@@ -970,15 +980,19 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 		double *AntANNInput;
 		AntANNInput = new double[5];
 		double *AntANNValue;
+		AntANNValue = new double[1];
 		double AntValue;
 		AntANNInput[0]  = 1;
 		AntANNInput[1] = cos(Azimuth*PI/180);
 		AntANNInput[2] = sin(Azimuth*PI/180);
 		AntANNInput[3] = cos(Elevation*PI/180);
 		AntANNInput[4] = sin(Elevation*PI/180);
+//		cout << "cAntennaPattern::GetPatternValue: Voor using ANN.";
+//		cout << " Azimuth =  " << Azimuth << "	Elevation = " << Elevation;
 		AntANNValue = mAntennasANN->run(AntANNInput);
 		AntValue = (AntANNValue[0]+0.5)*ANTENNASCALE;
-		delete [] AntANNValue;
+//		cout << "	AntValue =  " <<  AntValue <<  endl;
+		if (0==AntANNValue) delete [] AntANNValue;
 		delete [] AntANNInput;
 		return AntValue;
 	}
@@ -1076,8 +1090,8 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 	}
 	else if (ref_Azi>mNAA-2)
 	{
-		cout<< "Az="<< Az << "	Azi_ref=" << ref_Azi;
-		cout << "	El_ref=" << ref_El << endl; 
+//		cout<< "Az="<< Az << "	Azi_ref=" << ref_Azi;
+//		cout << "	El_ref=" << ref_El << endl; 
 			ValueAz1 = mAntPattern[ref_Azi][ref_El];
 			ValueAz1 = ValueAz1 + (El-mElevAngles[ref_El])
 									*(mAntPattern[ref_Azi][ref_El+1]-ValueAz1)

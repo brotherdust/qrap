@@ -303,7 +303,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
 			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
 
-			if (DiffLoss < 25)
+			if (DiffLoss < 20)
 			{
 					Delta =  - NewMeasurement.sMeasValue - PathLoss;
 					Total +=Delta;
@@ -358,9 +358,9 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 	double minTestError = MAXDOUBLE;
 	unsigned i,j,k;
 	float Tilt;
-	double Azimuth,  DiffLoss;
+	double Azimuth,  DiffLoss, RxLevCalc;
 	bool stop = false;
-	string query, queryM, queryC, queryD;
+	string query, queryM, queryC;
 	string outdir, filename, outputfile;
 	
 	char * temp;
@@ -386,6 +386,9 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 	gDb.GetLastResult(r);
 	newANNid = atoi(r[0]["id"].c_str());
 
+	string queryDD;
+	string queryD ="delete from AntNeuralNet where radid ="; 
+
 	queryM = "INSERT into AntNeuralNet (id, Lastmodified, machineid, radid, ";
 	queryM += "filename) Values (";
 
@@ -405,7 +408,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 		cout << " NumTest = " <<  mCells[i].sNumTest << endl;
 		cout << " NumTrain = " <<  mCells[i].sNumTrain << endl;
 
-		if (mCells[i].sNumTrain>199)
+		if (mCells[i].sNumTrain>50)
 		{
 			mCells[i].sInputTrain = new double*[mCells[i].sNumTrain + mNumAzifFile+mNumElevfFile];
 			mCells[i].sOutputTrain = new double*[mCells[i].sNumTrain+ mNumAzifFile+mNumElevfFile];
@@ -415,7 +418,8 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				mCells[i].sOutputTrain[j] = new double[mCells[i].sNumOutputs];
 			}
 
-			AntPatternFromFile.SetAntennaPattern(mCells[i].sRI, false, Tx,
+			AntPatternFromFile.SetUseAntANN(false);
+			AntPatternFromFile.SetAntennaPattern(mCells[i].sRI, Tx,
 													mCells[i].sBearing, mCells[i].sTilt);
 			EIRP = mCells[i].sTxPwr - mCells[i].sTxSysLoss + AntPatternFromFile.mGain;
 				mPathLoss.setParameters(mkFactor,mCells[i].sMeasTrain[0].sFrequency,
@@ -440,9 +444,11 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				mCells[i].sInputTrain[j][2] = sin(Azimuth*PI/180);
 				mCells[i].sInputTrain[j][3] = cos(Tilt*PI/180);
 				mCells[i].sInputTrain[j][4] = sin(Tilt*PI/180);
-
-				Delta = MIN(-mCells[i].sMin,EIRP) - PathLoss - mCells[i].sMeasTrain[j].sMeasValue;
-			
+				
+				RxLevCalc = MIN(-mCells[i].sMin,EIRP) - PathLoss;
+				if (RxLevCalc >-140) 
+							Delta = RxLevCalc - mCells[i].sMeasTrain[j].sMeasValue;
+				else Delta = -140 -  mCells[i].sMeasTrain[j].sMeasValue;		
 				mCells[i].sOutputTrain[j][0]  = Delta / ANTENNASCALE - 0.5;
 				if (fabs(mCells[i].sOutputTrain[j][0])>mMAXANNOutput)
 					mMAXANNOutput = fabs(mCells[i].sOutputTrain[j][0]);
@@ -507,7 +513,10 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				mCells[i].sInputTest[j][3] = cos(Tilt*PI/180);
 				mCells[i].sInputTest[j][4] = sin(Tilt*PI/180);
 	
-				Delta =   MIN(-mCells[i].sMin,EIRP) - PathLoss - mCells[i].sMeasTest[j].sMeasValue;
+				RxLevCalc = MIN(-mCells[i].sMin,EIRP) - PathLoss;
+				if (RxLevCalc >-140) 
+							Delta = RxLevCalc - mCells[i].sMeasTrain[j].sMeasValue;
+				else Delta = -140 -  mCells[i].sMeasTrain[j].sMeasValue;	
 				
 				mCells[i].sOutputTest[j][0]  = Delta / ANTENNASCALE - 0.5;
 				if (fabs(mCells[i].sOutputTest[j][0])>mMAXANNOutput)
@@ -524,11 +533,11 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 						mCells[i].sNumInputs, mCells[i].sInputTest,
 						mCells[i].sNumOutputs, mCells[i].sOutputTest);
 
-			unsigned HiddenN1 =8;
+			unsigned HiddenN1 = 10;
 			unsigned HiddenN2 = 4;
 
 			mANN.create_standard(3, mCells[i].sNumInputs, 
-						HiddenN1, HiddenN2, mCells[i].sNumOutputs);
+						HiddenN1, mCells[i].sNumOutputs);
  			mANN.set_train_error_function(FANN::ERRORFUNC_LINEAR);
 			mANN.set_train_stop_function(FANN::STOPFUNC_MSE);
 			mANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
@@ -574,6 +583,19 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				k++;
 				
 			} 	
+
+			queryDD = queryD;
+			queryDD += radinst;
+			queryDD += ";";
+
+			if (!gDb.PerformRawSql(queryDD))
+			{
+				string err = "Error deleting from AntNeuralNet by running query: ";
+				err += queryDD;
+				cout << err <<endl; 
+				QRAP_WARN(err.c_str());
+			}
+
 
 			query = queryM;
 			gcvt(newANNid,9,annid);
@@ -647,7 +669,8 @@ bool cTrainAntPattern::Output(string Outputfile, unsigned currentCell)
 	ANNInput[0] = 1;
 	double *ANNOutput;
 	cAntennaPattern AntPatternFromFile; 
-	AntPatternFromFile.SetAntennaPattern(mCells[currentCell].sRI, false, Tx,
+	AntPatternFromFile.SetUseAntANN(false);
+	AntPatternFromFile.SetAntennaPattern(mCells[currentCell].sRI, Tx,
 													mCells[currentCell].sBearing, mCells[currentCell].sTilt);
 
 	bool WriteFile = true;

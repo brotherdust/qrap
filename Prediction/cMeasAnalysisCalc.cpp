@@ -302,7 +302,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(unsigned MeasType, unsigned PosSource,
 
 //******************************************************************************
 int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
-					double &StDev, double &CorrC, unsigned Clutterfilter, bool UseAntANN)
+					double &StDev, double &CorrC, unsigned Clutterfilter)
 {
 
 	float *TempClutter;
@@ -388,7 +388,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					return 0;
 				}
 //				cout << "Setting Mobile Antenna" << endl;
-				MobileAnt.SetAntennaPattern(mMobiles[MobileNum].sInstKey, false, Mobile, 0, 0);
+				MobileAnt.SetAntennaPattern(mMobiles[MobileNum].sInstKey, Mobile, 0, 0);
 
 //				cout << "Setting Path loss parameters" << endl;
 //				cout << "FixedNum = " << FixedNum << endl;
@@ -445,8 +445,10 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					return 0;
 				}
 
+
+				FixedAnt.SetUseAntANN(mUseAntANN);
 //				cout << "Setting Antenna Pattern to match FixedInstallation" << endl;
-				FixedAnt.SetAntennaPattern(mFixedInsts[FixedNum].sInstKey, UseAntANN, Tx,
+				FixedAnt.SetAntennaPattern(mFixedInsts[FixedNum].sInstKey, Tx,
 															mFixedInsts[FixedNum].sTxAzimuth,  mFixedInsts[FixedNum].sTxMechTilt);
 				EIRP = mFixedInsts[FixedNum].sTxPower 
 								- mFixedInsts[FixedNum].sTxSysLoss + FixedAnt.mGain + MobileAnt.mGain;

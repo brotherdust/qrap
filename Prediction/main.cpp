@@ -99,8 +99,8 @@ int main (int argc, char **argv)
 	cout << endl << "Wrote Measurements to DataBase" << endl;
 */
 
-	double Mean, MSE, StDev, CorrC;
-	cMeasAnalysisCalc Meas;
+//	double Mean, MSE, StDev, CorrC;
+//	cMeasAnalysisCalc Meas;
 
 /*
   	query = "update coefficients set coefficient=0.0;";
@@ -224,7 +224,7 @@ int main (int argc, char **argv)
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
 */
-
+/*
 	Meas.SetUseAntANN(true);
 	cout << "Before PerformAnalysis ... in main()" << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
@@ -243,7 +243,7 @@ int main (int argc, char **argv)
    Meas.OptimiseModelCoefD(0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
+*/
 /*
 	double hoek = 45;
 	double x=cos(hoek/180*PI);
@@ -286,7 +286,7 @@ int main (int argc, char **argv)
 	
 	delete [] Hoek;
 
-	Positioning.SetUseAntANN(true);	
+	Positioning.SetUseAntANN(false);	
 	Positioning.LoadMeasurements(Punte,2,6,1,1);
 
 	cout << " Clearing Punte " << endl;

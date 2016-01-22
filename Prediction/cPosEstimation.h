@@ -36,10 +36,12 @@
 #define Cp 1.4
 #define Cg 1.4
 #define STOPN 50
-#define MAXITER 300
+#define MAXITERpos 300
 #define DELTA 5e-10
 
 // include local headers
+#include "../libcmaes/src/cmaes.h"
+#include "../libcmaes/src/cmaparameters.h"
 #include "../DataBase/Config.h"
 #include "../DataBase/cDatabase.h"
 #include "cGeoP.h"
@@ -54,10 +56,12 @@
 #include "doublefann.h"
 #include "fann_cpp.h"
 #include "cTrainPosNetDistAngle.h"
+
 //#include "cTrainAntPattern.h"
 
 using namespace std;
 using namespace Qrap;
+using namespace libcmaes;
 
 enum eMethod
 {
@@ -72,8 +76,11 @@ enum eMethod
 	CosRuleAngleAngle, //9
 	DCM_PSO, //10
 	DCM_PSObestN, //11
-	ANN, //12
-	ANNangleLineSearch, //13
+	DCM_CMA_ESmean, //12
+	DCM_CMA_ESbest, //13
+	DCM_CMA_ESbestSeen, //14
+	ANN, //15
+	ANNangleLineSearch, //16
 	None
 };
 
@@ -175,7 +182,7 @@ class cPosEstimation
 
 	void EstimatePositions();
 	int SaveResults();
-
+	
 
    private:
 
@@ -187,45 +194,47 @@ class cPosEstimation
 	double SearchDistance(double Azimuth, double min, double max);
 	bool CoSinRule();
 	bool DCM_ParticleSwarm();
+	int DCM_CMA_ES();
 	bool ANNrun();
 
 	// In this function the default mobile installation 
 	// with height of MOBILEHEIGHT (#defined) and an isotropic antenna. 
 	double CostFunction(double rho, double phi);
+	static FitFunc CostCMA_ES;
 
-	vPosSet mPosSets;		/// an array with all the testpoints
-	unsigned mCurPosI;
+	static vPosSet mPosSets;		/// an array with all the testpoints
+	static unsigned mCurPosI;
 	FANN::neural_net *mCurANNa;
 	FANN::neural_net *mCurANNd;
-	unsigned mCurSiteI;
-	unsigned mNumPoints;
-	unsigned mNewTP;
-	unsigned mNumSites;
-	unsigned mNum;
+	static unsigned mCurSiteI;
+	static unsigned mNumPoints;
+	static unsigned mNewTP;
+	static unsigned mNumSites;
+	static unsigned mNum;
 
-	double mPlotResolution;
-	double mkFactor;
-	eOutputUnits mUnits;
-	bool mUseClutter;
-	short int mDEMsource;
-	short int mClutterSource;
-	cRasterFileHandler mDEM;
-	cRasterFileHandler mClutter;
-	cAntennaPattern* mFixedAnts;
-	unsigned mNumInsts;
-	unsigned mClutterClassGroup;
-	unsigned *mClutterCount;
-	cPathLossPredictor mPathLoss;
-	double* mCellPathLoss;		/// Pathloss to each cell in a measurement set.
-	cProfile mClutterProfile;
-	cProfile mDEMProfile;
-	vector<tFixed>	mFixedInsts;	///< Information on the fixed installations
-	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
-	vSiteInfo mSites;
-	bool mLTEsim;
-	bool mUMTS;	
-	bool mOriginal;
-	bool mUseAntANN;
+	static double mPlotResolution;
+	static double mkFactor;
+	static eOutputUnits mUnits;
+	static bool mUseClutter;
+	static short int mDEMsource;
+	static short int mClutterSource;
+	static cRasterFileHandler mDEM;
+	static cRasterFileHandler mClutter;
+	static cAntennaPattern* mFixedAnts;
+	static unsigned mNumInsts;
+	static unsigned mClutterClassGroup;
+	static unsigned *mClutterCount;
+	static cPathLossPredictor mPathLoss;
+	static double* mCellPathLoss;		/// Pathloss to each cell in a measurement set.
+	static cProfile mClutterProfile;
+	static cProfile mDEMProfile;
+	static vector<tFixed>	mFixedInsts;	///< Information on the fixed installations
+	static vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
+	static vSiteInfo mSites;
+	static bool mLTEsim;
+	static bool mUMTS;	
+	static bool mOriginal;
+	static bool mUseAntANN;
 };
 }
 #endif

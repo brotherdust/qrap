@@ -211,11 +211,11 @@ bool cSpectralLink::DoLink()
 	eAnt Which;
 	if (mDownlink) Which = Tx;
 	else Which = Rx;
-	mTxAnt.SetAntennaPattern(mTxInst.sInstKey, mUseAntennaANN, Which, 
+	mTxAnt.SetAntennaPattern(mTxInst.sInstKey, Which, 
 														mTxInst.sTxAzimuth, mTxInst.sTxMechTilt);
 	if (mDownlink) Which = Rx;
 	else Which = Tx;
-	mRxAnt.SetAntennaPattern(mRxInst.sInstKey, mUseAntennaANN, Which, 
+	mRxAnt.SetAntennaPattern(mRxInst.sInstKey, Which, 
 														mRxInst.sRxAzimuth, mRxInst.sRxMechTilt);
 	EIRP = mTxInst.sTxPower - mTxInst.sTxSysLoss + mTxAnt.mGain;
 

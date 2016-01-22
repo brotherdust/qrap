@@ -813,7 +813,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 //			filename += ctime(&now);
 			filename += ".ann";
 
-//			ANN.train_on_data(TrainDataAngle, MAXepoch,REPORTInt,ERROR);
+//			ANN.train_on_data(TrainDataAngle, MAXepoch,REPORTInt,TERROR);
 
 			cout << "In cTrainPosNetDistAngle::TrainANDSaveANDTest(): before ANN training " << endl;
 
@@ -837,8 +837,8 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 					||((TrainError<= minTrainError*0.6)&&(TestError<=(minTestError*1.1))&&(k>REPORTInt)))
 				{
 					ANN.save(filename);
-					stop = (((minTestError-TestError)/TestError) < ERROR)
-								&&(((minTrainError-TrainError)/TrainError) < ERROR)&&(k>(MAXepoch/3));
+					stop = (((minTestError-TestError)/TestError) < TERROR)
+								&&(((minTrainError-TrainError)/TrainError) < TERROR)&&(k>(MAXepoch/3));
 					minTrainError = TrainError;
 					minTestError = TestError; 
 				}
@@ -923,7 +923,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 //			filename += ctime(&now);
 			filename += ".ann";
 
-//			ANN.train_on_data(TrainDataDist, MAXepoch,REPORTInt,ERROR/3);
+//			ANN.train_on_data(TrainDataDist, MAXepoch,REPORTInt,TERROR/3);
 			cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;
 			cout << "		mSites[i].sNumOutputsD = " << mSites[i].sNumOutputsD;
 			cout << "		mSites[i].sNumDataRowsTrain = " << mSites[i].sNumDataRowsTrain;
@@ -949,8 +949,8 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 					||((TrainError<= minTrainError*0.6)&&(TestError<=(minTestError*1.1))&&(k>REPORTInt)))
 				{
 					ANN.save(filename);
-					stop = (((minTestError-TestError)/TestError) < ERROR*ERROR)
-								&&(((minTrainError-TrainError)/TrainError) < ERROR*ERROR)&&(k>(MAXepoch/3));
+					stop = (((minTestError-TestError)/TestError) < TERROR*TERROR)
+								&&(((minTrainError-TrainError)/TrainError) < TERROR*TERROR)&&(k>(MAXepoch/3));
 					minTrainError = TrainError;
 					minTestError = TestError;
 				}

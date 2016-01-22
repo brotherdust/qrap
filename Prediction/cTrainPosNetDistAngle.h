@@ -39,7 +39,7 @@
 
 #define MAXepoch 300000
 #define REPORTInt 10000
-#define ERROR (0.0015/5000)
+#define TERROR 0.0015/5000
 
 // include local headers
 #include "../DataBase/Config.h"

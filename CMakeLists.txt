@@ -385,7 +385,7 @@ SET (qrap_SRCS
     	DataBase/cRapLinks.cpp
     	DataBase/cRapServedKeyLocations.cpp
     	DataBase/cRapRasterFiles.cpp
-	DataBase/cRapMeasurements.cpp
+		DataBase/cRapMeasurements.cpp
     	DataBase/cSearchFormWidgets.cpp
     	DataBase/cSearchForm.cpp
     	DataBase/AdminWindow.cpp
@@ -401,14 +401,14 @@ SET (qrap_SRCS
     	DataBase/cCsvImportDialog.cpp
 	
 	Prediction/cMemmngr.cpp
-     	Prediction/cAntpatn.cpp
-     	Prediction/cBIN.cpp
-     	Prediction/cBTLPredict.cpp
-     	Prediction/cCoveragePredict.cpp
-     	Prediction/cSpectralLink.cpp
-     	Prediction/cSpectralPlot.cpp
-     	Prediction/cGDAL.cpp
-     	Prediction/cGeoP.cpp
+   Prediction/cAntpatn.cpp
+   Prediction/cBIN.cpp
+   Prediction/cBTLPredict.cpp
+   Prediction/cCoveragePredict.cpp
+   Prediction/cSpectralLink.cpp
+   Prediction/cSpectralPlot.cpp
+   Prediction/cGDAL.cpp
+   Prediction/cGeoP.cpp
 	Prediction/cPlotTask.cpp
 	Prediction/cProfile.cpp
 	Prediction/cClutter.cpp
@@ -463,21 +463,21 @@ SET (qrap_PLUGIN_SRCS
 )
 
 SET (qrap_UIS 
-        Interface/Site.ui
-        Interface/ConfirmLink.ui
-        Interface/LinkAnalysis.ui
-        Interface/ConfirmPrediction.ui
+   Interface/Site.ui
+   Interface/ConfirmLink.ui
+   Interface/LinkAnalysis.ui
+   Interface/ConfirmPrediction.ui
 	Interface/LoadMeasurements.ui
 	Interface/MeasurementAnalysis.ui
 	Interface/LoadRasterFiles/CreateDataSet.ui
 	Interface/LoadRasterFiles/CutSet.ui
 	Interface/LoadRasterFiles/LoadFiles.ui
 	Interface/LoadRasterFiles/LoadRasterFiles.ui
-        Interface/LinkAnalysis.ui
+   Interface/LinkAnalysis.ui
 	Interface/Optimisation.ui
 	Interface/ConfirmSpectral.ui
 	Interface/ConfirmMultiLink.ui
-        Interface/ColourManager.ui
+   Interface/ColourManager.ui
 	Interface/DeleteObject.ui
 	Interface/FilterDialog.ui
 	DataBase/Filter.ui
@@ -551,7 +551,7 @@ SET (qrap_MOC_HDRS
 	Interface/cSpectralAnalysis.h
 	Interface/cLinkAnalysis.h
 	Interface/cFilterDialog.h
-    	Interface/cColourManager.h
+   Interface/cColourManager.h
 	Interface/cDeleteObject.h
 	Interface/cBackup.h
 	Interface/cRestore.h
@@ -618,12 +618,15 @@ INCLUDE_DIRECTORIES(
 	/usr/include/qgis
 	/usr/include/eigen3
 	/usr/include/gdal
-     	/usr/include/Poco/
+   /usr/include/Poco/
+#	/usr/include/libcmaes/src/
 	/usr/include/qwt-qt4
 #	/usr/include/qwt
-     	/usr/include/pqxx
+  	/usr/include/pqxx
 	/usr/include/armadillo_bits
 	/usr/include/boost
+	../libcmaes/src
+	../libcmaes
 )
 
 TARGET_LINK_LIBRARIES(qrapplugin

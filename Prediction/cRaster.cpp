@@ -582,9 +582,9 @@ bool cRaster::ReturnProj4(GeoType PointType,
 			//pj_free(Proj);
 		}
 		char *centmer;
-		centmer = new char[100];
+		centmer = new char[120];
 		char *southstr;
-		southstr = new char [100];
+		southstr = new char [120];
 		string Proj4;
 		switch (PointType) 
 		{
@@ -623,8 +623,10 @@ bool cRaster::ReturnProj4(GeoType PointType,
 //				Proj = pj_init(sizeof(NDEFparms)/sizeof(char*),NDEFparms);
 				break;
 		}
-		Proj = NULL;
+		Proj = nullptr;
+		cout << " In cRaster::ReturnProj, Proj4 = " << Proj4 << endl;
 		Proj = pj_init_plus(Proj4.c_str());
+		cout << " Leaving cRaster::ReturnProj" << endl;
 		delete [] centmer;
 		delete [] southstr;
 		return true;

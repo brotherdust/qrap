@@ -534,7 +534,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 						mCells[i].sNumOutputs, mCells[i].sOutputTest);
 
 			unsigned HiddenN1 = 10;
-			unsigned HiddenN2 = 4;
+//			unsigned HiddenN2 = 4;
 
 			mANN.create_standard(3, mCells[i].sNumInputs, 
 						HiddenN1, mCells[i].sNumOutputs);

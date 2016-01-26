@@ -29,6 +29,11 @@
 namespace libcmaes
 {
 
+  class CMASolutions;
+
+  template <class TGenoPheno>
+    using StopCriteriaFunc = std::function<int (const CMAParameters<TGenoPheno> &cmap, const CMASolutions &cmas)>;
+
   enum CMAStopCritType
   {
     CONT = 0,
@@ -42,14 +47,9 @@ namespace libcmaes
     NOEFFECTAXIS = 3, // partial success
     NOEFFECTCOOR = 4, // partial success
     MAXFEVALS = 8,
-    MAXITER = 9,
+    MAXITER = 20,
     FTARGET = 10 // success
   };
-
-  class CMASolutions;
-
-  template <class TGenoPheno>
-    using StopCriteriaFunc = std::function<int (const CMAParameters<TGenoPheno> &cmap, const CMASolutions &cmas)>;
 
   template <class TGenoPheno=NoBoundStrategy>
   class StopCriteria
@@ -121,6 +121,6 @@ namespace libcmaes
 									  {MAXITER,"The maximum number of iterations specified for optimization has been reached"},
 									  {FTARGET,"[Success] The objective function target value has been reached"}};
 
-};
+}
 
 #endif

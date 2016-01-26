@@ -180,7 +180,7 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 		return 0;
 	}
 
-	unsigned MeasCount=0, LocalNum=0;	
+	unsigned LocalNum=0;	
 	double Lat, Lon, prevLat, prevLon, Meas, dist, Ddist=1e-12, NprevLat, NprevLon, ndist=0;
 	double LocalTotal=0.0, LocalAve=0.0;
 
@@ -409,6 +409,7 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 	delete [] temp2;
 	delete [] TPID;
 	cout << "cMeasImportCSV::LoadMeasurement: leaving ";
+	return 1;
 }
 
 

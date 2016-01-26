@@ -328,7 +328,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 
 	double DiffLoss =0;
 	terms = new double[NUMTERMS];
-	double CMean = 0, CMeanSquareError=0, CStDev = 0, CCorrC = 0;
+	double CMean = 0, CMeanSquareError=0, CCorrC=0.0, CStDev=0.0;
 	Mean = 0; 
 	MeanSquareError=0;
 	StDev = 0;
@@ -342,7 +342,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 //	unsigned tClutter = 0;
 
 	//These varaibles are local and are such that they can be used with the TERMs defined in cClutter.h
-	double mLinkLength, m_freq, m_htx, Cheight;
+	double mLinkLength, m_freq, m_htx;
 	
 	for (j=0;j<mPathLoss.mClutter.mNumber;j++)
 	{
@@ -715,7 +715,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 	MatrixXd SolveCoefMatrix;	//Declare local matrixes of reduced size
 	MatrixXd LeftSide;
 	MatrixXd DeltaCoeff;
-	int NumUsed, TotalNumUsed;
+	int NumUsed;
 	mPathLoss.set_Tuning(true);
 
 	mUseClutter = true;
@@ -728,7 +728,6 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 	// This first analysis is to update the clutter each pixel belongs to. 
 	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor performAnalysis()" << endl;
 	NumUsed = PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, mClutterFilter);
-	TotalNumUsed = NumUsed;
 	cout << "clutterType = " << mClutterFilter;
 	cout << "	#Used: " << NumUsed << "	Mean: " << Mean 
 		<< "	MeanSquare: " << MeanSquareError << "	StDev: " << StDev
@@ -865,7 +864,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 	MatrixXd SolveCoefMatrix;	//Declare local matrixes of reduced size
 	MatrixXd LeftSide;
 	MatrixXd DeltaCoeff;
-	int NumUsed, TotalNumUsed;
+	int NumUsed;
 	mPathLoss.set_Tuning(true);
 	mUseClutter = true;
 
@@ -873,7 +872,6 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 
 	// This first analysis is to update the clutter each pixel belongs to. 
 	NumUsed = PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, 0);
-	TotalNumUsed = NumUsed;
 	cout << "clutterType = " << mClutterFilter;
 	cout << "	#Used: " << NumUsed << "	Mean: " << Mean 
 		<< "	MeanSquare: " << MeanSquareError << "	StDev: "<< StDev
@@ -1134,7 +1132,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	int NumUsed;
 	bool stop = false, redo=false;
 	bool first = true, ExhaustiveSearch=true;
-	bool StopStepSize=false;
+//	bool StopStepSize=false;
 	double cost, costOld, costMin, costMinTemp, cost1, cost2;
 	double dCost1,dCost2,ddCost;
 	double StepSize=0.5,TempStepSize=0.5,OldStepSize;
@@ -1168,7 +1166,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		Up[i] = true;
 		CHeightDiff[i] = 0.5;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
-		DeltaH[i] = 0.2;
+		DeltaH[i] = -0.2;
 		NumClut[i] = 0;
 		Passed[i] = false;
 	}
@@ -1187,8 +1185,8 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	costMinTemp = cost;
 	StepResult[NumStop] = cost;
 
-	for(i=0;i<NumUsed;i++)
-		NumClut[mMeasPoints[i].sClutter]++; 
+	for(int ii=0;ii<NumUsed;ii++)
+		NumClut[mMeasPoints[ii].sClutter]++; 
 
 	unsigned TotNum=0;
 	for (i=0; i<mPathLoss.mClutter.mNumber ; i++)

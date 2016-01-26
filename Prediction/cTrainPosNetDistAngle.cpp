@@ -117,7 +117,7 @@ bool cTrainPosNetDistAngle::LoadSites(vPoints Points,
 	double longitude, latitude;
 	string PointString;
 	unsigned spacePos;
-	unsigned NumInPosSet = 0; 
+//	unsigned NumInPosSet = 0; 
 	unsigned siteid;
 	
 	areaQuery += " @ ST_GeomFromText('POLYGON((";
@@ -292,9 +292,9 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 	unsigned i;
 
 	unsigned Counter =0;
-	tCell NewCell;
+//	tCell NewCell;
 	tSiteInfoNN NewSite;
-	NewCell.sCI=0;
+//	NewCell.sCI=0;
 	NewSite.sSiteID=0;
 
 	double longitude, latitude, Distance;

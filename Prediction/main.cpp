@@ -99,37 +99,47 @@ int main (int argc, char **argv)
 	cout << endl << "Wrote Measurements to DataBase" << endl;
 */
 
-//	double Mean, MSE, StDev, CorrC;
-//	cMeasAnalysisCalc Meas;
+	double Mean, MSE, StDev, CorrC;
+	cMeasAnalysisCalc Meas;
 
-/*
+
   	query = "update coefficients set coefficient=0.0;";
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
-*/
-/*
-  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
+
+
+  	query = "update qrap_config set value='false' where name = 'UseAntANN';";
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error updating qrap_config" << endl;
 	}
 
+
 	Meas.SetUseAntANN(false);
 	Meas.mPathLoss.mClutter.Reset(1);
 	cout << "Loading measurements ... in main()" << endl;
 	Meas.LoadMeasurements(2,0,6);
+
+  Meas.OptimiseHeights(6);
 	
 	cout << "Before PerformAnalysis ... in main()" << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-
+//	Meas.OptimiseModelCoefAllTotal(6);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
+	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+   Meas.OptimiseModelCoefD(6);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
+	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+//	cout<< "Na0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
 //	Meas.OptimiseSeekWidth();
-	cout << "Starting Optimisation ... in main()" << endl; 
-*/
-//	Meas.OptimiseHeights(6);
+//	cout << "Starting Optimisation ... in main()" << endl; 
+//
+
+
 /*
   	query = "update coefficients set coefficient=0.0;";
 	if (!gDb.PerformRawSql(query))
@@ -176,7 +186,7 @@ int main (int argc, char **argv)
 */
 
 /*
-  	string query = "update coefficients set coefficient=0.0;";
+	query = "update coefficients set coefficient=0.0;";
 
 	if (!gDb.PerformRawSql(query))
 	{
@@ -270,7 +280,11 @@ int main (int argc, char **argv)
 	cout << hoek << "		" << angle << endl;
 */
 
+
+
+	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
+	cout << "Na constructor" << endl;
 	vPoints Punte;
 	cGeoP *Hoek;
 	Hoek = new cGeoP[4];
@@ -286,8 +300,16 @@ int main (int argc, char **argv)
 	
 	delete [] Hoek;
 
+  	query = "truncate positionestimate cascade;";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error truncating positionestimate" << endl;
+	}
+
+	cout << "Voor LoadMeasurements" << endl;
 	Positioning.SetUseAntANN(false);	
 	Positioning.LoadMeasurements(Punte,2,6,1,1);
+	cout << "Na LoadMeasurements" << endl;
 
 	cout << " Clearing Punte " << endl;
 	Punte.clear();

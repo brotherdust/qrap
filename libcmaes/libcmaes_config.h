@@ -66,19 +66,19 @@
 #define PACKAGE_BUGREPORT ""
 
 /* Define to the full name of this package. */
-#define NAME "libcmaes"
+#define PACKAGE_NAME "libcmaes"
 
 /* Define to the full name and version of this package. */
-#define STRING "libcmaes 0.9.5"
+#define PACKAGE_STRING "libcmaes 0.9.5"
 
 /* Define to the one symbol short name of this package. */
-#define TARNAME "libcmaes"
+#define PACKAGE_TARNAME "libcmaes"
 
 /* Define to the home page for this package. */
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define VERSION "0.9.5"
+#define PACKAGE_VERSION "0.9.5"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1

@@ -425,7 +425,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //cout << "Na clutter in TotPathloss" << endl;
 
 
-	m_Loss = max(m_Loss,min(FreeSpace,PlaneEarth));
+	m_Loss = max(m_Loss,max(FreeSpace,PlaneEarth));
 /*
 #ifndef NO_DEBUG
 	m_counter++;
@@ -480,7 +480,7 @@ inline double cPathLossPredictor::CalcPlaneEarthLoss(const double pathLength)
 	double PlaneEarth;
 	if (pathLength >0)
 		PlaneEarth = 40.0*log10(pathLength) 
-				+ 20.0*log10(m_htx) + 20.0*log10(m_hrx);
+				- 20.0*log10(m_htx) - 20.0*log10(m_hrx);
 	else	PlaneEarth = 0;
 return  PlaneEarth;
 }/* end CalcFreeSpaceLoss */

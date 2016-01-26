@@ -209,8 +209,7 @@ namespace Qrap
 			 * @param EWres Description
 			 */
 			double GetRes ();
-			
-			
+	
 			
 			void GetCorners (cGeoP &NW, cGeoP &SE)
 			{

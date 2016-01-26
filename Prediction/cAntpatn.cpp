@@ -113,7 +113,6 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	if (Type ==Mobile)
 		mUseANN = false;
 
-//	cout << "RadKey = "	<< Key << "	Bearing = " << Bearing << "	Tilt = " << MechTilt << endl;
 	pqxx::result r;
 
 	string QueryResult, query, filename;
@@ -128,6 +127,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 //	cout << "cAntennaPattern::SetAntennaPattern. Before if (mUseANN) " << endl;
 	if (mUseANN)
 	{
+//		Bearing and MechTilt is not yet affected for ANNantenna patterns
 		query = "select filename from AntNeuralNet cross join radioinstallation ";
 		query += "where radid=radioinstallation.id and radioinstallation.id = ";
 		gcvt(Key, 8, Temp);
@@ -164,6 +164,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	}
 	
 //	cout << "cAntennaPattern::SetAntennaPattern. Na if (mUseANN) " << endl;
+//	cout << "RadKey = "	<< Key << "	Bearing = " << Bearing << "	Tilt = " << MechTilt << endl;
 
 	int pp, ss, sign; 	//point position
 	float *TempAziAngles;
@@ -185,6 +186,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		query += "from mobile cross join antennapattern where " ;
 		query += "mobile.antpatternkey = AntennaPattern.id ";
  		query += "and mobile.id = ";
+//		cout << "Mobile Antenna" << endl;
 	}
 	else
 	{
@@ -471,14 +473,13 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		}
 	}
 
-/*
 	for (k=0; k<mNAA; k++)
 	{
 		mAziAngles[k]=TempAziAngles[k];		
 		if (fabs(mAziAngles[k]-180.0)<0.1) mRef180az = k;
 	}
-	
 
+/*
 	for (k=0; k<mNAA+3; k++)
 	{
 		cout << k << ":  " << TempRef_mAzi[k] << "  h: " 
@@ -550,12 +551,15 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		}
 	}
 
+	//????
+	//Anders as oorspronklike kode
+	//Maak ekstra (onnodige) waardes gelyk aan die laaste waarde
 	for (k=mNEA;k<mNEA+3;k++)
 	{
 		if (TempRef_mElev[k]>8000) 
 		{
 			if (k-3>0)
-			{ 
+			{	//Vir die waardes van die agterkant van die antenna as daar nie eintlik 'n ref is nie 
 				if ((mElevAngles[k-3]>90.0)&&(mElevAngles[k-3]<270.0))
 				{
 					TempElevAngles[k] = 180 - mElevAngles[k-3];
@@ -565,7 +569,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 					TempAgterValues[k] = mElevValues[k-3]; 
 				}
 				else
-				{
+				{ //Voorkant
 			 		TempElevAngles[k] = mElevAngles[k-3];
 			 		TempRef_mElev[k] = k-3;
 			 		TempAgterAngles[k] = mElevAngles[k-3];
@@ -596,13 +600,13 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 					TempAgterValues[k] = TempAgterValues[l];
 					TempAgterRef[l]=9999;
 					TempAgterAngles[l]=9999.0;
-					 TempAgterValues[l]=9999.0;
+					TempAgterValues[l]=9999.0;
 				}
 				else if (TempAgterRef[l]==7777)
 				{
 					TempAgterRef[l]=9999;
 					TempAgterAngles[l]=9999.0;
-					 TempAgterValues[l]=9999.0;
+				 	TempAgterValues[l]=9999.0;
 				}
 				else
 				{
@@ -610,7 +614,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 					// given that we are dealing with negative log10 values this is probably WRONG!!
 					TempAgterRef[l] = 9999;
 					TempAgterAngles[l] = 9999.0;
-					 TempAgterValues[l]=9999.0;
+					TempAgterValues[l]=9999.0;
 				}
 			}
 			else if ((TempAgterAngles[l]<TempAgterAngles[k]))	//swap
@@ -861,6 +865,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		{ 
 			if ((mAntPattern[k][l]>3000.0))
 			{
+				Value =0.0;
 				if (l<mRef0el)
 				{
 					tydelikBO = exp10(-mAntPattern[k][0]/10);
@@ -901,8 +906,8 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 			} // end if
 		} // end for step through elevation angles
 	} // end for step through Azimuth angles
-
 */
+
 
 	for (k=1; k<mNAA-1; k++)
 	{
@@ -997,6 +1002,7 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 		return AntValue;
 	}
 
+//	cout << "Not antenna ANN" << endl;
 	if ((mNAA>9990)||(mNEA>9990)
 			||(Azimuth>500)||(Azimuth<-500)||(Elevation>180)||(Elevation<-180))
 	{
@@ -1092,7 +1098,12 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 	{
 //		cout<< "Az="<< Az << "	Azi_ref=" << ref_Azi;
 //		cout << "	El_ref=" << ref_El << endl; 
-			ValueAz1 = mAntPattern[ref_Azi][ref_El];
+//		cout << "Azi_ref: " << ref_Azi <<  endl; 
+		ValueAz1 = mAntPattern[ref_Azi][ref_El];
+		Value = ValueAz1 + (El-mElevAngles[ref_El])
+				*(mAntPattern[ref_Azi][ref_El+1]-ValueAz1)
+				/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
+/*			ValueAz1 = mAntPattern[ref_Azi][ref_El];
 			ValueAz1 = ValueAz1 + (El-mElevAngles[ref_El])
 									*(mAntPattern[ref_Azi][ref_El+1]-ValueAz1)
 									/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
@@ -1102,6 +1113,7 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 										/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
 			Value = ValueAz1 + (Az-mAziAngles[ref_Azi])*(ValueAz2-ValueAz1)
 						/(360+mAziAngles[0]-mAziAngles[ref_Azi]);
+*/
 	}
 	else
 	{

@@ -360,6 +360,7 @@ int cMeasImportSpace::LoadMeasurement(char *filename)
 		delete [] temp2;
 		delete [] TPID;
 		cout << "cMeasImportSpace::LoadMeasurement: leaving " << endl;
+		return 1;
 }
 
 

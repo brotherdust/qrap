@@ -122,13 +122,13 @@ int main (int argc, char **argv)
 	cout << "Loading measurements ... in main()" << endl;
 	Meas.LoadMeasurements(2,0,6);
 
-  Meas.OptimiseHeights(6);
+//  Meas.OptimiseHeights(6);
 	
 	cout << "Before PerformAnalysis ... in main()" << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-//	Meas.OptimiseModelCoefAllTotal(6);
+	Meas.OptimiseModelCoefAllTotal(6);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
    Meas.OptimiseModelCoefD(6);
@@ -193,7 +193,7 @@ int main (int argc, char **argv)
 		cout << "Error clearing coefficients" << endl;
 	}
 */
-/*
+
 	cTrainAntPattern NeuralNets;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -233,7 +233,7 @@ int main (int argc, char **argv)
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
+
 /*
 	Meas.SetUseAntANN(true);
 	cout << "Before PerformAnalysis ... in main()" << endl;
@@ -280,7 +280,7 @@ int main (int argc, char **argv)
 	cout << hoek << "		" << angle << endl;
 */
 
-
+/*
 
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
@@ -319,7 +319,7 @@ int main (int argc, char **argv)
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-
+*/
 /*
 	if (!gDb.PerformRawSql(query))
 	{

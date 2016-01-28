@@ -1132,6 +1132,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	int NumUsed;
 	bool stop = false, redo=false;
 	bool first = true, ExhaustiveSearch=true;
+
 //	bool StopStepSize=false;
 	double cost, costOld, costMin, costMinTemp, cost1, cost2;
 	double dCost1,dCost2,ddCost;
@@ -1153,6 +1154,8 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	double *CHeightDiff;
 	double *DeltaH;
 	double *BestHeight;
+	bool *changed;
+	changed = new bool[mPathLoss.mClutter.mNumber];
 	CHeightDiff = new double[mPathLoss.mClutter.mNumber];
 	BestHeight = new double[mPathLoss.mClutter.mNumber];
 	DeltaH = new double[mPathLoss.mClutter.mNumber];
@@ -1166,9 +1169,10 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		Up[i] = true;
 		CHeightDiff[i] = 0.5;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
-		DeltaH[i] = -0.2;
+		DeltaH[i] = 0.2;
 		NumClut[i] = 0;
 		Passed[i] = false;
+		changed[i]=false;
 	}
 
 	mUseClutter = true;
@@ -1493,9 +1497,13 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			if (((CHeightDiff[i]>0)&&(Up[i]))||((CHeightDiff[i]<0)&&(!Up[i]))
 				||((0==mPathLoss.mClutter.mClutterTypes[i].sHeight)&&(CHeightDiff[i]>0)))
 			{
-				if (DeltaH[i]>0.05)
-					DeltaH[i]*=-0.8;
-				else Passed[i]=true;
+					if (DeltaH[i]>0.05)
+					{
+//					cout << "Maal met DeltaH" << endl;
+						DeltaH[i]*=-0.8;
+						changed[i] =true;
+					}
+					else Passed[i]=true;
 			}
 			Up[i] = (CHeightDiff[i]<0);
 //			stop = stop&&Passed[i];
@@ -1541,12 +1549,14 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			TempMinIndex=0;
 			StepResult[NumStop] = cost;
 		}
-		if ((stuck>1)||( (ExhaustiveSearch)&&(stuck>0)))
+
+		if ((stuck>1)||((ExhaustiveSearch)&&(stuck>0)))
 		{
 			for (i=0; i<mPathLoss.mClutter.mNumber; i++)
 			{
+				if (!changed[i]) DeltaH[i]=-0.8*DeltaH[i];
 				mPathLoss.mClutter.mClutterTypes[i].sHeight=BestHeight[i];
-				DeltaH[i]=-0.8*DeltaH[i];
+				changed[i] = false;
 			}
 			NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
 			cost = 100*(1-CorrC);

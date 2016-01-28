@@ -701,16 +701,16 @@ void cPosEstimation::EstimatePositions()
 	
 			if (mPosSets[mCurPosI].sMeasurements[0].sDistance<120001)		
 			{
-//			CoSinRule();
+				CoSinRule();
 				if (!CI_TA())
 					SecondSite();
 			}
 			else SecondSite();
 			CI();
-//			DCM_ParticleSwarm();
+			DCM_ParticleSwarm();
 			ExhaustiveSearch();
 			DCM_CMA_ES();
-//			ANNrun();
+			ANNrun();
 
 			for (j=0; j<mPosSets[mCurPosI].sTestPoints.size(); j++)
 			{

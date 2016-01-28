@@ -36,7 +36,7 @@
 #define Cp 1.4
 #define Cg 1.4
 #define STOPN 50
-#define MAXITERpos 100
+#define MAXITERpos 50
 #define DELTA 5e-10
 
 // include local headers

@@ -51,7 +51,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	mDEM = new cRasterFileHandler();
 	mClutter = new cRasterFileHandler();
 	mPathLoss= new cPathLossPredictor();
-	mLTEsim = false;
+	mLTEsim = true;
 	mOriginal = false;
 	mUMTS = false;
 	mCurSiteI = 0;
@@ -673,6 +673,7 @@ void cPosEstimation::EstimatePositions()
 	}
 
 	for (i=0; i< mNumPoints; i++)
+//	for (i=2385; i<2395; i++)
 	{
 		mCurPosI = i;
 		if ((mPosSets[mCurPosI].sMeasurements.size()>0)
@@ -710,7 +711,7 @@ void cPosEstimation::EstimatePositions()
 			DCM_ParticleSwarm();
 			ExhaustiveSearch();
 			DCM_CMA_ES();
-			ANNrun();
+//			ANNrun();
 
 			for (j=0; j<mPosSets[mCurPosI].sTestPoints.size(); j++)
 			{
@@ -1636,7 +1637,7 @@ bool cPosEstimation::DCM_ParticleSwarm()
 			NbestValue[NumBest-1] = pbestValue[i];
 			NbestRho[NumBest-1] = pbestRho[i];
 			NbestPhi[NumBest-1] = pbestPhi[i];
-			for (j=NumBest-1; j>=0; j--)
+			for (j=NumBest-1; j>0; j--)
 			{
 				if (NbestValue[j]<NbestValue[j-1])
 				{
@@ -1982,7 +1983,7 @@ bool cPosEstimation::ExhaustiveSearch()
 					NbestValue[NumBest-1] = value;
 					NbestRho[NumBest-1] = rho;
 					NbestPhi[NumBest-1] = phi;
-					for (j=NumBest-1; j>=0; j--)
+					for (j=NumBest-1; j>0; j--)
 					{
 						if (NbestValue[j]<NbestValue[j-1])
 						{
@@ -2548,6 +2549,7 @@ int cPosEstimation::SaveResults()
 	string queryP = "INSERT into PositionEstimate (id, tp, azimuth, distance, error) Values (";
 
 	for (i=0; i<mNumPoints; i++)
+//	for (i=0; i<2390; i++)
 	{
 
 		if (mPosSets[i].sTestPoints.size()>0)

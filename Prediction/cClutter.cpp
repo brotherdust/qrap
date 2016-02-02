@@ -108,8 +108,10 @@ void cClutter::Display()
 		cout << "ID: " << mClutterTypes[i].sLandCoverID;
 		cout << "	rho: " << mClutterTypes[i].sRho;
 		cout << "	H: " << mClutterTypes[i].sHeight << endl;
+		cout << "TermCoeffs:";
 		for (j=0; j<NUMTERMS; j++)
-			cout << "TERM" << j<< "	" << mClutterTypes[i].sCoefficients[j] << endl;
+			cout << "	" << j<< "	" << mClutterTypes[i].sCoefficients[j];
+		cout << endl;
 	}
 }
 
@@ -361,6 +363,9 @@ bool cClutter::Reset (unsigned ClassGroup)
 //*
 bool cClutter::UpdateCoefficients(unsigned ClutterType)
 {
+
+//	cout << " In cClutter::UpdateCoefficients  type = " << ClutterType << end;
+
 	bool Success=true;
 	string query, queryI;
 	char *term, *coef, *type, *group;
@@ -383,6 +388,7 @@ bool cClutter::UpdateCoefficients(unsigned ClutterType)
 	Success=true;
 	for (j=0; (j<NUMTERMS)&&(Success); j++)
 	{
+//		cout << "	term = "<< j << "	coef = " << mClutterTypes[ClutterType].sCoefficients[j] << endl;
 		query = "UPDATE coefficients set coefficient = ";
 		gcvt(mClutterTypes[ClutterType].sCoefficients[j],9,coef);	
 		query += coef;
@@ -400,6 +406,7 @@ bool cClutter::UpdateCoefficients(unsigned ClutterType)
 			Success = false;
 		}
 	}
+//	cout << endl;
 
 	delete [] term;
 	delete [] type;

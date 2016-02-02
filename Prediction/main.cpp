@@ -102,7 +102,7 @@ int main (int argc, char **argv)
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 
-
+/*
   	query = "update coefficients set coefficient=0.0;";
 	if (!gDb.PerformRawSql(query))
 	{
@@ -116,13 +116,13 @@ int main (int argc, char **argv)
 		cout << "Error updating qrap_config" << endl;
 	}
 
-
 	Meas.SetUseAntANN(false);
+
 	Meas.mPathLoss.mClutter.Reset(1);
 	cout << "Loading measurements ... in main()" << endl;
 	Meas.LoadMeasurements(2,0,6);
 
-//  Meas.OptimiseHeights(6);
+//   Meas.OptimiseHeights(6);
 	
 	cout << "Before PerformAnalysis ... in main()" << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
@@ -138,7 +138,7 @@ int main (int argc, char **argv)
 //	Meas.OptimiseSeekWidth();
 //	cout << "Starting Optimisation ... in main()" << endl; 
 //
-
+*/
 
 /*
   	query = "update coefficients set coefficient=0.0;";
@@ -183,7 +183,6 @@ int main (int argc, char **argv)
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
 
 /*
 	query = "update coefficients set coefficient=0.0;";
@@ -193,7 +192,7 @@ int main (int argc, char **argv)
 		cout << "Error clearing coefficients" << endl;
 	}
 */
-
+/*
 	cTrainAntPattern NeuralNets;
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -227,12 +226,36 @@ int main (int argc, char **argv)
 	Punte.push_back(Hoek[3]);
 	
 	delete [] Hoek;
+
+  	query = "truncate table AntNeuralNet cascade;";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error truncating Antenna Neural Nets" << endl;
+	}
 	
 	cout << "In main Loading measurements " << endl;
 	NeuralNets.LoadMeasurements(Punte,2,6,1,1);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
+*/
+/*
+  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+
+	Meas.LoadMeasurements(2,0,6);
+	Meas.SetUseAntANN(true);
+
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
+	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	Meas.OptimiseOffsets(6);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
+	cout<< "PostOffsets" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+*/
 
 /*
 	Meas.SetUseAntANN(true);
@@ -280,7 +303,7 @@ int main (int argc, char **argv)
 	cout << hoek << "		" << angle << endl;
 */
 
-/*
+
 
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
@@ -307,7 +330,7 @@ int main (int argc, char **argv)
 	}
 
 	cout << "Voor LoadMeasurements" << endl;
-	Positioning.SetUseAntANN(false);	
+	Positioning.SetUseAntANN(true);	
 	Positioning.LoadMeasurements(Punte,2,6,1,1);
 	cout << "Na LoadMeasurements" << endl;
 
@@ -317,9 +340,9 @@ int main (int argc, char **argv)
 	cout << " Estimating Positions " << endl;
 	Positioning.EstimatePositions();
 
-	cout << " Saving Results " << endl;
+//	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-*/
+
 /*
 	if (!gDb.PerformRawSql(query))
 	{

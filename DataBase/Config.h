@@ -32,7 +32,7 @@
 
 #define QRAP_ALERT_DEFAULT_CALLBACK Qrap::ConsoleAlert
 #define QRAP_DEBUG
-#define ANTENNASCALE 52.0
+#define ANTENNASCALE 60.0
 
 #include <iostream>
 #include <string.h>

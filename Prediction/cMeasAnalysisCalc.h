@@ -86,6 +86,7 @@ class cMeasAnalysisCalc
 	int SaveResults();
 
 	bool OptimiseModelCoefD(unsigned MeasSource=0);
+	bool OptimiseOffsets(unsigned MeasSource=0);
 	bool OptimiseModelCoefAllTotal(unsigned MeasSource=0);
 	bool OptimiseModelCoefAllTogether();
 	bool OptimiseSeekWidth();

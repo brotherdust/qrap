@@ -303,7 +303,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
 			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
 
-			if (DiffLoss < 20)
+			if (DiffLoss < 10)
 			{
 					Delta =  - NewMeasurement.sMeasValue - PathLoss;
 					Total +=Delta;
@@ -445,10 +445,11 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				mCells[i].sInputTrain[j][3] = cos(Tilt*PI/180);
 				mCells[i].sInputTrain[j][4] = sin(Tilt*PI/180);
 				
-				RxLevCalc = MIN(-mCells[i].sMin,EIRP) - PathLoss;
-				if (RxLevCalc >-140) 
-							Delta = RxLevCalc - mCells[i].sMeasTrain[j].sMeasValue;
-				else Delta = -140 -  mCells[i].sMeasTrain[j].sMeasValue;		
+//				RxLevCalc = MIN(-mCells[i].sMin,EIRP) - PathLoss;
+//				if (RxLevCalc >-140) 
+//							Delta = RxLevCalc - mCells[i].sMeasTrain[j].sMeasValue;
+//				else Delta = -140 -  mCells[i].sMeasTrain[j].sMeasValue;		
+				Delta = EIRP - PathLoss - mCells[i].sMeasTrain[j].sMeasValue;
 				mCells[i].sOutputTrain[j][0]  = Delta / ANTENNASCALE - 0.5;
 				if (fabs(mCells[i].sOutputTrain[j][0])>mMAXANNOutput)
 					mMAXANNOutput = fabs(mCells[i].sOutputTrain[j][0]);
@@ -607,8 +608,6 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 			query += ",'";
 			query += filename;
 			query += "');";
-
-
 
 
 			if (!gDb.PerformRawSql(query))

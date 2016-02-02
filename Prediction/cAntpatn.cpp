@@ -101,7 +101,7 @@ cAntennaPattern::~cAntennaPattern()
 	delete [] mMake;
 	delete [] mDescription;
 	delete [] mPol; 
-	mAntennasANN->destroy();
+	if (mUseANN) mAntennasANN->destroy();
 }/* end CAntennaPattern:: Destructor */
 
 // ********************************************************************
@@ -160,6 +160,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 				mUseANN = false;
 			}
 		}
+		delete [] Temp;
 		return true;
 	}
 	

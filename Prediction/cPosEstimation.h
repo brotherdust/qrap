@@ -40,7 +40,7 @@
 #define DELTA 5e-10
 
 // include local headers
-#include "../libcmaes/src/cmaes.h"
+//#include "../libcmaes/src/cmaes.h"
 #include "../DataBase/Config.h"
 #include "../DataBase/cDatabase.h"
 #include "cGeoP.h"
@@ -60,7 +60,7 @@
 
 using namespace std;
 using namespace Qrap;
-using namespace libcmaes;
+//using namespace libcmaes;
 
 enum eMethod
 {
@@ -183,7 +183,7 @@ class cPosEstimation
 	void EstimatePositions();
 	int SaveResults();
 
-	static FitFunc CostCMA_ES;
+//	static FitFunc CostCMA_ES;
 	static vPosSet mPosSets;		/// an array with all the testpoints
 	static unsigned mNumInsts;	
 	static unsigned mCurPosI;
@@ -227,7 +227,7 @@ class cPosEstimation
 	bool CoSinRule();
 	bool DCM_ParticleSwarm();
 	bool ExhaustiveSearch();
-	int DCM_CMA_ES();
+//	int DCM_CMA_ES();
 	bool ANNrun();
 
 	// In this function the default mobile installation 

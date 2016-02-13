@@ -25,7 +25,6 @@
 
 
 #include "cPosEstimation.h"
-#include "cmaes.h"
 #include <random>
 
 
@@ -710,7 +709,7 @@ void cPosEstimation::EstimatePositions()
 			CI();
 			DCM_ParticleSwarm();
 			ExhaustiveSearch();
-			DCM_CMA_ES();
+//			DCM_CMA_ES();
 //			ANNrun();
 
 			for (j=0; j<mPosSets[mCurPosI].sTestPoints.size(); j++)
@@ -732,9 +731,9 @@ void cPosEstimation::EstimatePositions()
 					case CosRuleAngleAngle:		cout << "CosRuleAngleAngle" << endl; 	break; 
 					case DCM_PSO:			cout << "DCM_PSO" << endl;		break; 
 					case DCM_PSObestN:		cout << "DCM_PSObestN" << endl;		break; 
-					case DCM_CMA_ESmean:	cout << "DCM_CMA_ESmean" << endl;	break; 
-					case DCM_CMA_ESbest:	cout << "DCM_CMA_ESbest" << endl;	break; 
-					case DCM_CMA_ESbestSeen:	cout << "DCM_CMA_ESbestSeen" << endl;	break; 
+//					case DCM_CMA_ESmean:	cout << "DCM_CMA_ESmean" << endl;	break; 
+//					case DCM_CMA_ESbest:	cout << "DCM_CMA_ESbest" << endl;	break; 
+//					case DCM_CMA_ESbestSeen:	cout << "DCM_CMA_ESbestSeen" << endl;	break; 
 					case Exhaustive: 	cout << "ExhaustiveSearch" << endl;
 					case ANN:			cout << "ANN" << endl;			break; 
 					case ANNangleLineSearch:	cout << "ANNangleLineSearch" << endl;	break; 
@@ -2182,7 +2181,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //	return altCost;
 }
 
-
+/*
 // ***********************************************************************************************
 // Cost function for CMA-ES
 FitFunc cPosEstimation::CostCMA_ES = [&](const double *x, const int N) 
@@ -2299,8 +2298,8 @@ FitFunc cPosEstimation::CostCMA_ES = [&](const double *x, const int N)
 	return Pcost;
 //	return altCost;
 };
-
-
+*/
+/*
 //******************************************************************************************************************************
 int cPosEstimation::DCM_CMA_ES()
 {
@@ -2394,6 +2393,7 @@ int cPosEstimation::DCM_CMA_ES()
 
   return cmasols.run_status();
 }
+*/
 
 //*******************************************************************
 bool cPosEstimation::ANNrun()

@@ -86,7 +86,9 @@ IF (NOT WITH_INTERNAL_SQLITE3)
     MESSAGE (SEND_ERROR "sqlite3 dependency was not found (try compiling with sqlite3 internal)!")
   ENDIF (NOT SQLITE3_FOUND)
 ENDIF (NOT WITH_INTERNAL_SQLITE3)
+
 FIND_PACKAGE(GEOS)
+
 FIND_PACKAGE(GDAL)
 
 # optional

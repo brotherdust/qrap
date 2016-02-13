@@ -76,7 +76,7 @@ class cMeasAnalysisCalc
 	cMeasAnalysisCalc(); // default constructor
 	~cMeasAnalysisCalc(); // destructor
 
-	bool LoadMeasurements(vPoints Points, 
+bool LoadMeasurements(vPoints Points, 
 														unsigned MeasType=0, 
 														unsigned PosSource=0, 
 														unsigned MeasSource=0, 

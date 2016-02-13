@@ -108,6 +108,7 @@ cMeasAnalysisCalc::~cMeasAnalysisCalc() // destructor
 	delete [] mClutterCount;
 }
 
+
 //*********************************************************************
 bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points, 
 																							unsigned MeasType, 

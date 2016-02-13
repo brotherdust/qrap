@@ -64,6 +64,7 @@ struct tMeasPoint
 	unsigned 	sClutter;
 };
 
+typedef vector<cGeoP> vPoints;
 
 //## Class cMeasAnalysisCalc
 
@@ -75,13 +76,22 @@ class cMeasAnalysisCalc
 	cMeasAnalysisCalc(); // default constructor
 	~cMeasAnalysisCalc(); // destructor
 
-	bool LoadMeasurements(unsigned MeasType=0, unsigned PosSource=0, 
-				unsigned MeasSource=0, unsigned Cell=0);
+	bool LoadMeasurements(vPoints Points, 
+														unsigned MeasType=0, 
+														unsigned PosSource=0, 
+														unsigned MeasSource=0, 
+														unsigned Cell=0);
+
+	bool LoadMeasurements(	unsigned MeasType=0, 
+														unsigned PosSource=0, 
+														unsigned MeasSource=0, 
+														unsigned Cell=0);
 
 	int PerformAnalysis(double &Mean, double &MeanSquareError,
 				double &StDev, double &CorrC, unsigned Clutterfilter=0);
 
 	void SetUseAntANN( bool UseAntANN) { mUseAntANN = UseAntANN;};
+	void SetPlotResolution( double InPlotRes) {mPlotResolution = InPlotRes;};
 
 	int SaveResults();
 

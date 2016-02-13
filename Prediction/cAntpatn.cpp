@@ -552,34 +552,6 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		}
 	}
 
-	//????
-	//Anders as oorspronklike kode
-	//Maak ekstra (onnodige) waardes gelyk aan die laaste waarde
-	for (k=mNEA;k<mNEA+3;k++)
-	{
-		if (TempRef_mElev[k]>8000) 
-		{
-			if (k-3>0)
-			{	//Vir die waardes van die agterkant van die antenna as daar nie eintlik 'n ref is nie 
-				if ((mElevAngles[k-3]>90.0)&&(mElevAngles[k-3]<270.0))
-				{
-					TempElevAngles[k] = 180 - mElevAngles[k-3];
-					TempRef_mElev[k] = 7777;
-					TempAgterAngles[k]= 180 - mElevAngles[k-3]; 
-					TempAgterRef[k] = k-3;
-					TempAgterValues[k] = mElevValues[k-3]; 
-				}
-				else
-				{ //Voorkant
-			 		TempElevAngles[k] = mElevAngles[k-3];
-			 		TempRef_mElev[k] = k-3;
-			 		TempAgterAngles[k] = mElevAngles[k-3];
-			 		TempAgterRef[k]= 7777;
-				}
-			}
-		}
-	}
-
 //************************?????????????????????????????????????????????	
  if (TempAgterRef[1]>mNEA)
 	{
@@ -670,6 +642,35 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		}
 	}
 
+	//????
+	//Anders as oorspronklike kode
+	//Maak ekstra (onnodige) waardes gelyk aan die laaste waarde
+	for (k=mNEA;k<mNEA+3;k++)
+	{
+		if (TempRef_mElev[k]>8000) 
+		{
+			if (k-3>0)
+			{	//Vir die waardes van die agterkant van die antenna as daar nie eintlik 'n ref is nie 
+				if ((mElevAngles[k-3]>90.0)&&(mElevAngles[k-3]<270.0))
+				{
+					TempElevAngles[k] = 180 - mElevAngles[k-3];
+					TempRef_mElev[k] = 7777;
+					TempAgterAngles[k]= 180 - mElevAngles[k-3]; 
+					TempAgterRef[k] = k-3;
+					TempAgterValues[k] = mElevValues[k-3]; 
+				}
+				else
+				{ //Voorkant
+			 		TempElevAngles[k] = mElevAngles[k-3];
+			 		TempRef_mElev[k] = k-3;
+			 		TempAgterAngles[k] = mElevAngles[k-3];
+			 		TempAgterRef[k]= 7777;
+				}
+			}
+		}
+	}
+
+
 	
 /*	for (k=0; k<mNEA+3; k++)
 	{
@@ -729,9 +730,9 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	
 	for (k=0; k<mNAA; k++) //populate pattern at elevation -90, 0 and 90 
 	{
+		mAntPattern[k][mRef0el] = mAziValues[TempRef_mAzi[k]];
 		mAntPattern[k][0] = mElevValues[TempRef_mElev[0]];
 		mAntPattern[k][mNEA-1] = mElevValues[TempRef_mElev[mNEA-1]];
-		mAntPattern[k][mRef0el] = mAziValues[TempRef_mAzi[k]];
 	}
 	
 	for (k=1; k<mNEA-1; k++)	//populate pattern at azimuth 0, 360
@@ -1012,6 +1013,7 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 		cout << "Azi: " << Azimuth << "  Elev: " << Elevation << endl;  
 		return 0;
 	}
+
 	float ValueAz1, ValueAz2,Value;
 	float Az, Azz, El, Ell;
 	float minDelta;
@@ -1023,6 +1025,7 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 	else if (Az<0.0) Az+=360.0;
 	
 	El = Elevation;
+	El = El - cos(Az*PI/180)*mMechTilt;
 
 	if (El<-90.0) El+=360.0;
 	else if (El>270.0) El-=360.0;
@@ -1040,7 +1043,6 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 		Az = Azz;
 		El = Ell;
 	}
-	El = El - cos(Az*PI/180)*mMechTilt;
 
 	ref_Azi=0;
 	minDelta = 360.0;
@@ -1080,7 +1082,7 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 	if (ref_El>mNEA-2)
 	{
 		cout << "El_ref: " << ref_El << endl; 
-		if (ref_Azi>mNAA-3)
+		if (ref_Azi>mNAA-2)
 		{
 			ValueAz1 = mAntPattern[ref_Azi][ref_El];
 			ValueAz2 = mAntPattern[0][ref_El];

@@ -84,7 +84,6 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	if (NUMTERMS>0) mCterms[0] = TERM0;
 	if (NUMTERMS>2) mCterms[2] = TERM2;
 	if (NUMTERMS>4) mCterms[4] = TERM4;
-	if (NUMTERMS>5) mCterms[5] = TERM5;
 
 	mUseClutter = true;
 	if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
@@ -252,7 +251,7 @@ int cPathLossPredictor::setParameters(double k, double f,
 		if (NUMTERMS>0) mCterms[0] = TERM0;
 		if (NUMTERMS>2) mCterms[2] = TERM2;
 		if (NUMTERMS>4) mCterms[4] = TERM4;
-		if (NUMTERMS>5) mCterms[5] = TERM5;
+//		if (NUMTERMS>5) mCterms[5] = TERM5;
 	}
 
 return 1;
@@ -400,16 +399,29 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		
 //		double Cwidth = mClutter.mClutterTypes[mClutterProfile[m_size-1]].sWidth;
 //		cout << "	" << mLinkLength << ".";
+
 		if (NUMTERMS>1) 
 		{
 			if (mLinkLength>0.0) mCterms[1] = TERM1;
 			else mCterms[1] = 0.0;
 		}
-		if (NUMTERMS>3) 
+
+		if (NUMTERMS>3)
 		{
-			if (mLinkLength>0.0) mCterms[3] = TERM3;
-			else mCterms[3] = 0.0;
+//			if ((mLinkLength>0.0)&&(fabs(DiffLoss)<0.1)) 
+//			{
+				if (mLinkLength>0.0) 	mCterms[3] = TERM3;
+//			}
+//			else mCterms[3] = 0.0;
 		}		
+
+		if (NUMTERMS>5)
+		{
+//			if (fabs(DiffLoss)<0.1) 
+				mCterms[5] = TERM5;
+//			else mCterms[5] = 0.0;
+		}	
+
 //		if (Cheight < (m_htx+0.1))
 //			mCterms[8] = TERM8;
 //		else mCterms[8] = 100;
@@ -419,7 +431,6 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 			for (i=0; i<NUMTERMS; i++)
 				m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
 		}
-
 	}
 
 //cout << "Na clutter in TotPathloss" << endl;

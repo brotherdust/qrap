@@ -1276,7 +1276,8 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 	double Mean, MeanSq, StDev, CorrC, Grad;
 	int NumUsed = 0;
 	bool stop = false;
-	int SeekWidth, SeekWidthBest, SeekWidthOld;
+	int SeekWidth, SeekClose, SeekWidthOld;
+	int SmoothWidth, SmoothClose;
 	double cost, costOld, costMin;
 	bool Up;
 	int DeltaSeek;
@@ -1284,47 +1285,80 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 	mPathLoss.set_Tuning(false);
 	mUseClutter = true;
 
-	SeekWidth= (3.0e8/mFixedInsts[0].sFrequency/mPlotResolution/1300+1);
-	cout << SeekWidth << endl;
-
-	SeekWidth = 19;
+//	SeekWidth= (3.0e8/mFixedInsts[0].sFrequency/mPlotResolution/1300+1);
+//	cout << SeekWidth << endl;
 
 	DeltaSeek = max(SeekWidth/2-1,1);
-	SeekWidthOld = SeekWidth;
-	SeekWidthBest = SeekWidth;
-	mPathLoss.setSeekWidth(SeekWidth);
+//	SeekClose = mSeekWidthBest;
+//	SmoothClose = mSmoothWidthBest;
+	mPathLoss.setSeekWidth(mSeekWidthBest);
+	mPathLoss.setSmoothWidth(mSmoothWidthBest);
 
 	NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
 	cost = 200*(1-CorrC);
-	cout << "SeekWidth=" << SeekWidth <<  "	Cost=" << cost;
-	cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
-	cout << "	MeanSquare: " << MeanSq << "	StDev: " << StDev;
-	cout << "	CorrC: " << CorrC << endl;
+//	cout << "SeekWidth=" << SeekWidth <<  "	Cost=" << cost;
+//	cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
+//	cout << "	MeanSquare: " << MeanSq << "	StDev: " << StDev;
+//	cout << "	CorrC: " << CorrC << endl;
 	costMin = cost;
 	costOld = cost;
-	SeekWidthBest = SeekWidth;
-	SeekWidthOld = SeekWidth;
 	SeekWidth += DeltaSeek;
 	Up = true;
 
-	for (SeekWidth=2;SeekWidth<50; SeekWidth++)
+
+SeekClose=mSeekWidthBest;
+SmoothClose=mSmoothWidthBest;
+
+		for (SmoothWidth=2; SmoothWidth<71; SmoothWidth=SmoothWidth+2)
+		{
+			mPathLoss.setSmoothWidth(SmoothWidth);
+			for (SeekWidth=2;SeekWidth<71; SeekWidth=SeekWidth+2)
+			{
+				mPathLoss.setSeekWidth(SeekWidth);
+				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+				cost = 200*(1-CorrC);
+//		cout << "	SeekW=" << SeekWidth <<"	SmoothW=" << SmoothWidth;
+//		cout <<  "	Cost=" << cost << "	Min=" << costMin;
+//		cout << "	#Used: " << NumUsed 
+//		cout << "	Mean: " << Mean; 
+//		cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
+//		cout << "	CorrC: " << CorrC << endl;
+				if (cost< costMin)
+				{
+					costMin = cost;
+					SeekClose = SeekWidth;
+					SmoothClose = SmoothWidth;
+				}
+			}
+		}
+
+	for (SeekWidth=max(1,SeekClose-4);SeekWidth<SeekClose+6; SeekWidth++)
 	{
 		mPathLoss.setSeekWidth(SeekWidth);
-		NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
-		cost = 200*(1-CorrC);
-		cout << "SWO=" << SeekWidthOld << "	CostO=" << costOld;
-		cout << "	SW=" << SeekWidth <<  "	Cost=" << cost << "	Min=" << costMin;
-		cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
-		cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
-		cout << "	CorrC: " << CorrC << endl;
-		if (cost < costMin)
+		for (SmoothWidth=max(1,SmoothClose-4);SmoothWidth<SmoothClose+6; SmoothWidth++)
 		{
-			costMin = cost;
-			SeekWidthBest = SeekWidth;
+			mPathLoss.setSmoothWidth(SmoothWidth);
+			NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+			cost = 200*(1-CorrC);
+//		cout << "	SeekW=" << SeekWidth <<"	SmoothW=" << SmoothWidth;
+//		cout <<  "	Cost=" << cost << "	Min=" << costMin;
+//		cout << "	#Used: " << NumUsed 
+//		cout << "	Mean: " << Mean; 
+//		cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
+//		cout << "	CorrC: " << CorrC << endl;
+			if (cost < costMin)
+			{
+				costMin = cost;
+				mSeekWidthBest = SeekWidth;
+				mSmoothWidthBest = SmoothWidth;
+			}
 		}
 	}
 
-
+cout << "bSeekW=" << mSeekWidthBest << "	bSmoothW=" << mSmoothWidthBest << endl;
+mPathLoss.setSeekWidth(mSeekWidthBest);
+mPathLoss.setSmoothWidth(mSmoothWidthBest);
+/*
 	while ((!stop)&&(NumStop>0))
 	{
 		NumStop --;
@@ -1332,9 +1366,10 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 		mPathLoss.setSeekWidth(SeekWidth);
 		NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
 		cost = 200*(1-CorrC);
-		cout << "SWO=" << SeekWidthOld << "	CostO=" << costOld;
-		cout << "	SW=" << SeekWidth <<  "	Cost=" << cost << "	Min=" << costMin;
-		cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
+		cout << "	SeekW=" << SeekWidth <<"	SmoothW=" << SmoothWidth;
+//		cout <<  "	Cost=" << cost << "	Min=" << costMin;
+//		cout << "	#Used: " << NumUsed 
+		cout << "	Mean: " << Mean; 
 		cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
 		cout << "	CorrC: " << CorrC << endl;
 		
@@ -1377,7 +1412,7 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 	}
 
 	mPathLoss.setSeekWidth(SeekWidthBest);
-
+*/
 	return true;
 }
 

@@ -174,7 +174,7 @@ namespace Qrap
 			 * @param value is the number of points left and right that will be included  
 			 * in local smooting of the terrain profile. 
 			 */
-			void setSmoothwidth(const int value) { m_SmoothWidth = value;}
+			void setSmoothWidth(const int value) { m_SmoothWidth = value;}
 			
 			/**
 			 * Description get_Clutter

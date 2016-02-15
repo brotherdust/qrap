@@ -53,26 +53,28 @@ MARK_AS_ADVANCED(LIBRARY_OUTPUT_PATH)
 # check if lexer and parser are not missing
 # http://www.mail-archive.com/cmake@cmake.org/msg02861.html
 
-INCLUDE(Flex)
+#INCLUDE(Flex)
 
-FIND_FLEX()
+#FIND_FLEX()
 
-IF (NOT FLEX_EXECUTABLE)
-  MESSAGE(FATAL_ERROR "Couldn't find Flex")
-ENDIF (NOT FLEX_EXECUTABLE)
+#IF (NOT FLEX_EXECUTABLE)
+# MESSAGE(FATAL_ERROR "Couldn't find Flex")
+#ENDIF (NOT FLEX_EXECUTABLE)
 
-INCLUDE(Bison)
+#INCLUDE(Bison)
 
-FIND_BISON()
+#FIND_BISON()
 
-IF (NOT BISON_EXECUTABLE)
-  MESSAGE(FATAL_ERROR "Couldn't find Bison")
-ENDIF (NOT BISON_EXECUTABLE)
+#IF (NOT BISON_EXECUTABLE)
+#  MESSAGE(FATAL_ERROR "Couldn't find Bison")
+#ENDIF (NOT BISON_EXECUTABLE)
 
 #############################################################
 # search for dependencies
 
 # required
+FIND_PACKAGE(Spatialindex REQUIRED)
+
 FIND_PACKAGE(Proj)
 
 FIND_PACKAGE(Eigen3)

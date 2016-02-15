@@ -92,6 +92,8 @@ bool LoadMeasurements(vPoints Points,
 
 	void SetUseAntANN( bool UseAntANN) { mUseAntANN = UseAntANN;};
 	void SetPlotResolution( double InPlotRes) {mPlotResolution = InPlotRes;};
+	void SetSeekWidthBest( double INS) {mSeekWidthBest=INS;};
+	void SetSmoothWidthBest( double INS) {mSmoothWidthBest=INS;};
 
 	int SaveResults();
 
@@ -129,6 +131,8 @@ bool LoadMeasurements(vPoints Points,
 	double *mMaxTerm;		// whether or not the coefficients of these terms are relavant or whether 
 					// the term will be constant.
 	double *mMidTerm;
+	double mSeekWidthBest;
+	double mSmoothWidthBest;
 };
 }
 #endif

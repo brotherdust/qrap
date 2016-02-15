@@ -151,7 +151,7 @@ int main (int argc, char **argv)
 	
 	delete [] Hoek; 
 
-
+/*
 	Meas.mPathLoss.mClutter.Reset(1);
 
 	cout << "Loading measurements ... in main()" << endl;
@@ -347,7 +347,7 @@ int main (int argc, char **argv)
 	Meas.SetPlotResolution(450);
 	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Set=4	Res=450" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
+*/
 //   Meas.OptimiseHeights(0);
 
 //	Meas.OptimiseModelCoefAllTotal(0);
@@ -357,10 +357,22 @@ int main (int argc, char **argv)
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 //	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 //	cout<< "Na0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
-//	Meas.OptimiseSeekWidth();
-//	cout << "Na OptimiseSeekWidth in main()" << endl;
-//	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-//	cout<< "Num = " << Num << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+int i,j;
+
+for ( i=4; i>0; i--)
+{
+	Meas.LoadMeasurements(Punte, 0,0,i);
+	Meas.SetSeekWidthBest(1);
+	Meas.SetSmoothWidthBest(1);
+	for(j=10;j<501;j=j+10)
+	{
+		cout <<"Set="<< i << "		 Res="	<< j << "	";
+		Meas.SetPlotResolution(j);
+		Meas.OptimiseSeekWidth();
+		Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+		cout <<"Set="<< i << "	Res="	<< j << "	Num = " << Num << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
+	}
+}
 //
 
 

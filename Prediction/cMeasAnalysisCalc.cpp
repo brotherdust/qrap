@@ -1323,7 +1323,7 @@ SmoothClose=mSmoothWidthBest;
 //		cout << "	Mean: " << Mean; 
 //		cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
 //		cout << "	CorrC: " << CorrC << endl;
-				if (cost< costMin)
+				if ((cost*1.025< costMin)||((cost<1.025*costMin)&&(SmoothWidth<SmoothClose)))
 				{
 					costMin = cost;
 					SeekClose = SeekWidth;

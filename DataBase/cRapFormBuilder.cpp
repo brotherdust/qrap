@@ -336,7 +336,6 @@ int cRapFormBuilder::InsertData (const QString& tableName, QMap<QString,QWidget*
 	string where="";
 	char *text = new char[33];
 	int Int;
-	double Double;
 	cout<<"cRapFormBuilder::InsertData ... Data insert begin"<<endl;	
 	while(it.hasNext())
 	{
@@ -1652,7 +1651,7 @@ void cRapFormBuilder::CloseBySite()
 	pqxx::result SiteCloseby = FindClosebySites(Here, searchD);
 	int currentRow = mTableView->currentRow();
 	int Row;
-	bool found=false;	
+//	bool found=false;	
 	if (SiteCloseby.size() >0)
 	{
 		mCurrentRecordID = (int)atoi(SiteCloseby[0]["id"].c_str());
@@ -1660,7 +1659,7 @@ void cRapFormBuilder::CloseBySite()
 		
 		QString fieldName;
 		cDatabase::FieldUiType uiType;
-		cDatabase::FieldDataType type;
+//		cDatabase::FieldDataType type;
 		int id=0;
 		
 		mTableView->setCurrentCell(0,0);

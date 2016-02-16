@@ -1781,7 +1781,7 @@ short int cDatabase::getsetMachineID()
 	char* HostID;
 	 
 	bool found = false;
-	bool HostIDnew = false;
+//	bool HostIDnew = false;
 	HostID = getenv("QRAPINST");
 	if (HostID==NULL)
 		HostID = getenv("HOSTID");
@@ -1795,7 +1795,7 @@ short int cDatabase::getsetMachineID()
 	{
 		HostID = new char[10];
 		strcpy(HostID,"LOCAL");
-		HostIDnew = true;
+//		HostIDnew = true;
 	}
 	string query = "select id from machine where qrapinst='";
 	query += HostID;
@@ -2265,9 +2265,9 @@ bool cDatabase::ImportFromCsv (const string& fileName, const string& tableName, 
 	return true;
 }
 
-/*
+
 //************************************************************************************
-bool cDatabase::ImportFromCsvSaps (const string& fileName, DegreeFormat format, IntArray& failed)
+/*bool cDatabase::ImportFromCsvSaps (const string& fileName, DegreeFormat format, IntArray& failed)
 {
 	FILE*          fp;
 	char           buf[cCsvLineBufferSize];
@@ -2418,8 +2418,8 @@ bool cDatabase::ImportFromCsvSaps (const string& fileName, DegreeFormat format, 
 	
 	return true;
 }
-*/
 
+*/
 //********************************************************************
 /*bool cDatabase::LogTransaction (const string& op, const StringMap& values, 
 				const string& tableName, const string& where)

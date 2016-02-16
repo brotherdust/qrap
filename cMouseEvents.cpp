@@ -47,7 +47,7 @@ void MouseEvents::canvasReleaseEvent(QMouseEvent * e)
 	//Debug("Button Pressed");
 	QgsPoint point = mCanvas->getCoordinateTransform()->toMapCoordinates(e->x(), e->y());
 
-  if(e->button() == Qt::RightButton && (e->state() & Qt::LeftButton) == 0) // restart
+  if(e->button() == Qt::RightButton && (e->button() & Qt::LeftButton) == 0) // restart
   {
     emit RightPoint(point);
   } 

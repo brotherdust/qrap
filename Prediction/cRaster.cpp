@@ -69,9 +69,9 @@ cRaster::cRaster(string Directory,
 	mEWres = 1.0;
 	mDirectory = Directory;
 	mFilename = FileName;
-	cout << "In cRaster non-default constructor, before new_Float2DArray" << endl;
+//	cout << "In cRaster non-default constructor, before new_Float2DArray" << endl;
 	mRaster = new_Float2DArray(mRows,mCols);
-	cout << "In cRaster non-default constructor, before ReadFile" << endl;	
+//	cout << "In cRaster non-default constructor, before ReadFile" << endl;	
 	ReadFile(Directory, FileName,filetype,mProjType,
 							Proj4String,CentMer,mSouth,
 							mMin,mMax);
@@ -85,7 +85,7 @@ cRaster::cRaster(string Directory,
 		mNW.SetGeoType(mProjType,mCentMer);
 		mNW.Get(mMapLat,mMapLon,mMapType,mMapCM,Hem);
 	}
-	cout << "Constructer Raster: " << mFilename << endl << endl;
+//	cout << "Constructer Raster: " << mFilename << endl << endl;
 /*	cout << "mSouth = ";
 	if (mSouth) cout << " true" << endl;
 	else cout << " false" << endl;
@@ -624,9 +624,9 @@ bool cRaster::ReturnProj4(GeoType PointType,
 				break;
 		}
 		Proj = nullptr;
-		cout << " In cRaster::ReturnProj, Proj4 = " << Proj4 << endl;
+//		cout << " In cRaster::ReturnProj, Proj4 = " << Proj4 << endl;
 		Proj = pj_init_plus(Proj4.c_str());
-		cout << " Leaving cRaster::ReturnProj" << endl;
+//		cout << " Leaving cRaster::ReturnProj" << endl;
 		delete [] centmer;
 		delete [] southstr;
 		return true;

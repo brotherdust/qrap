@@ -678,7 +678,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 		query += " AND filename NOT IN ("+LoadedRastersNames;
 		query += ") AND "+ PointString + " <@"+"areasquare;";
 	
-		cout << query << endl;				
+//		cout << query << endl;				
 		if(!gDb.PerformRawSql(query))
 		{
 			string err = "Database Select for RasterFile failed. Query: ";
@@ -720,7 +720,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 				else if (projection=="WGS84GC") GeoProj=WGS84GC;
 				else if (projection=="UTM")	GeoProj=UTM;
 				else GeoProj=NDEF;
-				cout << FileName <<  endl;
+//				cout << FileName <<  endl;
 				cRaster* New = new cRaster(Directory, FileName, filetype, GeoProj,proj4string, centmer);
 				New->mUsed=true;
 				mCurrentRasters.push_back(New);
@@ -760,7 +760,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 		{
 			if (!mCurrentRasters[i]->mUsed)
 			{
-				cout << "Removing " << mCurrentRasters[i]->mFilename << endl;
+//				cout << "Removing " << mCurrentRasters[i]->mFilename << endl;
 				delete mCurrentRasters[i];
 				mCurrentRasters.erase(mCurrentRasters.begin()+i);
 			}

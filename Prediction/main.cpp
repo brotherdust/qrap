@@ -60,6 +60,9 @@ int main (int argc, char **argv)
 
 	cout << "Connected " << endl;
 
+//	cAntennaPattern FixedAnt;
+//	FixedAnt.SetAntennaPattern(29641, Tx, 0,  0);
+
 /*
 	cMeasImportOldTEMS VCMeasurements(2, 5, 1);
 	cout << "Constructed " << endl;
@@ -125,25 +128,25 @@ int main (int argc, char **argv)
 	cGeoP *Hoek;
 	Hoek = new cGeoP[20];
 
-	Hoek[0].Set(-25.0, 29);
-	Hoek[1].Set(-25.0, 28.5);
-	Hoek[2].Set(-25.25, 28.5);
-	Hoek[3].Set(-25.25, 28);
-	Hoek[4].Set(-25.5, 28);
-	Hoek[5].Set(-25.5, 27.75);
-	Hoek[6].Set(-25.75, 27.75);
-	Hoek[7].Set(-25.75, 27.25);
-	Hoek[8].Set(-26.5, 27.25);
-	Hoek[9].Set(-26.5, 27.5);
-	Hoek[10].Set(-27, 27.5);
-	Hoek[11].Set(-27, 28.5);
-	Hoek[12].Set(-26.75, 28.5);
-	Hoek[13].Set(-26.75, 29);
-	Hoek[14].Set(-26.75, 29);
-	Hoek[15].Set(-25.75, 29.25);
-	Hoek[16].Set(-25.25, 29.25);
-	Hoek[17].Set(-26.25, 29);
-	Hoek[18].Set(-25, 29);
+	Hoek[0].Set(-25.01, 28.99);
+	Hoek[1].Set(-25.01, 28.51);
+	Hoek[2].Set(-25.26, 28.51);
+	Hoek[3].Set(-25.26, 28.01);
+	Hoek[4].Set(-25.51, 28.01);
+	Hoek[5].Set(-25.51, 27.76);
+	Hoek[6].Set(-25.76, 27.76);
+	Hoek[7].Set(-25.76, 27.26);
+	Hoek[8].Set(-26.49, 27.26);
+	Hoek[9].Set(-26.49, 27.51);
+	Hoek[10].Set(-26.99, 27.51);
+	Hoek[11].Set(-26.99, 28.49);
+	Hoek[12].Set(-26.74, 28.49);
+	Hoek[13].Set(-26.74, 28.99);
+	Hoek[14].Set(-25.74, 28.99);
+	Hoek[15].Set(-25.74, 29.24);
+	Hoek[16].Set(-25.26, 29.24);
+	Hoek[17].Set(-26.26, 28.99);
+	Hoek[18].Set(-25.01, 28.99);
 
 	for (int i=0; i<19; i++)
 		Punte.push_back(Hoek[i]);
@@ -151,13 +154,15 @@ int main (int argc, char **argv)
 	
 	delete [] Hoek; 
 
-/*
+
 	Meas.mPathLoss.mClutter.Reset(1);
 
 	cout << "Loading measurements ... in main()" << endl;
 
-	Meas.LoadMeasurements(Punte, 0,0,0);
+	Meas.SetPlotResolution(30);
 
+	Meas.LoadMeasurements(0,0,1);
+/*
 	Meas.SetPlotResolution(10);
 	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Set=0	Res=10" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
@@ -348,31 +353,34 @@ int main (int argc, char **argv)
 	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Set=4	Res=450" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
 */
-//   Meas.OptimiseHeights(0);
-
-//	Meas.OptimiseModelCoefAllTotal(0);
-//   Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-//	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-//   Meas.OptimiseModelCoefD(0);
-//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-//	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-//	cout<< "Na0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
+   Meas.OptimiseHeights(1);
+/*
+	Meas.OptimiseModelCoefAllTotal(0);
+   Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+   Meas.OptimiseModelCoefD(0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Na0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
+*/
+/*
 int i,j;
 
-for ( i=4; i>0; i--)
+for ( i=4; i>=0; i--)
 {
 	Meas.LoadMeasurements(Punte, 0,0,i);
 	Meas.SetSeekWidthBest(1);
 	Meas.SetSmoothWidthBest(1);
-	for(j=10;j<501;j=j+10)
+	for(j=10;j<51;j=j+10)
 	{
 		cout <<"Set="<< i << "		 Res="	<< j << "	";
 		Meas.SetPlotResolution(j);
-		Meas.OptimiseSeekWidth();
+//		Meas.OptimiseSeekWidth();
 		Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 		cout <<"Set="<< i << "	Res="	<< j << "	Num = " << Num << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
 	}
 }
+*/
 //
 
 
@@ -578,13 +586,15 @@ for ( i=4; i>0; i--)
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-*/
-/*
+
+
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
+*/
+//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
 	Meas. LoadMeasurements(0,0,4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
@@ -595,21 +605,21 @@ for ( i=4; i>0; i--)
 	Meas. LoadMeasurements(0,0,2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-	Meas. LoadMeasurements(0,0,5);
+	Meas. LoadMeasurements(0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl; 
 
-	Meas. LoadMeasurements();
+	Meas. LoadMeasurements(0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 
 
-	Meas. LoadMeasurements();
+	Meas. LoadMeasurements(0,0,0);
 	Meas.OptimiseModelCoefAllTotal(0);
 
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-	Meas. LoadMeasurements(0,0,5);
+	Meas. LoadMeasurements(0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na0,1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas. LoadMeasurements(0,0,2);
@@ -622,17 +632,17 @@ for ( i=4; i>0; i--)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 
+/*
 
-
-	Meas. LoadMeasurements();
+	Meas. LoadMeasurements(0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
-	cout<< "Voor" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
+	cout<< "Voor0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
 	Meas.OptimiseModelCoefD(0);
 	Meas. LoadMeasurements(0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nao0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-	Meas. LoadMeasurements(0,0,5);
+	Meas. LoadMeasurements(0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nao0,1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC  << endl;
 	Meas. LoadMeasurements(0,0,2);
@@ -644,8 +654,8 @@ for ( i=4; i>0; i--)
 	Meas. LoadMeasurements(0,0,4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nao0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-
 */
+
 /*
 	if (!gDb.PerformRawSql(query))
 	{
@@ -656,9 +666,9 @@ for ( i=4; i>0; i--)
 	Meas.OptimiseModelCoefD(0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nac0,0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-//  Meas. LoadMeasurements(0,0,1);
-//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-//	cout<< "Nac0,1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+   Meas. LoadMeasurements(0,0,1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nac0,1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 	Meas. LoadMeasurements(0,0,2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nac0,2" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
@@ -670,7 +680,7 @@ for ( i=4; i>0; i--)
 	cout<< "Nac0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 	Meas. LoadMeasurements(0,0,5);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nac0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Nac0,5" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
 
 /*

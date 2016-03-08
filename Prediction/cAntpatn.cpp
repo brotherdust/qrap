@@ -860,7 +860,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 //There are 2 valid approximations for mAntPattern[k][l] namely tydelikV and tydelikH
 // The question is how to combine them?
 
-/*
+
 	for (k=1; k<mNAA-1; k++)
 	{
 		for (l=1; l<mNEA-1; l++)
@@ -908,9 +908,9 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 			} // end if
 		} // end for step through elevation angles
 	} // end for step through Azimuth angles
-*/
 
 
+/*
 	for (k=1; k<mNAA-1; k++)
 	{
 		for (l=1; l<mNEA-1; l++)
@@ -962,10 +962,10 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 			} // end if
 		} // end for step through elevation angles
 	} // end for step through Azimuth angles
+*/
 
-
-
-/*	for (k=0; k< mNAA; k++)
+/*
+	for (k=0; k< mNAA; k++)
 	{
 		cout << k << " k:: ";
 		for (l=0; l<mNEA; l++)

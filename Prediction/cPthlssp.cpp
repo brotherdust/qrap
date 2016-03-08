@@ -60,8 +60,10 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 
 	m_tempIPD = 30;
 	m_slope = 0.0;
+//	m_SmoothWidth=21;
+//	m_SeekWidth=26;
 	m_SmoothWidth=1;
-	m_SeekWidth=22;
+	m_SeekWidth=2;
 	mUseClutter = UseClutter;
 
 	m_markers[0] = 0;
@@ -380,7 +382,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	}
 
 //	cout << "FLoss=" << m_Loss << "	DiffL=" << DiffLoss << endl;
-// The following 2 commands should mostly be commented out. It is when a emperical model is tuned:
+// The following 2 commands should mostly be commented out. It is for when a empirical model is tuned:
 //	m_Loss = 0;
 //	DiffLoss = 0;
 
@@ -555,7 +557,7 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 
 //	m_SeekWidth =35;
 //	m_SmoothWidth=70/m_interPixelDist;
-//	if (m_SeekWidth<3) m_SeekWidth = 3;
+	if (m_SeekWidth<2) m_SeekWidth = 2;
 //	if (m_SmoothWidth<1) m_SmoothWidth = 1;
 
 	if (m_kFactor!=1.0)

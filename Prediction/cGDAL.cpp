@@ -48,9 +48,9 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 	Cols = 0;
 	string FN = Directory+"/" +FileName;
 	m_file_name = FN;
-	cout << " In cGDAL::openFile(...) before GDALDataset constructor." << endl;
+//	cout << " In cGDAL::openFile(...) before GDALDataset constructor." << endl;
 	GDALDataset *poDataset;
-	cout << " In cGDAL::openFile(...) before GDALOpen ..." << endl;
+//	cout << " In cGDAL::openFile(...) before GDALOpen ..." << endl;
 	poDataset = (GDALDataset *) GDALOpen( m_file_name.c_str(), GA_ReadOnly );
 	if( poDataset == NULL )
 	{
@@ -62,7 +62,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		//\TODO:Error message
 		return false;
 	}
-	printf("The GDAL file is open");
+//	printf("The GDAL file is open");
 	/* Getting the meta data */
 
 /*	printf( "Driver: %s/%s\n",
@@ -101,38 +101,37 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 	}
 	else Proj = DEG;
 
-	cout << " In cGDAL::openFile(...) before Getting the raster band ..." << endl;
+//	cout << " In cGDAL::openFile(...) before Getting the raster band ..." << endl;
 	/* Getting the raster band */
 	poBand = poDataset->GetRasterBand( 1 );
 	poBand->GetBlockSize( &nBlockXSize, &nBlockYSize );
-	printf( "Block=%dx%d Type=%s, ColorInterp=%s\n", nBlockXSize, nBlockYSize,
-			GDALGetDataTypeName(poBand->GetRasterDataType()),
-			GDALGetColorInterpretationName(poBand->GetColorInterpretation()) );
+//	printf( "Block=%dx%d Type=%s, ColorInterp=%s\n", nBlockXSize, nBlockYSize,
+//			GDALGetDataTypeName(poBand->GetRasterDataType()),
+//			GDALGetColorInterpretationName(poBand->GetColorInterpretation()) );
 	adfMinMax[0] = poBand->GetMinimum( &bGotMin );
 	adfMinMax[1] = poBand->GetMaximum( &bGotMax );
 	if( ! (bGotMin && bGotMax) )
 		GDALComputeRasterMinMax((GDALRasterBandH)poBand, TRUE, adfMinMax);
-	printf( "Min=%.3fd, Max=%.3f\n", adfMinMax[0], adfMinMax[1] );
+//	printf( "Min=%.3fd, Max=%.3f\n", adfMinMax[0], adfMinMax[1] );
 	min = adfMinMax[0];
 	max = adfMinMax[1];
-	if( poBand->GetOverviewCount() > 0 )
-		printf( "Band has %d overviews.\n", poBand->GetOverviewCount() );
-	if( poBand->GetColorTable() != NULL )
-		printf( "Band has a color table with %d entries.\n",
-				poBand->GetColorTable()->GetColorEntryCount() );
+//	if( poBand->GetOverviewCount() > 0 )
+//		printf( "Band has %d overviews.\n", poBand->GetOverviewCount() );
+//	if( poBand->GetColorTable() != NULL )
+//		printf( "Band has a color table with %d entries.\n",poBand->GetColorTable()->GetColorEntryCount() );
 	if( poDataset->GetGeoTransform( adfGeoTransform ) == CE_None )
 	{
-		printf( "Origin = (%.6f,%.6f)\n",adfGeoTransform[0], adfGeoTransform[3] );
+//		printf( "Origin = (%.6f,%.6f)\n",adfGeoTransform[0], adfGeoTransform[3] );
         	Rows = poBand->GetYSize();
 		Cols = poBand->GetXSize();
 		rows = Rows;
 		cols = Cols;
-		printf( "Pixel Size = (%.6f,%.6f)\n", adfGeoTransform[1], adfGeoTransform[5] );
+//		printf( "Pixel Size = (%.6f,%.6f)\n", adfGeoTransform[1], adfGeoTransform[5] );
         	ns_res = adfGeoTransform[5];
         	ew_res = adfGeoTransform[1];
         	NW.Set(adfGeoTransform[3],adfGeoTransform[0],Proj,-1);
         	SE.Set((adfGeoTransform[3]+ns_res*rows),(adfGeoTransform[0]+ew_res*cols),Proj,-1);
-        	printf("Rotation (0 = north is up): %d\n",(int)adfGeoTransform[2]);
+//        	printf("Rotation (0 = north is up): %d\n",(int)adfGeoTransform[2]);
 	}
 	
 	if (Rows <1 || Cols < 1)

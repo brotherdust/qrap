@@ -143,10 +143,10 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
    }
    NorthWestCorner.Set(mNorth,mWest,DEG);
    SouthEastCorner.Set(mSouth,mEast,DEG);
-	cout << "North West corner: " << endl;
-	NorthWestCorner.Display();
-	cout << "South East corner: " << endl;
-	SouthEastCorner.Display();
+//	cout << "North West corner: " << endl;
+//	NorthWestCorner.Display();
+//	cout << "South East corner: " << endl;
+//	SouthEastCorner.Display();
 	Points[0].Get(Lat,Lon);
 	gcvt(Lon,12,text);
    areaQuery += text;
@@ -155,10 +155,10 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
    areaQuery += text;
    areaQuery += "))',4326) ";
 
-	cout << areaQuery << endl;
+//	cout << areaQuery << endl;
 	delete [] text;
 
-	cout << " In cMeasAnalysisCalc::LoadMeasurements " << endl;
+//	cout << " In cMeasAnalysisCalc::LoadMeasurements " << endl;
 	text = new char[10];		
 	pqxx::result r, rMobile, rFixed;
 
@@ -282,7 +282,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 					mMeasPoints[i].sInstKeyFixed = currentFixedInst;
 				else
 				{
-					cout << "New Cell = " << mMeasPoints[i].sCell << endl;
+//					cout << "New Cell = " << mMeasPoints[i].sCell << endl;
 					gcvt(mMeasPoints[i].sCell,8,text);
 					query = "SELECT risector, siteid, ST_AsText(location) as location, eirp,";
 					query += "radioinstallation.txpower as txpower,txlosses,rxlosses";
@@ -341,7 +341,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 		}// if there are measurements
 	} // else ... hence the query was successful
 	
-	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
+//	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
 	return true;
 }
 
@@ -475,7 +475,7 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 					mMeasPoints[i].sInstKeyFixed = currentFixedInst;
 				else
 				{
-					cout << "New Cell = " << mMeasPoints[i].sCell << endl;
+//					cout << "New Cell = " << mMeasPoints[i].sCell << endl;
 					gcvt(mMeasPoints[i].sCell,8,text);
 					query = "SELECT risector, siteid, ST_AsText(location) as location, eirp,";
 					query += "radioinstallation.txpower as txpower,txlosses,rxlosses";
@@ -534,7 +534,7 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 		}// if there are measurements
 	} // else ... hence the query was successful
 	
-	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
+//	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
 	return true;
 }
 
@@ -654,7 +654,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
 
-/*				cout << "Inst: " << currentInst << "	#: " << CNumUsed << "	M: " << CMean 					
+/*			cout << "Inst: " << currentInst << "	#: " << CNumUsed  << "	Freq =" << mFixedInsts[FixedNum].sFrequency 
+						<< "	M: "<< CMean 					
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
@@ -943,18 +944,18 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 
 	mUseClutter = true;
 
-	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor LoadMeasurements()" << endl;
+//	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor LoadMeasurements()" << endl;
 
 	mClutterFilter=0;
 	// This first analysis is to update the clutter each pixel belongs to. 
-	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor performAnalysis()" << endl;
+//	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor performAnalysis()" << endl;
 	NumUsed = PerformAnalysis(Mean, MeanSquareError, StDev, CorrC, mClutterFilter);
 	cout << "clutterType = " << mClutterFilter;
 	cout << "	#Used: " << NumUsed << "	Mean: " << Mean 
 		<< "	MeanSquare: " << MeanSquareError << "	StDev: " << StDev
 		<< "	CorrC: " << CorrC << endl;
 	
-	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor Preprosessing Terms" << endl;
+//	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor Preprosessing Terms" << endl;
 	for (i=0; i<NUMTERMS; i++)
 	{
 		cout << "TERM" << i << "	Max="<< mMaxTerm[i] 
@@ -989,8 +990,8 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 		if (mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[i])
 			Size++;
 		
-	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor Matrix manipulation" << endl;
-	cout <<"Size = " << Size << endl; 
+//	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor Matrix manipulation" << endl;
+//	cout <<"Size = " << Size << endl; 
 	if (Size > 0)
 	{
 		mPathLoss.mClutter.mClutterTypes[mClutterFilter].sAllowCchange[0]=true;
@@ -1104,7 +1105,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 			<< "	MeanSquare: " << MeanSquareError << "	StDev: "<< StDev
 			<< "	CorrC: " << CorrC << endl;
 		// Only optimise if enough points are involved
-		if ((NumUsed > 500))
+		if ((NumUsed > 2000))
 		{
 			for (i=0; i<NUMTERMS; i++)
 			{
@@ -1309,21 +1310,21 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 SeekClose=mSeekWidthBest;
 SmoothClose=mSmoothWidthBest;
 
-		for (SmoothWidth=2; SmoothWidth<71; SmoothWidth=SmoothWidth+2)
+		for (SmoothWidth=2; SmoothWidth<50; SmoothWidth=SmoothWidth+2)
 		{
 			mPathLoss.setSmoothWidth(SmoothWidth);
-			for (SeekWidth=2;SeekWidth<71; SeekWidth=SeekWidth+2)
+			for (SeekWidth=2;SeekWidth<31; SeekWidth=SeekWidth+2)
 			{
 				mPathLoss.setSeekWidth(SeekWidth);
 				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
 				cost = 200*(1-CorrC);
-//		cout << "	SeekW=" << SeekWidth <<"	SmoothW=" << SmoothWidth;
-//		cout <<  "	Cost=" << cost << "	Min=" << costMin;
-//		cout << "	#Used: " << NumUsed 
-//		cout << "	Mean: " << Mean; 
-//		cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
-//		cout << "	CorrC: " << CorrC << endl;
-				if ((cost*1.025< costMin)||((cost<1.025*costMin)&&(SmoothWidth<SmoothClose)))
+		cout << "	SeekW=" << SeekWidth <<"	SmoothW=" << SmoothWidth;
+		cout <<  "	Cost=" << cost << "	Min=" << costMin;
+		cout << "	#Used: " << NumUsed; 
+		cout << "	Mean: " << Mean; 
+		cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
+		cout << "	CorrC: " << CorrC << endl;
+				if ((cost*1.01< costMin)||((cost<1.01*costMin)&&(SmoothWidth<SmoothClose)))
 				{
 					costMin = cost;
 					SeekClose = SeekWidth;
@@ -1462,7 +1463,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		Up[i] = true;
 		CHeightDiff[i] = 0.5;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
-		DeltaH[i] = 0.2;
+		DeltaH[i] =-0.5;
 		NumClut[i] = 0;
 		Passed[i] = false;
 		changed[i]=false;

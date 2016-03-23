@@ -1105,7 +1105,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 			<< "	MeanSquare: " << MeanSquareError << "	StDev: "<< StDev
 			<< "	CorrC: " << CorrC << endl;
 		// Only optimise if enough points are involved
-		if ((NumUsed > 2000))
+		if ((NumUsed > 500))
 		{
 			for (i=0; i<NUMTERMS; i++)
 			{
@@ -1463,7 +1463,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		Up[i] = true;
 		CHeightDiff[i] = 0.5;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
-		DeltaH[i] =-0.5;
+		DeltaH[i] =0.5;
 		NumClut[i] = 0;
 		Passed[i] = false;
 		changed[i]=false;

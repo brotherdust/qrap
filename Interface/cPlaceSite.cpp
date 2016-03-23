@@ -81,7 +81,7 @@ bool cPlaceSite::SetParameters(QString Lat,QString Lon,bool Edit,double scale)
 	double lat = Lat.toDouble();
 	double lon = Lon.toDouble();
 	cout << "lat: " << lat << "   lon: " << lon << endl;
-	string Location = QString ("POINT(%1 %2)").arg(Lon).arg(Lat).toStdString();
+	string Location = QString ("ST_POINT(%1 %2)").arg(Lon).arg(Lat).toStdString();
 
 	cout  << Location << endl;
 	if (mEdit)
@@ -151,7 +151,7 @@ bool cPlaceSite::ChangeLocation(QString Lat,QString Lon)
 	double lat = Lat.toDouble();
 	double lon = Lon.toDouble();
 	cout << "lat: " << lat << "   lon: " << lon << endl;
-	string Location = QString ("POINT(%1 %2)").arg(Lon).arg(Lat).toStdString();
+	string Location = QString ("ST_POINT(%1 %2)").arg(Lon).arg(Lat).toStdString();
 	string La,Lo;
 	cout  << Location << endl;
 	ExtractLatLongFromPoint(Location,locationFormat,La,Lo);

@@ -122,7 +122,7 @@ int main (int argc, char **argv)
 
 	Meas.SetUseAntANN(false);
 
-
+/*
 //Gauteng 20m DEM
 	vPoints Punte;
 	cGeoP *Hoek;
@@ -151,6 +151,19 @@ int main (int argc, char **argv)
 	for (int i=0; i<19; i++)
 		Punte.push_back(Hoek[i]);
 
+	delete [] Hoek; 
+*/
+
+	vPoints Punte;
+	cGeoP *Hoek;
+	Hoek = new cGeoP[4];
+	Hoek[0].Set(-24.01, 30.99);
+	Hoek[1].Set(-30.01, 30.99);
+	Hoek[2].Set(-30.01, 23.00);
+	Hoek[3].Set(-24.01, 23.00);
+
+	for (int i=0; i<4; i++)
+		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek; 
 
@@ -160,208 +173,54 @@ int main (int argc, char **argv)
 	cout << "Loading measurements ... in main()" << endl;
 
 	Meas.SetPlotResolution(30);
+	Meas.LoadMeasurements(0,0,6);
 
-	Meas.LoadMeasurements(0,0,1);
-/*
-	Meas.SetPlotResolution(10);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=0	Res=10" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(20);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=0	Res=20" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(30);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=0	Res=30" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(60);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=0	Res=60" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(90);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=0	Res=90" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(180);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=0	Res=180" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(270);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=0	Res=270" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(360);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=0	Res=360" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(450);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=0	Res=450" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.LoadMeasurements(Punte, 0,0,1);
-
-	Meas.SetPlotResolution(10);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=1	Res=10" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(20);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=1	Res=20" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(30);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=1	Res=30" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(60);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=1	Res=60" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(90);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=1	Res=90" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(180);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=1	Res=180" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(270);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=1	Res=270" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(360);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=1	Res=360" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	Meas.SetPlotResolution(450);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=1	Res=450" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-	
-
-	Meas.LoadMeasurements(Punte, 0,0,2);
-
-	Meas.SetPlotResolution(10);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=2	Res=10" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(20);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=2	Res=20" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(30);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=2	Res=30" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(60);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=2	Res=60" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(90);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=2	Res=90" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(180);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=2	Res=180" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(270);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=2	Res=270" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(360);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=2	Res=360" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(450);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=2	Res=450" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.LoadMeasurements(Punte, 0,0,3);
-
-	Meas.SetPlotResolution(10);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=3	Res=10" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(20);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=3	Res=20" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(30);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=3	Res=30" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(60);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=3	Res=60" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(90);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=3	Res=90" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(180);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=3	Res=180" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(270);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=3	Res=270" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(360);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=3	Res=360" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(450);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=3	Res=450" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
+//   Meas.OptimiseHeights(6);
 
 
-	Meas.LoadMeasurements(Punte, 0,0,4);
-
-	Meas.SetPlotResolution(10);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=4	Res=10" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(20);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=4	Res=20" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(30);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=4	Res=30" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(60);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=4	Res=60" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(90);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=4	Res=90" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(180);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=4	Res=180" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(270);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=4	Res=270" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(360);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=4	Res=360" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-
-	Meas.SetPlotResolution(450);
-	Num = Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Set=4	Res=450" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl;
-*/
-   Meas.OptimiseHeights(1);
-/*
-	Meas.OptimiseModelCoefAllTotal(0);
+	Meas.OptimiseModelCoefAllTotal(6);
    Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-   Meas.OptimiseModelCoefD(0);
+   Meas.OptimiseModelCoefD(6);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-	cout<< "Na0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
+	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
+
+/*
+	cTrainAntPattern NeuralNets;
+	double Azimuth;
+
+  	query = "truncate table AntNeuralNet cascade;";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error truncating Antenna Neural Nets" << endl;
+	}
+	
+	cout << "In main Loading measurements " << endl;
+	NeuralNets.LoadMeasurements(Punte,0,6);
+
+	cout << "In main training nets " << endl;
+	NeuralNets.TrainANDSaveANDTest();
+*/
+
+  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+	Meas.SetUseAntANN(true);
+   Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+//   Meas.OptimiseHeights(1);
+/*
+	Meas.OptimiseModelCoefAllTotal(1);
+   Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+   Meas.OptimiseModelCoefD(1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
 */
 /*
 int i,j;
@@ -427,7 +286,7 @@ for ( i=4; i>=0; i--)
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-
+*/
 /*
 	query = "update coefficients set coefficient=0.0;";
 
@@ -438,38 +297,7 @@ for ( i=4; i>=0; i--)
 */
 /*
 	cTrainAntPattern NeuralNets;
-	vPoints Punte;
-	cGeoP *Hoek;
 	double Azimuth;
-	Hoek = new cGeoP[4];
-
-	Hoek[0].Set(-26.0, 28.0);
-	Hoek[1].Set(-26.5, 28.0);
-	Hoek[2].Set(-26.0, 28.5);
-	Hoek[3].Set(-25.5, 28.0);
-
-
-	Azimuth = Hoek[0].Bearing( Hoek[1]);	
-	cout << "Suid: " << Azimuth  << endl;
-	Azimuth = Hoek[0].Bearing( Hoek[2]);	
-	cout << "Oos: " << Azimuth  << endl;
-	Azimuth = Hoek[0].Bearing( Hoek[3]);	
-	cout << "Noord: " << Azimuth  << endl;
-	Hoek[3].Set(-26.0, 27.5);
-	Azimuth = Hoek[0].Bearing( Hoek[3]);	
-	cout << "Wes: " << Azimuth  << endl;
-
-
-	Hoek[0].Set(-26.06, 28.26);
-	Punte.push_back(Hoek[0]);
-	Hoek[1].Set(-25.94, 28.26);
-	Punte.push_back(Hoek[1]);
-	Hoek[2].Set(-25.94, 28.113);
-	Punte.push_back(Hoek[2]);
-	Hoek[3].Set(-26.06, 28.113);
-	Punte.push_back(Hoek[3]);
-	
-	delete [] Hoek;
 
   	query = "truncate table AntNeuralNet cascade;";
 	if (!gDb.PerformRawSql(query))
@@ -478,7 +306,7 @@ for ( i=4; i>=0; i--)
 	}
 	
 	cout << "In main Loading measurements " << endl;
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1);
+	NeuralNets.LoadMeasurements(Punte,0,0,1);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
@@ -595,7 +423,7 @@ for ( i=4; i>=0; i--)
 	Meas.mPathLoss.mClutter.Reset(1);
 */
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-
+/*
 	Meas. LoadMeasurements(0,0,4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
@@ -631,7 +459,7 @@ for ( i=4; i>=0; i--)
 	Meas. LoadMeasurements(0,0,4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Na0,4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;
-
+*/
 /*
 
 	Meas. LoadMeasurements(0,0,0);

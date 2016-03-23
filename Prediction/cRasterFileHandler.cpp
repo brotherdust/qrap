@@ -657,7 +657,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 	point.Get(lat,lon);
 	gcvt(lon,9,temp);
 	gcvt(lat,9,temp2);
-	PointString = "POINT'(";
+	PointString = "ST_POINT'(";
 	PointString += temp2;
 	PointString += ",";
 	PointString += temp;

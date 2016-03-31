@@ -34,7 +34,8 @@
 #include <QMessageBox>
 
 
-using namespace std;
+using std::string;
+using namespace pqxx;
 
 namespace Qrap
 {

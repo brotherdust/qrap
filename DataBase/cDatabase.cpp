@@ -986,7 +986,7 @@ bool cDatabase::GetDefaults (const string& tableName, StringMap& output)
 		return true;
 	
 	// run through the fields
-	for (pqxx::result::const_fielditerator field=mLastResult[0].begin();
+	for (pqxx::const_tuple_iterator field=mLastResult[0].begin();
 		field != mLastResult[0].end(); field++)
 	{
 		fieldName = field->name();
@@ -1990,7 +1990,7 @@ bool cDatabase::ExportCmdToCsv (const string& cmd, const string& fileName)
 	
 	// get the headers for this table
 	i = 0;
-	pqxx::result::const_fielditerator field=mLastResult[0].begin();
+	pqxx::const_tuple_iterator field=mLastResult[0].begin();
 	
 	while (field != mLastResult[0].end())
 	{

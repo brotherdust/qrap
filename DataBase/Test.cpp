@@ -112,7 +112,7 @@ int main (int argc, char** argv)
 					{
 						cout << "Entry " << i << endl;
 						// output the results
-						for (pqxx::result::const_fielditerator it=r[i].begin();it != r[i].end();it++)
+						for (pqxx::const_tuple_iterator it=r[i].begin();it != r[i].end();it++)
 						{
 							cout << string(it->name()) << ": " << it->c_str() << endl;
 						}

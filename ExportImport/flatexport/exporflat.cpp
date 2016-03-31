@@ -31,8 +31,8 @@
 #include <pqxx>
 
 
-using namespace pqxx;
-using namespace std;
+//using namespace pqxx;
+using std::string;
 
 #include "exportf.h"
 

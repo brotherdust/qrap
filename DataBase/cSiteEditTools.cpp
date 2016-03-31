@@ -29,7 +29,7 @@
 /*
  * Explicitly define the classes we're using from each namespace.
  */
-using namespace std;
+using std::string;
 using namespace Qrap;
 
 

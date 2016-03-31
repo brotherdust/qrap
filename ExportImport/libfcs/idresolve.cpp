@@ -47,7 +47,7 @@ int IdResolve::connectDB(const char *hname, const char *dbname, const char *unam
 		sprintf(cstr,"user=%s password=%s dbname=%s host=%s",uname,password,dbname,hname);
 		
 		// set up the connection
-		conn = new connection(cstr);
+		conn = new pqxx::connection(cstr);
 
 	} catch(const exception &e) {
 		cout << e.what() << endl;
@@ -61,11 +61,11 @@ int IdResolve::connectDB(const char *hname, const char *dbname, const char *unam
 
 void IdResolve::execSQLCommand(const char *query)
 {
-	work *wv;
+	pqxx::work *wv;
 
 	try {
 		// create a new work object
-		wv = new work(*conn);
+		wv = new pqxx::work(*conn);
 
 		// execute and commit a command
 		wv->exec(query);
@@ -88,18 +88,18 @@ int IdResolve::resolveId(unsigned int hostid,const char *desc)
 	string a;
 
 	// create a new working variable
-	work *wv = new work(*conn);
+	pqxx::work *wv = new pqxx::work(*conn);
 
 	// create the query 
 	sprintf(query,"SELECT id FROM machine WHERE mainuserid = '%d'",hostid);
 
 	// perform a query
-	result R = wv->exec(query);
+	pqxx::result R = wv->exec(query);
 
 	printf("result site %d\n",(int)R.size());
 	if (R.size()==1) {
 printf("b\n");
-		result::const_iterator r = R.begin();
+		pqxx::result::const_iterator r = R.begin();
 		a = string(r[0].c_str());
 		printf("b - string return %s\n",a.c_str());
 	
@@ -116,17 +116,17 @@ printf("c\n");
 		execSQLCommand(query);
 
 		// get a new working structure 
-		wv = new work(*conn);
+		wv = new pqxx::work(*conn);
 
 		// set up the query
 		sprintf(query,"SELECT id FROM machine WHERE mainuserid = '%d'",hostid);
 	
 		// perform a query
-		result R = wv->exec(query);
+		pqxx::result R = wv->exec(query);
 	
 		if (R.size()==1) {
 printf("d\n");
-			result::const_iterator r = R.begin();
+			pqxx::result::const_iterator r = R.begin();
 			a = string(r[0].c_str());
 			printf("d result %s\n",a.c_str());
 			idx = atoi(a.c_str());//atoi(r[0].c_str());
@@ -158,16 +158,16 @@ int IdResolve::getHostId()
 	idx = -1;
 
 	// create a new working variable
-	work *wv = new work(*conn);
+	pqxx::work *wv = new pqxx::work(*conn);
 
 	// create the query 
 	sprintf(query,"SELECT id FROM machine WHERE mainuserid = '%d'",hostid);
 
 	// perform a query
-	result R = wv->exec(query);
+	pqxx::result R = wv->exec(query);
 
 	if (R.size()==1) {
-		result::const_iterator r = R.begin();
+		pqxx::result::const_iterator r = R.begin();
 		a = string(r[0].c_str());
 	
 		idx = atoi(a.c_str());

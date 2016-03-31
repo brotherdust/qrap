@@ -28,9 +28,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <pqxx>
+#include <pqxx/pqxx>
 
-using namespace pqxx;
+//using namespace pqxx;
 using namespace std;
 
 
@@ -50,7 +50,7 @@ public:
 	int mergeDelete(const char *fname);
 
 private:
-	connection *conn;
+	pqxx::connection *conn;
 
 	/// Executes a SQL command (that does not return an output.
 	///  This function may throw SQL exceptions (should be handled in the 

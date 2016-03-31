@@ -29,10 +29,10 @@
 #include <string>
 #include <vector>
 #include <unistd.h>
-#include <pqxx>
+#include <pqxx/pqxx>
 
 
-using namespace pqxx;
+//using namespace pqxx;
 using namespace std;
 
 /// Resolves the ID of the system.
@@ -57,7 +57,7 @@ public:
 	///  the server.
 	void setHostId(unsigned int index,unsigned int hostid);
 protected:
-	connection *conn;
+	pqxx::connection *conn;
 
 	/// Executes a SQL command (that does not return an output.
 	///  This function may throw SQL exceptions (should be handled in the 

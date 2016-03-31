@@ -623,7 +623,7 @@ bool cRaster::ReturnProj4(GeoType PointType,
 //				Proj = pj_init(sizeof(NDEFparms)/sizeof(char*),NDEFparms);
 				break;
 		}
-		Proj = nullptr;
+		Proj = NULL;
 //		cout << " In cRaster::ReturnProj, Proj4 = " << Proj4 << endl;
 		Proj = pj_init_plus(Proj4.c_str());
 //		cout << " Leaving cRaster::ReturnProj" << endl;

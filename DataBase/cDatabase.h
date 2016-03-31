@@ -26,10 +26,11 @@
 #ifndef Qrap_cDatabase_h
 #define Qrap_cDatabase_h
 
-using namespace std;
-#include <string.h>
-#include <stdio.h>
+
 #include "cSiteEditTools.h"
+#include "Config.h"
+
+using std::string;
 
 namespace Qrap
 {

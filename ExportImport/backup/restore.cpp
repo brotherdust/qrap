@@ -29,11 +29,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <pqxx>
+#include <pqxx/pqxx>
 
 
-using namespace pqxx;
-using namespace std;
+//using namespace pqxx;
+//using namespace std;
 
 #include "restore.h"
 
@@ -44,7 +44,8 @@ Restore::Restore():conn(NULL)
 
 Restore::~Restore()
 {
-	if (conn) {
+	if (conn) 
+	{
 		delete conn;
 	}
 }
@@ -68,13 +69,15 @@ int Restore::restoreFile(const char *fname)
 
 	// open the file list file 
 	f = fopen("backuplist.txt","rt");
-	if (f==NULL) {
+	if (f==NULL) 
+	{
 		printf("failed to open backuplist.txt!\n");
 		return 0;
 	}
 
 	// truncate all the tables
-	while (1) {
+	while (1) 
+	{
 		// read the table name
 		n = fscanf(f,"%s",tname);
 		if (n<=0)
@@ -90,7 +93,8 @@ int Restore::restoreFile(const char *fname)
 	fseek(f,0,SEEK_SET);
 
 	// read the tablenames and process
-	while (1) {
+	while (1) 
+	{
 		// read the table name
 		n = fscanf(f,"%s",tname);
 		if (n<=0)
@@ -130,17 +134,20 @@ int Restore::restoreTable(const char *tableName)
 int Restore::connectDB(const char* hname,const char* dbname,const char *uname,const char *password)
 {
 	char cstr[512];
-	try {
+//	try 
+//	{
 		// set up the connection string
 		sprintf(cstr,"host=%s dbname=%s user=%s password=%s",hname,dbname,uname,password);
 		printf("[%s]\n",cstr);
 
 		// set up the connection
-		conn = new connection(cstr);
-	}catch (const exception &e) {
-		cout << e.what() << endl;
-		return 0;
-	}
+		conn = new pqxx::connection(cstr);
+//	}
+//	catch (const exception &e) 
+//	{
+//		cout << e.what() << endl;
+//		return 0;
+//	}
 	return 1;
 }
 
@@ -165,10 +172,10 @@ int Restore::connectDB(const char* hname,const char* dbname)
 
 void Restore::execSQLCommand(const char *query)
 {
-	work *wv;
+	pqxx::work *wv;
 
 	// create a new work object
-	wv = new work(*conn);
+	wv = new pqxx::work(*conn);
 
 	// execute and commit a command
 	wv->exec(query);
@@ -180,11 +187,11 @@ void Restore::execSQLCommand(const char *query)
 
 void Restore::execSQLCommandF(const char *query)
 {
-	try {
-		work *wv;
+//	try {
+		pqxx::work *wv;
 
 		// create a new work object
-		wv = new work(*conn);
+		wv = new pqxx::work(*conn);
 
 		// execute and commit a command
 		wv->exec(query);
@@ -192,9 +199,9 @@ void Restore::execSQLCommandF(const char *query)
 
 		// delete the query object
 		delete wv;
-	}catch (const exception &ex)
-	{
-		cout << "failed SQL command: " << query << endl << ex.what() << endl;
-	}
+//	}catch (const exception &ex)
+//	{
+//		cout << "failed SQL command: " << query << endl << ex.what() << endl;
+//	}
 }
 

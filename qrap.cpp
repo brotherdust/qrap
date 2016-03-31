@@ -32,12 +32,6 @@
 #include <QToolBar>
 #include <QMessageBox>
 
-#ifdef WIN32
-#define QGISEXTERN extern "C" __declspec( dllexport )
-#else
-#define QGISEXTERN extern "C"
-#endif
-
 //////////////////////////////////////////////////////////////////////
 //
 // THE FOLLOWING METHODS ARE MANDATORY FOR ALL PLUGINS
@@ -679,9 +673,14 @@ void QRap::UpdateSiteLayer()
 void QRap::InitRubberBand(bool IsArea)
 {
 	mQGisIface->mapCanvas()->setMapTool(Mouse);
-	
+	QGis::GeometryType bArea;
+	if (IsArea)
+		bArea = QGis::Polygon;
+	else 	bArea = QGis::Line;
+
 	mPoints.clear();
-	mRubberBand = new QgsRubberBand(mQGisIface->mapCanvas(), IsArea);
+	mRubberBand = new 
+	QgsRubberBand(mQGisIface->mapCanvas(), bArea);
 	connect(Mouse, SIGNAL(MouseMove(QgsPoint&)), this, SLOT(ReceiveMouseMove(QgsPoint&)));
   	mQGisIface->mapCanvas()->setCursor(Qt::CrossCursor);
   

@@ -23,16 +23,10 @@
  ************************************************************************* */
 
 #define QRAP_DEBUG
-
-#include <QString>
-#include <iostream>
-#include <string>
-#include <map>
-#include <vector>
-
 #include "Config.h"
+#include "cDatabase.h"
 
-using namespace std;
+using std::string;
 using namespace Qrap;
 
 

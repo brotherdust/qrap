@@ -50,7 +50,7 @@ int ExportF::connectDB(const char *hname, const char *dbname, const char *uname,
 		// create the connection string
 		sprintf(cstr,"user=%s password=%s dbname=%s host=%s",uname,password,dbname,hname);
 		// set up the connection
-		conn = new connection(cstr);
+		conn = new pqxx::connection(cstr);
 
 	} catch(const exception &e) {
 		cout << e.what() << endl;
@@ -177,7 +177,7 @@ void ExportF::createTempTable(const char *tname)
 	char query[4096];
 	int i,j;
 	string collist;
-	work *wv;
+	pqxx::work *wv;
 	int N;
 
 	printf("ExportF::createTempTable(%s)\n",tname);
@@ -185,8 +185,8 @@ void ExportF::createTempTable(const char *tname)
 	// get the column names of the table
 	sprintf(query,"SELECT * FROM %s",tname);
 
-	wv = new work(*conn);
-	result R = wv->exec(query);
+	wv = new pqxx::work(*conn);
+	pqxx::result R = wv->exec(query);
 	delete wv;
 
 	// build the select list
@@ -278,9 +278,9 @@ int ExportF::writeTable(const char *tname,const char *fname)
 	int N;
 	char query[1024];
 	FILE *f;
-	work *wv;
+	pqxx::work *wv;
 
-	wv = new work(*conn);
+	wv = new pqxx::work(*conn);
 
 	try {
 
@@ -294,7 +294,7 @@ int ExportF::writeTable(const char *tname,const char *fname)
 		sprintf(query,"SELECT * FROM %s",tname);
 
 		// execute the query
-		result R = wv->exec(query);
+		pqxx::result R = wv->exec(query);
 
 		if (R.size()==0) {
 			printf("%s does not exist\n",tname);
@@ -311,7 +311,7 @@ int ExportF::writeTable(const char *tname,const char *fname)
 		fprintf(f,"\n");
 
 		// print the sites
-		for (result::const_iterator r = R.begin();r!=R.end(); ++r)
+		for (pqxx::result::const_iterator r = R.begin();r!=R.end(); ++r)
 		{
 			// get the number of columns			
 			N = r.size();
@@ -359,10 +359,10 @@ void ExportF::execSQLCommand(const char *query)
 void ExportF::execSQLCommandF(const char *query)
 {
 	try {
-		work *wv;
+		pqxx::work *wv;
 
 		// create a new work object
-		wv = new work(*conn);
+		wv = new pqxx::work(*conn);
 
 		#ifdef EXPORTF_PRINTSQL
 			printf("[EXPORTF_SQL] [%s]\n",query);

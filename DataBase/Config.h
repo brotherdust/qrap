@@ -25,7 +25,6 @@
 
 #ifndef Qrap_Config_h
 #define Qrap_Config_h
-
 // comment out to define client edition compile
 //#define QRAP_SERVER_DAEMON
 #define QRAP_SERVER_EDITION

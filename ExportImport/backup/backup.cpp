@@ -136,10 +136,10 @@ int Backup::backupList(const char *tableListfname, const char *outputfname)
 
 void Backup::execSQLCommand(const char *query)
 {
-	work *wv;
+	pqxx::work *wv;
 
 	// create a new work object
-	wv = new work(*conn);
+	wv = new pqxx::work(*conn);
 
 	// execute and commit a command
 	wv->exec(query);
@@ -153,10 +153,10 @@ void Backup::execSQLCommand(const char *query)
 void Backup::execSQLCommandF(const char *query)
 {
 	try {
-		work *wv;
+		pqxx::work *wv;
 
 		// create a new work object
-		wv = new work(*conn);
+		wv = new pqxx::work(*conn);
 
 		// execute and commit a command
 		wv->exec(query);
@@ -179,7 +179,7 @@ int Backup::connectDB(const char* hname,const char* dbname,const char *uname,con
 		printf("[%s]\n",cstr);
 
 		// set up the connection
-		conn = new connection(cstr);
+		conn = new pqxx::connection(cstr);
 	}catch (const exception &e) {
 		cout << e.what() << endl;
 		return 0;

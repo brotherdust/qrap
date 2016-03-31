@@ -47,7 +47,7 @@ int MergeDelete::connectDB(const char *hname, const char *dbname, const char *un
 		sprintf(cstr,"user=%s password=%s dbname=%s host=%s",uname,password,dbname,hname);
 		
 		// set up the connection
-		conn = new connection(cstr);
+		conn = new pqxx::connection(cstr);
 
 	} catch(const exception &e) {
 		cout << e.what() << endl;
@@ -59,12 +59,12 @@ int MergeDelete::connectDB(const char *hname, const char *dbname, const char *un
 
 void MergeDelete::execSQLCommand(const char *query)
 {
-	work *wv;
+	pqxx::work *wv;
 
 	try {
 
 		// create a new work object
-		wv = new work(*conn);
+		wv = new pqxx::work(*conn);
 
 		// execute and commit a command
 		wv->exec(query);

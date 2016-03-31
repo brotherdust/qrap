@@ -29,12 +29,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <pqxx>
+#include <pqxx/pqxx>
 
 // if defined, the SQL statements executed will be printed to STD out
 //#define IMPORTF_PRINTSQL 
 
-using namespace pqxx;
+//using namespace pqxx;
 using namespace std;
 
 class ImportF
@@ -59,7 +59,7 @@ private:
 	void fixSequence(const char *tableName,const char *columnName);
 
 	/// The database connection
-	connection *conn;
+	pqxx::connection *conn;
 
 	/// Executes a SQL command (that does not return an output.
 	///  This function may throw SQL exceptions (should be handled in the 

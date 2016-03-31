@@ -13,7 +13,7 @@ ENDIF(COMMAND cmake_policy)
   SET (DEFAULT_BIN_SUBDIR     /usr/bin)
   SET (DEFAULT_LIB_SUBDIR     /usr/lib)
   SET (DEFAULT_DATA_SUBDIR    /usr/share/qgis)
-  SET (DEFAULT_PLUGIN_SUBDIR  /usr/lib/qgis/plugins)
+  SET (DEFAULT_PLUGIN_SUBDIR  /usr/lib/qgis/plugins/)
   SET (DEFAULT_INCLUDE_SUBDIR /usr/include/qgis)
 
 SET(CMAKE_COLOR_MAKEFILE ON)
@@ -49,6 +49,8 @@ SET (ENABLE_TESTS FALSE CACHE BOOL "Build unit tests?")
 # hide this variable because building of python bindings might fail
 # if set to other directory than expected
 MARK_AS_ADVANCED(LIBRARY_OUTPUT_PATH)
+
+
 #############################################################
 # check if lexer and parser are not missing
 # http://www.mail-archive.com/cmake@cmake.org/msg02861.html
@@ -77,9 +79,9 @@ FIND_PACKAGE(Spatialindex REQUIRED)
 
 FIND_PACKAGE(Proj)
 
-FIND_PACKAGE(Eigen3)
-INCLUDE( ${EIGEN3_INCLUDE_DIR} )
- MESSAGE ( "  Found Eigen Include:" ${EIGEN3_INCLUDE_DIR})
+#FIND_PACKAGE(Eigen3)
+#INCLUDE( ${EIGEN3_INCLUDE_DIR} )
+# MESSAGE ( "  Found Eigen Include:" ${EIGEN3_INCLUDE_DIR})
 
 #optional since we can use internal sqlite
 IF (NOT WITH_INTERNAL_SQLITE3)
@@ -93,10 +95,8 @@ FIND_PACKAGE(GEOS)
 
 FIND_PACKAGE(GDAL)
 
-# optional
-IF (WITH_POSTGRESQL)
-  FIND_PACKAGE(Postgres) # PostgreSQL provider, SPIT plugin
-ENDIF (WITH_POSTGRESQL)
+FIND_PACKAGE(Postgres) # PostgreSQL provider, SPIT plugin
+
 FIND_PACKAGE(Expat)    # GPS importer plugin
 FIND_PACKAGE(GSL)      # Georeferencer
 IF (WITH_GRASS)
@@ -113,6 +113,9 @@ IF (WITH_BINDINGS)
   INCLUDE (Python) # file cmake/Python.cmake
 ENDIF (WITH_BINDINGS)
 
+FIND_PACKAGE(PQXX)
+MESSAGE(STATUS "pqxx include: ${PQXX_HEADER_PATH}")
+MESSAGE(STATUS "pqxx library: ${PQXX_LIBRARY}")
 
 IF (NOT PROJ_FOUND)
  	MESSAGE (SEND_ERROR "PROJ were not found!")
@@ -195,7 +198,7 @@ ENDIF (PEDANTIC)
 #############################################################
 # platform specific stuff
 
-set(CMAKE_CXX_FLAGS "-std=c++0x -std=gnu++0x")
+set(CMAKE_CXX_FLAGS "-std=c++11 -std=gnu++11")
 
 IF (WIN32)
   SET (DEFAULT_LIB_SUBDIR     lib)
@@ -273,41 +276,153 @@ ELSE (WIN32)
   ADD_DEFINITIONS(-DGUI_EXPORT=)
   ADD_DEFINITIONS(-DPYTHON_EXPORT=)
 ENDIF (WIN32)
-###############################################################
-FIND_PACKAGE(QGIS REQUIRED)
-IF (NOT QGIS_FOUND)
-  MESSAGE (SEND_ERROR "QGIS dependency was not found!")
-ENDIF (NOT QGIS_FOUND)
 
-    MESSAGE(STATUS "1) Found QGIS Plugins Dir: ${QGIS_PLUGIN_DIR}")
-    MESSAGE(STATUS "1) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")
+
+#############################################################
+# enable use of c++11 features where available
+# full c++11 support in clang 3.3+: http://clang.llvm.org/cxx_status.html
+# for Mac, this is probably Apple LLVM 4.2 (based on LLVM 3.2svn, in XCode 4.6+)
+#   or definitely Apple LLVM 5.0 (based on LLVM 3.3svn, in Xcode 5+):
+#   https://gist.github.com/yamaya/2924292
+
+IF (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  EXECUTE_PROCESS(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+  IF (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
+    SET(USE_CXX_11 TRUE)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  ENDIF()
+ELSEIF (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  IF ((NOT APPLE AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "3.2")
+       OR (APPLE AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.1"))
+    SET(USE_CXX_11 TRUE)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-error=c++11-narrowing")
+  ENDIF()
+ELSEIF (MSVC AND MSVC_VERSION GREATER 1600)
+  SET(USE_CXX_11 TRUE)
+ELSE()
+  SET(USE_CXX_11 FALSE)
+ENDIF()
+
+#allow override keyword if available
+IF (NOT USE_CXX_11)
+  ADD_DEFINITIONS("-Doverride=")
+  ADD_DEFINITIONS("-Dnullptr=0")
+ENDIF()
+
+
+#############################################################
+# enable warnings
+
+IF (PEDANTIC)
+  MESSAGE (STATUS "Pedantic compiler settings enabled")
+  IF(MSVC)
+    SET(_warnings "")
+    IF (NOT USING_NMAKE)
+      SET(_warnings "${_warnings} /W4" )
+    ENDIF (NOT USING_NMAKE)
+
+    # disable warnings
+    SET(_warnings "${_warnings} /wd4100 ")  # unused formal parameters
+    SET(_warnings "${_warnings} /wd4127 ")  # constant conditional expressions (used in Qt template classes)
+    SET(_warnings "${_warnings} /wd4190 ")  # 'identifier' has C-linkage specified, but returns UDT 'identifier2' which is incompatible with C
+    SET(_warnings "${_warnings} /wd4231 ")  # nonstandard extension used : 'identifier' before template explicit instantiation (used in Qt template classes)
+    SET(_warnings "${_warnings} /wd4244 ")  # conversion from '...' to '...' possible loss of data
+    SET(_warnings "${_warnings} /wd4251 ")  # needs to have dll-interface to be used by clients of class (occurs in Qt template classes)
+    SET(_warnings "${_warnings} /wd4275 ")  # non dll-interface class '...' used as base for dll-interface class '...'
+    SET(_warnings "${_warnings} /wd4505 ")  # unreferenced local function has been removed (QgsRasterDataProvider::extent)
+    SET(_warnings "${_warnings} /wd4510 ")  # default constructor could not be generated (sqlite3_index_info, QMap)
+    SET(_warnings "${_warnings} /wd4512 ")  # assignment operator could not be generated (sqlite3_index_info)
+    SET(_warnings "${_warnings} /wd4610 ")  # user defined constructor required (sqlite3_index_info)
+    SET(_warnings "${_warnings} /wd4706 ")  # assignment within conditional expression (pal)
+    SET(_warnings "${_warnings} /wd4800 ")  # 'int' : forcing value to bool 'true' or 'false' (performance warning)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_warnings}")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_warnings}")
+  ELSE (MSVC)
+    # add warnings via flags (not as definitions as on Mac -Wall can not be overridden per language )
+    SET(_warnings "-Wall -Wextra -Wno-long-long -Wformat-security -Wno-strict-aliasing")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_warnings}")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_warnings}")
+
+    # Qt produces lots of warnings with strict aliasing (as of Qt 4.4.0 & GCC 4.3)
+    # There are redundant declarations in Qt and GDAL
+    # ADD_DEFINITIONS( -fstrict-aliasing -Wstrict-aliasing=1 -Wredundant-decls )
+
+    IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-return-type-c-linkage -Wno-overloaded-virtual")
+    ENDIF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+
+    # add any extra CXXFLAGS flags set by user. can be -D CXX_EXTRA_FLAGS or environment variable
+    # command line -D option overrides environment variable
+    # e.g. useful for suppressing transient upstream warnings in dependencies, like Qt
+    SET(CXX_EXTRA_FLAGS "" CACHE STRING "Additional appended CXXFLAGS")
+    IF ("${CXX_EXTRA_FLAGS}" STREQUAL "" AND DEFINED $ENV{CXX_EXTRA_FLAGS})
+      SET(CXX_EXTRA_FLAGS "$ENV{CXX_EXTRA_FLAGS}")
+    ENDIF ("${CXX_EXTRA_FLAGS}" STREQUAL "" AND DEFINED $ENV{CXX_EXTRA_FLAGS})
+    IF (NOT "${CXX_EXTRA_FLAGS}" STREQUAL "")
+      MESSAGE (STATUS "Appending CXX_EXTRA_FLAGS")
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_EXTRA_FLAGS}")
+    ENDIF (NOT "${CXX_EXTRA_FLAGS}" STREQUAL "")
+  ENDIF (MSVC)
+
+ENDIF (PEDANTIC)
+
+
+IF (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Qunused-arguments")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments")
+  SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Qunused-arguments")
+  SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Qunused-arguments")
+  SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Qunused-arguments")
+ENDIF (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+
+IF(CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|ppc)")
+  # spatialite crashes on ppc - see bugs.debian.org/603986
+  ADD_DEFINITIONS( -fno-strict-aliasing )
+ENDIF(CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|ppc)")
+
+IF (CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+  MESSAGE (STATUS "Debug output enabled")
+  ADD_DEFINITIONS(-DQGISDEBUG=1)
+ENDIF (CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+
+IF(MSVC)
+  SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DQGISDEBUG=1")
+  SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DQGISDEBUG=1")
+  # disable macros that offend std::numeric_limits<T>::min()/max()
+  ADD_DEFINITIONS(-DNOMINMAX)
+ENDIF(MSVC)
+
+IF(ENABLE_COVERAGE)
+  INCLUDE("cmake/modules/coverage/CodeCoverage.cmake")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage --coverage")
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage --coverage")
+  SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage --coverage")
+  SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage --coverage")
+  SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage --coverage")
+  SETUP_TARGET_FOR_COVERAGE(qgis_coverage ctest coverage)
+ENDIF(ENABLE_COVERAGE)
 
 #############################################################
 # user-changeable settings which can be used to customize
 # layout of QGIS installation
 # (default values are platform-specific)
 #
-#SET (QGIS_BIN_SUBDIR     ${DEFAULT_BIN_SUBDIR}     CACHE STRING "Subdirectory where executables will be installed")
-#SET (QGIS_LIB_SUBDIR     ${DEFAULT_LIB_SUBDIR}     CACHE STRING "Subdirectory where libraries will be installed")
-#SET (QGIS_DATA_SUBDIR    ${DEFAULT_DATA_SUBDIR}    CACHE STRING "Subdirectory where QGIS data will be installed")
-#SET (QGIS_PLUGIN_SUBDIR  ${DEFAULT_PLUGIN_SUBDIR}  CACHE STRING "Subdirectory where plugins will be installed")
-#SET (QGIS_INCLUDE_SUBDIR ${DEFAULT_INCLUDE_SUBDIR} CACHE STRING "Subdirectory where header files will be installed")
+SET (QGIS_BIN_SUBDIR     ${DEFAULT_BIN_SUBDIR}     CACHE STRING "Subdirectory where executables will be installed")
+SET (QGIS_LIB_SUBDIR     ${DEFAULT_LIB_SUBDIR}     CACHE STRING "Subdirectory where libraries will be installed")
+SET (QGIS_DATA_SUBDIR    ${DEFAULT_DATA_SUBDIR}    CACHE STRING "Subdirectory where QGIS data will be installed")
+SET (QGIS_PLUGIN_SUBDIR  ${DEFAULT_PLUGIN_SUBDIR}  CACHE STRING "Subdirectory where plugins will be installed")
+SET (QGIS_INCLUDE_SUBDIR ${DEFAULT_INCLUDE_SUBDIR} CACHE STRING "Subdirectory where header files will be installed")
 
 # mark *_SUBDIR variables as advanced as this is not something
 # that an average user would use
 #MARK_AS_ADVANCED (QGIS_BIN_SUBDIR QGIS_LIB_SUBDIR QGIS_DATA_SUBDIR QGIS_PLUGIN_SUBDIR QGIS_INCLUDE_SUBDIR)
 
 # full paths for the installation
-#SET (QGIS_BIN_DIR     ${QGIS_BIN_SUBDIR})
-#SET (QGIS_LIB_DIR     ${QGIS_LIB_SUBDIR})
-#SET (QGIS_DATA_DIR    ${QGIS_DATA_SUBDIR})
-#SET (QGIS_PLUGIN_DIR  ${QGIS_PLUGIN_SUBDIR})
-#SET (QGIS_INCLUDE_DIR ${QGIS_INCLUDE_SUBDIR})
-
-    MESSAGE(STATUS "2) Found QGIS Plugins Dir: ${QGIS_PLUGIN_DIR}")
-    MESSAGE(STATUS "2) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")
-	MESSAGE(STATUS "2) Found QGIS Core Library: ${QGIS_CORE_LIBRARY}")
-	MESSAGE(STATUS "2) Found QGIS GUI Library: ${QGIS_GUI_LIBRARY}")
+SET (QGIS_BIN_DIR     ${QGIS_BIN_SUBDIR})
+SET (QGIS_LIB_DIR     ${QGIS_LIB_SUBDIR})
+SET (QGIS_DATA_DIR    ${QGIS_DATA_SUBDIR})
+SET (QGIS_PLUGIN_DIR  ${QGIS_PLUGIN_SUBDIR})
+SET (QGIS_INCLUDE_DIR ${QGIS_INCLUDE_SUBDIR})
 
 # manual page - makes sense only on unix systems
 IF (UNIX)
@@ -317,10 +432,6 @@ IF (UNIX)
   SET (QGIS_MANUAL_DIR  ${CMAKE_INSTALL_PREFIX}/${QGIS_MANUAL_SUBDIR})
 ENDIF (UNIX)
 
-    MESSAGE(STATUS "3) Found QGIS Plugins Dir: ${QGIS_PLUGIN_DIR}")
-    MESSAGE(STATUS "3) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")
-	MESSAGE(STATUS "3) Found QGIS Core Library: ${QGIS_CORE_LIBRARY}")
-	MESSAGE(STATUS "3) Found QGIS GUI Library: ${QGIS_GUI_LIBRARY}")
 
 #############################################################
 # Uninstall stuff see: http://www.vtk.org/Wiki/CMake_FAQ
@@ -331,11 +442,6 @@ CONFIGURE_FILE(
 
 ADD_CUSTOM_TARGET(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
-
-    MESSAGE(STATUS "4) Found QGIS Plugins Dir: ${QGIS_PLUGIN_DIR}")
-    MESSAGE(STATUS "4) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")
-	MESSAGE(STATUS "4) Found QGIS Core Library: ${QGIS_CORE_LIBRARY}")
-	MESSAGE(STATUS "4) Found QGIS GUI Library: ${QGIS_GUI_LIBRARY}")
 
 ########################################################
 # Files
@@ -389,7 +495,7 @@ SET (qrap_SRCS
     	DataBase/cRapLinks.cpp
     	DataBase/cRapServedKeyLocations.cpp
     	DataBase/cRapRasterFiles.cpp
-		DataBase/cRapMeasurements.cpp
+	DataBase/cRapMeasurements.cpp
     	DataBase/cSearchFormWidgets.cpp
     	DataBase/cSearchForm.cpp
     	DataBase/AdminWindow.cpp
@@ -405,14 +511,14 @@ SET (qrap_SRCS
     	DataBase/cCsvImportDialog.cpp
 	
 	Prediction/cMemmngr.cpp
-   Prediction/cAntpatn.cpp
-   Prediction/cBIN.cpp
-   Prediction/cBTLPredict.cpp
-   Prediction/cCoveragePredict.cpp
-   Prediction/cSpectralLink.cpp
-   Prediction/cSpectralPlot.cpp
-   Prediction/cGDAL.cpp
-   Prediction/cGeoP.cpp
+   	Prediction/cAntpatn.cpp
+   	Prediction/cBIN.cpp
+   	Prediction/cBTLPredict.cpp
+   	Prediction/cCoveragePredict.cpp
+   	Prediction/cSpectralLink.cpp
+   	Prediction/cSpectralPlot.cpp
+   	Prediction/cGDAL.cpp
+   	Prediction/cGeoP.cpp
 	Prediction/cPlotTask.cpp
 	Prediction/cProfile.cpp
 	Prediction/cClutter.cpp
@@ -467,21 +573,21 @@ SET (qrap_PLUGIN_SRCS
 )
 
 SET (qrap_UIS 
-   Interface/Site.ui
-   Interface/ConfirmLink.ui
-   Interface/LinkAnalysis.ui
-   Interface/ConfirmPrediction.ui
+   	Interface/Site.ui
+   	Interface/ConfirmLink.ui
+   	Interface/LinkAnalysis.ui
+   	Interface/ConfirmPrediction.ui
 	Interface/LoadMeasurements.ui
 	Interface/MeasurementAnalysis.ui
 	Interface/LoadRasterFiles/CreateDataSet.ui
 	Interface/LoadRasterFiles/CutSet.ui
 	Interface/LoadRasterFiles/LoadFiles.ui
 	Interface/LoadRasterFiles/LoadRasterFiles.ui
-   Interface/LinkAnalysis.ui
+   	Interface/LinkAnalysis.ui
 	Interface/Optimisation.ui
 	Interface/ConfirmSpectral.ui
 	Interface/ConfirmMultiLink.ui
-   Interface/ColourManager.ui
+   	Interface/ColourManager.ui
 	Interface/DeleteObject.ui
 	Interface/FilterDialog.ui
 	DataBase/Filter.ui
@@ -555,7 +661,7 @@ SET (qrap_MOC_HDRS
 	Interface/cSpectralAnalysis.h
 	Interface/cLinkAnalysis.h
 	Interface/cFilterDialog.h
-   Interface/cColourManager.h
+   	Interface/cColourManager.h
 	Interface/cDeleteObject.h
 	Interface/cBackup.h
 	Interface/cRestore.h
@@ -591,11 +697,6 @@ SET (qrap_RCCS  qrap.qrc
         DataBase/application.qrc 
 )
 
-	MESSAGE(STATUS "5) Found QGIS Plugins Dir: ${QGIS_PLUGIN_DIR}")
-	MESSAGE(STATUS "5) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")
-	MESSAGE(STATUS "5) Found QGIS Core Library: ${QGIS_CORE_LIBRARY}")
-	MESSAGE(STATUS "5) Found QGIS GUI Library: ${QGIS_GUI_LIBRARY}")
-
 INSTALL(CODE "MESSAGE(${CMAKE_CURRENT_BINARY_DIR})")
 
 ########################################################
@@ -610,32 +711,37 @@ QT4_ADD_RESOURCES(qrap_RCC_SRCS ${qrap_RCCS})
 ADD_LIBRARY (qrapplugin MODULE ${qrap_SRCS}  ${qrap_MOC_SRCS}  ${qrap_RCC_SRCS} ${qrap_UIS_H})
 
 INCLUDE_DIRECTORIES(
-      	${CMAKE_CURRENT_BINARY_DIR}
+     	${CMAKE_CURRENT_BINARY_DIR}
      	${QGIS_INCLUDE_DIR}
      	${GRASS_INCLUDE_DIR}
      	${GDAL_INCLUDE_DIR}
      	${PROJ_INCLUDE_DIR}
 	${POSTGRES_INCLUDE_DIR}
+	${PQXX_HEADER_PATH}
+#	${EIGEN3_INCLUDE_DIR}
+	${QWT_INCLUDE_DIR}
 	${QT_INCLUDES}
 	/usr/include
-	/usr/include/c++
-	/usr/include/qgis
+#	/usr/include/c++
+#	/usr/include/qgis
 	/usr/include/eigen3
-	/usr/include/gdal
-   /usr/include/Poco/
+#	/usr/include/gdal
+   	/usr/include/Poco/
 #	/usr/include/libcmaes/src/
 	/usr/include/qwt-qt4
 #	/usr/include/qwt
-  	/usr/include/pqxx
-	/usr/include/armadillo_bits
-	/usr/include/boost
-	../libcmaes/src
-	../libcmaes
+
+#	../libcmaes/src
+#	../libcmaes
 )
 
 TARGET_LINK_LIBRARIES(qrapplugin
 	${QGIS_CORE_LIBRARY}
 	${QGIS_GUI_LIBRARY}
+	${GDAL_LIBRARY}
+	${PROJ_LIBRARY}
+	${PQXX_LIBRARY}
+	${QWT_LIBRARY}
 	${GRASS_LIBRARIES}
 	${POSTGRES_LIBRARY}
 	${QT_LIBRARIES}
@@ -645,10 +751,10 @@ TARGET_LINK_LIBRARIES(qrapplugin
   	${QT_QTSVG_LIBRARY} 
   	${QT_QTNETWORK_LIBRARY} 
   	${QT_QTSQL_LIBRARY}
-    	libpqxx.so
+ #   	libpqxx.so
     	libPocoXML.so
-	libqgis_core.so
-  	libqgis_gui.so
+#	libqgis_core.so
+ # 	libqgis_gui.so
 	libqwt-qt4.so
 #	libqwt.so
 )
@@ -658,6 +764,8 @@ TARGET_LINK_LIBRARIES(qrapplugin
 	MESSAGE(STATUS "6) Found QGIS Core Library: ${QGIS_CORE_LIBRARY}")
 	MESSAGE(STATUS "6) Found QGIS GUI Library: ${QGIS_GUI_LIBRARY}")
     MESSAGE(STATUS "6) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")
+
+    MESSAGE(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
 ########################################################
 # Install

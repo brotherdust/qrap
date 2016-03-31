@@ -28,9 +28,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <pqxx>
+#include <pqxx/pqxx>
 
-using namespace pqxx;
+//using namespace pqxx;
 using namespace std;
 
 /// Converts to the new format

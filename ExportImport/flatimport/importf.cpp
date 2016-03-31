@@ -46,7 +46,7 @@ int ImportF::connectDB(const char *hname, const char *dbname, const char *uname,
 		sprintf(cstr,"user=%s password=%s dbname=%s host=%s",uname,password,dbname,hname);
 		
 		// set up the connection
-		conn = new connection(cstr);
+		conn = new pqxx::connection(cstr);
 
 	} catch(const exception &e) {
 		cout << e.what() << endl;
@@ -125,12 +125,12 @@ frequencyallocationlistlastmodified, frequencyallocationlistmachineid,frequencya
 
 void ImportF::execSQLCommand(const char *query)
 {
-	work *wv;
+	pqxx::work *wv;
 
 	try {
 
 		// create a new work object
-		wv = new work(*conn);
+		wv = new pqxx::work(*conn);
 
 		#ifdef IMPORTF_PRINTSQL
 			printf("[IMPORTF_SQL] [%s]\n",query);
@@ -341,10 +341,10 @@ void ImportF::dropTmpTables()
 void ImportF::dropTable(const char *tname)
 {
 	char buf[1024];
-	work *wv;
+	pqxx::work *wv;
 
 	// create a new work object
-	wv = new work(*conn);
+	wv = new pqxx::work(*conn);
 
 	try {
 		// create the SQL command
@@ -395,11 +395,11 @@ int ImportF::getMaxId(const char *tableName,const char *columnName)
 {
 	char query[512];
 	int N;
-	work *wv;
+	pqxx::work *wv;
 	string output;
 
 	// create a new work object
-	wv = new work(*conn);
+	wv = new pqxx::work(*conn);
 
 	try {
 
@@ -407,10 +407,10 @@ int ImportF::getMaxId(const char *tableName,const char *columnName)
 		sprintf(query,"SELECT MAX(%s) FROM %s;",columnName,tableName);
 
 		// perform the query
-		result R = wv->exec(query);
+		pqxx::result R = wv->exec(query);
 
 		// print the sites
-		result::const_iterator r = R.begin();
+		pqxx::result::const_iterator r = R.begin();
 
 		output = string(r[0].c_str());
 	

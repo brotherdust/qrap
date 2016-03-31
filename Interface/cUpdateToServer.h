@@ -37,7 +37,7 @@
 
 #include "ui_UpdateToServer.h"
 
-using namespace std;
+using std::string;
 
 namespace Qrap
 {

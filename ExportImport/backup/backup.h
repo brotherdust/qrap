@@ -33,9 +33,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <pqxx>
+#include <pqxx/pqxx>
 
-using namespace pqxx;
+//using namespace pqxx;
 using namespace std;
 
 /// Backs up a list of tables to a single tar archive.
@@ -62,7 +62,7 @@ public:
 
 protected:
 	// the connection
-	connection *conn;
+	pqxx::connection *conn;
 	// executes the query. throws an exception if unsuccessful.
 	void execSQLCommand(const char *query);
 

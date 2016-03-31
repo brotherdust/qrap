@@ -42,7 +42,7 @@ public:
 	int restoreFile(const char *fname);
 protected:
 	// the connection
-	connection *conn;
+	pqxx::connection *conn;
 	// executes the query. throws an exception if unsuccessful.
 	void execSQLCommand(const char *query);
 

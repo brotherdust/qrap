@@ -27,12 +27,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <pqxx>
+#include <pqxx/pqxx>
 
 #define EXPORTF_PRINTSQL // if defined, the SQL statements executed will be printed to STD out
 
 
-using namespace pqxx;
+//using pqxx::connection;
 
 class ExportF
 {
@@ -61,7 +61,7 @@ public:
 
 
 protected:
-	connection *conn;
+	pqxx::connection *conn;
 
 	/// Writes a table to a comma separated text file
 	/// \param tname The name of the table to export

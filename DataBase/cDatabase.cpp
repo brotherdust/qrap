@@ -23,17 +23,9 @@
  *                                                                         *
  ************************************************************************* */
 
-#include <iostream>
-#include <ctype.h>
-#include <cstdlib>
-#include <pqxx/pqxx>
-#include <pqxx/transaction>
-#include <pqxx/transactor>
-
-#include "Config.h"
 #include "cDatabase.h"
 
-using namespace std;
+using std::string;
 using namespace Qrap;
 
 /*

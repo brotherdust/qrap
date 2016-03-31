@@ -24,9 +24,9 @@
 
 #include <string>
 #include <vector>
-#include <pqxx>
+#include <pqxx/pqxx>
 
-using namespace pqxx;
+//using namespace pqxx;
 
 #include "cUpdateToServer.h"
 #include "../DataBase/cBase.h"

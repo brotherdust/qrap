@@ -48,9 +48,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 	Cols = 0;
 	string FN = Directory+"/" +FileName;
 	m_file_name = FN;
-//	cout << " In cGDAL::openFile(...) before GDALDataset constructor." << endl;
 	GDALDataset *poDataset;
-//	cout << " In cGDAL::openFile(...) before GDALOpen ..." << endl;
 	poDataset = (GDALDataset *) GDALOpen( m_file_name.c_str(), GA_ReadOnly );
 	if( poDataset == NULL )
 	{
@@ -72,12 +70,16 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
     	poDataset->GetRasterXSize(), poDataset->GetRasterYSize(),
     	poDataset->GetRasterCount() );
 */	
+//	cout << " In cGDAL::openFile(...) AFTER GDALOpen ..." << endl;
 	if( poDataset->GetProjectionRef() != NULL ) 
 	{
 		poSRS = OGRSpatialReference(poDataset->GetProjectionRef());
-		char *pszProjWKT[] = {NULL};
-
+		char **pszProjWKT;
+		pszProjWKT = new char*[1];
+		pszProjWKT[0] = new char[1];
+		cout << " In cGDAL::openFile(...) BEFORE poSRS.export ..." << endl;
 		poSRS.exportToProj4( pszProjWKT ); 
+//		cout << " In cGDAL::openFile(...) AFTER poSRS.export ..." << endl;
 
 		if ((Proj4=pj_init(sizeof(pszProjWKT)/sizeof(char*),pszProjWKT)))
 		{
@@ -87,17 +89,21 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		else
 		{
 			//printf("Error in: %s",pszProjWKT);
-			
-			char *pszProjWKT1[] = {"proj=latlong"};
+//			cout << " In cGDAL::openFile(...) in else ..." << endl;
+			char **pszProjWKT1;
+			pszProjWKT1 = new char*[1];
+			pszProjWKT1[0] = new char[13];
+			strcpy(pszProjWKT1[0],"proj=latlong");
+//			char *pszProjWKT1[] = {"proj=latlong"};
 			if ((Proj4=pj_init(sizeof(pszProjWKT1)/sizeof(char*),pszProjWKT1)))
 			{
 //				printf("Initialised Proj4: %s\n",pj_get_def(Proj4,0));	
 				Proj = DEG;
 			}
 			else printf("Error in: %s",*pszProjWKT);
-//			CSLDestroy( pszProjWKT1 );
+			CPLFree( pszProjWKT1 );
 		}
-//		CSLDestroy( pszProjWKT );
+		CPLFree( pszProjWKT );
 	}
 	else Proj = DEG;
 
@@ -119,6 +125,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 //		printf( "Band has %d overviews.\n", poBand->GetOverviewCount() );
 //	if( poBand->GetColorTable() != NULL )
 //		printf( "Band has a color table with %d entries.\n",poBand->GetColorTable()->GetColorEntryCount() );
+//	cout << " In cGDAL::openFile(...) before GetGeoTransform ..." << endl;
 	if( poDataset->GetGeoTransform( adfGeoTransform ) == CE_None )
 	{
 //		printf( "Origin = (%.6f,%.6f)\n",adfGeoTransform[0], adfGeoTransform[3] );
@@ -140,6 +147,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		//\TODO:Error message
 		return false;
 	}
+	cout << " In cGDAL::openFile(...) before delete Raster ..." << endl;
 //	cout << Raster << endl;
     	delete_Float2DArray(Raster);
 //    	cout << Raster << endl;
@@ -217,7 +225,7 @@ bool cGDAL::writeFile(Float2DArray &Raster,
 	char **papszMetadata;
 	
 	papszMetadata = poDataset->GetMetadata(NULL);
-	CSLSetNameValue( papszMetadata,"Generated Map","QRAP");
+	papszMetadata = CSLSetNameValue( papszMetadata,"Generated Map","QRAP");
 	
 	double North, West;
 	int TempCentMer;

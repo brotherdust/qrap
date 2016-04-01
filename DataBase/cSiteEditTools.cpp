@@ -249,7 +249,7 @@ int Qrap::GetGroundHeight(double lat, double lon)
 	{
 		GroundHeight = 0;
 //		QMessageBox::information(this, "QRap", "There are no height data for this point!");
-		QRAP_WARN("There are no height data for this point!");
+		QRAP_WARN("There are no height data for this point! Did you load height data /raster files into the database? Did you define which order they should be used in. See manual $3.4");
 	}
 	delete [] text;
 	return GroundHeight;

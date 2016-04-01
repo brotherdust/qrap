@@ -2,15 +2,14 @@
  *    QRAP Project
  *
  *    Version     : 0.1
- *    Date        : 2008/04/01
+ *    Date        : 2016/04/01
  *    License     : GNU GPLv3
  *    File        : qrap.cpp
  *    Copyright   : (c) University of Pretoria
- *    Author      : Dirk van der Merwe
- *                : Magdaleen Ballot 
+ *    Author      : Magdaleen Ballot 
  *                : email: magdaleen.ballot@up.ac.za
  *    Description : This is the main QRap plugin for QGIS. QRap is Radio
- *                  Planning Tool.
+ *                  Planning Tool. (www.QRap.org.za)
  *
  **************************************************************************
  *                                                                         *
@@ -27,6 +26,9 @@
 
 #include "qrap.h"
 //
+#include <qgisinterface.h>
+#include <qgisgui.h>
+
 // Qt4 Related Includes
 #include <QAction>
 #include <QToolBar>
@@ -45,18 +47,17 @@
  * @param theQGisInterface - Pointer to the QGIS interface object
  */
 
-static const QString pPluginIcon = ":/qrap/Coverage.png";
-//static const char * const pIdent = "$Id: qrap.cpp 9327 2008-06-10 11:18:44Z magdaleen $";
-static const QgisPlugin::PLUGINTYPE pPluginType = QgisPlugin::UI;
-static const QString pCategory = QObject::tr( "Database" );
-static const QString pName = QObject::tr("Q-Rap");
-static const QString pDescription = QObject::tr("Radio Systems Planning Tool");
-static const QString pPluginVersion = QObject::tr("Version 0.1");
+static const QString sPluginIcon = ":/qrap/Coverage.png";
+static const QgisPlugin::PLUGINTYPE sPluginType = QgisPlugin::UI;
+static const QString sCategory = QObject::tr( "Database" );
+static const QString sName = QObject::tr("Q-Rap");
+static const QString sDescription = QObject::tr("Radio Systems Planning Tool");
+static const QString sPluginVersion = QObject::tr("Version 0.1");
 
 
 //*************************************************************************
  QRap::QRap(QgisInterface * theQgisInterface):
-    QgisPlugin( pName, pDescription, pCategory, pPluginVersion, pPluginType ),
+    QgisPlugin( sName, sDescription, sCategory, sPluginVersion, sPluginType ),
 //		qgisMainWindow(theQgisInterface->mainWindow() ),
 		mQGisIface (theQgisInterface)
 {
@@ -81,10 +82,6 @@ void QRap::initGui()
 	mPoints.clear();
 	mMouseType = CLEAN;
 	// Create the action for tool
-  	cout << "VOOR DataBase Connect" << endl;
-  	openDatabaseConnection();
-  	cout << "Na DataBase Connect" << endl;
-
 
 	cout << "Voor new Actions" << endl;
 	mQActionPointer = new QAction(QIcon(":/qrap/Data.png"),tr("Q-Rap Database Interface"), this);
@@ -125,6 +122,7 @@ void QRap::initGui()
 
   	// Add the toolbar to the main window
   	mToolBarPointer = mQGisIface->addToolBar(tr("Q-Rap")); 
+	mQGisIface->addToolBar(mToolBarPointer);
   	mToolBarPointer->setIconSize(QSize(24,24));
   	mToolBarPointer->setObjectName("Q-Rap");
   	// Add the icon to the toolbar
@@ -147,10 +145,10 @@ void QRap::initGui()
 
 	mLoaded = true; 
  
-//  	openDatabaseConnection();
-//  	cout << "Na DataBase Connect" << endl;
+  	cout << "VOOR DataBase Connect" << endl;
+  	openDatabaseConnection();
+  	cout << "Na DataBase Connect" << endl;
 
-//  	mQGisIface->addToolBarIcon( mQActionPointer );
 //  	mQGisIface->addPluginToMenu( tr( "Q-Rap Database" ), mQActionPointer );
 
   	Mouse = new MouseEvents(mQGisIface->mapCanvas());
@@ -170,14 +168,14 @@ void QRap::help()
 // Unload the plugin by cleaning up the GUI
 void QRap::unload()
 {
-	if (mLoaded)
-	{
+  	if (mLoaded)
+  	{
 	  	// remove the GUI  
-  
-	  	mToolBarPointer->removeAction(mSiteAction);
+	
+  		mToolBarPointer->removeAction(mSiteAction);
 		mToolBarPointer->removeAction(mSelectSiteAction);
 		mToolBarPointer->removeAction(mDeleteSiteAction);
-	  	mToolBarPointer->removeAction(mLinkAction);
+  		mToolBarPointer->removeAction(mLinkAction);
 		mToolBarPointer->removeAction(mSelectLinkAction);
 		mToolBarPointer->removeAction(mDeleteLinkAction);
 	  	mToolBarPointer->removeAction(mRadioAction);
@@ -186,7 +184,7 @@ void QRap::unload()
 	  	mToolBarPointer->removeAction(mSpectralAction);
 		mToolBarPointer->removeAction(mPreferencesAction);
 		mToolBarPointer->removeAction(mMeasAnalysisAction);
-	   mToolBarPointer->removeAction(mQActionPointer);
+		mToolBarPointer->removeAction(mQActionPointer);
 
 	  	delete mQActionPointer;
 	  	delete mSelectSiteAction;
@@ -203,8 +201,9 @@ void QRap::unload()
 		
 		delete mToolBarPointer;
 
-		disconnect(Mouse);
+	//	disconnect(Mouse);
 	//	delete Mouse;
+//		mQGisIface->removeToolBar(mToolBarPointer);
 		mLoaded =false;
 
 	}
@@ -239,35 +238,42 @@ QGISEXTERN QgisPlugin * classFactory(QgisInterface * theQgisInterfacePointer)
 // the class may not yet be insantiated when this method is called.
 QGISEXTERN QString name()
 {
-	return pName;
+	return sName;
 }
 
 //*******************************************************************************
 // Return the description
 QGISEXTERN QString description()
 {
-	return pDescription;
+	return sDescription;
 }
 
 //********************************************************************************
 // Return the type (either UI or MapLayer plugin)
 QGISEXTERN int type()
 {
-	return pPluginType;
+	return sPluginType;
 }
 
 //********************************************************************************
 // Return the version number for the plugin
 QGISEXTERN QString version()
 {
-	return pPluginVersion;
+	return sPluginVersion;
 }
 
 //********************************************************************************
 // Return the Icon for the plugin
 QGISEXTERN QString icon()
 {
-  return pPluginIcon;
+  return sPluginIcon;
+}
+
+//********************************************************************************
+// Return the category
+QGISEXTERN QString category()
+{
+  return sCategory;
 }
 
 //*******************************************************************************
@@ -383,6 +389,7 @@ void QRap::run()
 //**************************************************************************************
 void QRap::PlaceSite()
 {
+	cout << " in QRap::PlaceSite() " << endl;
 	mMouseType = PLACESITE;
 	mQGisIface->mapCanvas()->setMapTool(Mouse);
 }
@@ -390,6 +397,7 @@ void QRap::PlaceSite()
 //************************************************************************************
 void QRap::Prediction()
 {
+	cout << " in QRap::Prediction() " << endl;
 	mMouseType = AREA;
 	InitRubberBand(true);
 }
@@ -397,6 +405,7 @@ void QRap::Prediction()
 //************************************************************************************
 void QRap::CreateLinkAnalysis()
 {
+	cout << " in QRap::CreateLinkAnalysis() " << endl;
 	mMouseType = LINK1;
 	InitRubberBand(false);
 }
@@ -404,6 +413,7 @@ void QRap::CreateLinkAnalysis()
 //*************************************************************************************
 void QRap::SpectralAnalysis()
 {
+	cout << " in QRap::SpectralAnalysis() " << endl;
 	mMouseType = SPECTRAL;
 	InitRubberBand(true);
 }
@@ -411,6 +421,7 @@ void QRap::SpectralAnalysis()
 //*************************************************************************************
 void QRap::MultiLink()
 {
+	cout << " in QRap::MultiLink() " << endl;
 	mMouseType = MULTILINK;
 	InitRubberBand(true);
 }
@@ -418,6 +429,7 @@ void QRap::MultiLink()
 //*************************************************************************************
 void QRap::ReceivedRightPoint(QgsPoint &Point)
 {
+	cout << " in QRap::ReceivedRIGHTPoint(QgsPoint &Point) " << endl;
 	if (mMouseType != CLEAN)
 	{
 		if (mMouseType == PLACESITE)
@@ -621,6 +633,7 @@ void QRap::ReceivedLeftPoint(QgsPoint &Point)
 //*****************************************************************************************
 void QRap::PlaceSiteDialog(double lat, double lon,bool IsOld)
 {
+	cout << " In QRap::PlaceSiteDialog" << endl;
 	QString Lat = QString("%1").arg(lat);
 	QString Lon = QString("%1").arg(lon);
 	mPlacedSite = new cPlaceSite(mQGisIface, mQGisIface->mainWindow(), QgisGui::ModalDialogFlags);
@@ -655,6 +668,7 @@ void QRap::MoveSiteDialog(double lat, double lon)
 //***************************************************************************************
 void QRap::ReceiveMouseMove(QgsPoint &Point)
 {
+//	cout << "QRap::ReceiveMouseMove" << endl;
 	if (mMouseType != CLEAN || mMouseType!=PLACESITE)
 	{
 		 mRubberBand->movePoint(Point);
@@ -664,6 +678,7 @@ void QRap::ReceiveMouseMove(QgsPoint &Point)
 //***************************************************************************************
 void QRap::UpdateSiteLayer()
 {
+	cout << "QRap::UpdateSiteLayer()" << endl;
 	int LayerCount = mQGisIface->mapCanvas()->layerCount();
 	QString temp = QString("%1").arg(LayerCount);
 	QMessageBox::information(mQGisIface->mainWindow(), "Q-Rap", temp);
@@ -672,6 +687,7 @@ void QRap::UpdateSiteLayer()
 //****************************************************************************************
 void QRap::InitRubberBand(bool IsArea)
 {
+	cout << "QRap::InitRubberBand(bool IsArea) " << endl;
 	mQGisIface->mapCanvas()->setMapTool(Mouse);
 	QGis::GeometryType bArea;
 	if (IsArea)
@@ -700,67 +716,7 @@ void QRap::DesRubberBand()
 	mQGisIface->mapCanvas()->setCursor(Qt::ArrowCursor);
 }
 
-//*****************************************************************************************
-void QRap::SelectSite()
-{
-	mMouseType = SELECTSITE;
-	mQGisIface->mapCanvas()->setMapTool(Mouse);
-	mQGisIface->mapCanvas()->setCursor(Qt::ArrowCursor);	
-}
 
-//***********************************************************************************
-void QRap::SelectLink()
-{
-	mMouseType = SELECTLINK;
-	cout << " Set Select Link " << endl;
-	mQGisIface->mapCanvas()->setMapTool(Mouse);
-	mQGisIface->mapCanvas()->setCursor(Qt::ArrowCursor);
-}
-
-//************************************************************************************
-void QRap::Preferences()
-{
-	PreferencesDialog *Preferences = new PreferencesDialog();
-	Preferences->show();
-}
-
-//************************************************************************************
-void QRap::Optimise()
-{
-	mMouseType = OPTIMISATION;
-	InitRubberBand(true);
-}
-
-//************************************************************************************
-void QRap::Measurements()
-{
-	cMeasurementAnalysis *Measurements = new cMeasurementAnalysis();
-	Measurements->show();
-}
-
-
-//****************************************************************************************
-void QRap::ImportExport()
-{
-	printf("QRap::ImportExport\n");
-
-	// create a new menu
-//	cImportExportMenu *ifMenuDialog = new cImportExportMenu();
-
-	// set the db username and password
-//	ifMenuDialog->setDB(dbusername,dbpassword);
-//	ifMenuDialog->setMachine(machinename);
-	
-	// show the menu
-//	ifMenuDialog->show();
-}
-
-//******************************************************************
-void QRap::Help()
-{
-	// launch the help file in evince
-//	system("evince /usr/share/doc/qrap/manual.pdf&");
-}
 
 
 //***************************************************************
@@ -919,6 +875,7 @@ void QRap::PerformOptimisation()
 void QRap::DeleteLink()
 {
 	mMouseType = DELETELINK;
+	cout << " Delete Link " << endl;
 	mQGisIface->mapCanvas()->setMapTool(Mouse);
 	mQGisIface->mapCanvas()->setCursor(Qt::ArrowCursor);
 }
@@ -927,6 +884,7 @@ void QRap::DeleteLink()
 void QRap::DeleteSite()
 {
   	mMouseType = DELETESITE;
+	cout << " Delete Site " << endl;
 	mQGisIface->mapCanvas()->setMapTool(Mouse);
 	mQGisIface->mapCanvas()->setCursor(Qt::ArrowCursor);	
 }
@@ -934,8 +892,73 @@ void QRap::DeleteSite()
 //********************************************************
  void QRap::SelectArea()
 {
+	cout << " Select Area " << endl;
   	mMouseType = FILTERAREA;
 	InitRubberBand(true);
+}
+
+//*****************************************************************************************
+void QRap::SelectSite()
+{
+	mMouseType = SELECTSITE;
+	cout << " Set Select SITE " << endl;
+	mQGisIface->mapCanvas()->setMapTool(Mouse);
+	mQGisIface->mapCanvas()->setCursor(Qt::ArrowCursor);	
+}
+
+//***********************************************************************************
+void QRap::SelectLink()
+{
+	mMouseType = SELECTLINK;
+	cout << " Set Select Link " << endl;
+	mQGisIface->mapCanvas()->setMapTool(Mouse);
+	mQGisIface->mapCanvas()->setCursor(Qt::ArrowCursor);
+}
+
+//************************************************************************************
+void QRap::Preferences()
+{
+	PreferencesDialog *Preferences = new PreferencesDialog();
+	Preferences->show();
+}
+
+//************************************************************************************
+void QRap::Optimise()
+{
+	mMouseType = OPTIMISATION;
+	cout << " Optimise Mesh network " << endl;
+	InitRubberBand(true);
+}
+
+//************************************************************************************
+void QRap::Measurements()
+{
+	cMeasurementAnalysis *Measurements = new cMeasurementAnalysis();
+	Measurements->show();
+}
+
+
+//****************************************************************************************
+void QRap::ImportExport()
+{
+	printf("QRap::ImportExport\n");
+
+	// create a new menu
+//	cImportExportMenu *ifMenuDialog = new cImportExportMenu();
+
+	// set the db username and password
+//	ifMenuDialog->setDB(dbusername,dbpassword);
+//	ifMenuDialog->setMachine(machinename);
+	
+	// show the menu
+//	ifMenuDialog->show();
+}
+
+//******************************************************************
+void QRap::Help()
+{
+	// launch the help file in evince
+//	system("evince /usr/share/doc/qrap/manual.pdf&");
 }
 
 //********************************************************

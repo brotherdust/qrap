@@ -48,7 +48,7 @@ cConfirmPrediction::cConfirmPrediction(QgisInterface * QgisInt,
 	LoadDefaults();
 	mQGisIface = QgisInt;
 	mMapCanvas = mQGisIface->mapCanvas();
-	mMapRenderer = mMapCanvas->mapRenderer();
+	mMapRenderer = mMapCanvas->mapSettings();
 }
 
 /***********************************************************/

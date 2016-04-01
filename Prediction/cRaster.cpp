@@ -61,10 +61,12 @@ cRaster::cRaster(string Directory,
 	mSouth = Hem;
 	mMin = Min;
 	mMax = Max;
+//	cout << "In CRaster Non-default constructor ... BEFORE mProj4 assignment." << endl;
 	if (mProjType != NDEF && Proj4String != "")
 		mProj4=pj_init_plus(Proj4String.c_str());
 	else if (mProjType != NDEF && Proj4String == "")
 		ReturnProj4(mProjType,mCentMer,mSouth,mProj4);
+//	cout << "In CRaster Non-default constructor ... after mProj4 assignment." << endl;
 	mNSres = 1.0;
 	mEWres = 1.0;
 	mDirectory = Directory;
@@ -75,6 +77,7 @@ cRaster::cRaster(string Directory,
 	ReadFile(Directory, FileName,filetype,mProjType,
 							Proj4String,CentMer,mSouth,
 							mMin,mMax);
+//	cout << "In CRaster Non-default constructor ... after ReadFile assignment." << endl;
 	if (mSouth)
 	{
 		mNW.SetGeoType(mProjType,mCentMer);
@@ -85,7 +88,7 @@ cRaster::cRaster(string Directory,
 		mNW.SetGeoType(mProjType,mCentMer);
 		mNW.Get(mMapLat,mMapLon,mMapType,mMapCM,Hem);
 	}
-//	cout << "Constructer Raster: " << mFilename << endl << endl;
+	cout << "Constructer Raster: " << mFilename << endl << endl;
 /*	cout << "mSouth = ";
 	if (mSouth) cout << " true" << endl;
 	else cout << " false" << endl;
@@ -248,6 +251,7 @@ bool cRaster::ReadFile(string Directory,
 	mSouth = Hem;
 	mMin = Min;
 	mMax = Max;
+
 	if (Proj != mProjType)
 	{
 		if (mProjType != NDEF && Proj4String != "")
@@ -272,9 +276,7 @@ bool cRaster::ReadFile(string Directory,
 	}
 	else if (filetype == GDALFILE) // GDAL file 
 	{
-//		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE ...)" << endl;
 		cGDAL MyRaster;
-//		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE ...) before cGDAL.openFile" << endl;
 		msgs = MyRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax);
 	}
@@ -340,7 +342,7 @@ bool cRaster::ReadFile(string Directory,
 
 	if (msgs)
 	{	
-//		cout << "In bool cRaster::ReadFile( ... msgs true " << endl;	
+		cout << "In bool cRaster::ReadFile( ... msgs true " << endl;	
 		if (CentMer != -1 && CentMer != mCentMer)
 			mCentMer = CentMer;
 		if (Min > mMin)	mMin = Min;

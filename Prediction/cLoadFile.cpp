@@ -59,9 +59,7 @@ bool cLoadFile::LoadFile(string SrcDirectory,
 									int CentMer,
 									bool Hem)
 {
-	cout << "In cLoadfile.cpp LoadFile" << endl; 
 	StructMetaData MapHeader;
-	cout << "In cLoadfile.cpp LoadFile Before cRaster constructer" << endl; 
 	cRaster INRaster(SrcDirectory, FileName,filetype,Proj,Proj4String,CentMer,Hem);
 
 	cGeoP NW,SE;

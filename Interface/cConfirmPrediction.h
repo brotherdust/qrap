@@ -97,7 +97,7 @@ private:
 	QStringList wordWrap( QString theString,
                           QFontMetrics theMetrics,
                           int theWidth );
-	QgsMapRenderer *mMapRenderer; 
+	QgsMapSettings mMapRenderer; 
 	QgsMapCanvas * mMapCanvas; 
 	
 	

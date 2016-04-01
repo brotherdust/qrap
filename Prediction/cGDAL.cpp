@@ -77,7 +77,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		char **pszProjWKT;
 		pszProjWKT = new char*[1];
 		pszProjWKT[0] = new char[1];
-		cout << " In cGDAL::openFile(...) BEFORE poSRS.export ..." << endl;
+//		cout << " In cGDAL::openFile(...) BEFORE poSRS.export ..." << endl;
 		poSRS.exportToProj4( pszProjWKT ); 
 //		cout << " In cGDAL::openFile(...) AFTER poSRS.export ..." << endl;
 
@@ -101,9 +101,11 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 				Proj = DEG;
 			}
 			else printf("Error in: %s",*pszProjWKT);
-			CPLFree( pszProjWKT1 );
+//			cout << " In cGDAL::openFile(...) BEFORE CPLFree( pszProjWKT1 ) 11111" << endl;
+//			CPLFree( pszProjWKT1 );
 		}
-		CPLFree( pszProjWKT );
+//		cout << "In cGDAL::openFile(...) BEFORE CPLFree( pszProjWKT )" << endl;
+//		CPLFree( pszProjWKT );
 	}
 	else Proj = DEG;
 
@@ -147,7 +149,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		//\TODO:Error message
 		return false;
 	}
-	cout << " In cGDAL::openFile(...) before delete Raster ..." << endl;
+//	cout << " In cGDAL::openFile(...) before delete Raster ..." << endl;
 //	cout << Raster << endl;
     	delete_Float2DArray(Raster);
 //    	cout << Raster << endl;

@@ -402,6 +402,14 @@ IF(ENABLE_COVERAGE)
   SETUP_TARGET_FOR_COVERAGE(qgis_coverage ctest coverage)
 ENDIF(ENABLE_COVERAGE)
 
+
+
+###############################################################
+FIND_PACKAGE(QGIS REQUIRED)
+IF (NOT QGIS_FOUND)
+  MESSAGE (SEND_ERROR "QGIS dependency was not found!")
+ENDIF (NOT QGIS_FOUND)
+
 #############################################################
 # user-changeable settings which can be used to customize
 # layout of QGIS installation
@@ -432,7 +440,6 @@ IF (UNIX)
   SET (QGIS_MANUAL_DIR  ${CMAKE_INSTALL_PREFIX}/${QGIS_MANUAL_SUBDIR})
 ENDIF (UNIX)
 
-
 #############################################################
 # Uninstall stuff see: http://www.vtk.org/Wiki/CMake_FAQ
 CONFIGURE_FILE(
@@ -442,7 +449,6 @@ CONFIGURE_FILE(
 
 ADD_CUSTOM_TARGET(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
-
 
 ########################################################
 # Files
@@ -712,7 +718,7 @@ QT4_ADD_RESOURCES(qrap_RCC_SRCS ${qrap_RCCS})
 ADD_LIBRARY (qrapplugin MODULE ${qrap_SRCS}  ${qrap_MOC_SRCS}  ${qrap_RCC_SRCS} ${qrap_UIS_H})
 
 INCLUDE_DIRECTORIES(
-     	${CMAKE_CURRENT_BINARY_DIR}
+      	${CMAKE_CURRENT_BINARY_DIR}
      	${QGIS_INCLUDE_DIR}
      	${GRASS_INCLUDE_DIR}
      	${GDAL_INCLUDE_DIR}
@@ -732,9 +738,10 @@ INCLUDE_DIRECTORIES(
 	/usr/include/qwt-qt4
 #	/usr/include/qwt
 
-#	../libcmaes/src
-#	../libcmaes
+	../libcmaes/src
+	../libcmaes
 )
+
 
 TARGET_LINK_LIBRARIES(qrapplugin
 	${QGIS_CORE_LIBRARY}

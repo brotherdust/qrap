@@ -410,6 +410,9 @@ IF (NOT QGIS_FOUND)
   MESSAGE (SEND_ERROR "QGIS dependency was not found!")
 ENDIF (NOT QGIS_FOUND)
 
+    MESSAGE(STATUS "1) Found QGIS Plugins Dir: ${QGIS_PLUGIN_DIR}")
+    MESSAGE(STATUS "1) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")
+
 #############################################################
 # user-changeable settings which can be used to customize
 # layout of QGIS installation
@@ -432,6 +435,11 @@ SET (QGIS_DATA_DIR    ${QGIS_DATA_SUBDIR})
 SET (QGIS_PLUGIN_DIR  ${QGIS_PLUGIN_SUBDIR})
 SET (QGIS_INCLUDE_DIR ${QGIS_INCLUDE_SUBDIR})
 
+    MESSAGE(STATUS "2) Found QGIS Plugins Dir: ${QGIS_PLUGIN_DIR}")
+    MESSAGE(STATUS "2) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")
+	MESSAGE(STATUS "2) Found QGIS Core Library: ${QGIS_CORE_LIBRARY}")
+	MESSAGE(STATUS "2) Found QGIS GUI Library: ${QGIS_GUI_LIBRARY}")
+
 # manual page - makes sense only on unix systems
 IF (UNIX)
   SET (DEFAULT_MANUAL_SUBDIR  man)
@@ -439,6 +447,11 @@ IF (UNIX)
   MARK_AS_ADVANCED (QGIS_MANUAL_SUBDIR)
   SET (QGIS_MANUAL_DIR  ${CMAKE_INSTALL_PREFIX}/${QGIS_MANUAL_SUBDIR})
 ENDIF (UNIX)
+
+    MESSAGE(STATUS "3) Found QGIS Plugins Dir: ${QGIS_PLUGIN_DIR}")
+    MESSAGE(STATUS "3) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")
+	MESSAGE(STATUS "3) Found QGIS Core Library: ${QGIS_CORE_LIBRARY}")
+	MESSAGE(STATUS "3) Found QGIS GUI Library: ${QGIS_GUI_LIBRARY}")
 
 #############################################################
 # Uninstall stuff see: http://www.vtk.org/Wiki/CMake_FAQ
@@ -449,6 +462,12 @@ CONFIGURE_FILE(
 
 ADD_CUSTOM_TARGET(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+
+    MESSAGE(STATUS "4) Found QGIS Plugins Dir: ${QGIS_PLUGIN_DIR}")
+    MESSAGE(STATUS "4) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")
+	MESSAGE(STATUS "4) Found QGIS Core Library: ${QGIS_CORE_LIBRARY}")
+	MESSAGE(STATUS "4) Found QGIS GUI Library: ${QGIS_GUI_LIBRARY}")
+
 
 ########################################################
 # Files
@@ -704,6 +723,11 @@ SET (qrap_RCCS  qrap.qrc
         DataBase/application.qrc 
 )
 
+	MESSAGE(STATUS "5) Found QGIS Plugins Dir: ${QGIS_PLUGIN_DIR}")
+	MESSAGE(STATUS "5) Found QGIS Include Dir: ${QGIS_INCLUDE_DIR}")
+	MESSAGE(STATUS "5) Found QGIS Core Library: ${QGIS_CORE_LIBRARY}")
+	MESSAGE(STATUS "5) Found QGIS GUI Library: ${QGIS_GUI_LIBRARY}")
+
 INSTALL(CODE "MESSAGE(${CMAKE_CURRENT_BINARY_DIR})")
 
 ########################################################
@@ -742,14 +766,9 @@ INCLUDE_DIRECTORIES(
 	../libcmaes
 )
 
-
 TARGET_LINK_LIBRARIES(qrapplugin
 	${QGIS_CORE_LIBRARY}
 	${QGIS_GUI_LIBRARY}
-	${GDAL_LIBRARY}
-	${PROJ_LIBRARY}
-	${PQXX_LIBRARY}
-	${QWT_LIBRARY}
 	${GRASS_LIBRARIES}
 	${POSTGRES_LIBRARY}
 	${QT_LIBRARIES}
@@ -759,10 +778,10 @@ TARGET_LINK_LIBRARIES(qrapplugin
   	${QT_QTSVG_LIBRARY} 
   	${QT_QTNETWORK_LIBRARY} 
   	${QT_QTSQL_LIBRARY}
- #   	libpqxx.so
+    	libpqxx.so
     	libPocoXML.so
-#	libqgis_core.so
- # 	libqgis_gui.so
+	libqgis_core.so
+  	libqgis_gui.so
 	libqwt-qt4.so
 #	libqwt.so
 )

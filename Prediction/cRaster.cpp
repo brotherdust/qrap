@@ -88,7 +88,7 @@ cRaster::cRaster(string Directory,
 		mNW.SetGeoType(mProjType,mCentMer);
 		mNW.Get(mMapLat,mMapLon,mMapType,mMapCM,Hem);
 	}
-	cout << "Constructer Raster: " << mFilename << endl << endl;
+	cout << "Constructer Raster: " << mFilename << endl;
 /*	cout << "mSouth = ";
 	if (mSouth) cout << " true" << endl;
 	else cout << " false" << endl;
@@ -342,7 +342,7 @@ bool cRaster::ReadFile(string Directory,
 
 	if (msgs)
 	{	
-		cout << "In bool cRaster::ReadFile( ... msgs true " << endl;	
+//		cout << "In bool cRaster::ReadFile( ... msgs true " << endl;	
 		if (CentMer != -1 && CentMer != mCentMer)
 			mCentMer = CentMer;
 		if (Min > mMin)	mMin = Min;

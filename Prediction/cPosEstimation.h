@@ -26,21 +26,21 @@
 #ifndef cPosEstimation_h
 #define cPosEstimation_h 1
 
-#define GAMMA 2.5
+#define GAMMA 2.4
 #define MOBILEHEIGHT 1
-#define SIGMA2 (6.4*6.4)
+#define SIGMA2 (8*8)
 #define MARGIN 15
 #define SENSITIVITY -110
-#define NUMPARTICLES 40  
+#define NUMPARTICLES 40
+#define MINSTEPSIZE 30  
 #define INERTIA 0.7
 #define Cp 1.4
 #define Cg 1.4
-#define STOPN 50
+#define STOPN 20
 #define MAXITERpos 50
-#define DELTA 5e-10
+#define DELTA 5e-8
 
 // include local headers
-//#include "../libcmaes/src/cmaes.h"
 #include "../DataBase/Config.h"
 #include "../DataBase/cDatabase.h"
 #include "cGeoP.h"
@@ -55,12 +55,13 @@
 #include "doublefann.h"
 #include "fann_cpp.h"
 #include "cTrainPosNetDistAngle.h"
+#include "/home/maggie/libcmaes-master/src/cmaes.h"
 
 //#include "cTrainAntPattern.h"
 
 using namespace std;
 using namespace Qrap;
-//using namespace libcmaes;
+using namespace libcmaes;
 
 enum eMethod
 {
@@ -183,7 +184,7 @@ class cPosEstimation
 	void EstimatePositions();
 	int SaveResults();
 
-//	static FitFunc CostCMA_ES;
+	static FitFunc CostCMA_ES;
 	static vPosSet mPosSets;		/// an array with all the testpoints
 	static unsigned mNumInsts;	
 	static unsigned mCurPosI;
@@ -227,14 +228,13 @@ class cPosEstimation
 	bool CoSinRule();
 	bool DCM_ParticleSwarm();
 	bool ExhaustiveSearch();
-//	int DCM_CMA_ES();
+	int DCM_CMA_ES();
 	bool ANNrun();
 
 	// In this function the default mobile installation 
 	// with height of MOBILEHEIGHT (#defined) and an isotropic antenna. 
 	double CostFunction(double rho, double phi);
 	bool SetSearchBoundaries();
-
 
 	FANN::neural_net *mCurANNa;
 	FANN::neural_net *mCurANNd;

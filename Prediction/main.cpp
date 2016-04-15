@@ -201,7 +201,7 @@ int main (int argc, char **argv)
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
+
 
   	query = "update qrap_config set value='true' where name = 'UseAntANN';";
 	if (!gDb.PerformRawSql(query))
@@ -211,7 +211,7 @@ int main (int argc, char **argv)
 	Meas.SetUseAntANN(true);
    Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
+*/
 //   Meas.OptimiseHeights(1);
 /*
 	Meas.OptimiseModelCoefAllTotal(1);
@@ -262,8 +262,9 @@ for ( i=4; i>=0; i--)
 */
 /*
 	cTrainPosNetDistAngle NeuralNets;
-	vPoints Punte;
-	cGeoP *Hoek;
+//	vPoints Punte;
+//	cGeoP *Hoek;
+	Punte.clear();
 	Hoek = new cGeoP[5];
 
 	Hoek[0].Set(-26.06, 28.26);
@@ -375,13 +376,11 @@ for ( i=4; i>=0; i--)
 	cout << hoek << "		" << angle << endl;
 */
 
-
-/*
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
 	cout << "Na constructor" << endl;
-	vPoints Punte;
-	cGeoP *Hoek;
+//	vPoints Punte;
+//	cGeoP *Hoek;
 	Hoek = new cGeoP[4];
 
 	Hoek[0].Set(-26.06, 28.26);
@@ -395,10 +394,15 @@ for ( i=4; i>=0; i--)
 	
 	delete [] Hoek;
 
-  	query = "truncate positionestimate cascade;";
+ 	query = "truncate positionestimate cascade;";
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error truncating positionestimate" << endl;
+	}
+  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
 	}
 
 	cout << "Voor LoadMeasurements" << endl;
@@ -415,15 +419,15 @@ for ( i=4; i>=0; i--)
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
 
-
+/*
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
-*/
+
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-/*
+
 	Meas. LoadMeasurements(0,0,4);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Voor4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl;

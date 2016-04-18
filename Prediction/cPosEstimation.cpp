@@ -711,7 +711,7 @@ void cPosEstimation::EstimatePositions()
 			CI();
 			DCM_ParticleSwarm();
 			ExhaustiveSearch();
-			DCM_CMA_ES();
+//			DCM_CMA_ES();
 			ANNrun();
 
 			for (j=0; j<mPosSets[mCurPosI].sTestPoints.size(); j++)
@@ -2192,7 +2192,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //	return altCost;
 }
 
-
+/*
 // ***********************************************************************************************
 // Cost function for CMA-ES
 FitFunc cPosEstimation::CostCMA_ES = [&](const double *x, const int N) 
@@ -2405,7 +2405,7 @@ int cPosEstimation::DCM_CMA_ES()
   return cmasols.run_status();
 }
 
-
+*/
 //*******************************************************************
 bool cPosEstimation::ANNrun()
 {

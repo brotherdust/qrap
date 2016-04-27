@@ -949,7 +949,8 @@ bool cDatabase::TableExists (const string& tableName, bool Spatial)
 		query += "));";
 		if (!PerformRawSql(query))
 		{
-			QRAP_ERROR("Unable to get current Sequence value for table");
+//			QRAP_ERROR("Unable to get current Sequence value for table");
+			cout << "Unable to get current Sequence value for table" << endl;
 //			throw cAlert(msAlertCode);
 		}
 	}	
@@ -1684,8 +1685,8 @@ bool cDatabase::GetFieldUiParams (const string& tableName, const string& fieldNa
 			cols.push_back("id");
 			cols.push_back(field);
 			
-			cout <<  "now attempt to select the field from the given table=";
-			cout << table <<"	field=" << field << endl;
+//			cout <<  "now attempt to select the field from the given table=";
+//			cout << table <<"	field=" << field << endl;
 			if (!Select("id,"+field, table, ""))
 			{
 				msAlertCode = acDbNotAllowed;
@@ -1695,7 +1696,7 @@ bool cDatabase::GetFieldUiParams (const string& tableName, const string& fieldNa
 			
 			// run through the results and populate the output parameters list
 			len = mLastResult.size();
-			cout << "success: len=" << len << endl;
+//			cout << "success: len=" << len << endl;
 			for (i=0;i<len;i++)
 			{
 				id = atoi(mLastResult[i]["id"].c_str());

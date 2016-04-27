@@ -159,7 +159,7 @@ cRapFormBuilder::cRapFormBuilder (QWidget* parent, QString tableName, QTableWidg
 	// Get the database structure
 	gDb.GetDbStructure(mDbs);
 	
-	cout << "cRapFormBuilder::cRapFormBuilder Voor rowCount:"<< mTableView->rowCount() << endl;
+//	cout << "cRapFormBuilder::cRapFormBuilder Voor rowCount:"<< mTableView->rowCount() << endl;
 	if(mTableView->rowCount()<=0)
 		insert=true;
 	mLayoutRow++;	
@@ -167,14 +167,14 @@ cRapFormBuilder::cRapFormBuilder (QWidget* parent, QString tableName, QTableWidg
 	if(insert)
 	{
 		// Get the default values for the mTable
-		cout << "cRapFormBuilder::cRapFormBuilder insert is TRUE" << endl;
+///		cout << "cRapFormBuilder::cRapFormBuilder insert is TRUE" << endl;
 		if(!gDb.GetDefaults(mTable.toStdString(),mDefaults))
 		{
 			cout << "Could not load the mDefaults." << endl;
 			return;
 		} // if
 		
-		cout << "cRapFormBuilder::cRapFormBuilder Voor GenericInsert" << endl;
+//		cout << "cRapFormBuilder::cRapFormBuilder Voor GenericInsert" << endl;
 		if(mTable=="antennadevice")
 			CreateAntennaDeviceForm();
 		else
@@ -182,10 +182,10 @@ cRapFormBuilder::cRapFormBuilder (QWidget* parent, QString tableName, QTableWidg
 	} // if insert
 	else
 	{
-		cout << "cRapFormBuilder::cRapFormBuilder insert is FALSE" << endl;
-		cout << "cRapFormBuilder::cRapFormBuilder Voor GenericUpdate" << endl;
+//		cout << "cRapFormBuilder::cRapFormBuilder insert is FALSE" << endl;
+//		cout << "cRapFormBuilder::cRapFormBuilder Voor GenericUpdate" << endl;
 		CreateGenericUpdateForm();
-		cout << "cRapFormBuilder::cRapFormBuilder Na GenericUpdate" << endl;
+//		cout << "cRapFormBuilder::cRapFormBuilder Na GenericUpdate" << endl;
 	} // else insert
 	
 }
@@ -211,7 +211,7 @@ cRapFormBuilder::cRapFormBuilder (StringMap ref, QWidget* parent,
 	if ((mButtonRow<0)||(mButtonRow>1000))
 		mButtonRow=0;	
 	mButtonRow =0;
-	cout << "cRapFormBuilder::cRapFormBuilder for table; mButtonRow = " << mButtonRow << endl;
+//	cout << "cRapFormBuilder::cRapFormBuilder for table; mButtonRow = " << mButtonRow << endl;
 	// make sure that there is an mUpdate button
 	mUpdateButton = new QPushButton("&Update",this);
 	mUpdateButton->setVisible(false);
@@ -270,6 +270,21 @@ cRapFormBuilder::cRapFormBuilder (StringMap ref, QWidget* parent,
 	mFormLayout->addWidget(mDefaultRadiosButton,10,1,1,1,Qt::AlignLeft);
 	connect(mDefaultRadiosButton,SIGNAL(clicked()),this,SLOT(InsertDefaultRadios()));
 
+        mCalculateRxLossesButton = new QPushButton("Calculate &Rx Losses",this);
+	mCalculateRxLossesButton->setToolTip("Calculate the rx losses.");
+	mCalculateRxLossesButton->setVisible(false);
+	mCalculateRxLossesButton->setEnabled(false);
+	mFormLayout->addWidget(mCalculateRxLossesButton,15,3,1,1,Qt::AlignRight);
+	connect(mCalculateRxLossesButton,SIGNAL(clicked()),this,SLOT(CalculateRXLosses()));
+        
+        mCalculateTxLossesButton = new QPushButton("Calculate &Tx Losses",this);
+	mCalculateTxLossesButton->setToolTip("Calculate the tx losses.");
+	mCalculateTxLossesButton->setVisible(false);
+	mCalculateTxLossesButton->setEnabled(false);
+	mFormLayout->addWidget(mCalculateTxLossesButton,9,3,1,1,Qt::AlignRight);
+	connect(mCalculateTxLossesButton,SIGNAL(clicked()),this,SLOT(CalculateTXLosses()));
+
+
 	mButtonPosX0 = mUpdateButton->pos().x();
 	mButtonPosX1 = mPreviousButton->pos().x();
 	mButtonPosX2 = mNextButton->pos().x();
@@ -288,17 +303,25 @@ cRapFormBuilder::cRapFormBuilder (StringMap ref, QWidget* parent,
 		mDefaultRadiosButton->setEnabled(true);
 	}
 
+        if (mTable == "radioinstallation")
+        {
+               mCalculateRxLossesButton->setVisible(true);
+               mCalculateRxLossesButton->setEnabled(true);
+               mCalculateTxLossesButton->setVisible(true);
+               mCalculateTxLossesButton->setEnabled(true);
+        }
+
 	// Get the database structure
 	gDb.GetDbStructure(mDbs);
 	
-	cout << "cRapFormBuilder::cRapFormBuilder Voor rowCount:"<< mTableView->rowCount() << endl;
+//	cout << "cRapFormBuilder::cRapFormBuilder Voor rowCount:"<< mTableView->rowCount() << endl;
 	if(mTableView->rowCount()<=0)
 		insert=true;
 	mLayoutRow++;	
 	if(insert)
 	{
 
-		cout << "cRapFormBuilder::cRapFormBuilder overloaded insert is TRUE" << endl;	
+//		cout << "cRapFormBuilder::cRapFormBuilder overloaded insert is TRUE" << endl;	
 		// Get the default values for the mTable
 		if(!gDb.GetDefaults(mTable.toStdString(),mDefaults))
 		{
@@ -313,7 +336,7 @@ cRapFormBuilder::cRapFormBuilder (StringMap ref, QWidget* parent,
 	} // if insert
 	else
 	{
-		cout << "cRapFormBuilder::cRapFormBuilder overloaded insert is FALSE" << endl;
+//		cout << "cRapFormBuilder::cRapFormBuilder overloaded insert is FALSE" << endl;
 		CreateGenericUpdateForm();
 	} // else insert
 }
@@ -336,7 +359,7 @@ int cRapFormBuilder::InsertData (const QString& tableName, QMap<QString,QWidget*
 	string where="";
 	char *text = new char[33];
 	int Int;
-	cout<<"cRapFormBuilder::InsertData ... Data insert begin"<<endl;	
+//	cout<<"cRapFormBuilder::InsertData ... Data insert begin"<<endl;	
 	while(it.hasNext())
 	{
 		it.next();
@@ -537,7 +560,7 @@ int cRapFormBuilder::InsertData (const QString& tableName, QMap<QString,QWidget*
 					type = cDatabase::dtString;
 				}
 				
-				cout << "cRapFormBuilder::InsertData	type = "<< type << endl;
+//				cout << "cRapFormBuilder::InsertData	type = "<< type << endl;
 				if(uiType == cDatabase::utNormal)
 				{
 					switch(type)
@@ -687,7 +710,7 @@ int cRapFormBuilder::InsertData (const QString& tableName, QMap<QString,QWidget*
 		mCurrentRecordID=newId;
 	} // else mode
 	
-	cout <<"cRapFormBuilder::InsertData voor mTableView stuff" << endl;
+//	cout <<"cRapFormBuilder::InsertData voor mTableView stuff" << endl;
 	// Synchronise the changes made in the form with the mTable view
 	if(antennaDevice==false)
 	{
@@ -698,7 +721,7 @@ int cRapFormBuilder::InsertData (const QString& tableName, QMap<QString,QWidget*
 			mUpdate=false;
 		if(!mUpdate)
 		{
-			cout <<"cRapFormBuilder::InsertData NOT mUpdate" << endl;
+//			cout <<"cRapFormBuilder::InsertData NOT mUpdate" << endl;
 			mTableView->setSortingEnabled(false);
 			mTableView->setRowCount(mTableView->rowCount()+1);
 			if (mTableView->currentRow()<0)
@@ -764,7 +787,7 @@ int cRapFormBuilder::InsertData (const QString& tableName, QMap<QString,QWidget*
 	if (mButtonRow)
 		mLayoutDelta = mButtonPosY/mButtonRow;
 	else mLayoutDelta = mButtonPosY;
-*/	cout<<"Data insert completed"<<endl;
+*///	cout<<"Data insert completed"<<endl;
 	return newId;
 }
 
@@ -773,7 +796,7 @@ int cRapFormBuilder::InsertData (const QString& tableName, QMap<QString,QWidget*
 // Populate the forms widgets with new data from the mTable view
 void cRapFormBuilder::PopulateForm ()
 {
-	cout << "Entering cRapFormBuilder::PopulateForm ()" << endl;
+//	cout << "Entering cRapFormBuilder::PopulateForm ()" << endl;
 	int size = mTableView->columnCount();
 	QString fieldName;
 	cDatabase::FieldUiType uiType;
@@ -783,10 +806,10 @@ void cRapFormBuilder::PopulateForm ()
 	char *text = new char[33];
 	bool rowReadOnly = false;
 	int id=0;
-	cout << "cRapFormBuilder::PopulateForm (): mTableView->currentRow() = " << mTableView->currentRow()<< endl;
+//	cout << "cRapFormBuilder::PopulateForm (): mTableView->currentRow() = " << mTableView->currentRow()<< endl;
 	if ((mTableView->currentRow()<0)||(mTableView->currentRow() > mTableView->rowCount()-1)) 
 		mTableView->setCurrentCell(0,0);
-	cout << "cRapFormBuilder::PopulateForm (): 2 mTableView->currentRow() = " << mTableView->currentRow()<< endl;
+//	cout << "cRapFormBuilder::PopulateForm (): 2 mTableView->currentRow() = " << mTableView->currentRow()<< endl;
 	for(int i=0; i<size ; i++)
 	{
 		QTableWidgetItem* item = mTableView->item(mTableView->currentRow(),i);
@@ -1122,14 +1145,14 @@ void cRapFormBuilder::PopulateForm ()
 				} // if contains
 		} // while
 	}
-	cout << "cRapFormBuilder::PopulateForm (): 3 mTableView->currentRow() = " << mTableView->currentRow()<< endl;
+//	cout << "cRapFormBuilder::PopulateForm (): 3 mTableView->currentRow() = " << mTableView->currentRow()<< endl;
 /*	mUpdateButton->move(mButtonRow*mLayoutDelta,mButtonPosX0);
 	mCommitButton->move(mButtonRow*mLayoutDelta,mButtonPosX0);
 	mCommitAddNextButton->move(mButtonRow*mLayoutDelta,mButtonPosX1);
 	mNextButton->move(mButtonRow*mLayoutDelta,mButtonPosX2);
 	mPreviousButton->move(mButtonRow*mLayoutDelta,mButtonPosX1);
 */	delete [] text;
-	cout << "Leaving cRapFormBuilder::PopulateForm ()" << endl;
+//	cout << "Leaving cRapFormBuilder::PopulateForm ()" << endl;
 }
 
 
@@ -1137,16 +1160,15 @@ void cRapFormBuilder::PopulateForm ()
 void cRapFormBuilder::Insert ()
 {
 	int TempID = InsertData(mTable, mFormWidgets);
-	if (TempID!=-1)
+	if (TempID>-1)
 	{
 		mCurrentRecordID = TempID;
-		cout << "In cRapFormBuilder::Insert ()  mCurrentRecordID = " << mCurrentRecordID << endl;
+//		cout << "In cRapFormBuilder::Insert ()  mCurrentRecordID = " << mCurrentRecordID << endl;
 		mCommitButton->setVisible(false);
 		mCommitButton->setEnabled(false);
 		mCommitAddNextButton->setVisible(false);
 		mCommitAddNextButton->setEnabled(false);
 		emit InsertComplete(TempID);
-	
 //		Clear();
 	
 		// Create the form grid layout
@@ -1155,20 +1177,25 @@ void cRapFormBuilder::Insert ()
 //		mFormLayout = new QGridLayout(this);
 			
 		// make sure that there is an mUpdate button
-///		mUpdateButton->move(mButtonRow*mLayoutDelta,0);
-		mUpdateButton->setVisible(true);
-		mUpdateButton->setEnabled(false);
-		mUpdate=false;
-		mInserting =false;
+		if (mUpdate)
+		{
+			mUpdateButton->move(mButtonRow*mLayoutDelta,0);
+			mUpdateButton->setVisible(true);
+			mUpdateButton->setEnabled(false);
+			mUpdate=false;
+		}
 
-//		mNextButton->move(mButtonRow*mLayoutDelta,2*mFormLayout->horizontalSpacing());
+		mInserting =false;
+		mNextButton->move(mButtonRow*mLayoutDelta,2*mFormLayout->horizontalSpacing());
 		mNextButton->setVisible(true);
 		mNextButton->setEnabled(true);
-//		mPreviousButton->move(mButtonRow*mLayoutDelta,mFormLayout->horizontalSpacing());
+		mPreviousButton->move(mButtonRow*mLayoutDelta,mFormLayout->horizontalSpacing());
 		mPreviousButton->setVisible(true);
 		mPreviousButton->setEnabled(true);
-//		CreateGenericUpdateForm();
+		CreateGenericUpdateForm();
 	}
+
+	
 	if (mTable=="site")
 	{
 		mCloseByButton->setVisible(true);
@@ -1178,13 +1205,17 @@ void cRapFormBuilder::Insert ()
 		mDefaultRadiosButton->setVisible(true);
 		mDefaultRadiosButton->setEnabled(true);
 	}
+
         if (mTable == "radioinstallation")
         {
+//	cout << "In cRapFormBuilder::VOOR RX" << mCurrentRecordID << endl;
                mCalculateRxLossesButton->setVisible(true);
                mCalculateRxLossesButton->setEnabled(true);
+//	cout << "In cRapFormBuilder::VOOR TX" << mCurrentRecordID << endl;
                mCalculateTxLossesButton->setVisible(true);
                mCalculateTxLossesButton->setEnabled(true);
         }
+//	cout << "In cRapFormBuilder::Insert leaving " << endl;
 }
 
 
@@ -1281,14 +1312,14 @@ void cRapFormBuilder::ImportAntennaFromFile ()
 void cRapFormBuilder::NextRecord ()
 {
 	int currentRow = mTableView->currentRow();
-	cout << "cRapFormBuilder::NextRecord (); currentRow = " << currentRow << endl;
+//	cout << "cRapFormBuilder::NextRecord (); currentRow = " << currentRow << endl;
 	if ((currentRow<0)||(currentRow > mTableView->rowCount()-1))
 		currentRow=0;
 	else if (currentRow==mTableView->rowCount()-1)
 		currentRow=0;
 	else currentRow++;
 
-	cout << "cRapFormBuilder::NextRecord (); currentRow = " << currentRow << endl;	
+//	cout << "cRapFormBuilder::NextRecord (); currentRow = " << currentRow << endl;	
 	mTableView->setCurrentCell(currentRow,0);
 	mTableView->selectRow(currentRow);
 	
@@ -1843,15 +1874,15 @@ void cRapFormBuilder::CreateFormWidget (QString fieldName,
 	QStringList location;
 	string setting;
 	bool direction = true;
-	cout << " Entering cRapFormBuilder::CreateFormWidget" << endl;
+//	cout << " Entering cRapFormBuilder::CreateFormWidget" << endl;
 
-	if (mInserting) cout << "cRapFormBuilder::CreateFormWidget mInserting is true." << endl;
-	else cout << "cRapFormBuilder::CreateFormWidget mInserting is false." << endl;
+//	if (mInserting) cout << "cRapFormBuilder::CreateFormWidget mInserting is true." << endl;
+//	else cout << "cRapFormBuilder::CreateFormWidget mInserting is false." << endl;
 
 	switch(type)
 	{
 		case cDatabase::dtPostGisPoint:
-				cout << " dtPostGisPoint in cRapFormBuilder::CreateFormWidget" << endl;
+//				cout << " dtPostGisPoint in cRapFormBuilder::CreateFormWidget" << endl;
 			
 			// Add the radio buttons to the form
 			widgets.insert(fieldName+":DDMMSS",static_cast<QWidget*>(new QRadioButton("DD:MM:SS X",this)));
@@ -2145,7 +2176,7 @@ void cRapFormBuilder::CreateFormWidget (QString fieldName,
 // Create the insert form
 void cRapFormBuilder::CreateGenericInsertForm ()
 {
-	cout << "REFERENCES SIZE IN cRapFormBuilder::CreateGenericInsertForm "<< mReferences.size() << endl;
+//	cout << "REFERENCES SIZE IN cRapFormBuilder::CreateGenericInsertForm "<< mReferences.size() << endl;
 	bool rowReadOnly=false;
 	mUpdate=false;
 	mInserting =true;
@@ -2445,8 +2476,8 @@ void cRapFormBuilder::CreateGenericUpdateForm ()
 		CreateGenericInsertForm ();
 		return;	
 	}
-	cout << " Entering cRapFormBuilder::CreateGenericUpdateForm ()" << endl;
-	cout << "REFERENCES SIZE IN cRapFormBuilder::CreateGenericUpdateForm ()  "<< mReferences.size() << endl;
+//	cout << " Entering cRapFormBuilder::CreateGenericUpdateForm ()" << endl;
+//	cout << "REFERENCES SIZE IN cRapFormBuilder::CreateGenericUpdateForm ()  "<< mReferences.size() << endl;
 	bool rowReadOnly=false;
 	// Create the Push Buttons
 	mNextButton->setVisible(true);
@@ -2456,7 +2487,7 @@ void cRapFormBuilder::CreateGenericUpdateForm ()
 	mUpdateButton->setVisible(true);
 	
 	// Add the buttons to the form layout
-	cout << "cRapFormBuilder::CreateGenericUpdateForm ()    mTableView->currentRow() = " <<  mTableView->currentRow() << endl;
+//	cout << "cRapFormBuilder::CreateGenericUpdateForm ()    mTableView->currentRow() = " <<  mTableView->currentRow() << endl;
 	int size = mTableView->columnCount();
 	int mLayoutRow = 2;
 	int id=0;
@@ -2464,7 +2495,7 @@ void cRapFormBuilder::CreateGenericUpdateForm ()
 	{
 		mTableView->setCurrentCell(0,0);
 	}
-	cout << "cRapFormBuilder::CreateGenericUpdateForm ()  Voor lus; size="<< size << endl;
+//	cout << "cRapFormBuilder::CreateGenericUpdateForm ()  Voor lus; size="<< size << endl;
 	for( int i=0 ; i<size ; i++ )
 	{
 		bool readOnly=false;
@@ -2474,8 +2505,8 @@ void cRapFormBuilder::CreateGenericUpdateForm ()
 			mTableView->selectRow(mTableView->rowCount()-1);	
 		int row = mTableView->currentRow();
 		if (row<0) row=0;
-		cout << "cRapFormBuilder::CreateGenericUpdateForm() RowCount = "<< mTableView->rowCount() << endl;
-		cout << "cRapFormBuilder::CreateGenericUpdateForm() currentRow = "<< mTableView->currentRow() << endl;
+//		cout << "cRapFormBuilder::CreateGenericUpdateForm() RowCount = "<< mTableView->rowCount() << endl;
+//		cout << "cRapFormBuilder::CreateGenericUpdateForm() currentRow = "<< mTableView->currentRow() << endl;
 		// Get the mTable header item and the data item
 		QTableWidgetItem* header = mTableView->horizontalHeaderItem(i);
 		QTableWidgetItem* item = mTableView->item(row,i);

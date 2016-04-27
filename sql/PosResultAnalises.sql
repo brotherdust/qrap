@@ -187,6 +187,8 @@ from Results) as temp
 group by positionsource, Error
 order by positionsource, Error;
 
+select * from positionsource;
+
 select * from measurement;
 
 drop table measedist;

@@ -53,7 +53,10 @@ int main (int argc, char** argv)
 				cout << "Unable to create database." << endl;
 				return 1;
 			}
-			cout << endl << "Success." << endl;
+			cout << endl << endl << "Even though you may have received several " 
+				<< "ERROR and FATAL messages that unfortunately is difficult to avoid " 
+				<< "during database creation process the database has been create with " << endl;
+			cout << "SUCCESS." << endl;
 			
 			return 0;
 		}

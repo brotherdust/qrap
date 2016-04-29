@@ -329,18 +329,21 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 
 	bool AfterReceiver = (mUnits!=dBWm2Hz) && (mUnits!=dBWm2);	
 
-	eAnt Which;
-	if (mDownlink) Which =Tx;
-	else Which = Rx;
-	mTxAnt.SetAntennaPattern(mTxInst.sInstKey, Which, mTxInst.sTxAzimuth,  mTxInst.sTxMechTilt);
-	if (mDownlink) Which =Rx;
-	else Which = Tx;
-	mRxAnt.SetAntennaPattern(mRxInst.sInstKey, Which, mRxInst.sRxAzimuth,  mRxInst.sRxMechTilt);
-	if (mDownlink) EIRP = mTxInst.sTxPower - mTxInst.sTxSysLoss + mTxAnt.mGain;
-	else mRxInst.sTxPower - mRxInst.sTxSysLoss + mRxAnt.mGain;
+	if (!Trial)
+	{
+		eAnt Which;
+		if (mDownlink) Which =Tx;
+		else Which = Rx;
+		mTxAnt.SetAntennaPattern(mTxInst.sInstKey, Which, mTxInst.sTxAzimuth,  mTxInst.sTxMechTilt);
+		if (mDownlink) Which =Rx;
+		else Which = Tx;
+		mRxAnt.SetAntennaPattern(mRxInst.sInstKey, Which, mRxInst.sRxAzimuth,  mRxInst.sRxMechTilt);
+		if (mDownlink) EIRP = mTxInst.sTxPower - mTxInst.sTxSysLoss + mTxAnt.mGain;
+		else mRxInst.sTxPower - mRxInst.sTxSysLoss + mRxAnt.mGain;
+	}
 
 	AfterReceiver = (mUnits==dBW)||(mUnits==dBm)||(mUnits==dBuV);
-	if (AfterReceiver)
+	if ((AfterReceiver)&&(!Trial))
 	{
 		if (mDownlink)
 			LinkOtherGain = EIRP -  mRxInst.sRxSysLoss + mRxAnt.mGain;
@@ -367,16 +370,16 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	if (mUseClutter)
 		mClutter.GetForLink(mTxInst.sSitePos,mRxInst.sSitePos,mPlotResolution, Clutter);
 
-	cout << "cLink::DoLink( ... ) before Initialize" << endl; 
+//	cout << "cLink::DoLink( ... ) before Initialize" << endl; 
 	Initialize(DEM,Clutter);
 	SetEffProfile();	//Calculates the effective profile
 	SetLineOfSight();
 	SetFresnelClear();
 	
-	cout << "cLink::DoLink( ... ) before PathLoss.setParameters" << endl; 	
+//	cout << "cLink::DoLink( ... ) before PathLoss.setParameters" << endl; 	
 	PathLoss.setParameters(mkFactor,mFrequency,mTxInst.sTxHeight,mRxInst.sRxHeight,
 				mUseClutter,mClutterClassGroup);
-	cout << "cLink::DoLink( ... ) After PathLoss.setParameters" << endl;
+//	cout << "cLink::DoLink( ... ) After PathLoss.setParameters" << endl;
 	if (Length>0)	
 		j=(Length-1);
 	else
@@ -391,13 +394,17 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	else	
 		mRxBearing = mTxBearing - 180.0;
 	PathLoss.FindElevAngles(mTxTilt,mRxTilt);
-	cout << "cLink::DoLink( ... ) before mPropLoss loop" << endl;
+//	cout << "cLink::DoLink( ... ) before mPropLoss loop" << endl;
 	for (j=(Length-1); j>0 ; j--)
 	{
 		mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss);
-		TxAntValue = mTxAnt.GetPatternValue(mTxBearing, Tilt[j])
-					+ mRxAnt.GetPatternValue(mRxBearing, -Tilt[j]);
-		mRxLev[j] = -mPropLoss[j] + LinkOtherGain - TxAntValue;
+		if (!Trial)
+		{
+			TxAntValue = mTxAnt.GetPatternValue(mTxBearing, Tilt[j])
+						+ mRxAnt.GetPatternValue(mRxBearing, -Tilt[j]);
+			mRxLev[j] = -mPropLoss[j] + LinkOtherGain - TxAntValue;
+		}
+		else mRxLev[j] = -mPropLoss[j] + EIRP;
 		if (mUseClutter) Clutter.ReduceSize();
 		DEM.ReduceSize();
 	}
@@ -699,7 +706,8 @@ bool cLink::GetDBinfo(tFixed &Inst)
 	gcvt(Inst.sInstKey,8,temp);
 	if (mFrequency>59999)
 	{ // Get frequency from database
-		query = "SELECT siteid,ST_AsText(location) as location, eirp, txpower, txlosses, rxlosses, "; 			query += "rxsensitivity, frequency, ";
+		query = "SELECT siteid,ST_AsText(location) as location, eirp, txpower, txlosses, rxlosses, "; 			
+		query += "rxsensitivity, frequency, ";
 		query += "txantpatternkey, txbearing, txmechtilt, txantennaheight, ";
 		query += "rxantpatternkey, rxbearing, rxmechtilt, rxantennaheight ";
 		query += "FROM radioinstallation cross join site cross join cell ";

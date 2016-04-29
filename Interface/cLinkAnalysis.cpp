@@ -627,7 +627,7 @@ void cLinkAnalysis::CreatePDF(QString OutputFileName)
   	myPrintPainter->setPen( Qt::white );
   	myPrintPainter->drawRect( myRect );
   	myPrintPainter->setPen( Qt::black );
-  	myText="Elevation : ";
+  	myText="Elevation (m) : ";
 	myPrintPainter->drawText( myRect, Qt::AlignRight, myText );
   	myRect.setRect( myOriginX+myColumnWidth, myOriginY, myColumnWidth, myFontHeight );
   	myPrintPainter->setPen( Qt::white );
@@ -641,7 +641,7 @@ void cLinkAnalysis::CreatePDF(QString OutputFileName)
   	myPrintPainter->setPen( Qt::white );
   	myPrintPainter->drawRect( myRect );
   	myPrintPainter->setPen( Qt::black );
-  	myText="Antenna Height : ";
+  	myText="Antenna Height (m) : ";
 	myPrintPainter->drawText( myRect, Qt::AlignRight, myText );
   	myRect.setRect( myOriginX+myColumnWidth, myOriginY, myColumnWidth, myFontHeight );
   	myPrintPainter->setPen( Qt::white );

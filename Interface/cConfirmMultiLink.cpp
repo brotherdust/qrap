@@ -399,7 +399,7 @@ void cConfirmMultiLink::on_pushOk_clicked()
 						cout <<i << " x " << j << "  of " << size << " : ";
 						if (Link.DoLink(true,mMaxDist*1000))
 						{
-			    				MinClearance = Link.GetMinClearance();
+			    			MinClearance = Link.GetMinClearance();
 							PathLoss = Link.GetPathLoss();	
 							Work = (MinClearance>=mMinClear)
 								&&(PathLoss<=mMaxPath);
@@ -415,6 +415,7 @@ void cConfirmMultiLink::on_pushOk_clicked()
 								Link.SetRxInst(RxRadID);
 								LinkName="Link";
 								LinkID=0;
+								Link.DoLink(false);
 								Link.SaveLink(LinkName,LinkID);
 								if (SavePDF)
 								{

@@ -793,7 +793,7 @@ void cConfirmPrediction::on_btnDo_clicked()
 	MinimumAngularResolution=minAngleResSpinBox->value();
 	
 	///////////// MOBILE KEY!!!!!!!
-	cout << "Mobile key: ";
+	cout << "cConfirmPrediction::on_btnDo_clicked(). Mobile key: ";
 	QString Mob = mobileCombo->currentText();
 	Mob=Mob.mid(0,Mob.indexOf(":"));
 	MobileInstallationKey=(unsigned int)Mob.toDouble();
@@ -827,7 +827,7 @@ void cConfirmPrediction::on_btnDo_clicked()
 			
 	if (mPlotType == DEM)
 	{	
-		cout << "Entering DEM in QRap.cpp" << endl;
+		cout << "Entering DEM in cConfirmPrediction::on_btnDo_clicked()" << endl;
 		cRaster Output;
 		cRasterFileHandler DEM(DEMsourceList); 
 		string Dir = DirectoryToStoreResult.c_str();
@@ -850,9 +850,9 @@ void cConfirmPrediction::on_btnDo_clicked()
 		DistRes*=cDegResT;
 		FileWritten = Output.WriteFile(Data, NW, SE, Rows, Cols, DistRes, DistRes,
 						Dir,OutputFile,HFA,DEG,DEG,central);
-		cout << "Wrote Output in Qrap.cpp" << endl;
+		cout << "Wrote Output in cConfirmPrediction::on_btnDo_clicked()" << endl;
 		delete_Float2DArray(Data);
-		cout << "Deleted Output Array in QRap.cpp" << endl;
+		cout << "Deleted Output Array in cConfirmPrediction::on_btnDo_clicked()" << endl;
 	}//end if DEM
  	else if ((mPlotType==Cov)||(mPlotType==PrimServer)||(mPlotType==SecondServer)
  				||(mPlotType==NumServers)||(mPlotType==SN))

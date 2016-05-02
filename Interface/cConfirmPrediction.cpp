@@ -524,6 +524,8 @@ void cConfirmPrediction::on_btnDo_clicked()
 	btnDone->setEnabled(false);
 	btnCancel->setEnabled(false);
 	btnDo->setEnabled(false);
+	btnCancel->setVisible(false);
+	btnDo->setVisible(false);
 	radioArea->setEnabled(false);
 	radioRadius->setEnabled(false);
 

@@ -1664,6 +1664,7 @@ void Optimisation::saveLinks(int index, siteDetails sites[], linkDetails links[]
                                 sites[index].savedLinks++;
                                 sites[m].savedLinks++;
                                 
+											Link.DoLink(false);
                                 Link.SaveLink(LinkName, LinkID);
                                 
                                 cout << "Saved link between " << index << " and " << m << endl;
@@ -1770,6 +1771,7 @@ void Optimisation::saveSingleLink(linkDetails links[])
                         links[currLinkNum].distance = Link.GetDistance();
                         LinkName = "Link";
                         LinkID = 0;
+								Link.DoLink(false);
                         Link.SaveLink(LinkName, LinkID);
                         if ( SavePDF )
                         {

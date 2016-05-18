@@ -514,7 +514,8 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				mCells[i].sInputTest[j][3] = cos(Tilt*PI/180);
 				mCells[i].sInputTest[j][4] = sin(Tilt*PI/180);
 	
-				RxLevCalc = MIN(-mCells[i].sMin,EIRP) - PathLoss;
+//				RxLevCalc = MIN(-mCells[i].sMin,EIRP) - PathLoss;
+				RxLevCalc = EIRP -PathLoss;
 				if (RxLevCalc >-140) 
 							Delta = RxLevCalc - mCells[i].sMeasTrain[j].sMeasValue;
 				else Delta = -140 -  mCells[i].sMeasTrain[j].sMeasValue;	

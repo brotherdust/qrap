@@ -649,7 +649,7 @@ void cPathLossPredictor::FindElevAngles(float &ElevAngleTX, float &ElevAngleRX)
    // else R is infinite and yHeight does not change. (earth is already flat)
 
 	ElevSlopeTX = yHeight/xDist;
-	ElevAngleTX = (180.0*atan(ElevSlopeTX)/PI);
+	ElevAngleTX = -(180.0*atan(ElevSlopeTX)/PI);
 
 	Index = 0;
 	for(i=m_size-2; i>0 ;i--)
@@ -682,7 +682,7 @@ void cPathLossPredictor::FindElevAngles(float &ElevAngleTX, float &ElevAngleRX)
    	//else R is infinite and yHeight does not change. (earth is already flat)
 
 	ElevSlopeRX = yHeight/xDist;
-	ElevAngleRX = 180.0*atan(ElevSlopeRX)/PI;
+	ElevAngleRX = -180.0*atan(ElevSlopeRX)/PI;
 //	cout << "Rxh: " << m_hrx << "	Txh: " << m_htx << endl;
    
 }/* end CPathLossPredictor::FindElevAngle */

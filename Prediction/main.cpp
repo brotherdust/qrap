@@ -260,7 +260,7 @@ for ( i=4; i>=0; i--)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-/*
+
 	cTrainPosNetDistAngle NeuralNets;
 //	vPoints Punte;
 //	cGeoP *Hoek;
@@ -287,7 +287,7 @@ for ( i=4; i>=0; i--)
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
+
 /*
 	query = "update coefficients set coefficient=0.0;";
 
@@ -297,6 +297,14 @@ for ( i=4; i>=0; i--)
 	}
 */
 /*
+  	query = "update qrap_config set value='false' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+
+	Meas.SetUseAntANN(false);
+
 	cTrainAntPattern NeuralNets;
 	double Azimuth;
 
@@ -307,12 +315,12 @@ for ( i=4; i>=0; i--)
 	}
 	
 	cout << "In main Loading measurements " << endl;
-	NeuralNets.LoadMeasurements(Punte,0,0,1);
+	NeuralNets.LoadMeasurements(Punte,0,6);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
-/*
+
+
   	query = "update qrap_config set value='true' where name = 'UseAntANN';";
 	if (!gDb.PerformRawSql(query))
 	{
@@ -324,7 +332,8 @@ for ( i=4; i>=0; i--)
 
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
+*/
+/*
 	Meas.OptimiseOffsets(6);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "PostOffsets" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;

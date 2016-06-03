@@ -1,13 +1,13 @@
  /*
  *    QRAP Project
  *
- *    Version     : 0.1
- *    Date        : 2008/04/01
- *    License     : GNU GPLv3
- *    File        : cRasterFileHandler.cpp
- *    Copyright   : (c) University of Pretoria
- *    Author      : Magdaleen Ballot (magdaleen.ballot@up.ac.za)
- *    Description : Handler of one or many raster files ... gets the info out
+ *    Version        : 0.1
+ *    Date            : 2008/04/01
+ *    License        : GNU GPLv3
+ *    File        		  : cRasterFileHandler.cpp
+ *    Copyright      : (c) University of Pretoria
+ *    Author          : Magdaleen Ballot (magdaleen.ballot@up.ac.za)
+ *    Description   : Handler of one or many raster files ... gets the info out
  *
  **************************************************************************
  *                                                                         *

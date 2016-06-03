@@ -524,8 +524,6 @@ void cConfirmPrediction::on_btnDo_clicked()
 	btnDone->setEnabled(false);
 	btnCancel->setEnabled(false);
 	btnDo->setEnabled(false);
-	btnCancel->setVisible(false);
-	btnDo->setVisible(false);
 	radioArea->setEnabled(false);
 	radioRadius->setEnabled(false);
 
@@ -852,9 +850,9 @@ void cConfirmPrediction::on_btnDo_clicked()
 		DistRes*=cDegResT;
 		FileWritten = Output.WriteFile(Data, NW, SE, Rows, Cols, DistRes, DistRes,
 						Dir,OutputFile,HFA,DEG,DEG,central);
-		cout << "Wrote Output in cConfirmPrediction::on_btnDo_clicked()" << endl;
+		cout << "Wrote DEM Output in cConfirmPrediction::on_btnDo_clicked()" << endl;
 		delete_Float2DArray(Data);
-		cout << "Deleted Output Array in cConfirmPrediction::on_btnDo_clicked()" << endl;
+		cout << "Deleted DEM Output Array in cConfirmPrediction::on_btnDo_clicked()" << endl;
 	}//end if DEM
  	else if ((mPlotType==Cov)||(mPlotType==PrimServer)||(mPlotType==SecondServer)
  				||(mPlotType==NumServers)||(mPlotType==SN))
@@ -888,21 +886,21 @@ void cConfirmPrediction::on_btnDo_clicked()
 	bool getFromDB;
 	switch(mPlotType) // set up of the prediction's colour type
 	{
-		case Cov:		Plot = "Coverage";			getFromDB = true;	discrete = false;	break;
+		case Cov:					Plot = "Coverage";			getFromDB = true;	discrete = false;	break;
 		case PrimServer:	Plot = "Primary Server";		getFromDB = false;	discrete = false;	break;
 		case SecondServer:	Plot = "Secondary Server";		getFromDB = false;	discrete = false;	break;
 		case NumServers:	Plot = "Number of Servers";		getFromDB = true;	discrete = false;	break;
-		case DEM:		Plot = "Digital Elevation Model";	getFromDB = true;	discrete = false;	break;
+		case DEM:				Plot = "Digital Elevation Model";	getFromDB = true;	discrete = false;	break;
 		case IntRatioCo:	Plot = "Carrier to Co-channel Interference Ratio"; 	getFromDB = true;	discrete = false;	break;
 		case IntRatioAd:	Plot = "Carrier to Adjacent-channel Interf Ratio";	getFromDB = true;	discrete = false;	break;
 		case IntAreas:		Plot = "Interfered Areas"; 		getFromDB = false;	discrete = false;	break;
-		case NumInt:		Plot = "Number of Interferers"; 	getFromDB = true;	discrete = false;	break;
+		case NumInt:			Plot = "Number of Interferers"; 	getFromDB = true;	discrete = false;	break;
 		case PrimIntCo:		Plot = "Primary Co-channel Interferers";	getFromDB = false;	discrete = false;	break;
 		case PrimIntAd:		Plot = "Primary Adjacent-channel Interferers"; 	getFromDB = false;	discrete = false;	break;
-		case SN:		Plot = "Signal to Noise Ratio"; 	getFromDB = true;	discrete = false;	break;	
+		case SN:					Plot = "Signal to Noise Ratio"; 	getFromDB = true;	discrete = false;	break;	
 //		case EbNo:		Plot = "Energy per Bit to Noise Power"; getFromDB = true;	discrete = false;	break;
 //		case ServiceLimits;	Plot = "Service Limiters"; 		getFromDB = true;	discrete = false;	break;	
-		default:		Plot = "";				getFromDB = true;	discrete = false;	break;
+		default:					Plot = "";				getFromDB = true;	discrete = false;	break;
 	}
 	QString File = DirectoryToStoreResult.c_str();
 	File +="/"; //\TODO: Windows....

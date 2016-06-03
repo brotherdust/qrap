@@ -51,8 +51,8 @@ cPosEstimation::cPosEstimation() // default constructor
 	mClutter = new cRasterFileHandler();
 	mPathLoss= new cPathLossPredictor();
 	mLTEsim = false;
-	mOriginal = false;
-	mUMTS = true;
+	mOriginal = true;
+	mUMTS = false;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;

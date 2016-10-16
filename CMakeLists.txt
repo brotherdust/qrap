@@ -113,10 +113,6 @@ IF (WITH_BINDINGS)
   INCLUDE (Python) # file cmake/Python.cmake
 ENDIF (WITH_BINDINGS)
 
-FIND_PACKAGE(PQXX)
-MESSAGE(STATUS "pqxx include: ${PQXX_HEADER_PATH}")
-MESSAGE(STATUS "pqxx library: ${PQXX_LIBRARY}")
-
 IF (NOT PROJ_FOUND)
  	MESSAGE (SEND_ERROR "PROJ were not found!")
 ENDIF(NOT PROJ_FOUND)
@@ -131,6 +127,10 @@ IF (POSTGRES_FOUND)
   # following variable is used in qgsconfig.h
   SET (HAVE_POSTGRESQL TRUE)
 ENDIF (POSTGRES_FOUND)
+
+FIND_PACKAGE(PQXX)
+MESSAGE(STATUS "pqxx include: ${PQXX_HEADER_PATH}")
+MESSAGE(STATUS "pqxx library: ${PQXX_LIBRARY}")
 
 IF (SPATIALITE_FOUND)
   # following variable is used in qgsconfig.h

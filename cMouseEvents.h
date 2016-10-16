@@ -39,7 +39,7 @@ class QgsPoint;
 class QgsMapTool;
 
 
-	class MouseEvents  : public QgsMapTool
+	class MouseEvents  : public QgsMapToolEmitPoint
 	{ Q_OBJECT
 	public:
 		MouseEvents(QgsMapCanvas* canvas);
@@ -61,8 +61,6 @@ class QgsMapTool;
    	 //! cursor used in map tool
     	QCursor mCursor;
     
-    	// Current map tool
-//    	QgsMapTool* mToolEmitPoint;
 	};
 
 

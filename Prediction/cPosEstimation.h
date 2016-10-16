@@ -31,13 +31,13 @@
 #define SIGMA2 (8*8)
 #define MARGIN 15
 #define SENSITIVITY -110
-#define NUMPARTICLES 40
+#define NUMPARTICLES 20
 #define MINSTEPSIZE 30  
 #define INERTIA 0.7
 #define Cp 1.4
 #define Cg 1.4
-#define STOPN 20
-#define MAXITERpos 50
+#define STOPN 10
+#define MAXITERpos 20
 #define DELTA 5e-8
 
 // include local headers

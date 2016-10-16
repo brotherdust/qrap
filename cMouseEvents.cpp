@@ -30,35 +30,36 @@ MouseEvents::MouseEvents(QgsMapCanvas* canvas)
 {
 	//Debug("Mouse");
 	mCanvas = canvas;
-	mToolEmitPoint = new QgsMapToolEmitPoint(mCanvas);
-//  //mToolEmitPoint->setButton(btnPointFromCanvas);
-  connect((QgsMapToolEmitPoint*)mToolEmitPoint, SIGNAL(gotPoint(QgsPoint&,Qt::MouseButton)),
-          this, SLOT(setXY(QgsPoint&)));
 	mCanvas->setCursor(Qt::CrossCursor);
 }
 
+//********************************************************************************************
 MouseEvents::~MouseEvents()
 {
-//	delete mToolEmitPoint;
+
 }
 
+
+//**********************************************************************************************
 void MouseEvents::canvasReleaseEvent(QMouseEvent * e)
 {
 	//Debug("Button Pressed");
+	std::cout << " MouseEvents::canvasReleaseEvent enter " << endl << endl;
 	QgsPoint point = mCanvas->getCoordinateTransform()->toMapCoordinates(e->x(), e->y());
 
   if(e->button() == Qt::RightButton && (e->button() & Qt::LeftButton) == 0) // restart
   {
-	std::cout << " MouseEvents::canvasReleaseEvent left " << endl;
-    emit RightPoint(point);
+		std::cout << " MouseEvents::canvasReleaseEvent right " << endl << endl;
+    	emit RightPoint(point);
   } 
   else if (e->button()== Qt::LeftButton)
   {
-	std::cout << " MouseEvents::canvasReleaseEvent left " << endl;
-    emit LeftPoint(point);
+		std::cout << " MouseEvents::canvasReleaseEvent left " << endl << endl;
+    	emit LeftPoint(point);
   }
 }
 
+//**********************************************************************************************
 void MouseEvents::canvasMoveEvent(QMouseEvent * e)
 {
     QgsPoint point = mCanvas->getCoordinateTransform()->toMapCoordinates(e->pos().x(), e->pos().y());

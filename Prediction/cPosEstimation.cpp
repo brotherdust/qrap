@@ -51,8 +51,8 @@ cPosEstimation::cPosEstimation() // default constructor
 	mClutter = new cRasterFileHandler();
 	mPathLoss= new cPathLossPredictor();
 	mLTEsim = false;
-	mOriginal = true;
-	mUMTS = false;
+	mOriginal = false;
+	mUMTS = true;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -701,7 +701,7 @@ void cPosEstimation::EstimatePositions()
 														mUseClutter, mClutterClassGroup);
 			SetSearchBoundaries();
 	
-			if (mPosSets[mCurPosI].sMeasurements[0].sDistance<120001)		
+/*			if (mPosSets[mCurPosI].sMeasurements[0].sDistance<120001)		
 			{
 				CoSinRule();
 				if (!CI_TA())
@@ -709,11 +709,11 @@ void cPosEstimation::EstimatePositions()
 			}
 			else SecondSite();
 			CI();
-			DCM_ParticleSwarm();
-			ExhaustiveSearch();
+*/			DCM_ParticleSwarm();
+//			ExhaustiveSearch();
 //			DCM_CMA_ES();
-			ANNrun();
-
+//			ANNrun();
+/*
 			for (j=0; j<mPosSets[mCurPosI].sTestPoints.size(); j++)
 			{
 				cout << endl;
@@ -759,9 +759,11 @@ void cPosEstimation::EstimatePositions()
 				
 			} 
 //			cout << endl;
-
+*/
 		}
+
 	}
+
 	time_t endTime = time(0);
 	cout << endTime - beginTime << endl;
 }

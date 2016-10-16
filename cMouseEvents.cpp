@@ -26,7 +26,7 @@
 #include "cMouseEvents.h"
 
 MouseEvents::MouseEvents(QgsMapCanvas* canvas)
-  : QgsMapTool(canvas)
+  : QgsMapToolEmitPoint(canvas)
 {
 	//Debug("Mouse");
 	mCanvas = canvas;
@@ -47,22 +47,22 @@ void MouseEvents::canvasReleaseEvent(QMouseEvent * e)
 	std::cout << " MouseEvents::canvasReleaseEvent enter " << endl << endl;
 	QgsPoint point = mCanvas->getCoordinateTransform()->toMapCoordinates(e->x(), e->y());
 
-  if(e->button() == Qt::RightButton && (e->button() & Qt::LeftButton) == 0) // restart
-  {
+  	if(e->button() == Qt::RightButton && (e->button() & Qt::LeftButton) == 0) // restart
+  	{
 		std::cout << " MouseEvents::canvasReleaseEvent right " << endl << endl;
-    	emit RightPoint(point);
-  } 
-  else if (e->button()== Qt::LeftButton)
-  {
+    		emit RightPoint(point);
+  	} 
+  	else if (e->button()== Qt::LeftButton)
+  	{
 		std::cout << " MouseEvents::canvasReleaseEvent left " << endl << endl;
-    	emit LeftPoint(point);
-  }
+    		emit LeftPoint(point);
+  	}
 }
 
 //**********************************************************************************************
 void MouseEvents::canvasMoveEvent(QMouseEvent * e)
 {
-    QgsPoint point = mCanvas->getCoordinateTransform()->toMapCoordinates(e->pos().x(), e->pos().y());
+    	QgsPoint point = mCanvas->getCoordinateTransform()->toMapCoordinates(e->pos().x(), e->pos().y());
    	emit MouseMove(point);
 }
 

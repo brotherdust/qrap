@@ -62,7 +62,7 @@ class QgsMapTool;
     	QCursor mCursor;
     
     	// Current map tool
-    	QgsMapTool* mToolEmitPoint;
+//    	QgsMapTool* mToolEmitPoint;
 	};
 
 

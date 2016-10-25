@@ -91,7 +91,8 @@ namespace Qrap
 				double &ns_res,
 				double &ew_res,
 				float &min,
-				float &max);
+				float &max,
+				int CentMer);
 			
 			/**
 			 * Description of readRaster
@@ -134,16 +135,17 @@ namespace Qrap
 		private:
 			string ReturnProj4(GeoType Type,int CentMer, bool Hem=true);
 			GDALDataset  	*poDataset;
-			string 			m_file_name;
+			string 		m_file_name;
 			GDALRasterBand  *poBand;
 			int             nBlockXSize, nBlockYSize;
 			int             bGotMin, bGotMax;
 			double          adfMinMax[2];
-			float 			*pafScanline;
-			unsigned 		Rows,Cols;
-			double        	adfGeoTransform[6];
+			float 		*pafScanline;
+			unsigned 	Rows,Cols;
+			double *       	mAdfGeoTransform;
 			OGRSpatialReference poSRS;
 			static char 	**temp1;
+			bool		mSouth;
 	};
 }
 #endif /*GDAL_H_*/

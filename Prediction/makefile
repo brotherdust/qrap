@@ -1,4 +1,4 @@
-CC = g++ -g -Wall -W -D_REENTRANT -c -std=c++0x -std=gnu++0x -I/usr/include  -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4  -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/eigen3 -I/usr/include/c++/4.8.2/ -I/usr/local/include -I../libcmaes/ -I../libcmaes/src/
+CC = g++ -g -Wall -W -D_REENTRANT -c -std=c++0x -std=gnu++0x -I/usr/include  -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I/include -I/usr/include/qt4  -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/eigen3 -I/usr/include/c++/4.8.2/ -I/usr/local/#include -I../libcmaes/ -I../libcmaes/src/
 
 OBJECTS =  cTrafficDist.o cMemmngr.o cGeoP.o cAntpatn.o cLoadFile.o cClutter.o cPthlssp.o cProfile.o cLink.o cBTLPredict.o cCoveragePredict.o cPlotTask.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o cMeasAnalysisCalc.o cMeasImportSpace.o cMeasImportCSV.o  cTrainPosNetDistAngle.o cPosEstimation.o cMeas.o cCellList.o cTPoint.o cTrainAntPattern.o main.o
 
@@ -9,7 +9,7 @@ all: rap makefile
 #	$(CC) main.cpp 
 
 rap: $(OBJECTS) makefile
-	c++ -g -o rap $(OBJECTS) -L/usr/local/pgsql/lib  -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal -lproj  -lssl -lPocoXML  -lPocoFoundation -lQtCore -ldoublefann -lfann -L../libcmaes/src/.libs/ -lcmaes
+	c++ -g -o rap $(OBJECTS) -L/usr/local/pgsql/lib  -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal -lproj  -lssl -lPocoXML  -lPocoFoundation -lQtCore -ldoublefann -lfann #-L../libcmaes/src/.libs/ -lcmaes
 
 
 main.o: ../DataBase/Config.h main.cpp makefile

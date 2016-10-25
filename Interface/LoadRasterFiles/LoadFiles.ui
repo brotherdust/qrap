@@ -128,13 +128,8 @@
     <item>
      <widget class="QComboBox" name="comboBoxFileFormat">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
-      <item>
-       <property name="text">
-        <string>All</string>
-       </property>
-      </item>
       <item>
        <property name="text">
         <string>GDALFILE</string>
@@ -143,11 +138,6 @@
       <item>
        <property name="text">
         <string>BINFILE</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>ORTFILE</string>
        </property>
       </item>
      </widget>
@@ -346,13 +336,6 @@
     </item>
    </layout>
   </widget>
-  <zorder>tableWidgetFileSets</zorder>
-  <zorder>listWidgetFiles</zorder>
-  <zorder>horizontalLayout</zorder>
-  <zorder>label_6</zorder>
-  <zorder>pushButtonImport</zorder>
-  <zorder>gridLayout</zorder>
-  <zorder>labelDirectory</zorder>
  </widget>
  <resources/>
  <connections/>

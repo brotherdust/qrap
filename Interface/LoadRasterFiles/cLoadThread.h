@@ -46,7 +46,7 @@ public:
 	virtual ~cLoadThread();
 	
 	void Set(unsigned Source,
-					unsigned Bin,
+				unsigned Bin,
 					GeoType Type,
 					int CentMer,
 					string Dir,
@@ -82,9 +82,9 @@ private:
 	short int mFileRule;
 	
 	QMutex mutex;
-     QWaitCondition condition;
-     bool restart;
-     bool abort;
+     	QWaitCondition condition;
+     	bool restart;
+     	bool abort;
 
 };
 

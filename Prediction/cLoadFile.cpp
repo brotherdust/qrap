@@ -52,15 +52,15 @@ cLoadFile::~cLoadFile()
 
 //**************************************************************************
 bool cLoadFile::LoadFile(string SrcDirectory, 
-			 						string FileName,
-			 						FileType filetype,
-									GeoType Proj,
-									string Proj4String,
-									int CentMer,
-									bool Hem)
+			string FileName,
+			FileType filetype,
+			GeoType Proj,
+			string Proj4String,
+			int CentMer,
+			bool Hem)
 {
 	StructMetaData MapHeader;
-	cRaster INRaster(SrcDirectory, FileName,filetype,Proj,Proj4String,CentMer,Hem);
+	cRaster INRaster(SrcDirectory, FileName, filetype, Proj, Proj4String, CentMer,Hem);
 
 	cGeoP NW,SE;
 	FileType Type;
@@ -71,11 +71,14 @@ bool cLoadFile::LoadFile(string SrcDirectory,
 	INRaster.GetHeader(NW, SE, MapCentMer, Rows, Cols, NSres, EWres, Proj, Proj4String, Type);
 	if (Proj != DEG)
 	{
+//		cout << "In cLoadFile::LoadFile ... (Proj != DEG) " << endl;
 		NW.SetGeoType(DEG);
 		SE.SetGeoType(DEG);
 	}
 	NW.Get(degNorth,degWest);
 	SE.Get(degSouth,degEast);
+//	NW.Display();
+//	SE.Display();
 	MapHeader.North = degNorth;
 	MapHeader.South = degSouth;
 	MapHeader.East = degEast;
@@ -89,7 +92,7 @@ bool cLoadFile::LoadFile(string SrcDirectory,
 	MapHeader.FileSet = mSourceFileSet;
 	MapHeader.Filetype = Type;
 	mMetaData.push_back(MapHeader);
-	cout << "Uit Loadfile" << endl; 
+//	cout << "Uit Loadfile" << endl; 
 	return true;
 }
 

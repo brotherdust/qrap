@@ -29,8 +29,8 @@ using namespace std;
 
 const double rd = PI/180.0; //converts degrees to radials
 const double a = 6378137.0; // WGS84 ellipsiod
-const double b = 6356752.31424518; // computed from WGS84 earth flattening coefficient definition
-const double f = 1.0/298.25722210088;  // WGS-84 ellipsiod
+const double b = 6356752.31424518; // WGS-84 ellipsiod
+const double f = 1.0/298.257223563;  // computed from WGS84 earth flattening coefficient definition
 //	const long double a = 6378249.145;           /*Clarke 1880 spheroid */
 //	const long double b = 6356514.96639;
 const double c= a*a/b;              /* section 3.2-23 */
@@ -76,28 +76,19 @@ cGeoP::cGeoP(const cGeoP &right)
 }
 
 //*********************************************************************
-cGeoP::cGeoP(double lat, double lon, GeoType type, int centMer)
+cGeoP::cGeoP(double lat, double lon, GeoType type, int centMer, bool South)
 {
 	mLat = lat;
 	mLon = lon;
 	mType = type;
+	mSouth = South;
 	
 	if ((mType==DEG)||(mType==NDEF))
 	{
 		mSouth = (mLat<=0.0);
 		DefaultCentMer(WGS84GC);
 	}
-	else if (mType==UTM)
-	{
-//		mSouth = Hemisphere; // This is not a convetional Implementation of UTM
-		mSouth = (mLat<=0.0);
-		mCentMer = centMer;
-	}
-	else
-	{
-		mSouth = (mLat<=0.0);
-		mCentMer = centMer;
-	}
+	else 	mCentMer = centMer;
 }
 
 //*********************************************************************
@@ -132,26 +123,19 @@ bool cGeoP::Get(double &lat, double &lon, GeoType &type, int &centMer, bool &Hem
 }
 
 //***********************************************************************
-void cGeoP::Set(double lat, double lon, GeoType type, int centMer)
+void cGeoP::Set(double lat, double lon, GeoType type, int centMer, bool South)
 {
 	mLat = lat;
 	mLon = lon;
 	mType = type;
+	mSouth = South;
 	if (mType==DEG)
 	{
 		mSouth = (mLat<=0.0);
 		DefaultCentMer(DEG);
 	}
-	else if (mType==UTM)
-	{
-		mSouth = (mLat<=0.0);
-		mCentMer = centMer;
-	}
-	else
-	{
-		mSouth = (mLat<=0.0);
-		mCentMer = centMer;
-	}
+	else mCentMer = centMer;
+
 } 
 
 //************************************************************************
@@ -279,6 +263,7 @@ bool cGeoP::SetGeoType(GeoType type, int central)
 	switch (mType)
 	{
 		case DEG:
+			mSouth = (mLat<=0.0); 
 			switch (type)
 			{
 				case DEG: 		return true;
@@ -348,17 +333,17 @@ void cGeoP::Display()
 		if (mLat<0.0) cout << " S, ";
 		else cout << " N, ";
 		cout << mLon;
-		if (mLon<0) cout << " W, ";
-		else cout << " E, ";
+		if (mLon<0) cout << " W";
+		else cout << " E";
 	}
 	else
 	{
 		cout << mLat <<", ";
 		cout << mLon <<", ";
-		cout << ",T:," << mType;
-		cout << ",Cent, " << mCentMer;
-		if (mSouth)	cout << " S, ";
-		else cout << " N, ";
+		cout << ",T:" << mType;
+		cout << ", Cent: " << mCentMer;
+		if (mSouth)	cout << " S";
+		else cout << " N";
 	}
 	cout << endl;
 }
@@ -726,6 +711,7 @@ inline bool cGeoP::WGS84GCtoDEG()
    mLon = radlong/rd;
    mLat = lat/rd;
    mType = DEG;
+   mCentMer =-1;
    return true;	
 }
 
@@ -821,34 +807,44 @@ inline bool cGeoP::UTMtoDEG()
 		cout << "UTMtoDEG: you should not be calling this conversion!!" << endl;
 		return false;	
 	}
-	double md = mLat/k0;
+
+	double x = mLon - 500000.0; //remove 500,000 meter offset for longitude
+	double y = mLat;
+	if (mSouth) y-=10000000.0;
+	
+	double Cent = (mCentMer - 1)*6 - 180 + 3;  //+3 puts origin in middle of zone
+
+	double md = y/k0;
 	double mu = md/m1;
-    double fp = mu+phi1*sin(2.*mu)+phi2*sin(4.*mu)
-    			+phi3*sin(6.*mu)+phi4*sin(8.*mu);
-    double cp = cos(fp);
-    double tp = tan(fp);
-    double T1= fp*fp;
-    double sinL2 = sin(fp)*sin(fp);
-    double C1 = eprime2*cp*cp;
-    double R1 = a*(1.-e2)/(pow((1.-e2*sinL2),1.5));
-    double N1 = a/sqrt(1.0-e2*sinL2);
-    double D = mLon/(N1*k0);
-    double D2 = D*D;
-    double D4 = D2*D2;
-    double Q1 = N1*tp/R1;
-    double Q2 = D*D/2.;
-    double Q3 = (5.+3.*T1+10.*C1-4.*C1*C1-9.*eprime2)*D4/24.0;
-    double Q4 = (61.+90.*T1+298.*C1+45.*T1*T1-3.*C1*C1-252.*eprime2)*D4*D2/720.0; 
-    double Q6 = (1. + 2.*T1 + C1)*D2*D/6.0;
-    double Q7 = (5.0-2.0*C1+28.*T1-3.*C1*C1+8.*eprime2+24.0*T1*T1)*D4*D/120.0;
-    mLat = (fp - Q1*(Q2 - Q3 + Q4))/rd;
-    mLon = mCentMer + (D - Q6 + Q7)/cp/rd;
-    mType=DEG;
-    return true;
+	double fp = mu+phi1*sin(2.*mu)+phi2*sin(4.*mu)
+    			+phi3*sin(6.*mu)+phi4*sin(8.*mu); //phi1Rad
+
+    	double cp = cos(fp);
+    	double tp = tan(fp);
+    	//double T1= fp*fp;
+	double T1 = tp*tp;
+    	double sinL2 = sin(fp)*sin(fp);
+    	double C1 = eprime2*cp*cp;
+    	double R1 = a*(1.-e2)/(pow((1.-e2*sinL2),1.5));
+    	double N1 = a/sqrt(1.0-e2*sinL2);
+    	double D = x/(N1*k0);
+    	double D2 = D*D;
+    	double D4 = D2*D2;
+    	double Q1 = N1*tp/R1;
+    	double Q2 = D*D/2.;
+    	double Q3 = (5.+3.*T1+10.*C1-4.*C1*C1-9.*eprime2)*D4/24.0;
+    	double Q4 = (61.+90.*T1+298.*C1+45.*T1*T1-3.*C1*C1-252.*eprime2)*D4*D2/720.0; 
+    	double Q6 = (1. + 2.*T1 + C1)*D2*D/6.0;
+    	double Q7 = (5.0-2.0*C1+28.*T1-3.*C1*C1+8.*eprime2+24.0*T1*T1)*D4*D/120.0;
+    	mLat = (fp - Q1*(Q2 - Q3 + Q4))/rd;
+    	mLon = Cent + (D - Q6 + Q7)/cp/rd;
+    	mType=DEG;
+	mCentMer =-1;
+    	return true;
 }
 
 //*************************************************************************
-inline bool cGeoP::DEGtoUTM(int central)
+inline bool cGeoP::DEGtoUTM(int zone)
 {
 	double k0 = 0.9996;
 	if (mType!=DEG)
@@ -857,25 +853,27 @@ inline bool cGeoP::DEGtoUTM(int central)
 		return false;	
 	}
 	mSouth = (mLat<0);
-	if (central==-1) DefaultCentMer(UTM);
-	else mCentMer = central;
+	if (zone==-1) DefaultCentMer(UTM);
+	else mCentMer = zone;
+	double CentMer = (mCentMer - 1)*6 - 180 + 3;
 	
-	double p = (mLon-(double)mCentMer)*rd;
+	double p = (mLon-(double)CentMer)*rd;
 	double p2=p*p; 
 	double p3=p2*p;
-    double lat = mLat*rd;
+    	double lat = mLat*rd;
 	double cp = cos(lat);
 	double sp = sin(lat);
 	double sp2 = sp*sp;
 	double cp2 = cp*cp;
-    double cp3 = cp2*cp;
-    double tp = tan(lat); 
-    double tp2 = tp*tp;
+    	double cp3 = cp2*cp;
+    	double tp = tan(lat); 
+    	double tp2 = tp*tp; //tp2
 //	double rho = a*(1.-e2)/(pow((1.-e2*sp2),(3./2.)));
 
-	double nu = a/sqrt(1.0-e2*sp2);
-	double eecc = eprime2*cp2;
-	double md = m1*lat+m2*sin(2.*lat)+m3*sin(4.*lat)+m4*sin(6.*lat);
+	double nu = a/sqrt(1.0-e2*sp2); //N
+	double eecc = eprime2*cp2; //C
+	double A = cp*p;
+	double md = m1*lat+m2*sin(2.*lat)+m3*sin(4.*lat)+m4*sin(6.*lat); //M
 	double K1 = md*k0;
 	double K2 = k0*nu*sp*cp/2.0;
 	double K3 = (k0*nu*sp*cp3/24.) *
@@ -884,8 +882,13 @@ inline bool cGeoP::DEGtoUTM(int central)
 	double K4 = k0*nu*cp;
 	double K5 = (k0*nu*cp3/6.0)*(1.0-tp2 + eecc);
 	double K6 = k0*nu*(5. - 18.*tp2 + tp2*tp2 + 72.0*eecc-58.0*eprime2)*cp3*cp2/120;
-	mLat = K1 + K2*p2 + K3*p2*p2 + K7*p3*p3;
-	mLon = K4*p + K5*p3 + K6*p2*p3;
+
+	mLon = K4*p + K5*p3 + K6*p2*p3 + 500000.0;
+
+	mSouth = (mLat < 0);
+	mLat = (double)(K1 + K2*p2 + K3*p2*p2 + K7*p3*p3);
+	if (mSouth) mLat += 10000000.0; //10000000 meter offset for southern hemisphere
+
 	mType=UTM;
 	return true;
 }
@@ -894,11 +897,13 @@ inline bool cGeoP::DEGtoUTM(int central)
 inline bool cGeoP::UTMtoWGS84GC(int CentMer)
 {
 	bool ReturnValue;
-	if (CentMer==mCentMer)
+	int TempCent = (mCentMer - 1)*6 - 180 + 3;
+	if (CentMer==TempCent)
 	{
 		mLat = mLat/0.9996;
-		mLon = -mLon/0.9996;
+		mLon = mLon/0.9996;
 		mType=WGS84GC;
+		mCentMer=CentMer;
 		return true;
 	}
 	else
@@ -912,24 +917,26 @@ inline bool cGeoP::UTMtoWGS84GC(int CentMer)
 }
 
 //*************************************************************************
-inline bool cGeoP::WGS84GCtoUTM(int CentMer)
+inline bool cGeoP::WGS84GCtoUTM(int Zone)
 {
 	bool ReturnValue;
 	bool SameCentMer = false; 
+	int CentMer = (Zone - 1)*6 - 180 + 3;
 	SameCentMer = (CentMer=-1)&&((mCentMer-3)/6)==floor((mCentMer-3)/6);
 	SameCentMer = (SameCentMer)||(CentMer==mCentMer);
 	if (SameCentMer)
 	{
 		mLat = mLat*0.9996;
-		mLon = -mLon*0.9996;
+		mLon = mLon*0.9996;
 		mType=UTM;
+		mCentMer = Zone;
 		return true;
 	}
 	else
 	{
 		ReturnValue = WGS84GCtoDEG();
 		if (CentMer==-1) DefaultCentMer(UTM);
-		else mCentMer=CentMer;
+		else mCentMer= Zone;
 		ReturnValue = (ReturnValue)&&(DEGtoUTM(mCentMer));
 		return ReturnValue;
 	}
@@ -951,16 +958,16 @@ inline bool cGeoP::WGS84GCtoWGS84GC(int central)
 }
 
 //*************************************************************************
-inline bool cGeoP::UTMtoUTM(int central)
+inline bool cGeoP::UTMtoUTM(int zone)
 {
 	if (mType!=UTM)
 	{
 		cout << "UTMtoUTM: you should not be calling this conversion!!" << endl;
 		return false;	
 	} 
-	else if (central==mCentMer) return true;
+	else if (zone==mCentMer) return true;
 	bool ReturnValue;
 	ReturnValue = UTMtoDEG();
-	ReturnValue = ReturnValue && DEGtoUTM(central);
+	ReturnValue = ReturnValue && DEGtoUTM(zone);
 	return ReturnValue;
 }

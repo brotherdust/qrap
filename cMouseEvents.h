@@ -23,30 +23,32 @@
 #ifndef MOUSEEVENTS_H_
 #define MOUSEEVENTS_H_
 
-#include <QCursor>
 #include <QString>
 #include <QObject>
 #include <QMouseEvent>
+#include <QSettings>
+#include <QCursor>
+#include <QPixmap>
 #include <qgsmaptool.h>
 #include <qgsmapcanvas.h>
 #include <qgsmaptopixel.h> 
 #include <qgsmaptoolemitpoint.h> 
 
-class QgsMapLayer;
-class QgsMapCanvas;
-class QMouseEvent;
-class QgsPoint;
-class QgsMapTool;
+//class QgsMapLayer;
+//class QgsMapCanvas;
+//class QMouseEvent;
+//class QgsPoint;
+//class QgsMapTool;
 
 
 	class MouseEvents  : public QgsMapToolEmitPoint
 	{ Q_OBJECT
 	public:
-		MouseEvents(QgsMapCanvas* canvas);
+		explicit MouseEvents(QgsMapCanvas* canvas);
 		virtual ~MouseEvents();
 	public slots:
-		virtual void canvasReleaseEvent(QMouseEvent * e); 
-		virtual void canvasMoveEvent(QMouseEvent * e);
+		virtual void canvasReleaseEvent(QMouseEvent * e) override; 
+		virtual void canvasMoveEvent(QMouseEvent * e) override;
 	
 	signals:
 		void RightPoint(QgsPoint &Point);

@@ -246,15 +246,15 @@ namespace Qrap
 			double		mNSres;		///< Description
 			double		mEWres;		///< Description
 			string		mDirectory;	///< Description
-			
+			double * 	mAdfGeoTransform;
 			float		mMin;		///< Description
 			float		mMax;		///< Description
 			projPJ		mProj4;
 			bool 		mSouth;
 			bool ReturnProj4(GeoType PointType,
-									int PointCM,
-									bool South, 
-									projPJ &Proj);
+						int PointCM,
+						bool South, 
+						projPJ &Proj);
 			FileType mFileType;
 			double 		mMapLat;
 			double		mMapLon;

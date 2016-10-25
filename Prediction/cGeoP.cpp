@@ -901,7 +901,7 @@ inline bool cGeoP::UTMtoWGS84GC(int CentMer)
 	if (CentMer==TempCent)
 	{
 		mLat = mLat/0.9996;
-		mLon = mLon/0.9996;
+		mLon = -mLon/0.9996;
 		mType=WGS84GC;
 		mCentMer=CentMer;
 		return true;
@@ -927,7 +927,7 @@ inline bool cGeoP::WGS84GCtoUTM(int Zone)
 	if (SameCentMer)
 	{
 		mLat = mLat*0.9996;
-		mLon = mLon*0.9996;
+		mLon = -mLon*0.9996;
 		mType=UTM;
 		mCentMer = Zone;
 		return true;

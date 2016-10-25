@@ -504,9 +504,8 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 		WE = max(NW.Distance(NE),SW.Distance(SE));
 		Rows = 2*(int)ceil(NW.Distance(SW)/(2.0*DistRes)+0.5)+1;
 		Cols = 2*(int)ceil(WE/(2.0*DistRes)+0.5)+1;
-//		if (ProjIn==WGS84GC) Sign = -1;
-//		else 
-		Sign = -1;
+		if (ProjIn==WGS84GC) Sign = -1;
+		else Sign = 1;
 	}
 	
 	if (Rows*Cols==0)

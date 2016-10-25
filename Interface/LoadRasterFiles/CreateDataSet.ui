@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>CreateDataSet</class>
- <widget class="QWidget" name="CreateDataSet" >
-  <property name="geometry" >
+ <widget class="QWidget" name="CreateDataSet">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,11 +10,11 @@
     <height>301</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QGroupBox" name="groupBox" >
-   <property name="geometry" >
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
     <rect>
      <x>10</x>
      <y>0</y>
@@ -21,11 +22,11 @@
      <height>121</height>
     </rect>
    </property>
-   <property name="title" >
+   <property name="title">
     <string>Create a new fileset:</string>
    </property>
-   <widget class="QWidget" name="gridLayout" >
-    <property name="geometry" >
+   <widget class="QWidget" name="gridLayout">
+    <property name="geometry">
      <rect>
       <x>10</x>
       <y>20</y>
@@ -33,125 +34,120 @@
       <height>95</height>
      </rect>
     </property>
-    <layout class="QGridLayout" >
-     <item row="0" column="0" >
-      <widget class="QLabel" name="label" >
-       <property name="text" >
+    <layout class="QGridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
         <string>Description:</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1" colspan="5" >
-      <widget class="QLineEdit" name="lineEditDescription" />
+     <item row="0" column="1" colspan="5">
+      <widget class="QLineEdit" name="lineEditDescription"/>
      </item>
-     <item row="1" column="0" >
-      <widget class="QLabel" name="label_2" >
-       <property name="text" >
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
         <string>File Type:</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1" >
-      <widget class="QComboBox" name="comboBoxFileType5" >
+     <item row="1" column="1">
+      <widget class="QComboBox" name="comboBoxFileType5">
        <item>
-        <property name="text" >
+        <property name="text">
          <string>DEM</string>
         </property>
        </item>
        <item>
-        <property name="text" >
+        <property name="text">
          <string>Clutter</string>
         </property>
        </item>
        <item>
-        <property name="text" >
+        <property name="text">
          <string>Other</string>
         </property>
        </item>
       </widget>
      </item>
-     <item row="1" column="2" >
-      <widget class="QLabel" name="label_3" >
-       <property name="text" >
+     <item row="1" column="2">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
         <string>Resolution:</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="3" >
-      <widget class="QSpinBox" name="spinBoxResolution" >
-       <property name="maximum" >
+     <item row="1" column="3">
+      <widget class="QSpinBox" name="spinBoxResolution">
+       <property name="maximum">
         <number>100000</number>
        </property>
-       <property name="value" >
+       <property name="value">
         <number>90</number>
        </property>
       </widget>
      </item>
-     <item row="1" column="4" >
-      <widget class="QCheckBox" name="checkBoxDerivedBinary" >
-       <property name="text" >
+     <item row="1" column="4">
+      <widget class="QCheckBox" name="checkBoxDerivedBinary">
+       <property name="text">
         <string>Derived Binary</string>
        </property>
-       <property name="checked" >
+       <property name="checked">
         <bool>false</bool>
        </property>
       </widget>
      </item>
-     <item row="2" column="0" >
-      <widget class="QLabel" name="label_4" >
-       <property name="text" >
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
         <string>File Format</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1" >
-      <widget class="QComboBox" name="comboBoxFileFormat5" >
+     <item row="2" column="1">
+      <widget class="QComboBox" name="comboBoxFileFormat5">
        <item>
-        <property name="text" >
+        <property name="text">
          <string>GDALFILE</string>
         </property>
        </item>
        <item>
-        <property name="text" >
+        <property name="text">
          <string>BINFILE</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>ORTFILE</string>
         </property>
        </item>
       </widget>
      </item>
-     <item row="2" column="2" >
-      <widget class="QLabel" name="label_5" >
-       <property name="text" >
+     <item row="2" column="2">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
         <string>Projection:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="3" >
-      <widget class="QComboBox" name="comboBoxProjection5" >
+     <item row="2" column="3">
+      <widget class="QComboBox" name="comboBoxProjection5">
        <item>
-        <property name="text" >
+        <property name="text">
          <string>DEG</string>
         </property>
        </item>
        <item>
-        <property name="text" >
+        <property name="text">
          <string>WGS84GC</string>
         </property>
        </item>
        <item>
-        <property name="text" >
+        <property name="text">
          <string>UTM</string>
         </property>
        </item>
       </widget>
      </item>
-     <item row="2" column="5" >
-      <widget class="QPushButton" name="pushButtonCreate" >
-       <property name="text" >
+     <item row="2" column="5">
+      <widget class="QPushButton" name="pushButtonCreate">
+       <property name="text">
         <string>Create</string>
        </property>
       </widget>
@@ -159,8 +155,8 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox_2" >
-   <property name="geometry" >
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
     <rect>
      <x>10</x>
      <y>130</y>
@@ -168,11 +164,11 @@
      <height>161</height>
     </rect>
    </property>
-   <property name="title" >
+   <property name="title">
     <string>Link to an exsisting fileset:</string>
    </property>
-   <widget class="QTableWidget" name="tableWidgetFileSets5" >
-    <property name="geometry" >
+   <widget class="QTableWidget" name="tableWidgetFileSets5">
+    <property name="geometry">
      <rect>
       <x>10</x>
       <y>20</y>
@@ -180,44 +176,44 @@
       <height>131</height>
      </rect>
     </property>
-    <property name="selectionMode" >
+    <property name="selectionMode">
      <enum>QAbstractItemView::SingleSelection</enum>
     </property>
-    <property name="selectionBehavior" >
+    <property name="selectionBehavior">
      <enum>QAbstractItemView::SelectRows</enum>
     </property>
     <column>
-     <property name="text" >
+     <property name="text">
       <string>ID</string>
      </property>
     </column>
     <column>
-     <property name="text" >
+     <property name="text">
       <string>Description</string>
      </property>
     </column>
     <column>
-     <property name="text" >
+     <property name="text">
       <string>Resolution</string>
      </property>
     </column>
     <column>
-     <property name="text" >
+     <property name="text">
       <string>File Format</string>
      </property>
     </column>
     <column>
-     <property name="text" >
+     <property name="text">
       <string>Use</string>
      </property>
     </column>
     <column>
-     <property name="text" >
+     <property name="text">
       <string>Cutted Set</string>
      </property>
     </column>
     <column>
-     <property name="text" >
+     <property name="text">
       <string>Projection</string>
      </property>
     </column>

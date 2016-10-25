@@ -49,7 +49,7 @@ namespace Qrap
  		DEG,		// decimal degrees in WGS84
  		WGS84GC,	// Gaussian Conform using the WGS84 elipsoids
  		UTM,		// Universal Transverse Mecator using WGS84, 
- 					// everything relative to CentMer, south negative. East positive  
+ 				// CentMer actually indicating the Zone.
  		NDEF		// not explicity set
  	};
 
@@ -80,7 +80,7 @@ namespace Qrap
 			 *
 			 * @return A cGeoP.
 			 */
-			cGeoP(double lat, double lon, GeoType type=DEG, int centMer=-1);
+			cGeoP(double lat, double lon, GeoType type=DEG, int centMer=-1, bool South=true);
 			
 			/**
 			 * Destructor
@@ -143,7 +143,7 @@ namespace Qrap
 			 * @param centMer Description
 			 * @param Sphere Description
 			 */
-			void Set(double lat, double lon, GeoType type=DEG, int centMer=-1);
+			void Set(double lat, double lon, GeoType type=DEG, int centMer=-1, bool South=true);
 			
 			/**
 			 * Description of Display
@@ -198,8 +198,20 @@ namespace Qrap
 			inline int DefaultCentMer(GeoType type)
 			{
 				if (mType!=DEG) SetGeoType(DEG);
-				if (type==UTM)
-					mCentMer = (int)floor((mLon-3)/6+0.5)*6+3;
+				if (type==UTM) // return Zone
+				{
+					mCentMer = int((mLon + 180)/6) + 1;
+					if( mLat>=56.0&&mLat<64.0&& mLon>=3.0&&mLon<12.0)
+						mCentMer = 32;
+  					// Special zones for Svalbard
+					if( mLat >= 72.0 && mLat < 84.0 ) 
+					{
+	  					if(      mLon>=0.0&&mLon<9.0 ) mCentMer = 31;
+	  					else if( mLon>=9.0&&mLon<21.0) mCentMer = 33;
+	  					else if( mLon>=21.0&&mLon<33.0) mCentMer = 35;
+	  					else if( mLon>=33.0&&mLon<42.0) mCentMer = 37;
+	 				}
+				}
 				else
 					mCentMer = (int)floor((mLon-1)/2+0.5)*2+1;
 				return mCentMer;
@@ -252,7 +264,7 @@ namespace Qrap
 			 * 
 			 * @return A boolean.
 			 */
-			inline bool DEGtoUTM(int central=-1);
+			inline bool DEGtoUTM(int zone=-1);
 			
 			/**
 			* Description of UTMtoWGS84GC
@@ -266,7 +278,7 @@ namespace Qrap
 			 * 
 			 * @return A boolean.
 			 */			
-			inline bool WGS84GCtoUTM(int central=-1);
+			inline bool WGS84GCtoUTM(int zone=-1);
 			
 	
 			/**
@@ -274,7 +286,7 @@ namespace Qrap
 			* 
 			* @return A boolean.
 			*/				
-			inline bool UTMtoUTM(int central=-1);
+			inline bool UTMtoUTM(int zone=-1);
 			
 		
 			/**

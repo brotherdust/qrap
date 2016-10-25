@@ -101,7 +101,7 @@ int main (int argc, char **argv)
 	VCMeasurements.WriteToDatabase();
 	cout << endl << "Wrote Measurements to DataBase" << endl;
 */
-
+/*
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 	int Num;
@@ -121,7 +121,7 @@ int main (int argc, char **argv)
 	}
 
 	Meas.SetUseAntANN(false);
-
+*/
 /*
 //Gauteng 20m DEM
 	vPoints Punte;
@@ -153,7 +153,7 @@ int main (int argc, char **argv)
 
 	delete [] Hoek; 
 */
-
+/*
 	vPoints Punte;
 	cGeoP *Hoek;
 	Hoek = new cGeoP[4];
@@ -185,7 +185,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
-
+*/
 /*
 	cTrainAntPattern NeuralNets;
 	double Azimuth;
@@ -384,7 +384,7 @@ for ( i=4; i>=0; i--)
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-
+/*
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
 	cout << "Na constructor" << endl;
@@ -427,7 +427,7 @@ for ( i=4; i>=0; i--)
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-
+*/
 /*
 	if (!gDb.PerformRawSql(query))
 	{
@@ -815,6 +815,86 @@ MeasImport.SetCI(553);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CWMe
 }
 */
 
+	char *text = new char[33];
+
+	query = "INSERT INTO filesets values (1, now(),";
+	gcvt(gDb.globalMachineID,10,text);
+	query +=text; 
+	query += ", ";	
+	query += " ' BryanstonDEM ', ' BryanstonDEM ', 'DEM', null, 5, now(), true, ";
+	query += " false, null, 'GDALFILE', 'UTM', ";
+	query += "'+proj=utm +zone=35 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs');";
+	if ((!gDb.PerformRawSql(query)))
+
+	{
+		cout << "Database Update on filesets table failed"<< endl;
+		return false;
+	}
+	query = "INSERT INTO filesets values (2,now(),";
+	gcvt(gDb.globalMachineID,10,text);
+	query +=text; 
+	query += ", ";	
+	query += " ' BryanstonDEMcut ', ' BryanstonDEMcut ', 'DEM', null, 5, now(), true, ";
+	query += " true, 1, 'BINFILE', 'WGS84GC', '');";
+
+	if ((!gDb.PerformRawSql(query)))
+	{
+		cout << "Database Update on filesets table failed"<< endl;
+
+		return false;
+	}
+
+
+	string dir="/home/maggie/GISdata/Bryanston/";
+	cLoadFile Files(1,2,dir);
+	Files.LoadFile("/home/maggie/GISdata/Bryanston/","DEM_5m.img",GDALFILE,UTM,
+			"+proj=utm +zone=35 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+			35, true);
+	Files.WriteDB();
+
+	query = "INSERT INTO filesets values (3, now(),";
+	gcvt(gDb.globalMachineID,10,text);
+	query +=text; 
+	query += ", ";	
+	query += " ' BryanstonClutter ', ' BryanstonClutter ', 'Clutter', null, 5, now(), true, ";
+	query += " false, null, 'GDALFILE', 'UTM', ";
+	query += "'+proj=utm +zone=35 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs');";
+	if ((!gDb.PerformRawSql(query)))
+
+	{
+		cout << "Database Update on filesets table failed"<< endl;
+		return false;
+	}
+	query = "INSERT INTO filesets values (4,now(),";
+	gcvt(gDb.globalMachineID,10,text);
+	query +=text; 
+	query += ", ";	
+	query += " ' BryanstonClutterCut ', ' BryanstonClutterCut ', 'Clutter', null, 5, now(), true, ";
+	query += " true, 3, 'BINFILE', 'WGS84GC', '');";
+
+	if ((!gDb.PerformRawSql(query)))
+	{
+		cout << "Database Update on filesets table failed"<< endl;
+
+		return false;
+	}
+
+
+	cLoadFile Files2(3,4,dir);
+	Files2.LoadFile("/home/maggie/GISdata/Bryanston/","Clutter_5m.img",GDALFILE,UTM,
+			"+proj=utm +zone=35 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
+			35, true);
+	Files2.WriteDB();
+
+
+//	string dir="/home/maggie/DEM/SRTM/BIN/";
+	//	string dir="/home/anita/SRTM/BIN/";
+//	cLoadFile Files(3,4,dir);
+//	Files.LoadFile("../Data/SRTM/srtm_40_19/","srtm_40_19.asc",GDALFILE,DEG);
+//	Files.WriteDB();
+//	delete [] text;
+//	Files.CutCurrentSet(3,4);
+
 
 /*	string dir="/home/anita/GISdata/SRTM/BIN/";
 	cLoadFile Files(3,4,dir);
@@ -851,7 +931,8 @@ MeasImport.SetCI(553);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CWMe
 		cout << "Database Update on filesets table failed"<< endl;
 		return false;
 	}
-*///	string dir="/home/maggie/DEM/SRTM/BIN/";
+*/
+//	string dir="/home/maggie/DEM/SRTM/BIN/";
 	//	string dir="/home/anita/SRTM/BIN/";
 //	cLoadFile Files(3,4,dir);
 //	Files.LoadFile("../Data/SRTM/srtm_40_19/","srtm_40_19.asc",GDALFILE,DEG);

@@ -56,17 +56,17 @@ cLoadThread::~cLoadThread()
 
 //***************************************************************
 void cLoadThread::Set(unsigned Source,
-					unsigned Bin,
-					GeoType Type,
-					int CentMer,
-					string Dir,
-					QStringList Files,
-					QString SourceDir,
-					int FileCount,
-					QString FileType,
-					bool cut,
-					short int Rule,
-					bool interpolate)
+		unsigned Bin,
+		GeoType Type,
+		int CentMer,
+		string Dir,
+		QStringList Files,
+		QString SourceDir,
+		int FileCount,
+		QString FileType,
+		bool cut,
+		short int Rule,
+		bool interpolate)
 {
 	try 
 	{
@@ -124,6 +124,7 @@ void cLoadThread::run()
 	    			{
 					cout << "cLoadThread::run() loading raster: k = " << k << endl;
 	    				Rasters.LoadFile(mSourceDir.latin1(),File.latin1(),Type,mType,"",mCentMer);
+//bool cLoadFile::LoadFile(string SrcDirectory, string FileName,FileType filetype,GeoType Proj,	string Proj4String,int CentMer,	bool Hem)
 					cout << "cLoadThread::run() DONE loading raster: k = " << k << endl;
 	    				++it;
 	    				k++;

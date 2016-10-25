@@ -1,3 +1,18 @@
+INSERT INTO filesets values (1, now(),1, ' BryanstonDEM ', 'DEM', null, 5, now(), true, 
+false, null, 'GDALFILE', 'UTM', 
+'+proj=utm +zone=35 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
+
+INSERT INTO sourcefiles (lastmodified, machineid, filesetkey, filename,
+location, centmer,areasquare) VALUES (now(), 1, 1, 
+'DEM_5m.img', '/home/maggie/GISdata/Bryanston/', 35, 
+BOX'((-5.576510192e+193,-8.247067047e+175),(-4.278320654e+200,-7.043908348e+182))');
+
+
+select * from sourcefiles;
+
+truncate table sourcefiles;
+truncate table filesets cascade;
+
 drop table tempsite;
 
 create table tempsite 

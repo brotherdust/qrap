@@ -60,6 +60,17 @@ int main (int argc, char **argv)
 
 	cout << "Connected " << endl;
 
+	cGeoP point(-34,27.9);
+	point.SetGeoType(WGS84GC);
+	point.Display();
+	point.SetGeoType(UTM);
+	point.Display();
+	point.Set(-34,27.9);
+	point.SetGeoType(UTM);
+	point.Display();
+	point.SetGeoType(WGS84GC);
+	point.Display();
+
 //	cAntennaPattern FixedAnt;
 //	FixedAnt.SetAntennaPattern(29641, Tx, 0,  0);
 
@@ -814,7 +825,7 @@ MeasImport.SetCI(552);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CWMe
 MeasImport.SetCI(553);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CWMeas/c_T3024all.dat");
 }
 */
-
+/*
 	char *text = new char[33];
 
 	query = "INSERT INTO filesets values (1, now(),";
@@ -885,7 +896,7 @@ MeasImport.SetCI(553);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CWMe
 			"+proj=utm +zone=35 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
 			35, true);
 	Files2.WriteDB();
-
+*/
 
 //	string dir="/home/maggie/DEM/SRTM/BIN/";
 	//	string dir="/home/anita/SRTM/BIN/";

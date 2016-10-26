@@ -252,6 +252,35 @@ bool cGeoP::operator==(const cGeoP &right) const
 	return ReturnValue;
 }
 
+//***************************************************************************************************
+inline int cGeoP::DefaultCentMer(GeoType type)
+{
+	if ((WGS84GC==mType)&&(UTM==type)&&(-1!=mCentMer))
+	{
+		double Zone = int((mCentMer + 180)/6) + 1;
+		mCentMer = Zone;
+		return Zone;
+	}
+	if (DEG!=mType) SetGeoType(DEG);
+	if (UTM==type) // return Zone
+	{
+		mCentMer = int((mLon + 180)/6) + 1;
+		if( mLat>=56.0&&mLat<64.0&& mLon>=3.0&&mLon<12.0)
+			mCentMer = 32;
+		// Special zones for Svalbard
+		if( mLat >= 72.0 && mLat < 84.0 ) 
+		{
+			if(      mLon>=0.0&&mLon<9.0 ) mCentMer = 31;
+			else if( mLon>=9.0&&mLon<21.0) mCentMer = 33;
+			else if( mLon>=21.0&&mLon<33.0) mCentMer = 35;
+			else if( mLon>=33.0&&mLon<42.0) mCentMer = 37;
+		}
+	}
+	else mCentMer = (int)floor((mLon-1)/2+0.5)*2+1; //WGS84 Gauss Conform
+	return mCentMer;
+};
+
+
 //**************************************************************************
 bool cGeoP::SetGeoType(GeoType type, int central)
 {
@@ -621,7 +650,7 @@ inline bool cGeoP::DEGtoWGS84GC(int central)
     	DefaultCentMer(WGS84GC);
     else mCentMer = (int)floor(central+0.5);
     mSouth = (mLat<0);
-	p = -(mLon - (double)mCentMer)*rd;              // Distance west of centmer in degrees
+    p = -(mLon - (double)mCentMer)*rd;              // Distance west of centmer in degrees
     p2 = p*p;
     p3 = p2*p;
     p4 = p3*p;
@@ -872,7 +901,7 @@ inline bool cGeoP::DEGtoUTM(int zone)
 
 	double nu = a/sqrt(1.0-e2*sp2); //N
 	double eecc = eprime2*cp2; //C
-	double A = cp*p;
+//	double A = cp*p;
 	double md = m1*lat+m2*sin(2.*lat)+m3*sin(4.*lat)+m4*sin(6.*lat); //M
 	double K1 = md*k0;
 	double K2 = k0*nu*sp*cp/2.0;
@@ -896,45 +925,62 @@ inline bool cGeoP::DEGtoUTM(int zone)
 //*************************************************************************
 inline bool cGeoP::UTMtoWGS84GC(int CentMer)
 {
-	bool ReturnValue;
-	int TempCent = (mCentMer - 1)*6 - 180 + 3;
-	if (CentMer==TempCent)
+	if (mType!=UTM)
 	{
+		cout << "UTMtoWGS84GC: you should not be calling this conversion!!" << endl;
+		return false;	
+	}
+	bool ReturnValue;
+	double tLon;
+	int TempCent = (mCentMer - 1)*6 - 180 + 3;
+	tLon = -(mLon - 500000)/0.9996;
+	if ((CentMer==TempCent)||
+		((-1==CentMer)&&(fabs(tLon)<55800)/*OK for |Lat|<60*/))
+	{
+		if (mSouth) mLat -= 10000000.0;		
 		mLat = mLat/0.9996;
-		mLon = -mLon/0.9996;
-		mType=WGS84GC;
-		mCentMer=CentMer;
+		mLon = -(mLon - 500000)/0.9996;
+		mType = WGS84GC;	
+		mCentMer=TempCent;
 		return true;
 	}
-	else
-	{
-		ReturnValue = UTMtoDEG();
-		if (CentMer==-1) DefaultCentMer(WGS84GC);
-		else mCentMer=CentMer;
-		ReturnValue = (ReturnValue)&&(DEGtoWGS84GC(mCentMer));
-		return ReturnValue;
-	}
+	
+//	cout << "In cGeoP::UTMtoWGS84GC NOT Same" << endl;
+	ReturnValue = UTMtoDEG();
+	if (CentMer==-1) DefaultCentMer(WGS84GC);
+	else mCentMer=CentMer;
+	ReturnValue = (ReturnValue)&&(DEGtoWGS84GC(mCentMer));
+	return ReturnValue;
 }
 
 //*************************************************************************
 inline bool cGeoP::WGS84GCtoUTM(int Zone)
 {
+	if (mType!=WGS84GC)
+	{
+		cout << "WGS84GCtoUTM: you should not be calling this conversion!!" << endl;
+		return false;	
+	}
 	bool ReturnValue;
 	bool SameCentMer = false; 
-	int CentMer = (Zone - 1)*6 - 180 + 3;
-	SameCentMer = (CentMer=-1)&&((mCentMer-3)/6)==floor((mCentMer-3)/6);
-	SameCentMer = (SameCentMer)||(CentMer==mCentMer);
-	if (SameCentMer)
+	int CentMer;
+	if (-1==Zone) Zone = int((mCentMer -3 + 180)/6) + 1;
+	CentMer = (Zone - 1)*6 - 180 + 3;
+	if ((CentMer==mCentMer))
 	{
 		mLat = mLat*0.9996;
-		mLon = -mLon*0.9996;
+		if (mSouth) mLat += 10000000.0;
+		mLon = -(mLon*0.9996 - 500000);
 		mType=UTM;
 		mCentMer = Zone;
+//		cout << "In cGeoP::WGS84GCtoUTM SameCentmer" << endl;
 		return true;
 	}
 	else
 	{
 		ReturnValue = WGS84GCtoDEG();
+//		cout << "In cGeoP::WGS84GCtoUTM NOT SameCentmer" << endl;
+//		Display();
 		if (CentMer==-1) DefaultCentMer(UTM);
 		else mCentMer= Zone;
 		ReturnValue = (ReturnValue)&&(DEGtoUTM(mCentMer));

@@ -253,6 +253,7 @@ bool cGeoP::operator==(const cGeoP &right) const
 }
 
 //***************************************************************************************************
+/*
 inline int cGeoP::DefaultCentMer(GeoType type)
 {
 	if ((WGS84GC==mType)&&(UTM==type)&&(-1!=mCentMer))
@@ -279,7 +280,7 @@ inline int cGeoP::DefaultCentMer(GeoType type)
 	else mCentMer = (int)floor((mLon-1)/2+0.5)*2+1; //WGS84 Gauss Conform
 	return mCentMer;
 };
-
+*/
 
 //**************************************************************************
 bool cGeoP::SetGeoType(GeoType type, int central)

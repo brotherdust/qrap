@@ -65,11 +65,18 @@ cRaster::cRaster(string Directory,
 	mMax = Max;
 //	cout << "In CRaster Non-default constructor ... Proj4Sting = " << Proj4String << endl;
 	if (mProjType != NDEF && Proj4String != "")
+	{
+//		cout << "In CRaster Non-default constructor ... Proj4Sting empty " << endl;
 		mProj4=pj_init_plus(Proj4String.c_str());
+	}
 	else if (mProjType != NDEF && Proj4String == "")
+	{
+//		cout << "In CRaster Non-default constructor ... calling ReturnProj4 " << endl;
 		ReturnProj4(mProjType,mCentMer,mSouth,mProj4);
+	}
+//	cout << "In CRaster Non-default constructor ... Geotype = " << mProjType << endl;
 	string Proj4 = pj_get_def(mProj4, 0);
-//	cout << "In cRaster::GetHeader: Proj4 = " << Proj4 << endl << endl;
+//	cout << "In CRaster Non-default constructor: Proj4 = " << Proj4 << endl << endl;
 	mNSres = 1.0;
 	mEWres = 1.0;
 	mDirectory = Directory;
@@ -78,7 +85,7 @@ cRaster::cRaster(string Directory,
 	mRaster = new_Float2DArray(mRows,mCols);
 //	cout << "In cRaster non-default constructor, before ReadFile" << endl;	
 	ReadFile(Directory, FileName,filetype,mProjType,
-							Proj4String,CentMer,mSouth,
+							Proj4String,mCentMer,mSouth,
 							mMin,mMax);
 //	cout << "In CRaster Non-default constructor ... after ReadFile assignment." << endl;
 	if (mSouth)
@@ -475,16 +482,23 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 		GeoType PointType;
 		double PointLat,PointLon;
 		int PointCM;
-		double dlat, dlon;                       // distance between point of interest
-	                                            // and closest point to NW
+		double dlat, dlon;     // 'decimal' row and col
+					// distance between point of interest
+	                               // and closest point to NW
 		double h11, h12, h21, h22, h1dash, h2dash;   // heights at intermediary points (see diagram)
 		double value;                           // height at point of interest
 
-		
+//		cout << " In cRaster::GetValue: mCentMer = " << mCentMer << endl;
+//		cout << " In cRaster::GetValue: mProjType = " << mProjType << endl;
+//		cout << " In cRaster::GetValue: mRows = " << mRows << endl;
+//		cout << " In cRaster::GetValue: mCols = " << mCols << endl;
 		// \TODO the following two line are only for debugging and need to be taken out
 //		Point.SetGeoType(DEG); 
+		Point.Display();
 		Point.SetGeoType(mProjType,mCentMer);
+//		cout << " In cRaster::GetValue: after Point.SetGeoType" << endl;		
 		Point.Get(PointLat,PointLon,PointType,PointCM,Hem);
+//		cout << " In cRaster::GetValue: after Point.Get" << endl;
 		if (mSouth)
 			drow = (mMapLat-PointLat)/mNSres;
 		else
@@ -495,6 +509,8 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 		else
 			dcol = (mMapLon - PointLon)/mEWres;
 
+//		cout << " In cRaster::GetValue: Before Interpolation" << endl;
+//		cout << " In cRaster::GetValue: drow = " << drow << "	dcol = " << dcol << endl;
 		if (Interpolation==2)
 		{
 			// interpolate between the surrounding 4 points
@@ -521,7 +537,7 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 				dlon = PointLon - mMapLon - (double)col*mEWres;
 			else
 				dlon = mMapLon - PointLon - (double)col*mEWres;
-			
+//			cout << " In cRaster::GetValue: row = " << row << "	col = " << col << endl;
 			// get heights at each of surrounding points
 			if ((row>=0)&&(row<mRows)&&(col>=0)&&(col<mCols))
 			{
@@ -571,6 +587,8 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 //		cout << "cRaster::GetValue .... amper einde" << endl; 
 		row = (int)(drow+0.5);
 		col = (int)(dcol+0.5);
+//		cout << " In cRaster::GetValue: After Interpololation " << endl;
+//		cout << " In cRaster::GetValue: row = " << row << "	col = " << col << endl;
 	   	if ((row>=0)&&(row<mRows)&&(col>=0)&&(col<mCols))
 			return mRaster[row][col];
 		else
@@ -598,9 +616,10 @@ bool cRaster::ReturnProj4(GeoType PointType,
 				bool South, 
 				projPJ &Proj)
 {
+		cout << "In cRaster::ReturnProj4. PointType = " << PointType << endl;
 		if (Proj != NULL)
 		{
-			//pj_free(Proj);
+			pj_free(Proj);
 		}
 		char *centmer;
 		centmer = new char[120];

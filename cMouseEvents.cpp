@@ -26,11 +26,13 @@
 #include "cMouseEvents.h"
 
 MouseEvents::MouseEvents(QgsMapCanvas* canvas)
-  : QgsMapToolEmitPoint(canvas)
+  : QgsMapTool(canvas)
 {
 	//Debug("Mouse");
 	mCanvas = canvas;
 	mCanvas->setCursor(Qt::CrossCursor);
+//  	QPixmap myCursor = QPixmap(( const char ** ) capture_point_cursor );
+// 	mCursor = QCursor( myCursor, 8, 8 ); //8,8 is the point in the cursor where clicks register
 }
 
 //********************************************************************************************
@@ -39,32 +41,41 @@ MouseEvents::~MouseEvents()
 
 }
 
-
 //**********************************************************************************************
-void MouseEvents::canvasReleaseEvent(QMouseEvent * e)
+void MouseEvents::canvasReleaseEvent(QgsMapMouseEvent * e)
 {
 	//Debug("Button Pressed");
-	std::cout << " MouseEvents::canvasReleaseEvent enter " << endl << endl;
+//	std::cout << " MouseEvents::canvasReleaseEvent enter " << endl << endl;
 	QgsPoint point = mCanvas->getCoordinateTransform()->toMapCoordinates(e->x(), e->y());
 
   	if(e->button() == Qt::RightButton && (e->button() & Qt::LeftButton) == 0) // restart
   	{
-		std::cout << " MouseEvents::canvasReleaseEvent right " << endl << endl;
+//		std::cout << " MouseEvents::canvasReleaseEvent right " << endl << endl;
     		emit RightPoint(point);
   	} 
   	else if (e->button()== Qt::LeftButton)
   	{
-		std::cout << " MouseEvents::canvasReleaseEvent left " << endl << endl;
+//		std::cout << " MouseEvents::canvasReleaseEvent left " << endl << endl;
     		emit LeftPoint(point);
   	}
 }
 
+//*****************************************************************************************************8
+void MouseEvents::deactivate()
+{
+  QgsMapTool::deactivate();
+}
 //**********************************************************************************************
-void MouseEvents::canvasMoveEvent(QMouseEvent * e)
+void MouseEvents::canvasMoveEvent(QgsMapMouseEvent * e)
 {
     	QgsPoint point = mCanvas->getCoordinateTransform()->toMapCoordinates(e->pos().x(), e->pos().y());
    	emit MouseMove(point);
 }
 
 
+//*********************************************************************************************
+void MouseEvents::canvasPressEvent( QgsMapMouseEvent * thepEvent )
+{
+  Q_UNUSED( thepEvent );
+}
 

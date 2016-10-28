@@ -92,7 +92,7 @@ namespace Qrap
 				double &ew_res,
 				float &min,
 				float &max,
-				int CentMer);
+				int &CentMer);
 			
 			/**
 			 * Description of readRaster

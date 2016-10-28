@@ -29,6 +29,7 @@
 #include <QSettings>
 #include <QCursor>
 #include <QPixmap>
+#include <QPointer>
 #include <qgsmaptool.h>
 #include <qgsmapcanvas.h>
 #include <qgsmaptopixel.h> 
@@ -41,14 +42,23 @@
 //class QgsMapTool;
 
 
-	class MouseEvents  : public QgsMapToolEmitPoint
+	class MouseEvents  : public QgsMapTool
 	{ Q_OBJECT
 	public:
 		explicit MouseEvents(QgsMapCanvas* canvas);
 		virtual ~MouseEvents();
 	public slots:
-		virtual void canvasReleaseEvent(QMouseEvent * e) override; 
-		virtual void canvasMoveEvent(QMouseEvent * e) override;
+    	//! Overridden mouse move event
+    	virtual void canvasMoveEvent( QgsMapMouseEvent* e ) override;
+
+    	//! Overridden mouse press event
+    	virtual void canvasPressEvent( QgsMapMouseEvent* e ) override;
+
+    	//! Overridden mouse release event
+    	virtual void canvasReleaseEvent( QgsMapMouseEvent* e ) override;
+
+    	//! called when map tool is being deactivated
+    	virtual void deactivate() override;
 	
 	signals:
 		void RightPoint(QgsPoint &Point);
@@ -58,10 +68,11 @@
 	
 	private:
 	//! pointer to map canvas
-    	QgsMapCanvas* mCanvas;
+    	//QgsMapCanvas* mCanvas;
+	QPointer<QgsMapCanvas> mCanvas;
     
    	 //! cursor used in map tool
-    	QCursor mCursor;
+    	//QCursor mCursor;
     
 	};
 

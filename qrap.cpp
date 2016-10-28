@@ -155,7 +155,7 @@ void QRap::initGui()
   	cout << "Na Mouse" << endl;
   	connect(Mouse, SIGNAL(RightPoint(QgsPoint&)), this, SLOT(ReceivedRightPoint(QgsPoint&)));
   	connect(Mouse, SIGNAL(LeftPoint(QgsPoint&)), this, SLOT(ReceivedLeftPoint(QgsPoint&)));
-	connect(Mouse, SIGNAL(canvasClicked(QgsPoint&, Qt::MouseButton)), this, SLOT(ReceivedLeftPoint(QgsPoint&)));
+//	connect(Mouse, SIGNAL(canvasClicked(QgsPoint&, Qt::MouseButton)), this, SLOT(ReceivedLeftPoint(QgsPoint&)));
 }
 
 //****************************************************************************************

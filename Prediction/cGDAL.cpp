@@ -45,7 +45,7 @@ cGDAL::~cGDAL()
 bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName, 
 			cGeoP &NW, cGeoP &SE, GeoType &Proj, projPJ &Proj4,
 			uint &rows, uint &cols, double &ns_res, double &ew_res,
-			float &min,float &max, int CentMer)
+			float &min,float &max, int &CentMer)
 {
 	Rows = 0;
 	Cols = 0;
@@ -65,7 +65,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		//\TODO:Error message
 		return false;
 	}
-//	printf("The GDAL file is open");
+//	cout << "The GDAL file is open" << endl;
 	/* Getting the meta data */
 /*
 	printf( "Driver: %s/%s\n",
@@ -96,7 +96,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 			{
 				Proj = UTM;
 				CentMer=atoi((tempProj4.substr(tempProj4.find("zone")+5,2)).c_str());
-//				cout << "Zone = " << CentMer << endl;
+				cout << "Zone = " << CentMer << endl;
 			}
 			else if (tempProj4.find("latlon")<tempProj4.size())
 				Proj = DEG;

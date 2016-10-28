@@ -195,8 +195,34 @@ namespace Qrap
 			/**
 			 * Determine default centralmeridian
 			 */
-			inline int DefaultCentMer(GeoType type);
-						
+			inline int DefaultCentMer(GeoType type)
+			{
+				if ((WGS84GC==mType)&&(UTM==type)&&(-1!=mCentMer))
+				{
+					double Zone = int((mCentMer + 180)/6) + 1;
+					mCentMer = Zone;
+					return Zone;
+				}
+				if (DEG!=mType) SetGeoType(DEG);
+				if (UTM==type) // return Zone
+				{
+					mCentMer = int((mLon + 180)/6) + 1;
+					if( mLat>=56.0&&mLat<64.0&& mLon>=3.0&&mLon<12.0)
+					mCentMer = 32;
+					// Special zones for Svalbard
+					if( mLat >= 72.0 && mLat < 84.0 ) 
+					{
+						if(      mLon>=0.0&&mLon<9.0 ) mCentMer = 31;
+						else if( mLon>=9.0&&mLon<21.0) mCentMer = 33;
+						else if( mLon>=21.0&&mLon<33.0) mCentMer = 35;
+						else if( mLon>=33.0&&mLon<42.0) mCentMer = 37;
+					}
+				}
+				else mCentMer = (int)floor((mLon-1)/2+0.5)*2+1; //WGS84 Gauss Conform
+				return mCentMer;
+			};
+
+			
 			/**
 			 * Determine Hemishere -- true = South
 			 */

@@ -178,8 +178,9 @@ int Qrap::GetGroundHeight(double lat, double lon)
 
 	string query;
 	pqxx::result r;
-	char *text= new char[33];
+	char *text= new char[200];
 	FileType Type=UNKNOWNFILE;
+	GeoType projection;
 	
 	QStringList Filesets;
 	int GroundHeight = 0;
@@ -208,7 +209,7 @@ int Qrap::GetGroundHeight(double lat, double lon)
 	while (i.hasNext() && GroundHeight == -9999)
 	{			
 		QString FS = i.next();	
-		query = "SELECT filename, location,centmer,filetype,projection,fileformat ";
+		query = "SELECT filename, location,centmer,filetype,projection,fileformat,proj4string ";
 		query += " FROM sourcefiles cross join filesets WHERE filesets.id = ";
 		query += FS.toStdString().c_str();
 		query += " AND filesets.id = sourcefiles.filesetkey AND POINT(";
@@ -232,14 +233,38 @@ int Qrap::GetGroundHeight(double lat, double lon)
 				if (!strcmp(text,"BINFILE"))
 				{
 					Type = BINFILE;
-					cout << "In cSiteEditTools... Qrap::GetGroundHeight(double lat, double lon) ... fileformat ==BINFILE" << endl;
+//					cout << "In cSiteEditTools... Qrap::GetGroundHeight(..) ... fileformat ==BINFILE" << endl;
 				}
 				else
 				{
 					Type = GDALFILE;
-					cout << "In cSiteEditTools... Qrap::GetGroundHeight(double lat, double lon) ... fileformat ==GDALFILE" << endl;
+//					cout << "In cSiteEditTools... Qrap::GetGroundHeight(..) ... fileformat ==GDALFILE" << endl;
 				}
-				cRaster CRaster(r[0]["location"].c_str(),r[0]["filename"].c_str(),Type);
+				
+				strcpy(text,r[0]["projection"].c_str());
+				if (!strcmp(text,"DEG"))
+				{
+					projection = DEG;
+//					cout << "In cSiteEditTools... Qrap::GetGroundHeight(..) ... in DEG" << endl;
+				}
+				else if (!strcmp(text,"UTM"))
+				{
+					projection = UTM;
+//					cout << "In cSiteEditTools... Qrap::GetGroundHeight(..) ... in UTM" << endl;
+				}
+				else if (!strcmp(text,"WGS84GC"))
+				{
+					projection = WGS84GC;
+//					cout << "In cSiteEditTools... Qrap::GetGroundHeight(..) ... in WGS84GC" << endl;
+				}
+				else 
+				{
+					projection = WGS84GC;
+					cout << "In cSiteEditTools: Qrap::GetGroundHeight(..) Projection NDEF" << endl;				
+				}
+				strcpy(text,r[0]["proj4string"].c_str());
+				cRaster CRaster(r[0]["location"].c_str(),r[0]["filename"].c_str(),Type,projection,text);
+//				cout << "In cSiteEditTools... Qrap::GetGroundHeight(...). After raster construct" << endl;
 				cGeoP Temp(lat,lon,DEG);
 				GroundHeight = CRaster.GetValue(Temp);
 			}

@@ -133,7 +133,7 @@ namespace Qrap
 				double EWRes);
 			
 		private:
-			string ReturnProj4(GeoType Type,int CentMer, bool Hem=true);
+			string ReturnProj4(GeoType &Type,int CentMer, bool Hem=true);
 			GDALDataset  	*poDataset;
 			string 		m_file_name;
 			GDALRasterBand  *poBand;

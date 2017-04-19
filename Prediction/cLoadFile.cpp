@@ -33,6 +33,7 @@ cLoadFile::cLoadFile()
 	mSourceFileSet = 0;
 	mBinaryFileSet = 0;
 	mBinaryDirectory = "";
+	cout << "In cLoadFile::cLoadFile() default constructor" << endl;
 }
 
 //********************************************************************************
@@ -43,6 +44,7 @@ cLoadFile::cLoadFile(unsigned SourceFileSet, unsigned BinaryFileSet, string Bina
 	mBinaryDirectory = BinaryDirectory;
 	mMetaData.clear();
 	mGlobalCounter = 0;
+	cout << "In cLoadFile::cLoadFile(unsigned, unsigned, string)" << endl;
 }
 
 //**************************************************************************
@@ -59,7 +61,9 @@ bool cLoadFile::LoadFile(string SrcDirectory,
 			int CentMer,
 			bool Hem)
 {
+	cout << "In cLoadFile::LoadFile(....)" << endl;
 	StructMetaData MapHeader;
+	
 	cRaster INRaster(SrcDirectory, FileName, filetype, Proj, Proj4String, CentMer,Hem);
 
 	cGeoP NW,SE;

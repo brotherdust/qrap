@@ -943,11 +943,11 @@ MeasImport.SetCI(553);    MeasImport.LoadMeasurement("/home/maggie/MeasData/CWMe
 		return false;
 	}
 */
-//	string dir="/home/maggie/DEM/SRTM/BIN/";
+	string dir="/home/maggie/GISdata/SRTM/";
 	//	string dir="/home/anita/SRTM/BIN/";
-//	cLoadFile Files(3,4,dir);
-//	Files.LoadFile("../Data/SRTM/srtm_40_19/","srtm_40_19.asc",GDALFILE,DEG);
-//	Files.WriteDB();
+	cLoadFile Files(1,1,dir);
+	Files.LoadFile("/home/maggie/GISdata/SRTM","srtm_42_18.asc",GDALFILE,DEG);
+	Files.WriteDB();
 //	delete [] text;
 //	Files.CutCurrentSet(3,4);
 

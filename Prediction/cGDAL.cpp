@@ -47,6 +47,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 			uint &rows, uint &cols, double &ns_res, double &ew_res,
 			float &min,float &max, int &CentMer)
 {
+	cout << "Entering cGDAL::openFile(....)" << endl;
 	Rows = 0;
 	Cols = 0;
 	string tempProj4;
@@ -54,59 +55,62 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 	m_file_name = FN;
 	GDALDataset *poDataset;
 	poDataset = (GDALDataset *) GDALOpen( m_file_name.c_str(), GA_ReadOnly );
-	if( poDataset == NULL )
+	if( NULL==poDataset)
 	{
-		string err = "Error reading file: ";
+		string err = "In cGDAL::openFile(....) Error reading file: ";
 		err+=FileName;
-		err+=" before PlotType. en of file reached";
 		QRAP_ERROR(err.c_str());
-		printf("We have a null");
+		printf("We have a null \n");
 		cout << " In cGDAL::openFile : NULL" <<endl;
 		//\TODO:Error message
 		return false;
 	}
 //	cout << "The GDAL file is open" << endl;
 	/* Getting the meta data */
-/*
-	printf( "Driver: %s/%s\n",
+
+/*	printf( "Driver: %s/() %s\n",
     	poDataset->GetDriver()->GetDescription(),
     	poDataset->GetDriver()->GetMetadataItem( GDAL_DMD_LONGNAME ) );
 	printf( "Size is %dx%dx%d\n",
     	poDataset->GetRasterXSize(), poDataset->GetRasterYSize(),
     	poDataset->GetRasterCount() );
-*/	
+	if( poDataset->GetProjectionRef()  != NULL )
+    		printf( "Projection is: %s\n", poDataset->GetProjectionRef() );
+*/
+	
 //	cout << " In cGDAL::openFile(...) AFTER GDALOpen ..." << endl;
 	if( poDataset->GetProjectionRef() != NULL ) 
 	{
 		poSRS = OGRSpatialReference(poDataset->GetProjectionRef());
-		char *pszProjWKT = NULL;
+		char *pszProjWKT;
+		pszProjWKT= new char[20];
 //		cout << " In cGDAL::openFile(...) BEFORE poSRS.export ..." << endl;
 		poSRS.exportToProj4( &pszProjWKT ); 
-//		cout << " In cGDAL::openFile(...) net NA poSRS.export ..." << endl;
-		Proj4=pj_init_plus(pszProjWKT);
-		tempProj4 = pj_get_def(Proj4, 0);
-//		cout << " In cGDAL::openFile(...) AFTER poSRS.export ..." << tempProj4 << endl;
+		printf("In cGDAL::openFile(...) Projection from file: %s\n",pszProjWKT);
 
+		if (nullptr!=Proj4)
+			pj_free(Proj4);
 
 		if ((Proj4=pj_init_plus(pszProjWKT)))
 		{
+//			cout << " In cGDAL::openFile(...) voor tempProj4 ..." << endl;
 			tempProj4 = pj_get_def(Proj4, 0);
-//			cout << " In cGDAL::openFile(...) (Proj4=pj_init_plus(pszProjWKT) ..." << tempProj4 << endl;
+			cout << " In cGDAL::openFile(...) (Proj4=pj_init_plus(pszProjWKT) ..." << tempProj4 << endl;
 			if (tempProj4.find("utm")<tempProj4.size())
 			{
 				Proj = UTM;
 				CentMer=atoi((tempProj4.substr(tempProj4.find("zone")+5,2)).c_str());
 				cout << "Zone = " << CentMer << endl;
 			}
-			else if (tempProj4.find("latlon")<tempProj4.size())
+			else if (pj_is_latlong(Proj4))
 				Proj = DEG;
 			else if (tempProj4.find("tmerc")<tempProj4.size())
 			{
 				Proj=WGS84GC;
 				CentMer=atoi((tempProj4.substr(tempProj4.find("lon_0")+6,3)).c_str());
-//				cout << "CentMer = " << CentMer << endl;
+				cout << "CentMer = " << CentMer << endl;
 			}
-			else Proj = NDEF;
+//			else Proj = NDEF;
 //			cout << " In cGDAL::openFile(...) Proj = " << Proj << endl;
 			if (tempProj4.find("north")<tempProj4.size())
 				mSouth=false;
@@ -114,21 +118,27 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		}
 		else
 		{
-			printf("Error in: %s",pszProjWKT);
-//			cout << " In cGDAL::openFile(...) in else ..." << endl;
-			if (Proj4=pj_init_plus("+proj=latlong"))
+			if (nullptr!=Proj4)
+				pj_free(Proj4);
+
+			double adfGeoTransform[6];
+			bool South = true;
+			if( poDataset->GetGeoTransform( adfGeoTransform ) == CE_None )
+				if (UTM==Proj) South = (adfGeoTransform[3]>10000000.0);
+				else South = (adfGeoTransform[3]<0);
+			
+			string temp =ReturnProj4(Proj, CentMer, South);
+
+			if ((Proj4=pj_init_plus(temp.c_str())))
 			{
-				printf("Initialised Proj4: %s\n",pj_get_def(Proj4,0));	
-				Proj = DEG;
-				cout << " In cGDAL::openFile(...) Proj DEG ..." << endl;
+				cout << "In cGDAL::openFile(...); No projection info in file.";
+				cout << "Assuming supplied info correct and so" << endl;
+				printf("initialised Proj4 as: %s\n",pj_get_def(Proj4,0));
 			}
-			else printf("Error in: %s",pszProjWKT);
 		}
 //		cout << "In cGDAL::openFile(...) BEFORE CPLFree( pszProjWKT )" << endl;
 		CPLFree( pszProjWKT );
-
 	}
-	else Proj = DEG;
 
 //	cout << " In cGDAL::openFile(...) before Getting the raster band ..." << endl;
 	/* Getting the raster band */
@@ -333,49 +343,53 @@ bool cGDAL::writeFile(Float2DArray &Raster,
 }
 
 //******************************************************************
-string cGDAL::ReturnProj4(GeoType Type,int CentMer, bool Hem)
+string cGDAL::ReturnProj4(GeoType &Type,int CentMer, bool Hem)
 {
-	char centmer[100];
-		char southstr[100];
-		string Proj4 = "";
-		switch (Type) 
-		{
-			case DEG:
-				Proj4 = "+latlong +ellps=WGS84 +datum=WGS84 +no_defs";
-//				static char *DEGparms[] = {	"proj=latlong",	"ellps=WGS84",	
-//											"datum=WGS84",	"no_defs"};
-//				Proj = pj_init(sizeof(DEGparms)/sizeof(char*),DEGparms);
-				break;
-			case WGS84GC:
-				sprintf(centmer,"+proj=tmerc +ellps=WGS84 +lon_0=%d +units=m +no_defs",CentMer);
-				Proj4 = centmer;
-//				sprintf(centmer,"lon_0=%d",PointCM);
-//				static char *WGS84GCparms[] = {"proj=tmerc","ellps=WGS84",
-//												centmer,"units=m","no_defs"};
-//				Proj = pj_init(sizeof(WGS84GCparms)/sizeof(char*),WGS84GCparms);
-				break;
-			case UTM:
-				if (Hem) {
-					sprintf(southstr,"south");
-					}
-					else {
-					sprintf(southstr,"north");
-					}
-				sprintf(centmer,"+proj=utm +zone=%d +%s",(int)ceil((180+CentMer)/6),southstr);
-				Proj4 = centmer;
-//				sprintf(centmer,"zone=%d",(int)ceil((180+PointCM)/6));
-//				if (South)
-//					sprintf(southstr,"south");
-//				else 
-//					sprintf(southstr,"north");
-//				static char *UTMparms[] = {	"proj=utm",	centmer,southstr };
-//				Proj = pj_init(sizeof(UTMparms)/sizeof(char*),UTMparms);
-				break;
-			case NDEF:
-				Proj4 = "+proj=latlong";
-//				static char *NDEFparms[] = {"proj=latlong"	};
-//				Proj = pj_init(sizeof(NDEFparms)/sizeof(char*),NDEFparms);
-				break;
+	char *centmer;
+	centmer = new char[100];
+	char *southstr;
+	southstr = new char[100];
+	string Proj4 = "";
+	switch (Type) 
+	{
+		case DEG:
+			Proj4 = "+latlong +ellps=WGS84 +datum=WGS84 +no_defs";
+//			static char *DEGparms[] = {	"proj=latlong",	"ellps=WGS84",	
+//										"datum=WGS84",	"no_defs"};
+//			Proj = pj_init(sizeof(DEGparms)/sizeof(char*),DEGparms);
+			break;
+		case WGS84GC:
+			sprintf(centmer,"+proj=tmerc +ellps=WGS84 +lon_0=%d +units=m +no_defs",CentMer);
+			Proj4 = centmer;
+//			sprintf(centmer,"lon_0=%d",PointCM);
+//			static char *WGS84GCparms[] = {"proj=tmerc","ellps=WGS84",
+//									centmer,"units=m","no_defs"};
+//			Proj = pj_init(sizeof(WGS84GCparms)/sizeof(char*),WGS84GCparms);
+			break;
+		case UTM:
+			if (Hem) 
+				sprintf(southstr,"south");
+			else 	sprintf(southstr,"north");
+				
+			sprintf(centmer,"+proj=utm +zone=%d +%s",(int)ceil((180+CentMer)/6),southstr);
+			Proj4 = centmer;
+//			sprintf(centmer,"zone=%d",(int)ceil((180+PointCM)/6));
+//			if (South)
+//				sprintf(southstr,"south");
+//			else 
+//				sprintf(southstr,"north");
+//			static char *UTMparms[] = {	"proj=utm",	centmer,southstr };
+//			Proj = pj_init(sizeof(UTMparms)/sizeof(char*),UTMparms);
+			break;
+		case NDEF:
+			Proj4 = "+proj=latlong";
+			Type = DEG;
+//			static char *NDEFparms[] = {"proj=latlong"	};
+//			Proj = pj_init(sizeof(NDEFparms)/sizeof(char*),NDEFparms);
+			break;
 		}
+
+		delete [] centmer;
+		delete [] southstr;		
 		return Proj4;
 }

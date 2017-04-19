@@ -198,6 +198,9 @@ void cAntennaFilesImporter::ImportAntennas ()
 					
 					QStringList list = line.split(" ", QString::SkipEmptyParts);
 					
+//					for (unsigned i=0; i<list.count(); i++)
+//						cout << list[i].toStdString() << endl;
+					
 					if( (list.count()!=0)&&(list.count()>=2) )
 					{
 						if(list[0]=="HORIZONTAL")

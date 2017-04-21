@@ -152,6 +152,7 @@ void QRap::initGui()
 //  	mQGisIface->addPluginToMenu( tr( "Q-Rap Database" ), mQActionPointer );
 
   	Mouse = new MouseEvents(mQGisIface->mapCanvas());
+   mMapToolEmitPoint = new QgsMapToolEmitPoint(mQGisIface->mapCanvas());
   	cout << "Na Mouse" << endl;
   	connect(Mouse, SIGNAL(RightPoint(QgsPoint&)), this, SLOT(ReceivedRightPoint(QgsPoint&)));
   	connect(Mouse, SIGNAL(LeftPoint(QgsPoint&)), this, SLOT(ReceivedLeftPoint(QgsPoint&)));

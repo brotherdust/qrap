@@ -263,5 +263,6 @@ private:
 	bool mLoaded;
 	// the username and password for the database login.
   	string machinename;
+	QgsMapToolEmitPoint*  mMapToolEmitPoint;
 };
 #endif //QRap_H

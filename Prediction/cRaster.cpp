@@ -65,7 +65,7 @@ cRaster::cRaster(string Directory,
 	mMin = Min;
 	mMax = Max;
 	mProj4=nullptr;
-//	cout << "In CRaster Non-default constructor ... Proj4Sting = " << Proj4String << endl;
+	cout << "In CRaster Non-default constructor ... FileName = " << FileName.c_str() << endl;
 	if (mProjType != NDEF && Proj4String != "")
 	{
 //		cout << "In CRaster Non-default constructor ... Proj4Sting empty " << endl;
@@ -88,7 +88,7 @@ cRaster::cRaster(string Directory,
 	ReadFile(Directory, FileName,filetype,mProjType,
 							Proj4String,mCentMer,mSouth,
 							mMin,mMax);
-	cout << "In CRaster Non-default constructor ... after ReadFile assignment." << endl;
+//	cout << "In CRaster Non-default constructor ... after ReadFile assignment." << endl;
 	if (mSouth)
 	{
 		mNW.SetGeoType(mProjType,mCentMer);
@@ -99,7 +99,7 @@ cRaster::cRaster(string Directory,
 		mNW.SetGeoType(mProjType,mCentMer);
 		mNW.Get(mMapLat,mMapLon,mMapType,mMapCM,Hem);
 	}
-//	cout << "Constructer Raster: " << mFilename << endl;
+	cout << "Leaving cRaster non-default Constructer: mFilename = " << mFilename << endl;
 /*	cout << "mSouth = ";
 	if (mSouth) cout << " true" << endl;
 	else cout << " false" << endl;
@@ -112,6 +112,8 @@ cRaster::~cRaster()
 //	cout << "cRaster Destructor" << endl;
 	delete [] mAdfGeoTransform;
 	delete_Float2DArray(mRaster); 
+	if (nullptr!=mProj4)
+		pj_free(mProj4);
 }
 
 //****************************************************************************
@@ -265,7 +267,6 @@ bool cRaster::ReadFile(string Directory,
 	char * Proj4char;
 	Proj4char = new char[100];
 
-//	cout << "In cRaster::ReadFile ... Proj4String = " << Proj4String << endl;
 	cout << "In cRaster::ReadFile ... Proj4String.c_str() = " << Proj4String.c_str() << endl;
 
 	strcpy(Proj4char,Proj4String.c_str());
@@ -286,6 +287,7 @@ bool cRaster::ReadFile(string Directory,
 		}
 
 	}
+	delete [] Proj4char;
 
 
 	if (filetype == BINFILE) // binary file
@@ -377,16 +379,12 @@ bool cRaster::ReadFile(string Directory,
 			mNW.SetGeoType(mProjType,mCentMer);
 			mSE.SetGeoType(mProjType,mCentMer);
 			ReturnProj4(mProjType,mCentMer,mSouth,mProj4);
-//			string Proj4 = pj_get_def(mProj4,0);
-//			cout << "In cRaster::ReadFile ... msg Proj4= " << Proj4 << endl;
 		}
-		if (mProj4==NULL)
+		if (nullptr==mProj4)
 		{
 			mNW.SetGeoType(mProjType,mCentMer);
 			mSE.SetGeoType(mProjType,mCentMer);
 			ReturnProj4(mProjType,mCentMer,mSouth,mProj4);
-//			string Proj4 = pj_get_def(mProj4,0);
-//			cout << "In cRaster::ReadFile ...mProj4==NULL Proj4= " << Proj4 << endl;
 		}
 		GetRes();
 		return true;

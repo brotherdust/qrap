@@ -132,7 +132,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 			if ((Proj4=pj_init_plus(temp.c_str())))
 			{
 				cout << "In cGDAL::openFile(...); No projection info in file.";
-				cout << "Assuming supplied info correct and so" << endl;
+				cout << "Assuming supplied info correct and so " << endl;
 				printf("initialised Proj4 as: %s\n",pj_get_def(Proj4,0));
 			}
 		}
@@ -140,7 +140,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		CPLFree( pszProjWKT );
 	}
 
-//	cout << " In cGDAL::openFile(...) before Getting the raster band ..." << endl;
+	cout << " In cGDAL::openFile(...) before Getting the raster band ..." << endl;
 	/* Getting the raster band */
 	poBand = poDataset->GetRasterBand( 1 );
 	poBand->GetBlockSize( &nBlockXSize, &nBlockYSize );

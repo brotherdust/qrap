@@ -561,10 +561,10 @@ bool cPlotTask::ReadPlotRequest(const char *filename)
 				W = min(W,Lon);
 //				cout << "2	N: " << N << "	S: "<< S << "	E: " << E << "	W: " << W << endl;
 				cGeoP NewPoint;
-				mFixedInsts[ii].sSitePos.Display();
+//				mFixedInsts[ii].sSitePos.Display();
 //				cout << mFixedInsts[ii].sRange << endl;
 				NewPoint.FromHere(mFixedInsts[ii].sSitePos,mFixedInsts[ii].sRange,0.0);
-				NewPoint.Display();
+//				NewPoint.Display();
 				//Check North
 				NewPoint.Get(Lat,Lon);
 				N = max(N,Lat);

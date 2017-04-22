@@ -47,12 +47,12 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 			uint &rows, uint &cols, double &ns_res, double &ew_res,
 			float &min,float &max, int &CentMer)
 {
-	cout << "Entering cGDAL::openFile(....)" << endl;
 	Rows = 0;
 	Cols = 0;
 	string tempProj4;
 	string FN = Directory+"/" +FileName;
 	m_file_name = FN;
+	cout << "Entering cGDAL::openFile(....)" << FN.c_str() << endl;
 	GDALDataset *poDataset;
 	poDataset = (GDALDataset *) GDALOpen( m_file_name.c_str(), GA_ReadOnly );
 	if( NULL==poDataset)
@@ -78,7 +78,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
     		printf( "Projection is: %s\n", poDataset->GetProjectionRef() );
 */
 	
-//	cout << " In cGDAL::openFile(...) AFTER GDALOpen ..." << endl;
+	cout << " In cGDAL::openFile(...) AFTER GDALOpen ..." << endl;
 	if( poDataset->GetProjectionRef() != NULL ) 
 	{
 		poSRS = OGRSpatialReference(poDataset->GetProjectionRef());

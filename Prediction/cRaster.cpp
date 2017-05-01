@@ -66,17 +66,6 @@ cRaster::cRaster(string Directory,
 	mMax = Max;
 	mProj4=nullptr;
 	cout << "In CRaster Non-default constructor ... FileName = " << FileName.c_str() << endl;
-	if (mProjType != NDEF && Proj4String != "")
-	{
-//		cout << "In CRaster Non-default constructor ... Proj4Sting empty " << endl;
-		mProj4=pj_init_plus(Proj4String.c_str());
-	}
-	else if (mProjType != NDEF && Proj4String == "")
-	{
-//		cout << "In CRaster Non-default constructor ... calling ReturnProj4 " << endl;
-		ReturnProj4(mProjType,mCentMer,mSouth,mProj4);
-	}
-//	cout << "In CRaster Non-default constructor ... Geotype = " << mProjType << endl;
 
 	mNSres = 1.0;
 	mEWres = 1.0;
@@ -85,10 +74,27 @@ cRaster::cRaster(string Directory,
 //	cout << "In cRaster non-default constructor, before new_Float2DArray" << endl;
 	mRaster = new_Float2DArray(mRows,mCols);
 //	cout << "In cRaster non-default constructor, before ReadFile" << endl;	
+	if ((Proj4String != "")&&(nullptr==mProj4))
+	{
+//		cout << "In CRaster Non-default constructor ... Proj4Sting empty " << endl;
+		mProj4=pj_init_plus(Proj4String.c_str());
+	}
+	else if ((mProjType != NDEF)&&(nullptr==mProj4))
+	{
+//		cout << "In CRaster Non-default constructor ... calling ReturnProj4 " << endl;
+		ReturnProj4(mProjType,mCentMer,mSouth,mProj4);
+		if (nullptr!=mProj4) Proj4String = pj_get_def(mProj4, 0);
+	}
+	
+
 	ReadFile(Directory, FileName,filetype,mProjType,
 							Proj4String,mCentMer,mSouth,
 							mMin,mMax);
+
+
+
 //	cout << "In CRaster Non-default constructor ... after ReadFile assignment." << endl;
+
 	if (mSouth)
 	{
 		mNW.SetGeoType(mProjType,mCentMer);
@@ -99,11 +105,18 @@ cRaster::cRaster(string Directory,
 		mNW.SetGeoType(mProjType,mCentMer);
 		mNW.Get(mMapLat,mMapLon,mMapType,mMapCM,Hem);
 	}
+
+
+	cout << "In CRaster Non-default constructor ... Geotype = " << mProjType << endl;
+	cout << "mCentMer = " << mCentMer << endl;
+	if (nullptr!=mProj4) Proj4String = pj_get_def(mProj4, 0);
+	cout << "Proj4string = " << Proj4String << endl;
+	if (mSouth) cout << " South" << endl;
+	else cout << " North" << endl;
+
 	cout << "Leaving cRaster non-default Constructer: mFilename = " << mFilename << endl;
-/*	cout << "mSouth = ";
-	if (mSouth) cout << " true" << endl;
-	else cout << " false" << endl;
-*/
+
+
 }
 
 //************************************************************************
@@ -276,23 +289,18 @@ bool cRaster::ReadFile(string Directory,
 		if (mProjType != NDEF && Proj4String != "")
 		{
 			mProj4=pj_init_plus(Proj4char);
-//			string Proj4 = pj_get_def(mProj4,0);
-//			cout << "In cRaster::ReadFile ... Proj4String!='' Proj4= " << Proj4 << endl;
 		}
 		else if (mProjType != NDEF && Proj4String == "")
 		{
 			ReturnProj4(mProjType,mCentMer,mSouth,mProj4);
-//			string Proj4 = pj_get_def(mProj4,0);
-//			cout << "In cRaster::ReadFile ... Proj4String=='' Proj4= " << Proj4 << endl;
 		}
-
 	}
 	delete [] Proj4char;
 
 
 	if (filetype == BINFILE) // binary file
 	{
-//		cout << endl << "In bool cRaster::ReadFile( ... filetype == BINFILE " << endl;
+		cout << endl << "In bool cRaster::ReadFile(...) filetype == BINFILE. First Try" << endl;
 		cBIN MyRaster;
 		msgs = MyRaster.openFile(mRaster, Directory, FileName, mNW,mSE, 
 				mProjType, mProj4, mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer);
@@ -300,7 +308,7 @@ bool cRaster::ReadFile(string Directory,
 	}
 	else if (filetype == GDALFILE) // GDAL file 
 	{
-//		cout << endl << "In bool cRaster::ReadFile( ... filetype == GDALFILE " << endl;
+		cout << endl << "In bool cRaster::ReadFile(...) filetype == GDALFILE . First try." << endl;
 		cGDAL MyRaster;
 		msgs = MyRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer);
@@ -323,7 +331,7 @@ bool cRaster::ReadFile(string Directory,
 */
 	if (!msgs)
 	{
-//		cout << endl <<"In bool cRaster::ReadFile( ... !msgs " << endl;
+		cout << endl <<"In bool cRaster::ReadFile(...) !msgs. Initial try failed. " << endl;
 		cGDAL MyGDALRaster;
 		msgs = (MyGDALRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 			mProjType,mProj4, mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer));
@@ -332,7 +340,7 @@ bool cRaster::ReadFile(string Directory,
 		{
 			mSouth = mNW.Hemisphere();
 			mFileType = GDALFILE;
-//			cout << endl << "In bool cRaster::ReadFile( ... !msgs  GDALFILE " << endl;
+			cout << endl << "In bool cRaster::ReadFile(...) !msgs  GDALFILE succeeded after defaulting to GDAL" << endl;
 		}
 		else
 		{
@@ -344,7 +352,7 @@ bool cRaster::ReadFile(string Directory,
 				mFileType = BINFILE;
 				mProjType = WGS84GC;
 				mSouth = mNW.Hemisphere();
-//				cout << endl << "In bool cRaster::ReadFile( ... !msgs  BINFILE " << endl;
+				cout << "In bool cRaster::ReadFile(...) !msgs attempting BINFILE after GDAL failed." << endl;
 			}
 /*			else
 			{
@@ -360,14 +368,17 @@ bool cRaster::ReadFile(string Directory,
 					cout << "In bool cRaster::ReadFile( ... !msgs  ORTFILE " << endl;
 				}
 */
-			else return false;
+			else 
+			{
+				cout << " Leaving cRaster::ReadFile(....) Could not load file. Returning False" << endl; 
+				return false;
+			}
 			
 		}
 	}
 
 	if (msgs)
 	{	
-//		cout << "In bool cRaster::ReadFile( ... msgs true " << endl;	
 		if (CentMer != -1 && CentMer != mCentMer)
 			mCentMer = CentMer;
 		if (Min > mMin)	mMin = Min;
@@ -378,7 +389,6 @@ bool cRaster::ReadFile(string Directory,
 			mProjType = Proj;
 			mNW.SetGeoType(mProjType,mCentMer);
 			mSE.SetGeoType(mProjType,mCentMer);
-			ReturnProj4(mProjType,mCentMer,mSouth,mProj4);
 		}
 		if (nullptr==mProj4)
 		{
@@ -387,9 +397,10 @@ bool cRaster::ReadFile(string Directory,
 			ReturnProj4(mProjType,mCentMer,mSouth,mProj4);
 		}
 		GetRes();
+		cout << "Leaving cRaster::ReadFile(...). File loaded." << endl;		
 		return true;
 	}
-	else return false;
+	cout << " Leaving cRaster::ReadFile(....). returning False as last resort" << endl; 
 	return false;
 }
 
@@ -496,7 +507,7 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 //		cout << " In cRaster::GetValue: mCols = " << mCols << endl;
 		// \TODO the following two line are only for debugging and need to be taken out
 //		Point.SetGeoType(DEG); 
-		Point.Display();
+//		Point.Display();
 		Point.SetGeoType(mProjType,mCentMer);
 //		cout << " In cRaster::GetValue: after Point.SetGeoType" << endl;		
 		Point.Get(PointLat,PointLon,PointType,PointCM,Hem);

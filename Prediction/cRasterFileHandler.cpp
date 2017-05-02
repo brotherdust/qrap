@@ -32,6 +32,8 @@ cRasterFileHandler::cRasterFileHandler()
 {
 	short int Source;
 	mSampleMethod=1;
+	mPreferedSetNW.Set(-90,180);
+	mPreferedSetSE.Set(90,-180);
 //	Source = atoi(gDb.GetSetting("DEMsource").c_str());
 //	SetRasterFileRules(Source);
 }
@@ -46,8 +48,10 @@ void cRasterFileHandler::DirectChangeSetToUse(int OriginalSet)
 //*********************************************************************
 cRasterFileHandler::cRasterFileHandler(short int Source)
 {
-	SetRasterFileRules(Source);
 	mSampleMethod=1;
+	SetRasterFileRules(Source);
+	mPreferedSetNW.Set(-90,180);
+	mPreferedSetSE.Set(90,-180);
 }
 
 //*********************************************************************
@@ -163,7 +167,7 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	unsigned NumPoints;
 	bool IsInSet=false;
 	bool AllFound=false;
-	unsigned j,k,Current;
+	unsigned i,j,k,Current;
 	float *profile;
 //	TxLoc.SetGeoType(DEG);
 //	RxLoc.SetGeoType(DEG);
@@ -179,10 +183,24 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	point.SetGeoType(WGS84GC);
 	string LoadedRastersList="'";
 
+	i=0;
+	while(i<mCurrentRasters.size())
+	{
+		if (mCurrentRasters[i]->mFileSetLevel>0)
+		{
+			delete mCurrentRasters[i];
+			mCurrentRasters.erase(mCurrentRasters.begin()+i);
+		}
+		else i++;
+	}
+
+
 	if (mCurrentRasters.size()==0)
 		AddRaster(TxLoc);
 	if (mCurrentRasters.size()==0)
-		AddRaster(RxLoc);	
+		AddRaster(RxLoc);
+	else if (mCurrentRasters[mCurrentRasters.size()-1]->mFileSetLevel>0)
+		AddRaster(RxLoc);
 	if (mCurrentRasters.size()==0)
 	{
 		string err = "cRasterFileHandler::GetForLink;  No raster files could be found. Confirm that File-Set Order exist. ";
@@ -192,13 +210,13 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	}
 	
 	k=mCurrentRasters.size()-1; 
-	IsInSet = mCurrentRasters[k]->IsIn(TxLoc);
+	IsInSet = (mCurrentRasters[k]->IsIn(TxLoc))&&(0==mCurrentRasters[k]->mFileSetLevel);
 	while ((k>0)&&(!IsInSet))
 	{
 		LoadedRastersList+=mCurrentRasters[k]->mFilename;
 		LoadedRastersList+="','";
 		k--;
-		IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(TxLoc));
+		IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(TxLoc))&&(0==mCurrentRasters[k]->mFileSetLevel));
 	}
 	if (!IsInSet)
 	{
@@ -226,36 +244,73 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 		AllFound = false;
 	}
 	
+	bool Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
+	bool ToSwitch=false;
+
 	for(j=1; j<NumPoints; j++)
 	{
 		point.FromHere(TxLoc,j*DistRes,Bearing);
 		profile[j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);
+		if (!Preferred)
+			ToSwitch=point.Between(mPreferedSetNW,mPreferedSetSE);
+		else ToSwitch=false;
 //		cout << j << "	" << profile[j] << endl;
-		if ((profile[j] <-440.0)||(profile[j] >8880)||(profile[j]==OUTOFRASTER))
+
+		if ((profile[j] <-440.0)||(profile[j] >8880)||(profile[j]==OUTOFRASTER)||ToSwitch)
 		// to allow for the Dead Sea shore and Mount Everest
 		{
 			LoadedRastersList="'";
 			k = mCurrentRasters.size()-1;
-			IsInSet= (mCurrentRasters[k]->IsIn(point));
+			IsInSet= (mCurrentRasters[k]->IsIn(point))&&(0==mCurrentRasters[k]->mFileSetLevel);
 			while ((k>0)&&(!IsInSet))
 			{
 				LoadedRastersList+=mCurrentRasters[k]->mFilename;
 				LoadedRastersList+="','";
 				k--;
-				IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(point));
+				IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(point))&&
+						(0==mCurrentRasters[k]->mFileSetLevel));
 			}
-			if (!IsInSet)
+			if ((!IsInSet)&&(ToSwitch))
 			{
 				LoadedRastersList+=mCurrentRasters[Current]->mFilename;
 				LoadedRastersList+="'";
 				IsInSet = AddRaster(point,LoadedRastersList);
 				k = mCurrentRasters.size()-1;
-				IsInSet= mCurrentRasters[k]->IsIn(point);
+				IsInSet= (mCurrentRasters[k]->IsIn(point))&&(0==mCurrentRasters[k]->mFileSetLevel);
 				while ((k>0)&&(!IsInSet))
 				{
 					k--;
+					IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(point))
+							&&(0==mCurrentRasters[k]->mFileSetLevel));
+				}
+			}
+
+			if(!IsInSet)
+			{
+				LoadedRastersList="'";
+				k = mCurrentRasters.size()-1;
+				IsInSet= (mCurrentRasters[k]->IsIn(point));
+				while ((k>0)&&(!IsInSet))
+				{
+					LoadedRastersList+=mCurrentRasters[k]->mFilename;
+					LoadedRastersList+="','";
+					k--;
 					IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(point));
 				}
+				if (!IsInSet)
+				{
+					LoadedRastersList+=mCurrentRasters[Current]->mFilename;
+					LoadedRastersList+="'";
+					IsInSet = AddRaster(point,LoadedRastersList);
+					k = mCurrentRasters.size()-1;
+					IsInSet= (mCurrentRasters[k]->IsIn(point));
+					while ((k>0)&&(!IsInSet))
+					{
+						k--;
+						IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(point));
+					}
+				}
+
 			}
 				
 			if (IsInSet)
@@ -263,6 +318,7 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 				Current =k;
 				profile[j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);
 				mCurrentRasters[Current]->mUsed = true;
+				Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
 			}
 			else
 			{
@@ -308,20 +364,44 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 		AngRes = (double)360.0/(double)NumAngles;
 	}
 	else AngRes = 360.0/NumAngles;
+
+	i=0;
+	while(i<mCurrentRasters.size())
+	{
+		if (mCurrentRasters[i]->mFileSetLevel>0)
+		{
+			delete mCurrentRasters[i];
+			mCurrentRasters.erase(mCurrentRasters.begin()+i);
+		}
+		else i++;
+	}
 	
 	if (mCurrentRasters.size()==0)
 		AddRaster(SitePos);
 	
 	if (!Fixed)
 	{
-		for (j=0; j<4; j++) // add all the raster for at least the ends
+		for (j=0; j<4; j++) //Check for preferred files for all the edges.
 		{
 			edge.FromHere(SitePos,Range,j*90);
 			IsInSet = false;
 			for (i=0; i<mCurrentRasters.size(); i++)
-				IsInSet = IsInSet || (mCurrentRasters[i]->IsIn(edge));
+				IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(edge))
+						&&(0==mCurrentRasters[i]->mFileSetLevel));
 			if (!IsInSet)
+			{
+				i=1;
+				while(i<mCurrentRasters.size())
+				{
+					if (mCurrentRasters[i]->mFileSetLevel>0)
+					{
+						delete mCurrentRasters[i];
+						mCurrentRasters.erase(mCurrentRasters.begin()+i);
+					}
+					else i++;
+				}
 				AddRaster(edge);
+			}
 		}
 //		for (i=0; i<mCurrentRasters.size(); i++)
 //			DistRes = min(DistRes,mCurrentRasters[i]->GetRes());
@@ -343,14 +423,15 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 //	cout << "NA: " << NumAngles << "	ND: "  << NumDistance << endl;
 
 	k=mCurrentRasters.size()-1; 
-	IsInSet = mCurrentRasters[k]->IsIn(SitePos);
+	IsInSet = (mCurrentRasters[k]->IsIn(SitePos))&&(0==mCurrentRasters[k]->mFileSetLevel);
 	LoadedRastersList="'";
 	while ((k>0)&&(!IsInSet))
 	{
 		LoadedRastersList+=mCurrentRasters[k]->mFilename;
 		LoadedRastersList+="','";
 		k--;
-		IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(SitePos));
+		IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(SitePos))
+					&&(0==mCurrentRasters[k]->mFileSetLevel));
 	}
 	if (!IsInSet)
 	{
@@ -384,47 +465,85 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 	for (i=1;i<NumAngles;i++)
 		Data[i][0]=Data[0][0];
 	LoadedRastersList="'";
+
+	bool Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
+	bool ToSwitch=false;
+	
 	for (i=0; i<NumAngles; i++)
 	{
 		for(j=1; j<NumDistance; j++)
 		{
 			point.FromHere(SitePos,j*DistRes,i*AngRes);
 			Data[i][j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);		
-			if ((Data[i][j] <-440.0)||(Data[i][j] >8880)||(Data[i][j]==OUTOFRASTER))
+			if (!Preferred)
+				ToSwitch=point.Between(mPreferedSetNW,mPreferedSetSE);
+			else ToSwitch=false;
+			if ((Data[i][j] <-440.0)||(Data[i][j] >8880)||(Data[i][j]==OUTOFRASTER)||ToSwitch)
 			{
 //				cout << "OUT: " << OUTOFRASTER << endl;
 //				point.SetGeoType(DEG);
 //				point.Display();
 //				mCurrentRasters[Current]->mUsed = false;
 				k = mCurrentRasters.size()-1;
-				IsInSet= (mCurrentRasters[k]->IsIn(point));
+				IsInSet= (mCurrentRasters[k]->IsIn(point))&&(0==mCurrentRasters[k]->mFileSetLevel);
 				LoadedRastersList="'";
 				while ((k>0)&&(!IsInSet))
 				{
 					LoadedRastersList+=mCurrentRasters[k]->mFilename;
 					LoadedRastersList+="','";
 					k--;
-					IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(point));
+					IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(point))
+							&&(0==mCurrentRasters[k]->mFileSetLevel));
 				}
-				if (!IsInSet)
+				if ((!IsInSet)&&(ToSwitch))
 				{
 					LoadedRastersList+=mCurrentRasters[Current]->mFilename;
 					LoadedRastersList+="'";
 					IsInSet = AddRaster(point,LoadedRastersList);
 					k = mCurrentRasters.size()-1;
-					IsInSet= mCurrentRasters[k]->IsIn(point);
+					IsInSet= (mCurrentRasters[k]->IsIn(point))
+						&&(0==mCurrentRasters[k]->mFileSetLevel);
 					while ((k>0)&&(!IsInSet))
 					{
 						k--;
-						IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(point));
+						IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(point))
+								&&(0==mCurrentRasters[k]->mFileSetLevel));
 					}
 				}
-				
+
+				if(!IsInSet)
+				{
+					LoadedRastersList="'";
+					k = mCurrentRasters.size()-1;
+					IsInSet= (mCurrentRasters[k]->IsIn(point));
+					while ((k>0)&&(!IsInSet))
+					{
+						LoadedRastersList+=mCurrentRasters[k]->mFilename;
+						LoadedRastersList+="','";
+						k--;
+						IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(point));
+					}
+					if (!IsInSet)
+					{
+						LoadedRastersList+=mCurrentRasters[Current]->mFilename;
+						LoadedRastersList+="'";
+						IsInSet = AddRaster(point,LoadedRastersList);
+						k = mCurrentRasters.size()-1;
+						IsInSet= (mCurrentRasters[k]->IsIn(point));
+						while ((k>0)&&(!IsInSet))
+						{
+							k--;
+							IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(point));
+						}
+					}
+				}				
+
 				if (IsInSet)
 				{
 					Current =k;
 					Data[i][j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);
 					mCurrentRasters[Current]->mUsed = true;
+					Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
 				}
 				else
 				{
@@ -462,6 +581,7 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	GeoType Proj=ProjIn;
 	bool Hemisphere=true;
 	bool IsInSet=false;
+	bool InPreferredSet=false;
 	double DistRes;
 	double Res=InRes;
 	string LoadedRastersList="'";
@@ -547,17 +667,156 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	for(i=0; i<Rows; i++)
 		for (j=0; j<Cols; j++)
 			Data[i][j]=OUTOFRASTER;
+
+	i=0;
+	while(i<mCurrentRasters.size())
+	{
+		if (mCurrentRasters[i]->mFileSetLevel>0)
+		{
+			delete mCurrentRasters[i];
+			mCurrentRasters.erase(mCurrentRasters.begin()+i);
+		}
+		else i++;
+	}
+
+	bool IsIn=false;
 	
 	if (mCurrentRasters.size()==0)
 		AddRaster(Mid);
+	else
+	{
+		i=0;
+		IsIn=false;
+		while ((i<mCurrentRasters.size())&&(!IsIn))
+		{
+			IsIn=IsIn||((mCurrentRasters[i]->IsIn(Mid))
+				&&(0==mCurrentRasters[i]->mFileSetLevel));
+			i++;
+		}
+		if (!IsIn)
+		{
+			i=0;
+			while(i<mCurrentRasters.size())
+			{
+				if (mCurrentRasters[i]->mFileSetLevel>0)
+				{
+					delete mCurrentRasters[i];
+					mCurrentRasters.erase(mCurrentRasters.begin()+i);
+				}
+				else i++;
+			}
+			AddRaster(Mid);
+		}
+	}
 	if (mCurrentRasters.size()==0)
 		AddRaster(SE);
+	else
+	{
+		i=0;
+		IsIn=false;
+		while ((i<mCurrentRasters.size())&&(!IsIn))
+		{
+			IsIn=IsIn||((mCurrentRasters[i]->IsIn(SE))
+				&&(0==mCurrentRasters[i]->mFileSetLevel));
+			i++;
+		}
+		if (!IsIn)
+		{
+			i=1;
+			while(i<mCurrentRasters.size())
+			{
+				if (mCurrentRasters[i]->mFileSetLevel>0)
+				{
+					delete mCurrentRasters[i];
+					mCurrentRasters.erase(mCurrentRasters.begin()+i);
+				}
+				else i++;
+			}
+			AddRaster(SE);
+		}
+	}
 	if (mCurrentRasters.size()==0)
 		AddRaster(NE);
+	else
+	{
+		i=0;
+		IsIn=false;
+		while ((i<mCurrentRasters.size())&&(!IsIn))
+		{
+			IsIn=IsIn||((mCurrentRasters[i]->IsIn(NE))
+				&&(0==mCurrentRasters[i]->mFileSetLevel));
+			i++;
+		}
+		if (!IsIn)
+		{
+			i=1;
+			while(i<mCurrentRasters.size())
+			{
+				if (mCurrentRasters[i]->mFileSetLevel>0)
+				{
+					delete mCurrentRasters[i];
+					mCurrentRasters.erase(mCurrentRasters.begin()+i);
+				}
+				else i++;
+			}
+			AddRaster(NE);
+		}
+	}
 	if (mCurrentRasters.size()==0)
 		AddRaster(SW);
+	else
+	{
+		i=0;
+		IsIn=false;
+		while ((i<mCurrentRasters.size())&&(!IsIn))
+		{
+			IsIn=IsIn||((mCurrentRasters[i]->IsIn(SW))
+				&&(0==mCurrentRasters[i]->mFileSetLevel));
+			i++;
+		}
+		if (!IsIn)
+		{
+			i=1;
+			while(i<mCurrentRasters.size())
+			{
+				if (mCurrentRasters[i]->mFileSetLevel>0)
+				{
+					delete mCurrentRasters[i];
+					mCurrentRasters.erase(mCurrentRasters.begin()+i);
+				}
+				else i++;
+			}
+			AddRaster(SW);
+		}
+	}
 	if (mCurrentRasters.size()==0)
 		AddRaster(NW);
+	else
+	{
+		i=0;
+		IsIn=false;
+		while ((i<mCurrentRasters.size())&&(!IsIn))
+		{
+			IsIn=IsIn||((mCurrentRasters[i]->IsIn(NW))
+					&&(0==mCurrentRasters[i]->mFileSetLevel));
+			i++;
+		}
+		if (!IsIn)
+		{
+			i=1;
+			while(i<mCurrentRasters.size())
+			{
+				if (mCurrentRasters[i]->mFileSetLevel>0)
+				{
+					delete mCurrentRasters[i];
+					mCurrentRasters.erase(mCurrentRasters.begin()+i);
+				}
+				else i++;
+			}
+			AddRaster(NW);
+		}
+	}
+	
 
 	if (mCurrentRasters.size()!=0)
 	{
@@ -572,7 +831,8 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 		return false;
 	}
 
-	
+	bool Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
+	bool ToSwitch=false;	
 	for (i=0; (i<Rows); i++)
 	{
 //		Sign = i-midRow;
@@ -587,39 +847,72 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 			Point.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
 //			Point.FromHere(tempP,Sign*(j-midCol)*DistRes,90+(double)(1.0-Sign)*90.0);
 			Data[i][j]=mCurrentRasters[Current]->GetValue(Point,mSampleMethod);
+			if (!Preferred)
+				ToSwitch=Point.Between(mPreferedSetNW,mPreferedSetSE);
+			else ToSwitch=false;
 			tempD= Data[i][j];
-			if ((Data[i][j] == OUTOFRASTER)||(Data[i][j]<-440)||(Data[i][j]>8880))
+			if ((Data[i][j] == OUTOFRASTER)||(Data[i][j]<-440)||(Data[i][j]>8880)||ToSwitch)
 			{
 //				mCurrentRasters[Current]->mUsed = false;
 				k=0;
-				IsInSet= mCurrentRasters[k]->IsIn(Point);
+				IsInSet= (mCurrentRasters[k]->IsIn(Point))&&(0==mCurrentRasters[k]->mFileSetLevel);
 				LoadedRastersList="'";
 				while ((k<mCurrentRasters.size()-1)&&(!IsInSet))
 				{
 					LoadedRastersList+=mCurrentRasters[k]->mFilename;
 					LoadedRastersList+="','";
 					k++;
-					IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(Point));
+					IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(Point))
+								&&(0==mCurrentRasters[k]->mFileSetLevel));
 				}
-				if (!IsInSet)
+				if ((!IsInSet)&&(ToSwitch))
 				{
 					LoadedRastersList+=mCurrentRasters[Current]->mFilename;
 					LoadedRastersList+="'";
 					IsInSet = AddRaster(Point,LoadedRastersList);
 					k=mCurrentRasters.size()-1;
-					IsInSet= mCurrentRasters[k]->IsIn(Point);
+					IsInSet= (mCurrentRasters[k]->IsIn(Point))&&(0==mCurrentRasters[k]->mFileSetLevel);
 					while ((k>0)&&(!IsInSet))
 					{
 						k--;
-						IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(Point));
+						IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(Point))
+								&&(0==mCurrentRasters[k]->mFileSetLevel));
 					}
 				}
+				if(!IsInSet)
+				{
+					LoadedRastersList="'";
+					k = mCurrentRasters.size()-1;
+					IsInSet= (mCurrentRasters[k]->IsIn(Point));
+					while ((k>0)&&(!IsInSet))
+					{
+						LoadedRastersList+=mCurrentRasters[k]->mFilename;
+						LoadedRastersList+="','";
+						k--;
+						IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(Point));
+					}
+					if (!IsInSet)
+					{
+						LoadedRastersList+=mCurrentRasters[Current]->mFilename;
+						LoadedRastersList+="'";
+						IsInSet = AddRaster(Point,LoadedRastersList);
+						k = mCurrentRasters.size()-1;
+						IsInSet= (mCurrentRasters[k]->IsIn(Point));
+						while ((k>0)&&(!IsInSet))
+						{
+							k--;
+							IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(Point));
+						}
+					}
+				}				
+
 				
 				if (IsInSet)
 				{
 					Current = k;
 					Data[i][j] = mCurrentRasters[k]->GetValue(Point,mSampleMethod);
 					mCurrentRasters[k]->mUsed = true;
+					Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
 				}
 				else Data[i][j]=0;
 			}
@@ -723,7 +1016,15 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 //				cout << FileName <<  endl;
 				cRaster* New = new cRaster(Directory, FileName, filetype, GeoProj,proj4string, centmer);
 				New->mUsed=true;
+				New->mFileSetLevel=i;
 				mCurrentRasters.push_back(New);
+				if (0==i)
+				{
+					if (!New->mNW.Between(mPreferedSetNW,mPreferedSetSE))
+					mPreferedSetNW=New->mNW;
+					if (!New->mSE.Between(mPreferedSetNW,mPreferedSetSE))
+					mPreferedSetSE=New->mSE;
+				}
 //				cout << "NumRastersLoaded: " << mCurrentRasters.size()  << endl << endl;
 			} // if r.size()
 			else
@@ -754,7 +1055,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 		i++;
 	}
 	
-	if ((RasterFound)&&(mCurrentRasters.size()>7))
+	if ((RasterFound)&&(mCurrentRasters.size()>4))
 	{	
 		for (i=0; i<mCurrentRasters.size(); i++)
 		{

@@ -91,8 +91,6 @@ cRaster::cRaster(string Directory,
 							Proj4String,mCentMer,mSouth,
 							mMin,mMax);
 
-
-
 //	cout << "In CRaster Non-default constructor ... after ReadFile assignment." << endl;
 
 	if (mSouth)
@@ -512,11 +510,7 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 //		cout << " In cRaster::GetValue: after Point.SetGeoType" << endl;		
 		Point.Get(PointLat,PointLon,PointType,PointCM,Hem);
 //		cout << " In cRaster::GetValue: after Point.Get" << endl;
-		if (mSouth)
-			drow = (mMapLat-PointLat)/mNSres;
-		else
-			drow = (mMapLat-PointLat)/mNSres;
-
+		drow = (mMapLat-PointLat)/mNSres;
 		if (mProjType!=WGS84GC)
 			dcol = (PointLon - mMapLon)/mEWres;
 		else
@@ -528,34 +522,35 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 		{
 			// interpolate between the surrounding 4 points
 			//
-			//             dlon
-			//      x0 X<------>     X x2     ^
+			//                  h1'
+			//     h11 X--------x----X h12        ^
 			//         |        ^    |            |
 			//         |    dlat|    |            |
-			//         |        |      |            | m_res
-			//         |        v     |            |
-			//     x'1 x--------o----x x'2 |
-			//         |             |              |
-			//      x1 X             X x3          v
-			//
-			if (drow<0.0) row = (int)(drow+0.5);
-			else row = (int)(drow);
-			if (dcol<0.0) col = (int)(dcol+0.5);
-			else col = (int)(dcol);
-			if (mSouth)
-				dlat = mMapLat - (double)row*mNSres - PointLat;
-			else
-				dlat = mMapLat - (double)row*mNSres - PointLat;
+			//         |        |    |            | m_res
+			//         |        v    |            |
+			//         |<------>o    |            |
+			//         |   dlon      |            |
+			//     h21 X--------x----X h22        v
+			//                  h2'
+
+			col = floor(dcol);
+			row = floor(drow);
+			dlat = mMapLat - (double)row*mNSres - PointLat;
+
 			if (mProjType!=WGS84GC)
 				dlon = PointLon - mMapLon - (double)col*mEWres;
 			else
 				dlon = mMapLon - PointLon - (double)col*mEWres;
+
 //			cout << " In cRaster::GetValue: row = " << row << "	col = " << col << endl;
 			// get heights at each of surrounding points
-			if ((row>=0)&&(row<mRows)&&(col>=0)&&(col<mCols))
+			if ((row>=0)&&(row+1<mRows)&&(col>=0)&&(col+1<mCols))
 			{
 				h11 = mRaster[row][col];
-				if (row+1 < mRows)   		
+				h21 = mRaster[row+1][col];
+				h12 = mRaster[row][col+1];
+				h22 = mRaster[row+1][col+1];
+/*				if (row+1 < mRows)   		
 					h21 = mRaster[row+1][col];
 				else h21 = h11;
 //				else h21 = OUTOFRASTER;
@@ -569,37 +564,36 @@ float cRaster::GetValue(cGeoP &Point, int Interpolation)
 			 	else if (col+1 < mCols) h22 = h12;
 			 	else h22 = h11;
 //				else h22 = OUTOFRASTER;
+*/
 			}
 			else return OUTOFRASTER;
 			
-			// 1. interpolate in a N-S direction between x0 and x1 to get height at x'1,
-			//    and between x2 and x3 to get height at x'2
-			h1dash = h11 + (dlat/mNSres)*(h21-h11);
-			h2dash = h12 + (dlat/mNSres)*(h22-h12);
+			// 1. interpolate in a E-W direction 
+			h1dash = h11 + (dlon/mEWres)*(h12-h11);
+			h2dash = h21 + (dlon/mEWres)*(h22-h21);
 
-			// 2. interpolate in a E-W direction between x'1 and x'2 to get height at
-			//    point of interest
-			value = h1dash + (dlon/mEWres)*(h2dash-h1dash);
+
+			// 2. interpolate in a N-S direction 
+			value = h1dash + (dlat/mNSres)*(h2dash-h1dash);
 
 			if ((h11!=OUTOFRASTER)&&(h12!=OUTOFRASTER)
 					&&(h21!=OUTOFRASTER)&&(h22!=OUTOFRASTER))
 			{
 				if ((value <-500)||(value>8880))
 				{
-				   		row = (int)(drow+0.5);
-						col = (int)(dcol+0.5);
+				   		row = round(drow);
+						col = round(dcol);
 	   					if ((row>=0)&&(row<mRows)&&(col>=0)&&(col<mCols))
 							return mRaster[row][col];
 						else
 							return OUTOFRASTER;
 				}
-				else
-					return(value);
+				else return(value);
 			}
 		}
 //		cout << "cRaster::GetValue .... amper einde" << endl; 
-		row = (int)(drow+0.5);
-		col = (int)(dcol+0.5);
+		row = round(drow);
+		col = round(dcol);
 //		cout << " In cRaster::GetValue: After Interpololation " << endl;
 //		cout << " In cRaster::GetValue: row = " << row << "	col = " << col << endl;
 	   	if ((row>=0)&&(row<mRows)&&(col>=0)&&(col<mCols))

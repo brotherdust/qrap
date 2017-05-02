@@ -111,7 +111,7 @@ namespace Qrap
 			 * @return A boolean.
 			 */
 			bool GetForCoverage(bool Fixed,	
-								cGeoP SitePos,
+							cGeoP SitePos,
 					    		double &Range, 
 					    		double &DistRes, 
 					    		double &AngRes,
@@ -147,6 +147,8 @@ namespace Qrap
 			VecRaster 	mCurrentRasters;	///< Description
 			IntArray 	mFileSetOrder;		///< Vector of ints containing file-set preferences
 			int 		mSampleMethod;
+			cGeoP		mPreferedSetNW;
+			cGeoP		mPreferedSetSE;
 	};
 }
 #endif

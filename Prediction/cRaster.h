@@ -200,7 +200,7 @@ namespace Qrap
 			 * @return A float.
 			 */
 			float GetValue(cGeoP &Point, 
-					int Interpolation = 0);
+					int Interpolation = 2);
 			
 			/**
 			 * Description of GetRes
@@ -225,9 +225,12 @@ namespace Qrap
 			 *
 			 * @return A boolean.
 			 */
-			bool IsIn (cGeoP point);
+			bool 	IsIn (cGeoP point);
 			
-			bool mUsed;			///< Description
+			bool 		mUsed;			///< Description
+			unsigned	mFileSetLevel;
+			cGeoP		mNW;		///< Description
+			cGeoP		mSE;		///< Description
 
 			bool GetRaster(Float2DArray &Raster, uint &Rows, uint &Cols);
 			void Display();
@@ -239,8 +242,6 @@ namespace Qrap
 			Float2DArray	mRaster;	///< Description
 			GeoType		mProjType;	///< Description
 			int 		mCentMer;
-			cGeoP		mNW;		///< Description
-			cGeoP		mSE;		///< Description
 			unsigned	mRows;		///< Description
 			unsigned	mCols;		///< Description
 			double		mNSres;		///< Description
@@ -256,10 +257,11 @@ namespace Qrap
 						bool South, 
 						projPJ &Proj);
 			FileType mFileType;
-			double 		mMapLat;
-			double		mMapLon;
+			double 		mMapLat; //Northern most point
+			double		mMapLon; //Western most point
 			int		mMapCM;
 			GeoType		mMapType;
+
 	};
 }
 #endif

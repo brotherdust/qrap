@@ -184,7 +184,7 @@ int main (int argc, char **argv)
 	delete [] Hoek; 
 
 
-	Meas.mPathLoss.mClutter.Reset(1);
+//	Meas.mPathLoss.mClutter.Reset(1);
 
 	cout << "Loading measurements ... in main()" << endl;
 

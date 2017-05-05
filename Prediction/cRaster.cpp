@@ -105,16 +105,14 @@ cRaster::cRaster(string Directory,
 	}
 
 
-	cout << "In CRaster Non-default constructor ... Geotype = " << mProjType << endl;
-	cout << "mCentMer = " << mCentMer << endl;
+//	cout << "In CRaster Non-default constructor ... Geotype = " << mProjType << endl;
+//	cout << "mCentMer = " << mCentMer << endl;
 	if (nullptr!=mProj4) Proj4String = pj_get_def(mProj4, 0);
 	cout << "Proj4string = " << Proj4String << endl;
-	if (mSouth) cout << " South" << endl;
-	else cout << " North" << endl;
+//	if (mSouth) cout << " South" << endl;
+//	else cout << " North" << endl;
 
 	cout << "Leaving cRaster non-default Constructer: mFilename = " << mFilename << endl;
-
-
 }
 
 //************************************************************************
@@ -278,7 +276,7 @@ bool cRaster::ReadFile(string Directory,
 	char * Proj4char;
 	Proj4char = new char[100];
 
-	cout << "In cRaster::ReadFile ... Proj4String.c_str() = " << Proj4String.c_str() << endl;
+//	cout << "In cRaster::ReadFile ... Proj4String.c_str() = " << Proj4String.c_str() << endl;
 
 	strcpy(Proj4char,Proj4String.c_str());
 //	if (Proj != mProjType)
@@ -298,7 +296,7 @@ bool cRaster::ReadFile(string Directory,
 
 	if (filetype == BINFILE) // binary file
 	{
-		cout << endl << "In bool cRaster::ReadFile(...) filetype == BINFILE. First Try" << endl;
+//		cout << endl << "In bool cRaster::ReadFile(...) filetype == BINFILE. First Try" << endl;
 		cBIN MyRaster;
 		msgs = MyRaster.openFile(mRaster, Directory, FileName, mNW,mSE, 
 				mProjType, mProj4, mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer);
@@ -306,7 +304,7 @@ bool cRaster::ReadFile(string Directory,
 	}
 	else if (filetype == GDALFILE) // GDAL file 
 	{
-		cout << endl << "In bool cRaster::ReadFile(...) filetype == GDALFILE . First try." << endl;
+//		cout << endl << "In bool cRaster::ReadFile(...) filetype == GDALFILE . First try." << endl;
 		cGDAL MyRaster;
 		msgs = MyRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 				mProjType,mProj4,mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer);
@@ -329,7 +327,7 @@ bool cRaster::ReadFile(string Directory,
 */
 	if (!msgs)
 	{
-		cout << endl <<"In bool cRaster::ReadFile(...) !msgs. Initial try failed. " << endl;
+//		cout << endl <<"In bool cRaster::ReadFile(...) !msgs. Initial try failed. " << endl;
 		cGDAL MyGDALRaster;
 		msgs = (MyGDALRaster.openFile(mRaster,Directory, FileName, mNW,mSE, 
 			mProjType,mProj4, mRows, mCols, mNSres, mEWres,mMin,mMax,mCentMer));
@@ -338,7 +336,7 @@ bool cRaster::ReadFile(string Directory,
 		{
 			mSouth = mNW.Hemisphere();
 			mFileType = GDALFILE;
-			cout << endl << "In bool cRaster::ReadFile(...) !msgs  GDALFILE succeeded after defaulting to GDAL" << endl;
+//			cout << endl << "In bool cRaster::ReadFile(...) !msgs  GDALFILE succeeded after defaulting to GDAL" << endl;
 		}
 		else
 		{
@@ -350,7 +348,7 @@ bool cRaster::ReadFile(string Directory,
 				mFileType = BINFILE;
 				mProjType = WGS84GC;
 				mSouth = mNW.Hemisphere();
-				cout << "In bool cRaster::ReadFile(...) !msgs attempting BINFILE after GDAL failed." << endl;
+//				cout << "In bool cRaster::ReadFile(...) !msgs attempting BINFILE after GDAL failed." << endl;
 			}
 /*			else
 			{
@@ -395,7 +393,7 @@ bool cRaster::ReadFile(string Directory,
 			ReturnProj4(mProjType,mCentMer,mSouth,mProj4);
 		}
 		GetRes();
-		cout << "Leaving cRaster::ReadFile(...). File loaded." << endl;		
+//		cout << "Leaving cRaster::ReadFile(...). File loaded." << endl;		
 		return true;
 	}
 	cout << " Leaving cRaster::ReadFile(....). returning False as last resort" << endl; 
@@ -676,7 +674,7 @@ bool cRaster::ReturnProj4(GeoType PointType,
 				break;
 		}
 //		Proj = nullptr;
-		cout << " In cRaster::ReturnProj, Proj4 = " << Proj4 << endl;
+//		cout << " In cRaster::ReturnProj, Proj4 = " << Proj4 << endl;
 		Proj = pj_init_plus(Proj4.c_str());
 		
 		delete [] centmer;

@@ -52,7 +52,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 	string tempProj4;
 	string FN = Directory+"/" +FileName;
 	m_file_name = FN;
-	cout << "Entering cGDAL::openFile(....)" << FN.c_str() << endl;
+//	cout << "Entering cGDAL::openFile(....)" << FN.c_str() << endl;
 	GDALDataset *poDataset;
 	poDataset = (GDALDataset *) GDALOpen( m_file_name.c_str(), GA_ReadOnly );
 	if( NULL==poDataset)
@@ -79,7 +79,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
     		printf( "Projection is: %s\n", poDataset->GetProjectionRef() );
 */
 	
-	cout << " In cGDAL::openFile(...) AFTER GDALOpen ..." << endl;
+//	cout << " In cGDAL::openFile(...) AFTER GDALOpen ..." << endl;
 	if( poDataset->GetProjectionRef() != NULL ) 
 	{
 		poSRS = OGRSpatialReference(poDataset->GetProjectionRef());
@@ -87,7 +87,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 		pszProjWKT= new char[20];
 //		cout << " In cGDAL::openFile(...) BEFORE poSRS.export ..." << endl;
 		poSRS.exportToProj4( &pszProjWKT ); 
-		printf("In cGDAL::openFile(...) Projection from file: %s\n",pszProjWKT);
+//		printf("In cGDAL::openFile(...) Projection from file: %s\n",pszProjWKT);
 
 		if (nullptr!=Proj4)
 			pj_free(Proj4);
@@ -97,27 +97,24 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 			
 //			cout << " In cGDAL::openFile(...) voor tempProj4 ..." << endl;
 			tempProj4 = pj_get_def(Proj4, 0);
-			cout << " In cGDAL::openFile(...) (Proj4=pj_init_plus(pszProjWKT) ..." << tempProj4 << endl;
+//			cout << " In cGDAL::openFile(...) (Proj4=pj_init_plus(pszProjWKT) ..." << tempProj4 << endl;
 			if (tempProj4.find("north")<tempProj4.size())
 				mSouth=false;
 			else mSouth=true;
-			cout << "In cGDAL::openFile(...) : adfGeoTransform[3] = " << adfGeoTransform[3] << endl;
 			if (tempProj4.find("utm")<tempProj4.size())
 			{
 				Proj = UTM;
 				CentMer=atoi((tempProj4.substr(tempProj4.find("zone")+5,2)).c_str());
-				cout << "Zone = " << CentMer << endl;
+//				cout << "Zone = " << CentMer << endl;
 			}
 			else if (pj_is_latlong(Proj4))
 			{
 				Proj = DEG;
-				mSouth = (adfGeoTransform[3]<0);
-			}
+				}
 			else if (tempProj4.find("tmerc")<tempProj4.size())
 			{
 				Proj=WGS84GC;
 				CentMer=atoi((tempProj4.substr(tempProj4.find("lon_0")+6,3)).c_str());
-				mSouth = (adfGeoTransform[3]<0);
 //				cout << "CentMer = " << CentMer << endl;
 			}
 //			else Proj = NDEF;
@@ -146,48 +143,48 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
 //		cout << "In cGDAL::openFile(...) BEFORE CPLFree( pszProjWKT )" << endl;
 		CPLFree( pszProjWKT );
 	}
-	if (mSouth) cout << "South" << endl;
-	else cout << "North" << endl;
 
-	cout << " In cGDAL::openFile(...) before Getting the raster band ..." << endl;
+//	cout << " In cGDAL::openFile(...) before Getting the raster band ..." << endl;
 	/* Getting the raster band */
 	poBand = poDataset->GetRasterBand( 1 );
 	poBand->GetBlockSize( &nBlockXSize, &nBlockYSize );
-	printf( "Block=%dx%d Type=%s, ColorInterp=%s\n", nBlockXSize, nBlockYSize,
-			GDALGetDataTypeName(poBand->GetRasterDataType()),
-			GDALGetColorInterpretationName(poBand->GetColorInterpretation()) );
+//	printf( "Block=%dx%d Type=%s, ColorInterp=%s\n", nBlockXSize, nBlockYSize,
+//			GDALGetDataTypeName(poBand->GetRasterDataType()),
+//			GDALGetColorInterpretationName(poBand->GetColorInterpretation()) );
 	adfMinMax[0] = poBand->GetMinimum( &bGotMin );
 	adfMinMax[1] = poBand->GetMaximum( &bGotMax );
 	if( ! (bGotMin && bGotMax) )
 		GDALComputeRasterMinMax((GDALRasterBandH)poBand, TRUE, adfMinMax);
-	printf( "Min=%.3fd, Max=%.3f\n", adfMinMax[0], adfMinMax[1] );
+//	printf( "Min=%.3fd, Max=%.3f\n", adfMinMax[0], adfMinMax[1] );
 	min = adfMinMax[0];
 	max = adfMinMax[1];
-	if( poBand->GetOverviewCount() > 0 )
-		printf( "Band has %d overviews.\n", poBand->GetOverviewCount() );
-	if( poBand->GetColorTable() != NULL )
-		printf( "Band has a color table with %d entries.\n",poBand->GetColorTable()->GetColorEntryCount() );
-	cout << " In cGDAL::openFile(...) before GetGeoTransform ..." << endl;
+//	if( poBand->GetOverviewCount() > 0 )
+//		printf( "Band has %d overviews.\n", poBand->GetOverviewCount() );
+//	if( poBand->GetColorTable() != NULL )
+//		printf( "Band has a color table with %d entries.\n",poBand->GetColorTable()->GetColorEntryCount() );
+//	cout << " In cGDAL::openFile(...) before GetGeoTransform ..." << endl;
 	if( poDataset->GetGeoTransform( mAdfGeoTransform ) == CE_None )
 	{
-		printf( "Origin = (%.6f,%.6f)\n",mAdfGeoTransform[0], mAdfGeoTransform[3] );
+
+//		printf( "Origin = (%.6f,%.6f)\n",mAdfGeoTransform[0], mAdfGeoTransform[3] );
         	Rows = poBand->GetYSize();
 		Cols = poBand->GetXSize();
 		rows = Rows;
 		cols = Cols;
-		cout << " In cGDAL::openFile  Rows = " << Rows << "	Cols=" << Cols << endl;
-		printf( "Pixel Size = (%.6f,%.6f)\n", mAdfGeoTransform[1], mAdfGeoTransform[5] );
-		printf( "transform is 0 ? : (%.6f,%.6f)\n", mAdfGeoTransform[2], mAdfGeoTransform[4] );
-		printf( "Corner : (%.6f,%.6f)\n", mAdfGeoTransform[3], mAdfGeoTransform[0] );
+//		cout << " In cGDAL::openFile  Rows = " << Rows << "	Cols=" << Cols << endl;
+//		printf( "Pixel Size = (%.6f,%.6f)\n", mAdfGeoTransform[1], mAdfGeoTransform[5] );
+//		printf( "transform is 0 ? : (%.6f,%.6f)\n", mAdfGeoTransform[2], mAdfGeoTransform[4] );
+//		printf( "Corner : (%.6f,%.6f)\n", mAdfGeoTransform[3], mAdfGeoTransform[0] );
         	ns_res = mAdfGeoTransform[5];
         	ew_res = mAdfGeoTransform[1];
-		if (mSouth) cout << "Suid" << endl;
-		else cout << "Noord" << endl;
+		if (UTM!=Proj) mSouth = (adfGeoTransform[3]<0);
+//		if (mSouth) cout << "Suid" << endl;
+//		else cout << "Noord" << endl;
         	NW.Set(mAdfGeoTransform[3],mAdfGeoTransform[0],Proj,CentMer,mSouth);
         	SE.Set((mAdfGeoTransform[3]+ns_res*rows),(mAdfGeoTransform[0]+ew_res*cols),Proj,CentMer,mSouth);
-		NW.Display();
-		SE.Display();
-        	printf("Rotation (0 = north is up): %d\n",(int)mAdfGeoTransform[2]);
+//		NW.Display();
+//		SE.Display();
+ //       	printf("Rotation (0 = north is up): %d\n",(int)mAdfGeoTransform[2]);
 	}
 	
 	if (Rows <1 || Cols < 1)
@@ -233,7 +230,7 @@ bool cGDAL::openFile(Float2DArray &Raster,string Directory, string FileName,
     	if( poDataset != NULL )
         	GDALClose( (GDALDatasetH) poDataset );
 //	printf("Read GDAL\n");
-	cout << "Leaving cGDAL::openFile(...)" << endl;
+//	cout << "Leaving cGDAL::openFile(...)" << endl;
 
 	return true;
 }

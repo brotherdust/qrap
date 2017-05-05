@@ -126,7 +126,7 @@ bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
 //************************************************************************
 unsigned cRasterFileHandler::GetClutterClassGroup()
 {
-	unsigned ClassGroup;
+	int ClassGroup;
 	char *temp;
 	temp = new char[33];	
 	pqxx::result CC;
@@ -135,7 +135,7 @@ unsigned cRasterFileHandler::GetClutterClassGroup()
 	query += temp;	
 	query += ";";
 
-//	cout << query << endl; 
+	cout << query << endl; 
 	if(!gDb.PerformRawSql(query))
 	{
 		string err = "Getting the Clutter Classification Group to use failed. Query: ";
@@ -147,13 +147,16 @@ unsigned cRasterFileHandler::GetClutterClassGroup()
 	{
 		gDb.GetLastResult(CC);
 		if(CC.size()!=0)
+		{
 			ClassGroup = atoi(CC[0]["classgroup"].c_str());
+			cout << "cRasterFileHandler::GetClutterClassGroup() ClassGroup = " << ClassGroup << endl;
+		}
 		else
 		{
 			string err = "The query for the Clutter Classification Group is empty. Query: ";
 			err += query;
 			QRAP_WARN(err.c_str());
-			ClassGroup = 0;	
+			ClassGroup = -100;	
 		}//end else CC.size
 	}
 	delete [] temp;	
@@ -183,24 +186,42 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	point.SetGeoType(WGS84GC);
 	string LoadedRastersList="'";
 
-	i=0;
-	while(i<mCurrentRasters.size())
+//	cout << "In cRasterFileHandler::GetForLink(...). before loading file for TxLoc" << endl;
+
+	for (i=0; i<mCurrentRasters.size(); i++)
 	{
-		if (mCurrentRasters[i]->mFileSetLevel>0)
-		{
-			delete mCurrentRasters[i];
-			mCurrentRasters.erase(mCurrentRasters.begin()+i);
-		}
-		else i++;
+		IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(TxLoc))
+				&&(0==mCurrentRasters[i]->mFileSetLevel));
+		LoadedRastersList+=mCurrentRasters[i]->mFilename;
+		LoadedRastersList+="','";
+	}
+	if (!IsInSet)
+	{
+		LoadedRastersList+="'";
+		AddRaster(TxLoc,LoadedRastersList);
 	}
 
+//	cout << "In cRasterFileHandler::GetForLink(...). before loading file for RxLoc" << endl;
 
-	if (mCurrentRasters.size()==0)
-		AddRaster(TxLoc);
-	if (mCurrentRasters.size()==0)
-		AddRaster(RxLoc);
-	else if (mCurrentRasters[mCurrentRasters.size()-1]->mFileSetLevel>0)
-		AddRaster(RxLoc);
+	LoadedRastersList="'";
+	IsInSet=false;
+	for (i=0; i<mCurrentRasters.size(); i++)
+	{
+		IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(RxLoc))
+				&&(0==mCurrentRasters[i]->mFileSetLevel));
+		LoadedRastersList+=mCurrentRasters[i]->mFilename;
+		LoadedRastersList+="','";
+	}
+	if (!IsInSet)
+	{
+		LoadedRastersList+="'";
+		AddRaster(RxLoc,LoadedRastersList);
+	}
+	LoadedRastersList="'";
+	IsInSet=false;
+//	cout << "In cRasterFileHandler::GetForLink(...). After loading file for RxLoc" << endl;
+
+
 	if (mCurrentRasters.size()==0)
 	{
 		string err = "cRasterFileHandler::GetForLink;  No raster files could be found. Confirm that File-Set Order exist. ";
@@ -209,6 +230,7 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 		return false;
 	}
 	
+	LoadedRastersList="'";
 	k=mCurrentRasters.size()-1; 
 	IsInSet = (mCurrentRasters[k]->IsIn(TxLoc))&&(0==mCurrentRasters[k]->mFileSetLevel);
 	while ((k>0)&&(!IsInSet))
@@ -364,20 +386,21 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 		AngRes = (double)360.0/(double)NumAngles;
 	}
 	else AngRes = 360.0/NumAngles;
-
-	i=0;
-	while(i<mCurrentRasters.size())
-	{
-		if (mCurrentRasters[i]->mFileSetLevel>0)
-		{
-			delete mCurrentRasters[i];
-			mCurrentRasters.erase(mCurrentRasters.begin()+i);
-		}
-		else i++;
-	}
 	
-	if (mCurrentRasters.size()==0)
-		AddRaster(SitePos);
+	IsInSet=false;
+	for (i=0; i<mCurrentRasters.size(); i++)
+	{
+		IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(SitePos))
+				&&(0==mCurrentRasters[i]->mFileSetLevel));
+		LoadedRastersList+=mCurrentRasters[i]->mFilename;
+		LoadedRastersList+="','";
+	}
+	if (!IsInSet)
+	{
+		LoadedRastersList+="'";
+		AddRaster(SitePos,LoadedRastersList);
+	}
+
 	
 	if (!Fixed)
 	{
@@ -385,22 +408,18 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 		{
 			edge.FromHere(SitePos,Range,j*90);
 			IsInSet = false;
+			LoadedRastersList="'";
 			for (i=0; i<mCurrentRasters.size(); i++)
+			{
 				IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(edge))
 						&&(0==mCurrentRasters[i]->mFileSetLevel));
+				LoadedRastersList+=mCurrentRasters[i]->mFilename;
+				LoadedRastersList+="','";
+			}
 			if (!IsInSet)
 			{
-				i=1;
-				while(i<mCurrentRasters.size())
-				{
-					if (mCurrentRasters[i]->mFileSetLevel>0)
-					{
-						delete mCurrentRasters[i];
-						mCurrentRasters.erase(mCurrentRasters.begin()+i);
-					}
-					else i++;
-				}
-				AddRaster(edge);
+				LoadedRastersList+="'";
+				AddRaster(edge,LoadedRastersList);
 			}
 		}
 //		for (i=0; i<mCurrentRasters.size(); i++)
@@ -409,6 +428,7 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 		Range = NumDistance*DistRes;
 		NumDistance++;
 	}
+
 
 	if (mCurrentRasters.size()==0)
 	{
@@ -668,155 +688,83 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 		for (j=0; j<Cols; j++)
 			Data[i][j]=OUTOFRASTER;
 
-	i=0;
-	while(i<mCurrentRasters.size())
+	IsInSet=false;
+	for (i=0; i<mCurrentRasters.size(); i++)
 	{
-		if (mCurrentRasters[i]->mFileSetLevel>0)
-		{
-			delete mCurrentRasters[i];
-			mCurrentRasters.erase(mCurrentRasters.begin()+i);
-		}
-		else i++;
+		IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(Mid))
+				&&(0==mCurrentRasters[i]->mFileSetLevel));
+		LoadedRastersList+=mCurrentRasters[i]->mFilename;
+		LoadedRastersList+="','";
+	}
+	if (!IsInSet)
+	{
+		LoadedRastersList+="'";
+		AddRaster(Mid,LoadedRastersList);
 	}
 
-	bool IsIn=false;
+
+	IsInSet=false;
+	LoadedRastersList="'";
+	for (i=0; i<mCurrentRasters.size(); i++)
+	{
+		IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(SE))
+				&&(0==mCurrentRasters[i]->mFileSetLevel));
+		LoadedRastersList+=mCurrentRasters[i]->mFilename;
+		LoadedRastersList+="','";
+	}
+	if (!IsInSet)
+	{
+		LoadedRastersList+="'";
+		AddRaster(SE,LoadedRastersList);
+	}	
 	
-	if (mCurrentRasters.size()==0)
-		AddRaster(Mid);
-	else
+	IsInSet=false;
+	LoadedRastersList="'";
+	for (i=0; i<mCurrentRasters.size(); i++)
 	{
-		i=0;
-		IsIn=false;
-		while ((i<mCurrentRasters.size())&&(!IsIn))
-		{
-			IsIn=IsIn||((mCurrentRasters[i]->IsIn(Mid))
+		IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(NE))
 				&&(0==mCurrentRasters[i]->mFileSetLevel));
-			i++;
-		}
-		if (!IsIn)
-		{
-			i=0;
-			while(i<mCurrentRasters.size())
-			{
-				if (mCurrentRasters[i]->mFileSetLevel>0)
-				{
-					delete mCurrentRasters[i];
-					mCurrentRasters.erase(mCurrentRasters.begin()+i);
-				}
-				else i++;
-			}
-			AddRaster(Mid);
-		}
+		LoadedRastersList+=mCurrentRasters[i]->mFilename;
+		LoadedRastersList+="','";
 	}
-	if (mCurrentRasters.size()==0)
-		AddRaster(SE);
-	else
+	if (!IsInSet)
 	{
-		i=0;
-		IsIn=false;
-		while ((i<mCurrentRasters.size())&&(!IsIn))
-		{
-			IsIn=IsIn||((mCurrentRasters[i]->IsIn(SE))
+		LoadedRastersList+="'";
+		AddRaster(NE,LoadedRastersList);
+	}
+
+	IsInSet=false;
+	LoadedRastersList="'";
+	for (i=0; i<mCurrentRasters.size(); i++)
+	{
+		IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(SW))
 				&&(0==mCurrentRasters[i]->mFileSetLevel));
-			i++;
-		}
-		if (!IsIn)
-		{
-			i=1;
-			while(i<mCurrentRasters.size())
-			{
-				if (mCurrentRasters[i]->mFileSetLevel>0)
-				{
-					delete mCurrentRasters[i];
-					mCurrentRasters.erase(mCurrentRasters.begin()+i);
-				}
-				else i++;
-			}
-			AddRaster(SE);
-		}
+		LoadedRastersList+=mCurrentRasters[i]->mFilename;
+		LoadedRastersList+="','";
 	}
-	if (mCurrentRasters.size()==0)
-		AddRaster(NE);
-	else
+	if (!IsInSet)
 	{
-		i=0;
-		IsIn=false;
-		while ((i<mCurrentRasters.size())&&(!IsIn))
-		{
-			IsIn=IsIn||((mCurrentRasters[i]->IsIn(NE))
+		LoadedRastersList+="'";
+		AddRaster(SW,LoadedRastersList);
+	}
+
+	IsInSet=false;
+	LoadedRastersList="'";
+	for (i=0; i<mCurrentRasters.size(); i++)
+	{
+		IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(NW))
 				&&(0==mCurrentRasters[i]->mFileSetLevel));
-			i++;
-		}
-		if (!IsIn)
-		{
-			i=1;
-			while(i<mCurrentRasters.size())
-			{
-				if (mCurrentRasters[i]->mFileSetLevel>0)
-				{
-					delete mCurrentRasters[i];
-					mCurrentRasters.erase(mCurrentRasters.begin()+i);
-				}
-				else i++;
-			}
-			AddRaster(NE);
-		}
+		LoadedRastersList+=mCurrentRasters[i]->mFilename;
+		LoadedRastersList+="','";
 	}
-	if (mCurrentRasters.size()==0)
-		AddRaster(SW);
-	else
+	if (!IsInSet)
 	{
-		i=0;
-		IsIn=false;
-		while ((i<mCurrentRasters.size())&&(!IsIn))
-		{
-			IsIn=IsIn||((mCurrentRasters[i]->IsIn(SW))
-				&&(0==mCurrentRasters[i]->mFileSetLevel));
-			i++;
-		}
-		if (!IsIn)
-		{
-			i=1;
-			while(i<mCurrentRasters.size())
-			{
-				if (mCurrentRasters[i]->mFileSetLevel>0)
-				{
-					delete mCurrentRasters[i];
-					mCurrentRasters.erase(mCurrentRasters.begin()+i);
-				}
-				else i++;
-			}
-			AddRaster(SW);
-		}
+		LoadedRastersList+="'";
+		AddRaster(NW,LoadedRastersList);
 	}
-	if (mCurrentRasters.size()==0)
-		AddRaster(NW);
-	else
-	{
-		i=0;
-		IsIn=false;
-		while ((i<mCurrentRasters.size())&&(!IsIn))
-		{
-			IsIn=IsIn||((mCurrentRasters[i]->IsIn(NW))
-					&&(0==mCurrentRasters[i]->mFileSetLevel));
-			i++;
-		}
-		if (!IsIn)
-		{
-			i=1;
-			while(i<mCurrentRasters.size())
-			{
-				if (mCurrentRasters[i]->mFileSetLevel>0)
-				{
-					delete mCurrentRasters[i];
-					mCurrentRasters.erase(mCurrentRasters.begin()+i);
-				}
-				else i++;
-			}
-			AddRaster(NW);
-		}
-	}
-	
+
+	IsInSet=false;
+	LoadedRastersList="'";
 
 	if (mCurrentRasters.size()!=0)
 	{

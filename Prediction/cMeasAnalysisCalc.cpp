@@ -78,15 +78,19 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 		mUseClutter = true;
 	else mUseClutter = false;
 
-	mUseClutter = true;
-
 	mClutterSource = atoi(gDb.GetSetting("ClutterSource").c_str());
 	cout << "mClutterSource = " << mClutterSource << endl;
 	if (mUseClutter)
 		mUseClutter = mClutter.SetRasterFileRules(mClutterSource);
+	cout << "cMeasAnalysisCalc::contructor: 1) mUseClutter=";
+	if (mUseClutter) cout << "true" << endl;
+		else cout << "False" << endl;
 	if (mUseClutter)
 		mClutterClassGroup = mClutter.GetClutterClassGroup();
-	mUseClutter = (mUseClutter)&&(mClutterClassGroup>0);
+	mUseClutter = (mUseClutter)&&(mClutterClassGroup>=0);
+	cout << "cMeasAnalysisCalc::contructor: 2) mUseClutter=";
+	if (mUseClutter) cout << "true" << endl;
+		else cout << "False" << endl;
 	if (mUseClutter) mClutterCount = new unsigned[mPathLoss.mClutter.mNumber];
 	else mClutterCount = new unsigned[2];
 	if (mUseClutter) mClutter.SetSampleMethod(1);
@@ -628,11 +632,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					cout << "MobileNum reached limit ... ending measurement analysis" <<endl;
 					return 0;
 				}
-				cout << "Setting Mobile Antenna, mMobiles[MobileNum].sInstKey =" << mMobiles[MobileNum].sInstKey << endl;
+//				cout << "Setting Mobile Antenna, mMobiles[MobileNum].sInstKey =" << mMobiles[MobileNum].sInstKey << endl;
 				MobileAnt.SetAntennaPattern(mMobiles[MobileNum].sInstKey, Mobile, 0, 0);
 
-				cout << "Setting Path loss parameters" << endl;
-				cout << "FixedNum = " << FixedNum << endl;
+//				cout << "Setting Path loss parameters" << endl;
+//				cout << "FixedNum = " << FixedNum << endl;
 
 				mPathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
 								mFixedInsts[FixedNum].sTxHeight,
@@ -643,7 +647,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			//Change settings if the Fixed Installation changed
 			if (mMeasPoints[i].sInstKeyFixed!=currentInst)
 			{
-				cout << "NextInst = " << mMeasPoints[i].sInstKeyFixed << endl;
+//				cout << "NextInst = " << mMeasPoints[i].sInstKeyFixed << endl;
 				if (CNumUsed>0)
 				{
 					CMean = CTotalError/CNumUsed;
@@ -691,12 +695,12 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				FixedAnt.SetUseAntANN(mUseAntANN);
 //				cout << "Setting Antenna Pattern to match FixedInstallation" << endl;
 				FixedAnt.SetAntennaPattern(mFixedInsts[FixedNum].sInstKey, Tx,
-															mFixedInsts[FixedNum].sTxAzimuth,  mFixedInsts[FixedNum].sTxMechTilt);
+							mFixedInsts[FixedNum].sTxAzimuth,  mFixedInsts[FixedNum].sTxMechTilt);
 				EIRP = mFixedInsts[FixedNum].sTxPower 
 								- mFixedInsts[FixedNum].sTxSysLoss + FixedAnt.mGain + MobileAnt.mGain;
 
 
-//				cout << "Setting Prediction parameters to match FixedInstallation" << endl;
+//				cout << "cMeasAnalysisCalc::PerformAnalysis: Setting Prediction parameters to match FixedInstallation" << endl;
 				mPathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
 								mFixedInsts[FixedNum].sTxHeight,
 								mMobiles[MobileNum].sMobileHeight,
@@ -713,7 +717,9 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				}
 			}
 			
+//			cout << "cMeasAnalysisCalc::PerformAnalysis:  Before mDEM.GetForLink" << endl;
 			mDEM.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution, DEM);
+//			cout << "cMeasAnalysisCalc::PerformAnalysis: After mDEM.GetForLink" << endl;
 			mMeasPoints[i].sDistance = mFixedInsts[FixedNum].sSitePos.Distance(mMeasPoints[i].sPoint);
 			Length = DEM.GetSize();
 			
@@ -724,6 +730,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 
 				if (mUseClutter)
 				{
+//					cout << "cMeasAnalysisCalc::PerformAnalysis:  Before mClutter.GetForLink" << endl;
 					mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution,Clutter);
 					Clutter.GetProfile(ClutterLength,TempClutter);
 

@@ -187,7 +187,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		query += "from mobile cross join antennapattern where " ;
 		query += "mobile.antpatternkey = AntennaPattern.id ";
  		query += "and mobile.id = ";
-//		cout << "Mobile Antenna" << endl;
+		cout << "Mobile Antenna" << endl;
 	}
 	else
 	{
@@ -203,7 +203,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	query += Temp;
 	query += ";";
 
-//	cout << query << endl;	
+	cout << query << endl;	
 //	cout << "cAntennaPattern::SetAntennaPattern. Query prepared. Before run query " << endl;
 
 	if(!gDb.PerformRawSql(query))
@@ -249,14 +249,14 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	CmdStr+=" numelevpoints, elevationangles, elevationpattern ";
 	CmdStr+="FROM AntennaPattern WHERE ID =";
 
-//   cout << "After setting basic CmdStr"  << endl;
+   cout << "After setting basic CmdStr"  << endl;
  
 	gcvt(AntKey, 8, Temp);
 //	cout << Temp << endl;
 	CmdStr += Temp;
 	CmdStr += ";";
 	
-//	cout << CmdStr << endl;
+	cout << CmdStr << endl;
 	if(!gDb.PerformRawSql(CmdStr))
 	{
 		string err = "Get AntennaPattern Failed. Query Failed: ";
@@ -267,13 +267,13 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	}
 	else
 	{
-//		cout << "Before get Query results " << endl;
+		cout << "Before get Query results " << endl;
 		gDb.GetLastResult(r);
 		if(r.size()!=0)
 		{
-//			cout << "Before get mNAA " << endl;
+			cout << "Before get mNAA " << endl;
 			mNAA = atoi(r[0]["numazipoints"].c_str());
-//			cout << "mNAA = " << mNAA << endl;
+			cout << "mNAA = " << mNAA << endl;
 			delete [] mAziAngles;
 			delete [] mAziValues;
 			mAziAngles = new float[mNAA];
@@ -405,7 +405,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		} // else r.size()
 	}//else !gDb->PerformRawSql(CmdStr1)
 
-//	cout << "After read database" << endl;
+	cout << "After read database" << endl;
 	
 	// Prepare angular values for mask
 	TempAziAngles = new float[mNAA+3];

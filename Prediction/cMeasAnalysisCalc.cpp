@@ -69,7 +69,7 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 	{
 		mPlotResolution = atof(setting.c_str());
 	}
-	else mPlotResolution = 20;
+	else mPlotResolution = 5;
 	cout << " In cMeasAnalysisCalc::cMeasAnalysisCalc() mPlotResolution = " << mPlotResolution << endl;
 
 
@@ -128,37 +128,37 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 
 	areaQuery += " @ ST_GeomFromText('POLYGON((";
 	for (i = 0 ; i < Points.size();i++)
-   {
+   	{
 		Points[i].Get(Lat, Lon);
-   	mNorth = max(mNorth,Lat);
-   	mSouth = min(mSouth,Lat);
-   	mEast = max(mEast,Lon);
-   	mWest = min(mWest,Lon);
+   		mNorth = max(mNorth,Lat);
+	   	mSouth = min(mSouth,Lat);
+	   	mEast = max(mEast,Lon);
+	   	mWest = min(mWest,Lon);
 		gcvt(Lon,12,text);
-   	areaQuery += text;
-   	areaQuery += " ";
+	   	areaQuery += text;
+	   	areaQuery += " ";
 		gcvt(Lat,12,text);
-   	areaQuery += text;
-   	areaQuery += ",";
-   }
-   NorthWestCorner.Set(mNorth,mWest,DEG);
-   SouthEastCorner.Set(mSouth,mEast,DEG);
-//	cout << "North West corner: " << endl;
-//	NorthWestCorner.Display();
-//	cout << "South East corner: " << endl;
-//	SouthEastCorner.Display();
+	   	areaQuery += text;
+	   	areaQuery += ",";
+	}
+   	NorthWestCorner.Set(mNorth,mWest,DEG);
+   	SouthEastCorner.Set(mSouth,mEast,DEG);
+	cout << "North West corner: " << endl;
+	NorthWestCorner.Display();
+	cout << "South East corner: " << endl;
+	SouthEastCorner.Display();
 	Points[0].Get(Lat,Lon);
 	gcvt(Lon,12,text);
-   areaQuery += text;
-   areaQuery += " ";
+	areaQuery += text;
+   	areaQuery += " ";
 	gcvt(Lat,12,text);
-   areaQuery += text;
-   areaQuery += "))',4326) ";
+   	areaQuery += text;
+   	areaQuery += "))',4326) ";
 
-//	cout << areaQuery << endl;
+	cout << areaQuery << endl;
 	delete [] text;
 
-//	cout << " In cMeasAnalysisCalc::LoadMeasurements " << endl;
+	cout << " In cMeasAnalysisCalc::LoadMeasurements " << endl;
 	text = new char[10];		
 	pqxx::result r, rMobile, rFixed;
 
@@ -341,15 +341,15 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 		}// if there are measurements
 	} // else ... hence the query was successful
 	
-//	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
+	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
 	return true;
 }
 
 //*********************************************************************
 bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType, 
-																							unsigned PosSource, 
-																							unsigned MeasSource, 
-																							unsigned CI)
+					unsigned PosSource, 
+					unsigned MeasSource, 
+					unsigned CI)
 {
 	unsigned i;
 	string PointString;
@@ -534,7 +534,7 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 		}// if there are measurements
 	} // else ... hence the query was successful
 	
-//	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
+	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
 	return true;
 }
 
@@ -611,7 +611,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 
 	if (0==mFixedInsts.size()) return 0;
 
-//	cout <<"cMeasAnalysisCalc::PerformAnalysis: mNumMeas = " << mNumMeas << endl;
+	cout <<"cMeasAnalysisCalc::PerformAnalysis: mNumMeas = " << mNumMeas << endl;
 	for (i=0; i<mNumMeas; i++) 
 	{
 		if ((0==Clutterfilter)||(0==mMeasPoints[i].sClutter)||(Clutterfilter==mMeasPoints[i].sClutter))
@@ -628,11 +628,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					cout << "MobileNum reached limit ... ending measurement analysis" <<endl;
 					return 0;
 				}
-//				cout << "Setting Mobile Antenna" << endl;
+				cout << "Setting Mobile Antenna, mMobiles[MobileNum].sInstKey =" << mMobiles[MobileNum].sInstKey << endl;
 				MobileAnt.SetAntennaPattern(mMobiles[MobileNum].sInstKey, Mobile, 0, 0);
 
-//				cout << "Setting Path loss parameters" << endl;
-//				cout << "FixedNum = " << FixedNum << endl;
+				cout << "Setting Path loss parameters" << endl;
+				cout << "FixedNum = " << FixedNum << endl;
 
 				mPathLoss.setParameters(mkFactor,mFixedInsts[FixedNum].sFrequency,
 								mFixedInsts[FixedNum].sTxHeight,
@@ -643,7 +643,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			//Change settings if the Fixed Installation changed
 			if (mMeasPoints[i].sInstKeyFixed!=currentInst)
 			{
-//				cout << "NextInst = " << mMeasPoints[i].sInstKeyFixed << endl;
+				cout << "NextInst = " << mMeasPoints[i].sInstKeyFixed << endl;
 				if (CNumUsed>0)
 				{
 					CMean = CTotalError/CNumUsed;
@@ -654,12 +654,12 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
 
-/*			cout << "Inst: " << currentInst << "	#: " << CNumUsed  << "	Freq =" << mFixedInsts[FixedNum].sFrequency 
+			cout << "Inst: " << currentInst << "	#: " << CNumUsed  << "	Freq =" << mFixedInsts[FixedNum].sFrequency 
 						<< "	M: "<< CMean 					
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-*/
+
 			}
 
 				CNumUsed = 0;

@@ -196,7 +196,7 @@ void cAntennaFilesImporter::ImportAntennas ()
 						break;
 					} // if
 					
-					QStringList list = line.split(" ", QString::SkipEmptyParts);
+					QStringList list = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
 					
 //					for (unsigned i=0; i<list.count(); i++)
 //						cout << list[i].toStdString() << endl;

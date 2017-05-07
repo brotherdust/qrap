@@ -115,10 +115,10 @@ cMeasAnalysisCalc::~cMeasAnalysisCalc() // destructor
 
 //*********************************************************************
 bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points, 
-																							unsigned MeasType, 
-																							unsigned PosSource, 
-																							unsigned MeasSource, 
-																							unsigned CI)
+					unsigned MeasType, 
+					unsigned PosSource, 
+					unsigned MeasSource, 
+					unsigned CI)
 {
 	unsigned i;
 	double Lat, Lon, mNorth, mSouth, mEast, mWest;
@@ -166,10 +166,19 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 	text = new char[10];		
 	pqxx::result r, rMobile, rFixed;
 
-	string query ="SELECT mobile, ci, frequency, ST_AsText(location) as location, ";
+//	Where testpoint is in area
+/*	string query ="SELECT mobile, ci, frequency, ST_AsText(location) as location, ";
 	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth ";
 	query += "from measurement cross join testpoint cross join measdatasource ";
 	query += "where tp=testpoint.id and measdatasource=measdatasource.id";
+*/
+//	Where site is in area
+	string query ="SELECT mobile, ci, frequency, ST_AsText(testpoint.location) as location, ";
+	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth ";
+	query += "from measurement cross join testpoint cross join measdatasource ";
+	query += "cross join cell cross join radioinstallation cross join site ";
+	query += "where ci=cell.id and risector= radioinstallation.id and siteid=site.id "; 
+	query += "and tp=testpoint.id and measdatasource=measdatasource.id";	
 	if (MeasType>0)
 	{
 		query += " and meastype=";
@@ -194,7 +203,10 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 		gcvt(CI,9,text);
 		query += text;
 	}
-	query += " and testpoint.location ";
+//	Where testpoint is in area
+//	query += " and testpoint.location ";
+//	Where site is in area
+	query += " and site.location";
 	query += areaQuery;
 	query+=" order by mobile, ci, id;";
 
@@ -207,7 +219,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 	tMobile tempMobile;
 
 //	cout << "In cMeasAnalysisCalc::LoadMeasurements; QUERY:" << endl;
-//	cout << query << endl; 
+	cout << query << endl; 
 	// Perform a Raw SQL query
 	if(!gDb.PerformRawSql(query))
 	{
@@ -365,6 +377,7 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth ";
 	query += "from measurement cross join testpoint cross join measdatasource ";
 	query += "where tp=testpoint.id and measdatasource=measdatasource.id";
+
 	if (MeasType>0)
 	{
 		query += " and meastype=";
@@ -615,7 +628,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 
 	if (0==mFixedInsts.size()) return 0;
 
-	cout <<"cMeasAnalysisCalc::PerformAnalysis: mNumMeas = " << mNumMeas << endl;
+//	cout <<"cMeasAnalysisCalc::PerformAnalysis: mNumMeas = " << mNumMeas << endl;
 	for (i=0; i<mNumMeas; i++) 
 	{
 		if ((0==Clutterfilter)||(0==mMeasPoints[i].sClutter)||(Clutterfilter==mMeasPoints[i].sClutter))
@@ -658,12 +671,12 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
 
-			cout << "Inst: " << currentInst << "	#: " << CNumUsed  << "	Freq =" << mFixedInsts[FixedNum].sFrequency 
+/*			cout << "Inst: " << currentInst << "	#: " << CNumUsed  << "	Freq =" << mFixedInsts[FixedNum].sFrequency 
 						<< "	M: "<< CMean 					
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-
+*/
 			}
 
 				CNumUsed = 0;
@@ -1317,15 +1330,15 @@ bool cMeasAnalysisCalc::OptimiseSeekWidth()
 SeekClose=mSeekWidthBest;
 SmoothClose=mSmoothWidthBest;
 
-		for (SmoothWidth=2; SmoothWidth<50; SmoothWidth=SmoothWidth+2)
+		for (SmoothWidth=1; SmoothWidth<50; SmoothWidth=SmoothWidth+1)
 		{
 			mPathLoss.setSmoothWidth(SmoothWidth);
-			for (SeekWidth=2;SeekWidth<31; SeekWidth=SeekWidth+2)
+			for (SeekWidth=1;SeekWidth<31; SeekWidth=SeekWidth+1)
 			{
 				mPathLoss.setSeekWidth(SeekWidth);
 				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
 				cost = 200*(1-CorrC);
-		cout << "	SeekW=" << SeekWidth <<"	SmoothW=" << SmoothWidth;
+		cout << "SeekW=" << SeekWidth <<"	SmoothW=" << SmoothWidth;
 		cout <<  "	Cost=" << cost << "	Min=" << costMin;
 		cout << "	#Used: " << NumUsed; 
 		cout << "	Mean: " << Mean; 
@@ -1348,7 +1361,7 @@ SmoothClose=mSmoothWidthBest;
 			mPathLoss.setSmoothWidth(SmoothWidth);
 			NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
 			cost = 200*(1-CorrC);
-//		cout << "	SeekW=" << SeekWidth <<"	SmoothW=" << SmoothWidth;
+//		cout << "SeekW=" << SeekWidth <<"	SmoothW=" << SmoothWidth;
 //		cout <<  "	Cost=" << cost << "	Min=" << costMin;
 //		cout << "	#Used: " << NumUsed 
 //		cout << "	Mean: " << Mean; 
@@ -1468,9 +1481,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	{
 		Change[i] = true;
 		Up[i] = true;
-		CHeightDiff[i] = 0.5;
+		CHeightDiff[i] = -0.5;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
-		DeltaH[i] =0.5;
+		DeltaH[i] = -0.5;
 		NumClut[i] = 0;
 		Passed[i] = false;
 		changed[i]=false;

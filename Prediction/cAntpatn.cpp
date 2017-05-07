@@ -187,7 +187,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		query += "from mobile cross join antennapattern where " ;
 		query += "mobile.antpatternkey = AntennaPattern.id ";
  		query += "and mobile.id = ";
-		cout << "Mobile Antenna" << endl;
+//		cout << "Mobile Antenna" << endl;
 	}
 	else
 	{

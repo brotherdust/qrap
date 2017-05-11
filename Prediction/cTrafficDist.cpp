@@ -91,9 +91,7 @@ bool cTrafficDist::SetTrafficDist(eOutputUnits DisplayUnits,
 								double PlotResolution,
 								double MinimumAngularResolution,
 								unsigned MobileInstallationKey,
-								unsigned NumberOfFixedInstallations,
-								unsigned *FixedInstallationKeys,
-								double *CoverangeRanges, // In Kilometer
+								double CoverangeRange, // In Kilometer
 								string DirectoryToStoreResult,
 								string OutputFileForResult)
 {
@@ -126,20 +124,10 @@ bool cTrafficDist::SetTrafficDist(eOutputUnits DisplayUnits,
 	mMinAngleRes=MinimumAngularResolution;			
 	mNumAngles = (unsigned)(360.0/mMinAngleRes);
 	mMobile.sInstKey=MobileInstallationKey;				
-	mNumFixed=NumberOfFixedInstallations;
+	mMaxCoverageRange = CoverangeRange;
 	
 	mMaxRange=0;
-	mFixedInsts.clear();
-	for (unsigned i=0; i<mNumFixed; i++)
-	{
-		tFixed tempInst;
-		tempInst.sInstKey = FixedInstallationKeys[i];
-		tempInst.sRange = CoverangeRanges[i];
-		tempInst.sRange *= 1000;
-		if (tempInst.sRange>mMaxRange) 
-			mMaxRange = tempInst.sRange;
-		mFixedInsts.push_back(tempInst);
-	}
+
 	if (mMaxRange>0)
 	{
 		if (mMinAngleRes<(270*mPlotResolution/mMaxRange/PI))
@@ -702,7 +690,7 @@ int cTrafficDist::OrderAllPred()
 //***************************************************************************
 bool cTrafficDist::GetDBinfo()
 {
-	pqxx::result r;
+	pqxx::result r, rFixed;
 	string query;
 	char temp[33];
 	unsigned i,j;
@@ -745,66 +733,117 @@ bool cTrafficDist::GetDBinfo()
 	double longitude, latitude; 
 	unsigned spacePos;
 	double channel;
-	// Populate the rest of the fixed installation information from the database.
-	for(i=0 ; i<mFixedInsts.size() ; i++)
+	double N,S,W,E;
+	mNorthWest.Get(N,W);
+	mSouthEast.Get(S,E);
+	char *text= new char[33];
+
+	string areaQuery = "@ ST_GeomFromText('POLYGON((";
+	gcvt(W,12,text);
+   	areaQuery += text;
+   	areaQuery += " ";
+	gcvt(N,12,text);
+   	areaQuery += text;
+   	areaQuery += ",";
+	gcvt(E,12,text);
+   	areaQuery += text;
+   	areaQuery += " ";
+	gcvt(N,12,text);
+   	areaQuery += text;
+   	areaQuery += ",";
+	gcvt(E,12,text);
+   	areaQuery += text;
+   	areaQuery += " ";
+	gcvt(S,12,text);
+   	areaQuery += text;
+   	areaQuery += ",";
+	gcvt(W,12,text);
+   	areaQuery += text;
+   	areaQuery += " ";
+	gcvt(S,12,text);
+   	areaQuery += text;
+   	areaQuery += ",";
+	gcvt(W,12,text);
+   	areaQuery += text;
+   	areaQuery += " ";
+	gcvt(N,12,text);
+   	areaQuery += text;
+	areaQuery += "))',4326) ";
+
+	delete [] text;
+
+	query = "SELECT radioinstallation.id as radid, siteid, ST_AsText(location) as location, ";
+	query += "eirp, max(cell.txpower) as txpower, txlosses, rxlosses, rxsensitivity, ";
+	query += "txantpatternkey, txbearing, txmechtilt, ";
+	query += "rxantpatternkey, rxbearing, rxmechtilt, txantennaheight, rxantennaheight, ";
+	query += "btlfreq, spacing, bandwidth, downlink, uplink, ";
+	query += "sum(cstraffic) as cstraffic, sum(pstraffic) as pstraffic ";
+	query += "FROM radioinstallation CROSS JOIN cell CROSS JOIN technology CROSS JOIN site ";
+	query += "WHERE techkey=technology.id and siteid=site.id and radioinstallation.id=risector ";
+	query += "and location ";
+	query += areaQuery;
+	query += "group by radid, siteid, location, eirp, txlosses, rxlosses,";
+	query += "txantpatternkey, txbearing, txmechtilt, ";
+	query += "rxantpatternkey, rxbearing, rxmechtilt, txantennaheight, rxantennaheight, ";
+	query += "btlfreq, spacing, bandwidth, downlink, uplink, rxsensitivity;";
+
+	cout << query;
+	// Perform a Raw SQL query
+	if(!gDb.PerformRawSql(query))
 	{
-		gcvt(mFixedInsts[i].sInstKey,8,temp);
-		query = "SELECT siteid, ST_AsText(location) as location, eirp,txpower,txlosses,rxlosses,rxsensitivity,";
-		query +="txantpatternkey,txbearing,txmechtilt,rxantpatternkey,rxbearing,rxmechtilt,txantennaheight,rxantennaheight, ";
-		query +="btlfreq, spacing, bandwidth, downlink, uplink,  sum(cstraffic), sum(pstraffic)";
-		query += "FROM radioinstallation CROSS JOIN cell CROSS JOIN technology CROSS JOIN site ";
-		query += "WHERE techkey=technology.id and siteid=site.id and radioinstallation.id=risector";
-		query += " and radioinstallation.id ="; 
-		query += temp;
-		query += "group by radioinstallation.id;";
-				
-		// Perform a Raw SQL query
-		if(!gDb.PerformRawSql(query))
-		{
-			string err = "Error in Database Select on tables radioinstallation and technology failed. Query:";
-			err+=query; 
-			QRAP_ERROR(err.c_str());
-			return false;
-		} // if
-		else
-		{
-			gDb.GetLastResult(r);
+		string err = "Error in Database Select on tables radioinstallation and technology failed. Query:";
+		err+=query; 
+		QRAP_ERROR(err.c_str());
+		return false;
+	} // if
+	else
+	{
+		gDb.GetLastResult(rFixed);
+		
+		int size = rFixed.size();
 			
-			int size = r.size();
+		if(size!=0)
+		{
+			mNumFixed=size;
+			mFixedInsts.clear();
 			
-			if(size!=0)
+			for (i=0; i<mNumFixed; i++)
 			{
-				mFixedInsts[i].sSiteID = atoi(r[0]["siteid"].c_str());
-				PointString = r[0]["location"].c_str();
+				tFixed tempInst;
+				tempInst.sInstKey = atoi(rFixed[i]["radid"].c_str());
+				tempInst.sRange = mMaxCoverageRange;
+				
+				tempInst.sSiteID = atoi(rFixed[i]["siteid"].c_str());
+				PointString = rFixed[i]["location"].c_str();
 				spacePos = PointString.find_first_of(' ');
 				longitude = atof((PointString.substr(6,spacePos).c_str())); 
 				latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
-				mFixedInsts[i].sSitePos.Set(latitude,longitude,DEG);
-				mFixedInsts[i].sEIRP = atof(r[0]["eirp"].c_str());
-				mFixedInsts[i].sTxPower = atof(r[0]["txpower"].c_str());
-				mFixedInsts[i].sTxSysLoss = atof(r[0]["txlosses"].c_str());
-				mFixedInsts[i].sRxSysLoss = atof(r[0]["rxlosses"].c_str());
-				mFixedInsts[i].sRxSens = atof(r[0]["rxsensitivity"].c_str());
-				mFixedInsts[i].sTxPatternKey = atoi(r[0]["txantpatternkey"].c_str());
-				mFixedInsts[i].sTxAzimuth = atof(r[0]["txbearing"].c_str());
-				mFixedInsts[i].sTxMechTilt = atof(r[0]["txmechtilt"].c_str());
-				mFixedInsts[i].sRxPatternKey = atoi(r[0]["rxantpatternkey"].c_str());
-				mFixedInsts[i].sRxAzimuth = atof(r[0]["rxbearing"].c_str());
-				mFixedInsts[i].sRxMechTilt = atof(r[0]["rxmechtilt"].c_str());
-				mFixedInsts[i].sTxHeight = atof(r[0]["txantennaheight"].c_str());
-				mFixedInsts[i].sRxHeight = atof(r[0]["rxantennaheight"].c_str());
-				mFixedInsts[i].sFrequency = atof(r[0]["btlfreq"].c_str());
-				mFixedInsts[i].sBandWidth = atof(r[0]["bandwidth"].c_str());
-				mFixedInsts[i].sCStraffic = atof(r[0]["cstraffic"].c_str());
-				mFixedInsts[i].sPStraffic = atof(r[0]["pstraffic"].c_str());
-				dloffset = atof(r[0]["downlink"].c_str());
-				upoffset = atof(r[0]["uplink"].c_str());
-				chansep = atof(r[0]["spacing"].c_str());
+				tempInst.sSitePos.Set(latitude,longitude,DEG);
+				tempInst.sEIRP = atof(rFixed[i]["eirp"].c_str());
+				tempInst.sTxPower = atof(rFixed[i]["txpower"].c_str());
+				tempInst.sTxSysLoss = atof(rFixed[i]["txlosses"].c_str());
+				tempInst.sRxSysLoss = atof(rFixed[i]["rxlosses"].c_str());
+				tempInst.sRxSens = atof(rFixed[i]["rxsensitivity"].c_str());
+				tempInst.sTxPatternKey = atoi(rFixed[i]["txantpatternkey"].c_str());
+				tempInst.sTxAzimuth = atof(rFixed[i]["txbearing"].c_str());
+				tempInst.sTxMechTilt = atof(rFixed[i]["txmechtilt"].c_str());
+				tempInst.sRxPatternKey = atoi(rFixed[i]["rxantpatternkey"].c_str());
+				tempInst.sRxAzimuth = atof(rFixed[i]["rxbearing"].c_str());
+				tempInst.sRxMechTilt = atof(rFixed[i]["rxmechtilt"].c_str());
+				tempInst.sTxHeight = atof(rFixed[i]["txantennaheight"].c_str());
+				tempInst.sRxHeight = atof(rFixed[i]["rxantennaheight"].c_str());
+				tempInst.sFrequency = atof(rFixed[i]["btlfreq"].c_str());
+				tempInst.sBandWidth = atof(rFixed[i]["bandwidth"].c_str());
+				tempInst.sCStraffic = atof(rFixed[i]["cstraffic"].c_str());
+				tempInst.sPStraffic = atof(rFixed[i]["pstraffic"].c_str());
+				dloffset = atof(rFixed[i]["downlink"].c_str());
+				upoffset = atof(rFixed[i]["uplink"].c_str());
+				chansep = atof(rFixed[i]["spacing"].c_str());
 				
 				query = "SELECT channel ";
 				query += "FROM cell CROSS JOIN frequencyallocationlist ";
 				query += "WHERE frequencyallocationlist.ci=cell.id and cell.risector ="; 
-				gcvt(mFixedInsts[i].sInstKey,8,temp);
+				gcvt(tempInst.sInstKey,8,temp);
 				query += temp;
 				query += " order by carrier;";
 								
@@ -823,105 +862,25 @@ bool cTrafficDist::GetDBinfo()
 					{
 						channel = atof(r[0]["channel"].c_str());
 						mMobile.sFrequency = channel*chansep/1000.0+upoffset;
-						mFixedInsts[i].sFrequency = channel*chansep/1000.0+dloffset;
+						tempInst.sFrequency = channel*chansep/1000.0+dloffset;
 						n++;
 						aveUpFreq +=channel*chansep/1000.0+upoffset;
-						mFixedInsts[i].sFreqList.push_back(channel*chansep/1000.0+dloffset);
+						tempInst.sFreqList.push_back(channel*chansep/1000.0+dloffset);
 						for (j=1; j<size; j++)
-							mFixedInsts[i].sFreqList.push_back(atof(r[j]["channel"].c_str())*chansep/1000.0+dloffset);
-					}
-				}
-			}
-			else
-			{
-				mFixedInsts.erase(mFixedInsts.begin()+i);
-				string err = "Warning, radio installation ";
-				gcvt(mFixedInsts[i].sInstKey,8,temp); 
-				err += temp;
-				err += " does not exist in the database. ";
-				err += "No prediction wil be done for it.";
-				QRAP_WARN(err.c_str());
-			} // else
-		} // else
-	} // for
-	if (n>0) mMobile.sFrequency = aveUpFreq/n;
-	return true;
-}
-
-
-//***************************************************************************
-bool cTrafficDist::GetDBIntInfo()
-{
-	pqxx::result r;
-	string query;
-	char *temp;
-	temp = new char[33];
-	unsigned i;
-
-	string radInstList= "";
-	string PointString;
-	gcvt(mFixedInsts[0].sInstKey,8,temp);
-	radInstList += temp;
-	// Populate the rest of the fixed installation information from the database.
-	for(i=1 ; i<mFixedInsts.size() ; i++)
-	{
-		radInstList += ",";
-		gcvt(mFixedInsts[i].sInstKey,8,temp);
-		radInstList += temp;
-	}
-	cout << radInstList << endl;
-	gcvt(mMaxRange,8,temp);
-	query = "select distinct interRadInst.id as id from "; 
-	query += "radioinstallation_view RadInst ";
-	query += "CROSS JOIN radioinstallation_view as interRadInst "; 
-	query += "CROSS JOIN site CROSS JOIN site as interSite "; 
-	query += "CROSS JOIN cell CROSS JOIN cell as interCell ";
-	query += "CROSS JOIN frequencyallocationlist as Freq "; 
-	query += "CROSS JOIN frequencyallocationlist as interFreq ";
-	query += "WHERE RadInst.siteid=site.id ";
-	query += "AND interRadInst.siteid=interSite.id ";
-	query += "AND cell.risector = RadInst.id ";
-	query += "AND interCell.risector = interRadInst.id ";	
-	query += "AND Freq.ci = cell.id ";
-	query += "AND interFreq.ci = interCell.id ";
-	query += "AND Freq.channel = interFreq.channel ";
-	query += "AND Freq.id <> interFreq.id ";
-	query += "AND ST_Distance(site.location,interSite.location) <";
-	query += temp;
-	query += "AND RadInst.id in (";
-	query += radInstList;
-	query += ");";
-						
-	// Perform a Raw SQL query
-	if(!gDb.PerformRawSql(query))
-	{
-		string err = "Error in Database Select to get Interfering RadioInst. Query:";
-		err+=query; 
-		QRAP_ERROR(err.c_str());
-		delete [] temp;
-		return false;
-	} // if
-	else
-	{
-		gDb.GetLastResult(r);
-		
-		unsigned size = r.size();
-		tFixed tempInst;
-		if (size>0)
-		{
-			mFixedInsts.clear();
-			cout << "NumInt: " << endl;
-			for (i=0; i<size; i++)
-			{
-				tFixed tempInst;
-				tempInst.sInstKey = atoi(r[i]["id"].c_str());
-				tempInst.sRange = mMaxRange;
+							tempInst.sFreqList.push_back(atof(r[j]["channel"].c_str())*chansep/1000.0+dloffset);
+					} // if query not empty
+				} // else query successfull
 				mFixedInsts.push_back(tempInst);
-			}
-		}
-		GetDBinfo();
-	}
-	delete [] temp;
+			}// end for
+		} // end if size>0
+		else
+		{
+			string err = "Empty query. No radioinstallations in area ";
+			QRAP_WARN(err.c_str());
+		} // else query empty
+	} // else query successful
+	if (n>0) mMobile.sFrequency = aveUpFreq/n;
+
 	return true;
 }
 
@@ -934,10 +893,12 @@ bool cTrafficDist::DetermineClutterDist()
 	cClutter ClutterUsed(mClutterClassGroup);
 	Float2DArray ClutterDist;
 	ClutterDist = new_Float2DArray(NumInsts,ClutterUsed.mNumber+1); 
-	for 	(i=0; i<NumInsts; i++)
+	for (i=0; i<NumInsts; i++)
 		for (j=0; j<ClutterUsed.mNumber; j++)
 				ClutterDist[i][j] = 0.0;
 
+	cout << "In cTrafficDist::DetermineClutterDist(). NumInsts = " 
+		<< NumInsts << "ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl;	
 	Float2DArray ClutterRaster;
 	ClutterRaster = new_Float2DArray(2,2);
 	cGeoP NW = mNorthWest;
@@ -960,7 +921,7 @@ bool cTrafficDist::DetermineClutterDist()
 	unsigned CurrentRadInstID = 0;
 
 	// Fill in Matrix
-	for 	(i=0; i<mRows; i++)
+	for (i=0; i<mRows; i++)
 	{
 		for (j=0; j<mCols; j++)
 		{
@@ -975,7 +936,8 @@ bool cTrafficDist::DetermineClutterDist()
 						CurrentRadInstID++;
 				}
 			}
-			ClutterDist[CurrentRadInstID][(int)ClutterRaster[i][j]] += mPlotResolution	*mPlotResolution/1000/1000;
+			ClutterDist[CurrentRadInstID][(int)ClutterRaster[i][j]] += mPlotResolution*mPlotResolution/1000/1000;
+	
 		}
 	}
 	delete_Float2DArray(ClutterRaster);
@@ -986,8 +948,13 @@ bool cTrafficDist::DetermineClutterDist()
 	{
 		TotalsPerInst[i] = 0.0;
 		for (j=0; j<=ClutterUsed.mNumber; j++)
+		{
 			TotalsPerInst[i]+=ClutterDist[i][j];
+//			cout << ClutterDist[i][j] << "	";
+		}
+//		cout << endl;
 	}
+
 
 	// Determine size of matrix ... i.e. How many Cluttertypes are represented
 	double *TotalsPerClutter;
@@ -996,12 +963,21 @@ bool cTrafficDist::DetermineClutterDist()
 	{
 		TotalsPerClutter[j] = 0.0;
 		for (i=0; i<NumInsts; i++)
+		{
+			cout << ClutterDist[i][j] << "	";
 			TotalsPerClutter[j]+=ClutterDist[i][j];
+		}
+		cout << endl;
+		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
 	}
+	
 	unsigned ClutterCount = 0;
 	for (j=0; j<=ClutterUsed.mNumber; j++)
+	{
 		if (TotalsPerClutter[j]>0) 
 			ClutterCount++;
+	}
+
 
 	if (NumInsts<ClutterCount)
 	{
@@ -1012,6 +988,7 @@ bool cTrafficDist::DetermineClutterDist()
 		return false;
 	}
 
+
 	mTheMatrix.resize(ClutterCount,ClutterCount);
 	mTraffic.resize(ClutterCount,1);
 
@@ -1019,7 +996,9 @@ bool cTrafficDist::DetermineClutterDist()
 	{
 		mTraffic(i,0)=0.0;
 		for(j=0; j<ClutterCount; j++)
+		{
 			mTheMatrix(i,j) = 0.0;
+		}
 	}
 
 	// Fill in square matrix
@@ -1027,7 +1006,10 @@ bool cTrafficDist::DetermineClutterDist()
 	unsigned *RadInstOrder;
 	RadInstOrder = new unsigned[NumInsts];
 	for(i=0; i<NumInsts; i++)
+	{
 		RadInstOrder[i] = i;
+	}
+	
 	
 	unsigned swap;
 	for (i=0;i<NumInsts;i++)
@@ -1043,11 +1025,19 @@ bool cTrafficDist::DetermineClutterDist()
 		}
 	}
 
+	cout << "In cTrafficDist::DetermineClutterDist(). ClutterCount = " << ClutterCount << endl; 
+	cout << "In cTrafficDist::DetermineClutterDist(). ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl; 
 	unsigned *ClutterIndex;
 	ClutterIndex = new unsigned[ClutterCount];
-	unsigned Index = 0;
-	for (j=0; j<ClutterUsed.mNumber; j++);
+	for (j=0; j<ClutterCount; j++)
 	{
+		ClutterIndex[j]=0;
+	}
+	unsigned Index = 0;
+	j=0;
+	for (j=0; j<ClutterUsed.mNumber; j++)
+	{
+		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
 		if ((TotalsPerClutter[j]>0)&&(Index<ClutterCount))
 		{
 			ClutterIndex[Index] = j;
@@ -1055,11 +1045,19 @@ bool cTrafficDist::DetermineClutterDist()
 		} 
 	}
 
+	cout << "Index = " << Index << endl;
+	cout << "In cTrafficDist::DetermineClutterDist() before Completing matrixes" << endl;
+
 	for(i=0; i<ClutterCount; i++)
 	{
+		cout << "i=" << i << "	RadInstOrder[i] = " << RadInstOrder[i] << endl;
 		mTraffic(i,0) = mFixedInsts[RadInstOrder[i]].sCStraffic;
 		for(j=0; j<ClutterCount; j++)
+		{
+			cout << "j=" << j << ": " << ClutterIndex[j] << "	";
 			mTheMatrix(i,j) = ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
+		}
+		cout << endl;
 	}
 
 	unsigned CountWrap = ceil(((double)NumInsts)/((double)ClutterCount));
@@ -1073,13 +1071,17 @@ bool cTrafficDist::DetermineClutterDist()
 		}
  	}
 
+	cout << "In cTrafficDist::DetermineClutterDist() before Solving fo CStraffic" << endl;
+
 	mWeights = mTheMatrix.fullPivLu().solve(mTraffic);
 
+	cout << "In cTrafficDist::DetermineClutterDist() before writing back to mCSweights" << endl;
 	delete [] mCSweights;
 	mCSweights = new double[ClutterUsed.mNumber+1];
 	for (i=0;i<ClutterCount;i++)
 		mCSweights[ClutterIndex[i]] = mWeights(i);
 
+	cout << "In cTrafficDist::DetermineClutterDist() Doing PS traffice now" << endl;
 	for(i=0; i<ClutterCount; i++)
 	{
 		mTraffic(i,0) = mFixedInsts[RadInstOrder[i]].sPStraffic;
@@ -1097,6 +1099,7 @@ bool cTrafficDist::DetermineClutterDist()
 		}
  	}
 
+	cout << "In cTrafficDist::DetermineClutterDist() before Solving fo CStraffic" << endl;
 	mWeights = mTheMatrix.fullPivLu().solve(mTraffic);
 
 	delete [] mPSweights;

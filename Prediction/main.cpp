@@ -37,6 +37,7 @@
 #include "cPosEstimation.h"
 #include "cTrainPosNetDistAngle.h"
 #include "cTrainAntPattern.h"
+#include "cTrafficDist.h"
 
 
 using namespace std;
@@ -60,6 +61,28 @@ int main (int argc, char **argv)
 
 	cout << "Connected " << endl;
 
+	cTrafficDist TrafficDistribution;
+	short int DEMsourceList=1;
+	short int ClutterSourceList=2;
+	bool UseClutter=true;
+	double PlotRes = 5;
+	double AngleRes = 1; 
+	int Mobile = 1;
+	double Range = 35;
+	string StoreDir="/home/maggie/MTN2016/";
+	string ResultFile="TrafficDist.img";
+	cGeoP NW(-26.036, 27.976);
+	cGeoP SE(-26.109, 28.075);
+
+	TrafficDistribution.SetTrafficDist(dBm,true,8,-115,3,8,-120,1.33,
+						DEMsourceList, ClutterSourceList, UseClutter,
+						NW,SE, PlotRes, AngleRes, Mobile,
+						Range, StoreDir, ResultFile);
+	TrafficDistribution.PrimServPlot();
+	TrafficDistribution.DetermineClutterDist();
+	TrafficDistribution.WriteOutput(DEG);
+
+/*
 	cGeoP point(-34,27.9);
 	point.SetGeoType(WGS84GC);
 	point.Display();
@@ -70,7 +93,7 @@ int main (int argc, char **argv)
 	point.Display();
 	point.SetGeoType(WGS84GC);
 	point.Display();
-
+*/
 //	cAntennaPattern FixedAnt;
 //	FixedAnt.SetAntennaPattern(29641, Tx, 0,  0);
 
@@ -111,7 +134,7 @@ int main (int argc, char **argv)
 	cout << endl << "Got CI's " << endl;
 	VCMeasurements.WriteToDatabase();
 	cout << endl << "Wrote Measurements to DataBase" << endl;
-*/
+
 
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
@@ -132,7 +155,7 @@ int main (int argc, char **argv)
 	}
 
 	Meas.SetUseAntANN(false);
-
+*/
 /*
 //Gauteng 20m DEM
 	vPoints Punte;
@@ -164,15 +187,15 @@ int main (int argc, char **argv)
 
 	delete [] Hoek; 
 */
-
+/*
 	vPoints Punte;
 	cGeoP *Hoek;
 	Hoek = new cGeoP[4];
-/*	Hoek[0].Set(-24.01, 30.99);
+	Hoek[0].Set(-24.01, 30.99);
 	Hoek[1].Set(-30.01, 30.99);
 	Hoek[2].Set(-30.01, 23.00);
 	Hoek[3].Set(-24.01, 23.00);
-*/
+
 	Hoek[0].Set(-26.036, 27.976);
 	Hoek[1].Set(-26.109, 27.976);
 	Hoek[2].Set(-26.109, 28.075);
@@ -203,11 +226,12 @@ int main (int argc, char **argv)
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
-
+*/
 /*	Meas.OptimiseOffsets(0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "PostOffsets" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
+/*
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -227,7 +251,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 //	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
-
+*/
 /*
 	cTrainAntPattern NeuralNets;
 	double Azimuth;

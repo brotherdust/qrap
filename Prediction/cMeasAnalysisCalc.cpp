@@ -130,7 +130,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 	mWest = mEast;
 	char *text= new char[33];
 
-	areaQuery += " @ ST_GeomFromText('POLYGON((";
+	areaQuery = " @ ST_GeomFromText('POLYGON((";
 	for (i = 0 ; i < Points.size();i++)
    	{
 		Points[i].Get(Lat, Lon);

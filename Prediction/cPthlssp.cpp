@@ -60,8 +60,6 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 
 	m_tempIPD = 30;
 	m_slope = 0.0;
-//	m_SmoothWidth=21;
-//	m_SeekWidth=26;
 	m_SmoothWidth=1;
 	m_SeekWidth=2;
 	mUseClutter = UseClutter;
@@ -304,7 +302,6 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	PlaneEarth = CalcPlaneEarthLoss(mLinkLength);
 	m_Loss = FreeSpace ;
 
-
 	DiffLoss = 0;
 	if (InputProfile.GetSize()>3)
 	{
@@ -381,8 +378,9 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		}
 	}
 
-//	cout << "FLoss=" << m_Loss << "	DiffL=" << DiffLoss << endl;
-// The following 2 commands should mostly be commented out. It is for when a empirical model is tuned:
+//	cout << "FLoss=" << FreeSpace << "	DiffL=" << DiffLoss;
+// The following 3 commands should mostly be commented out. It is for when a empirical model is tuned:
+//	FreeSpace = 0;
 //	m_Loss = 0;
 //	DiffLoss = 0;
 
@@ -434,6 +432,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 				m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
 		}
 	}
+//	cout << "      m_Loss=" << m_Loss << endl;
 
 //cout << "Na clutter in TotPathloss" << endl;
 
@@ -555,7 +554,7 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 //    m_SmoothWidth = (int)(30000/m_freq/m_interPixelDist);
 //	cout << " m_SmoothWidth=" << m_SmoothWidth  << endl;
 
-//	m_SeekWidth =35;
+	m_SeekWidth =2*90/m_interPixelDist;
 //	m_SmoothWidth=70/m_interPixelDist;
 	if (m_SeekWidth<2) m_SeekWidth = 2;
 //	if (m_SmoothWidth<1) m_SmoothWidth = 1;
@@ -673,7 +672,7 @@ void cPathLossPredictor::FindElevAngles(float &ElevAngleTX, float &ElevAngleRX)
 
    	if (m_kFactor!=1.0)
    	{
-			R = m_reR/((1.0-1.0/m_kFactor)*cos(atan(yHeight/xDist)));
+		R = m_reR/((1.0-1.0/m_kFactor)*cos(atan(yHeight/xDist)));
 	   	temp = yHeight*yHeight + xDist*xDist;
 	   	y0 = yHeight/2.0 - xDist * sqrt(4.0*R*R/temp -1.0) /2.0;
 	   	x0 = (temp - 2.0*y0*yHeight) / (2.0*xDist);
@@ -944,7 +943,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 
 	temp = (double)(EndIndex-BeginIndex)*m_interPixelDist/2.0;
 
-	if ((!Vertical)&&(radius>0)&&(rho<=1.4)&&(radius<0.5*m_reR)&&(mhu>-0.6))
+/*	if ((!Vertical)&&(radius>0)&&(rho<=1.4)&&(radius<0.5*m_reR)&&(mhu>-0.6))
 	{
 		// Parsons  //if (rho<=1.4)   //For horizontal polirization 
 		// Dougherty & Maloney 1964 Radio Science Journal of Research
@@ -1006,7 +1005,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 //		double R2 = RoundHill;
 //		RoundHill = max(R1,R2);
 	}
-/*
+
 	else if ((radius>0)&&(radius<3*m_reR)&&(rho<1.3)&&(mhu>-0.6))
 	{
 		//  Rec. ITU-R P.526-12 Feb 2012 $4.2 

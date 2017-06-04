@@ -426,14 +426,14 @@ int cBTLPredict::PredictBTL(unsigned NumAngles, unsigned NumDistance,
 	DTMProfile.SetInterPixelDist(mDistanceRes);
 	ClutterProfile.SetInterPixelDist(mDistanceRes);
 	
-	cout << "cBTLPredict::PredictBTL" << endl; 
-	cout << "Freq: " << mFrequency << endl;
-	cout << "k: " << mkFactor << endl;
-	cout << "F_height: " << mFixedHeight << endl;
-	cout << "M_height: " << mMobileHeight << endl;
+	cout << "cBTLPredict::PredictBTL"; 
+	cout << "	Freq: " << mFrequency;
+	cout << "	k: " << mkFactor;
+	cout << "	F_height: " << mFixedHeight;
+	cout << "	M_height: " << mMobileHeight << endl;
 	PathLoss.setParameters(mkFactor,mFrequency,mFixedHeight,mMobileHeight,UseClutter,ClutterClassGroup);
 	for (i=0; i<NumAngles; i++)
-	{
+	{	
 		DTMProfile.SetProfile(mNumRadialPoints, DTM[i]);
 		if (UseClutter)
 			ClutterProfile.SetProfile(mNumRadialPoints, Clutter[i]);
@@ -448,8 +448,8 @@ int cBTLPredict::PredictBTL(unsigned NumAngles, unsigned NumDistance,
 			if (UseClutter) ClutterProfile.ReduceSize();
 			DTMProfile.ReduceSize();
 		}
-		if (((double)i/10.0)==(i/10))
-			cout << "Perform prediction: " << 100.0*i/NumAngles << endl;
+		if (((double)i/20.0)==(i/20))
+			cout << "cBTLPredict::PredictBTL. Prediction progress: " << 100.0*i/NumAngles << endl;
 	}
 	for (i=0;i<mNumAngles;i++)
 	{

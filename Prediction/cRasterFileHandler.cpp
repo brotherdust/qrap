@@ -488,7 +488,7 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 
 	bool Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
 	bool ToSwitch=false;
-	
+
 	for (i=0; i<NumAngles; i++)
 	{
 		for(j=1; j<NumDistance; j++)
@@ -908,7 +908,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 	
 	while((i<mFileSetOrder.size())&&(!(RasterFound)))
 	{
-		query = "SELECT filename,location,fileformat, projection, proj4string, centmer ";
+		query = "SELECT distinct filename,location,fileformat, projection, proj4string, centmer ";
 		query += "FROM sourcefiles CROSS JOIN filesets ";
 		query += "WHERE filesetkey=filesets.id AND filesets.id=";
 		gcvt(mFileSetOrder[i],8,temp);
@@ -922,17 +922,18 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 //		cout << query << endl;				
 		if(!gDb.PerformRawSql(query))
 		{
-			string err = "Database Select for RasterFile failed. Query: ";
+			string err = "In cRasterFileHandler::AddRaste. Database Select for RasterFile failed. Query: ";
 			err += query;
 			QRAP_WARN(err.c_str());
 		}
 		else
 		{
 			gDb.GetLastResult(r);
-			
 			if (r.size())
 			for (unsigned j=0; j<r.size(); j++)
 			{
+				cout << query << endl;	
+				cout << "cRasterFileHandler::AddRaster: r.size() = " << r.size() << endl;
 				if (!NewFound)
 				{				
 					NewFound = true;

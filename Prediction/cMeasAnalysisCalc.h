@@ -77,15 +77,15 @@ class cMeasAnalysisCalc
 	~cMeasAnalysisCalc(); // destructor
 
 bool LoadMeasurements(vPoints Points, 
-														unsigned MeasType=0, 
-														unsigned PosSource=0, 
-														unsigned MeasSource=0, 
-														unsigned Cell=0);
+			unsigned MeasType=0, 
+			unsigned PosSource=0, 
+			unsigned MeasSource=0, 
+			unsigned Cell=0);
 
 	bool LoadMeasurements(	unsigned MeasType=0, 
-														unsigned PosSource=0, 
-														unsigned MeasSource=0, 
-														unsigned Cell=0);
+				unsigned PosSource=0, 
+				unsigned MeasSource=0, 
+				unsigned Cell=0);
 
 	int PerformAnalysis(double &Mean, double &MeanSquareError,
 				double &StDev, double &CorrC, unsigned Clutterfilter=0);

@@ -26,7 +26,7 @@
 #ifndef cPosEstimation_h
 #define cPosEstimation_h 1
 
-#define GAMMA 2.4
+#define GAMMA 2.0
 #define MOBILEHEIGHT 1
 #define SIGMA2 (8*8)
 #define MARGIN 15

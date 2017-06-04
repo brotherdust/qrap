@@ -186,6 +186,9 @@ bool cTrafficDist::SetTrafficDist(eOutputUnits DisplayUnits,
 		{
 			string err ="  Trouble getting Clutter list. Not using clutter.";
 			QRAP_WARN(err.c_str());
+			cout << "  Trouble getting Clutter list. Not using clutter."<< endl;
+			cout << "  cTrafficDist::SetTrafficDist:  This makes no sense withou clutter." << endl; 
+			return false;
 		}
 	}
 	if (mUseClutter)
@@ -423,7 +426,7 @@ unsigned cTrafficDist::UpdateActiveRasters(int Here, int Advance)
 				BTLkey = Prediction.SetCommunicationLink(mFixedInsts[i].sSiteID,
 										mDownlink, EIRP, TxPower, TxSysLoss, 
 										RxSysLoss, RxSens,
-										mFixedInsts[i].sInstKey,	FixedAzimuth, FixedMechTilt,
+										mFixedInsts[i].sInstKey, FixedAzimuth, FixedMechTilt,
 										mMobile.sInstKey, FixedHeight, MobileHeight, 
 										mFixedInsts[i].sFrequency, kFactor,
 										mFixedInsts[i].sRange, mPlotResolution, 
@@ -964,11 +967,11 @@ bool cTrafficDist::DetermineClutterDist()
 		TotalsPerClutter[j] = 0.0;
 		for (i=0; i<NumInsts; i++)
 		{
-			cout << ClutterDist[i][j] << "	";
+//			cout << ClutterDist[i][j] << "	";
 			TotalsPerClutter[j]+=ClutterDist[i][j];
 		}
-		cout << endl;
-		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
+//		cout << endl;
+//		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
 	}
 	
 	unsigned ClutterCount = 0;
@@ -1025,8 +1028,8 @@ bool cTrafficDist::DetermineClutterDist()
 		}
 	}
 
-	cout << "In cTrafficDist::DetermineClutterDist(). ClutterCount = " << ClutterCount << endl; 
-	cout << "In cTrafficDist::DetermineClutterDist(). ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl; 
+//	cout << "In cTrafficDist::DetermineClutterDist(). ClutterCount = " << ClutterCount << endl; 
+//	cout << "In cTrafficDist::DetermineClutterDist(). ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl; 
 	unsigned *ClutterIndex;
 	ClutterIndex = new unsigned[ClutterCount];
 	for (j=0; j<ClutterCount; j++)
@@ -1035,9 +1038,9 @@ bool cTrafficDist::DetermineClutterDist()
 	}
 	unsigned Index = 0;
 	j=0;
-	for (j=0; j<ClutterUsed.mNumber; j++)
+	for (j=0; j<=ClutterUsed.mNumber; j++)
 	{
-		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
+//		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
 		if ((TotalsPerClutter[j]>0)&&(Index<ClutterCount))
 		{
 			ClutterIndex[Index] = j;
@@ -1045,22 +1048,22 @@ bool cTrafficDist::DetermineClutterDist()
 		} 
 	}
 
-	cout << "Index = " << Index << endl;
-	cout << "In cTrafficDist::DetermineClutterDist() before Completing matrixes" << endl;
+//	cout << "Index = " << Index << endl;
+//	cout << "In cTrafficDist::DetermineClutterDist() before Completing matrixes" << endl;
 
 	for(i=0; i<ClutterCount; i++)
 	{
-		cout << "i=" << i << "	RadInstOrder[i] = " << RadInstOrder[i] << endl;
+//		cout << "i=" << i << "	RadInstOrder[i] = " << RadInstOrder[i] << endl;
 		mTraffic(i,0) = mFixedInsts[RadInstOrder[i]].sCStraffic;
 		for(j=0; j<ClutterCount; j++)
 		{
-			cout << "j=" << j << ": " << ClutterIndex[j] << "	";
+//			cout << "j=" << j << ": " << ClutterIndex[j] << "	";
 			mTheMatrix(i,j) = ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
 		}
-		cout << endl;
+//		cout << endl;
 	}
 
-	unsigned CountWrap = ceil(((double)NumInsts)/((double)ClutterCount));
+/*	unsigned CountWrap = ceil(((double)NumInsts)/((double)ClutterCount));
 	for (k=1;k<=CountWrap; k++)
 	{
 		for (i=ClutterCount*k+1;i<min(NumInsts,ClutterCount*(k+1));i++)
@@ -1070,7 +1073,7 @@ bool cTrafficDist::DetermineClutterDist()
 				mTheMatrix(ClutterCount-(i-ClutterCount*k),j) += ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
 		}
  	}
-
+*/
 	cout << "In cTrafficDist::DetermineClutterDist() before Solving fo CStraffic" << endl;
 
 	mWeights = mTheMatrix.fullPivLu().solve(mTraffic);
@@ -1079,7 +1082,11 @@ bool cTrafficDist::DetermineClutterDist()
 	delete [] mCSweights;
 	mCSweights = new double[ClutterUsed.mNumber+1];
 	for (i=0;i<ClutterCount;i++)
+	{
 		mCSweights[ClutterIndex[i]] = mWeights(i);
+		cout << "ClutterIndex[i]=" << ClutterIndex[i] 
+			<< "	mCSweights[ClutterIndex[i]] = " << mCSweights[ClutterIndex[i]] << endl;
+	}
 
 	cout << "In cTrafficDist::DetermineClutterDist() Doing PS traffice now" << endl;
 	for(i=0; i<ClutterCount; i++)
@@ -1089,7 +1096,7 @@ bool cTrafficDist::DetermineClutterDist()
 			mTheMatrix(i,j) = ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
 	}
 
-	for (k=1;k<=CountWrap; k++)
+/*	for (k=1;k<=CountWrap; k++)
 	{
 		for (i=ClutterCount*k+1;i<min(NumInsts,ClutterCount*(k+1));i++)
 		{
@@ -1098,7 +1105,7 @@ bool cTrafficDist::DetermineClutterDist()
 				mTheMatrix(ClutterCount-(i-ClutterCount*k),j) += ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
 		}
  	}
-
+*/
 	cout << "In cTrafficDist::DetermineClutterDist() before Solving fo CStraffic" << endl;
 	mWeights = mTheMatrix.fullPivLu().solve(mTraffic);
 

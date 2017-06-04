@@ -670,8 +670,9 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
-
-/*			cout << "Inst: " << currentInst << "	#: " << CNumUsed  << "	Freq =" << mFixedInsts[FixedNum].sFrequency 
+/*
+					cout << "Inst: " << currentInst << "	#: " << CNumUsed  
+						<< "	Freq =" << mFixedInsts[FixedNum].sFrequency 
 						<< "	M: "<< CMean 					
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
@@ -767,6 +768,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 										+ MobileAnt.GetPatternValue(0, -mMeasPoints[i].sTilt);
 
 				mMeasPoints[i].sPredValue = -mMeasPoints[i].sPathLoss + EIRP - AntValue;
+//				cout << "cMeasAnalysisCalc::PerformAnalysis pathloss=" << mMeasPoints[i].sPathLoss;
+//				cout << "	AntValue=" << AntValue << endl;
 
 				Error = - mMeasPoints[i].sMeasValue + mMeasPoints[i].sPredValue;
 				TotalError += Error;  
@@ -961,7 +964,6 @@ bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)
 	MatrixXd DeltaCoeff;
 	int NumUsed =0;
 	mPathLoss.set_Tuning(true);
-
 	mUseClutter = true;
 
 //	cout << "cMeasAnalysisCalc::OptimiseModelCoefAllTotal: Voor LoadMeasurements()" << endl;

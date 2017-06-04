@@ -281,6 +281,14 @@ void cAntennaFilesImporter::ImportAntennas ()
 										cout << "GAIN " << list[1].toStdString() << endl;
 											
 										antennaPattern["gain"] = list[1].toStdString();
+										if (list.count()>2)
+										{
+											if (list[2]=="dBd")
+											{
+											double gain = list[1].toDouble()+2.15;
+											antennaPattern["gain"]=std::to_string(gain);
+											}
+										}
 										} // if GAIN
 										else
 										{

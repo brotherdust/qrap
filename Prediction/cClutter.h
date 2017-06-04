@@ -35,7 +35,7 @@
 #include "../DataBase/cDatabase.h"
 
 //The following terms in used in the clutter dependant propagation Prediction
-#define NUMTERMS 2
+#define NUMTERMS 7
  
 #define TERM0 1		//Constant offset
 #define TERM1 log10(mLinkLength/1000.0) // This term occur in virtually all models. Here it will refer loss over and above free-space. 

@@ -40,7 +40,7 @@
 #include "cClutter.h"
 
 // local defines
-#define MAXPEAK 4
+#define MAXPEAK 5
 
 namespace Qrap
 {

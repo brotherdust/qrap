@@ -48,7 +48,7 @@ int main (int argc, char **argv)
 {
 //	bool error = false;
 	cout << "Main 1" << endl;
-	string query;
+	string queryC, queryN;
 	
 	if (!gSettings.LoadFromFile("/usr/lib/qgis/plugins/settings.xml"))
 		return 0;
@@ -61,7 +61,7 @@ int main (int argc, char **argv)
 
 	cout << "Connected " << endl;
 
-	cTrafficDist TrafficDistribution;
+/*	cTrafficDist TrafficDistribution;
 	short int DEMsourceList=1;
 	short int ClutterSourceList=2;
 	bool UseClutter=true;
@@ -71,7 +71,7 @@ int main (int argc, char **argv)
 	double Range = 35;
 	string StoreDir="/home/maggie/MTN2016/";
 	string ResultFile="TrafficDist.img";
-	cGeoP NW(-26.036, 27.976);
+	cGeoP NW(-26.035, 27.975);
 	cGeoP SE(-26.109, 28.075);
 
 	TrafficDistribution.SetTrafficDist(dBm,true,8,-115,3,8,-120,1.33,
@@ -81,7 +81,7 @@ int main (int argc, char **argv)
 	TrafficDistribution.PrimServPlot();
 	TrafficDistribution.DetermineClutterDist();
 	TrafficDistribution.WriteOutput(DEG);
-
+*/
 /*
 	cGeoP point(-34,27.9);
 	point.SetGeoType(WGS84GC);
@@ -134,28 +134,28 @@ int main (int argc, char **argv)
 	cout << endl << "Got CI's " << endl;
 	VCMeasurements.WriteToDatabase();
 	cout << endl << "Wrote Measurements to DataBase" << endl;
-
+*/
 
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 	int Num;
 
 
-  	query = "update coefficients set coefficient=0.0;";
-	if (!gDb.PerformRawSql(query))
+  	queryC = "update coefficients set coefficient=0.0;";
+	if (!gDb.PerformRawSql(queryC))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
 
 
-  	query = "update qrap_config set value='false' where name = 'UseAntANN';";
-	if (!gDb.PerformRawSql(query))
+  	queryN = "update qrap_config set value='false' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(queryN))
 	{
 		cout << "Error updating qrap_config" << endl;
 	}
 
 	Meas.SetUseAntANN(false);
-*/
+
 /*
 //Gauteng 20m DEM
 	vPoints Punte;
@@ -187,7 +187,7 @@ int main (int argc, char **argv)
 
 	delete [] Hoek; 
 */
-/*
+
 	vPoints Punte;
 	cGeoP *Hoek;
 	Hoek = new cGeoP[4];
@@ -207,7 +207,7 @@ int main (int argc, char **argv)
 	delete [] Hoek; 
 
 
-//	Meas.mPathLoss.mClutter.Reset(1);
+	Meas.mPathLoss.mClutter.Reset(1);
 
 	cout << "Loading measurements ... in main()" << endl;
 
@@ -220,36 +220,44 @@ int main (int argc, char **argv)
 //	Meas.SetSeekWidthBest(1);
 //	Meas.SetSmoothWidthBest(1);
 //	Meas.OptimiseSeekWidth();
-//        Meas.OptimiseHeights(0);
-	if (!gDb.PerformRawSql(query))
+        Meas.OptimiseHeights(0);
+/*	if (!gDb.PerformRawSql(queryC))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
-	Meas.mPathLoss.mClutter.Reset(1);
-*/
-/*	Meas.OptimiseOffsets(0);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-	cout<< "PostOffsets" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-*/
-/*
-	if (!gDb.PerformRawSql(query))
-	{
-		cout << "Error clearing coefficients" << endl;
-	}
-	Meas.mPathLoss.mClutter.Reset(1);
 
+	Meas.mPathLoss.mClutter.Reset(1);
+	Meas.SetPlotResolution(5);
+	Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.OptimiseModelCoefAllTotal(0);
    	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-	if (!gDb.PerformRawSql(query))
+	if (!gDb.PerformRawSql(queryC))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
 	Meas.mPathLoss.mClutter.Reset(1);
+	Meas.SetPlotResolution(5);
+	Meas.LoadMeasurements(Punte,0,0,0);
    	Meas.OptimiseModelCoefD(0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+
+	if (!gDb.PerformRawSql(queryC))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+//	Meas.mPathLoss.mClutter.Reset(1);
+	Meas.SetPlotResolution(5);
+	Meas.LoadMeasurements(Punte,0,0,0);
+	Meas.OptimiseOffsets(0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "PostOffsets" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+
+
 //	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
 */
 /*

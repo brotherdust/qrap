@@ -2154,7 +2154,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 			}
  		}
 
-		Radius=8000;
+		Radius=5000;
 		if ((MAXBTLinMEMORY>iBTL)&&(mBTL.size()>iBTL))
 		{
 //			cout << "Found iBTL = " << iBTL << endl; 

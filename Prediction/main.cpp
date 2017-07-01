@@ -48,7 +48,7 @@ int main (int argc, char **argv)
 {
 //	bool error = false;
 	cout << "Main 1" << endl;
-	string queryC, queryN;
+	string queryC, queryN, queryP, queryA;
 	
 	if (!gSettings.LoadFromFile("/usr/lib/qgis/plugins/settings.xml"))
 		return 0;
@@ -187,14 +187,15 @@ int main (int argc, char **argv)
 
 	delete [] Hoek; 
 */
-
+/*
 	vPoints Punte;
 	cGeoP *Hoek;
 	Hoek = new cGeoP[4];
-	Hoek[0].Set(-24.01, 30.99);
-	Hoek[1].Set(-30.01, 30.99);
-	Hoek[2].Set(-30.01, 23.00);
-	Hoek[3].Set(-24.01, 23.00);
+
+//	Hoek[0].Set(-24.01, 30.99);
+//	Hoek[1].Set(-30.01, 30.99);
+//	Hoek[2].Set(-30.01, 23.00);
+//	Hoek[3].Set(-24.01, 23.00);
 
 	Hoek[0].Set(-26.036, 27.976);
 	Hoek[1].Set(-26.109, 27.976);
@@ -216,11 +217,11 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
+*/
 //	Meas.SetSeekWidthBest(1);
 //	Meas.SetSmoothWidthBest(1);
 //	Meas.OptimiseSeekWidth();
-        Meas.OptimiseHeights(0);
+//        Meas.OptimiseHeights(0);
 /*	if (!gDb.PerformRawSql(queryC))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -334,10 +335,8 @@ for ( i=4; i>=0; i--)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
+
 /*
-	cTrainPosNetDistAngle NeuralNets;
-//	vPoints Punte;
-//	cGeoP *Hoek;
 	Punte.clear();
 	Hoek = new cGeoP[5];
 
@@ -353,11 +352,32 @@ for ( i=4; i>=0; i--)
 	Punte.push_back(Hoek[4]);
 	
 	delete [] Hoek; 
+*/
+/*
+	cTrainPosNetDistAngle NeuralNets;
+
+	vPoints Punte;
+	cGeoP *Hoek;
+	Hoek = new cGeoP[4];
+	Hoek[0].Set(-24.01, 30.99);
+	Hoek[1].Set(-30.01, 30.99);
+	Hoek[2].Set(-30.01, 23.00);
+	Hoek[3].Set(-24.01, 23.00);
+
+	Hoek[0].Set(-26.053, 28.000);
+	Hoek[1].Set(-26.094, 28.000);
+	Hoek[2].Set(-26.094, 28.055);
+	Hoek[3].Set(-26.043, 28.055);
+
+	for (int i=0; i<4; i++)
+		Punte.push_back(Hoek[i]);
+	
+	delete [] Hoek; 
 	
 	cout << "In main Loading measurements " << endl;
-	NeuralNets.LoadSites(Punte,2,6,1,1);
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Test",false);
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Train",true);
+	NeuralNets.LoadSites(Punte,1,1,1,1);
+	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Test",false);
+	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Train",true);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
@@ -458,39 +478,43 @@ for ( i=4; i>=0; i--)
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-/*
+
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
 	cout << "Na constructor" << endl;
-//	vPoints Punte;
-//	cGeoP *Hoek;
+	vPoints Punte;
+	cGeoP *Hoek;
 	Hoek = new cGeoP[4];
 
-	Hoek[0].Set(-26.06, 28.26);
-	Punte.push_back(Hoek[0]);
-	Hoek[1].Set(-25.94, 28.26);
-	Punte.push_back(Hoek[1]);
-	Hoek[2].Set(-25.94, 28.113);
-	Punte.push_back(Hoek[2]);
-	Hoek[3].Set(-26.06, 28.113);
-	Punte.push_back(Hoek[3]);
+//	Hoek[0].Set(-26.036, 27.976);
+//	Hoek[1].Set(-26.109, 27.976);
+//	Hoek[2].Set(-26.109, 28.075);
+//	Hoek[3].Set(-26.036, 28.075);
+
+	Hoek[0].Set(-26.053, 28.000);
+	Hoek[1].Set(-26.094, 28.000);
+	Hoek[2].Set(-26.094, 28.055);
+	Hoek[3].Set(-26.043, 28.055);
+
+	for (int i=0; i<4; i++)
+		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek;
 
- 	query = "truncate positionestimate cascade;";
-	if (!gDb.PerformRawSql(query))
+ 	queryP = "truncate positionestimate cascade;";
+	if (!gDb.PerformRawSql(queryP))
 	{
 		cout << "Error truncating positionestimate" << endl;
 	}
-  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
-	if (!gDb.PerformRawSql(query))
+  	queryA = "update qrap_config set value='false' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(queryA))
 	{
 		cout << "Error updating qrap_config" << endl;
 	}
 
 	cout << "Voor LoadMeasurements" << endl;
-	Positioning.SetUseAntANN(true);	
-	Positioning.LoadMeasurements(Punte,2,6,1,1);
+	Positioning.SetUseAntANN(false);	
+	Positioning.LoadMeasurements(Punte,1,1,1,1);
 	cout << "Na LoadMeasurements" << endl;
 
 	cout << " Clearing Punte " << endl;
@@ -501,7 +525,7 @@ for ( i=4; i>=0; i--)
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-*/
+
 /*
 	if (!gDb.PerformRawSql(query))
 	{

@@ -45,6 +45,11 @@ cCoveragePredict::cCoveragePredict()
 	mAngleRes = 1; 	// in degees
 	mNumAngles = 360;
 	mNumRadialPoints = 2;
+	mDistRes=30;
+	mRadius=mNumRadialPoints*mDistRes;
+	mkFactor=1.33;
+	mUseClutter=true;
+	mFrequency=945;
 	mBTL = new_Float2DArray(mNumAngles,mNumRadialPoints);
 	mTilt = new_Float2DArray(mNumAngles,mNumRadialPoints);
 	mRxLev = new_Float2DArray(mNumAngles,mNumRadialPoints);
@@ -75,11 +80,12 @@ int cCoveragePredict::SetCommunicationLink(	int		SiteID,
 						double 		FixedHeight, // in meters
 						double 		MobileHeight, // 
 						double 		&Frequency, // in MHz
-						double 		kFactor,
+						double 		&kFactor,
 						double 		&Radius, // in meters
 						double 		DistanceRes, // in meters
 						unsigned	NumAngles, // input in degrees
 						int 		DTMsource, // key to source 
+						bool		UseClutter,
 						int 		ClutterSource)
 {
 	mSiteID = SiteID;
@@ -118,12 +124,19 @@ int cCoveragePredict::SetCommunicationLink(	int		SiteID,
 	cout << "k: " << kFactor << endl;
 	cout << "F_height: " << FixedHeight << endl;
 	cout << "M_height: " << MobileHeight << endl;
-	int rValue = mBTLPredict.Check_and_SetBTL
+	int BTLkey = mBTLPredict.Check_and_SetBTL
 					(SiteID, Radius, mDistRes, mNumAngles,
 					Frequency, FixedHeight, MobileHeight, 
-					kFactor, DTMsource,	ClutterSource);
-	return rValue;
+					kFactor, DTMsource, ClutterSource);
+
+	mRadius=Radius;
+	mFrequency=Frequency;
+	mkFactor=kFactor;
+	mUseClutter=UseClutter;
+
+	return BTLkey;
 }
+
 
 //*************************************************************************
 bool cCoveragePredict::CalculateRadialCoverage(bool AfterReceiver)

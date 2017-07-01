@@ -130,10 +130,14 @@ namespace Qrap
 				mMaxPathLossReached = false;
 			};
 			
-			double GetRange() { return mRange; };
+			double GetRange() 	{ return mRange; };
+			double GetDistRes() 	{ return mDistanceRes; };
+			double GetAnglesRes() 	{ return mAngleRes; };
+	
+			Float2DArray mBTL;	///< stores the elevation/heigh data
+			Float2DArray mTilt;	///< stores the clutter data
 			
-			Float2DArray mBTL;		///< stores the elevation/heigh data
-			Float2DArray mTilt;		///< stores the clutter data
+			int	mSiteID;	///< Site ID of the centre of the prediction.
 		
 		private:
 
@@ -147,25 +151,24 @@ namespace Qrap
 			 */
 			int StoreBTL();
 		
-			bool	mArraysPopulated;	///< Are the arrays populated
-			bool	mMaxPathLossReached; ///<Indicates whether range was limited because the maximum pathloss was reached.
-			double	mMaxPathLoss;
-			int 	mBTLid;
-			int	mSiteID;		///< Description
-			double	mAngleRes; 		///< In degrees
+			bool		mArraysPopulated;	///< Are the arrays populated
+			bool		mMaxPathLossReached; ///<Indicates whether range was limited because the maximum pathloss was reached.
+			double		mMaxPathLoss;
+			int 		mBTLid;
+			double		mAngleRes; 		///< In degrees
 			unsigned 	mNumAngles;		///< Description
-			double	mDistanceRes;		///< In meters
-			unsigned		mNumRadialPoints;	///< Description
-			double	mFrequency;		///< In MHz
-			double	mkFactor;		///< Used in effective earth model to represent refractivity
-			double	mRange;			///< In meters
-			double	mFixedHeight;		///< In meters
-			double	mMobileHeight;		///< In meters
-			int 	mDTMsource;		///< "key" to indicate which DTM set/rule was used for prediction
-			int 	mClutterSource;		///< "key" to indicate which Clutter set/rule was used for prediction
+			double		mDistanceRes;		///< In meters
+			unsigned	mNumRadialPoints;	///< Description
+			double		mFrequency;		///< In MHz
+			double		mkFactor;		///< Used in effective earth model to represent refractivity
+			double		mRange;			///< In meters
+			double		mFixedHeight;		///< In meters
+			double		mMobileHeight;		///< In meters
+			int 		mDTMsource;		///< "key" to indicate which DTM set/rule was used for prediction
+			int 		mClutterSource;		///< "key" to indicate which Clutter set/rule was used for prediction
 			// stores the tilt that the Tx antenna will have to a point.
-			string	mBTLfile;  		///< Name of the BTL file
-			string	mBTLdir;		///< Description
+			string		mBTLfile;  		///< Name of the BTL file
+			string		mBTLdir;		///< Description
 	};
 }
 #endif

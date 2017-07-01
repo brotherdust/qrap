@@ -67,8 +67,8 @@ cBTLPredict::~cBTLPredict()
 }
 
 //*********************************************************************
-bool cBTLPredict::GetBTL(	unsigned 	&NumAngles,
-				unsigned		&NumRadialPoints,
+bool cBTLPredict::GetBTL(	unsigned &NumAngles,
+				unsigned &NumRadialPoints,
 				double &Radius, // in meters
 				double &DistanceRes) // in meters
 {
@@ -84,18 +84,18 @@ bool cBTLPredict::GetBTL(	unsigned 	&NumAngles,
 
 //*********************************************************************
 int cBTLPredict::Check_and_SetBTL(	int SiteID, 
-									double &Radius, // in meters
-									double &DistanceRes, // in meters
-									unsigned &NumAngles, // input in degrees
-									double &Frequency, // in MHz
-									double &FixedHeight, // in meters
-									double &MobileHeight,
-									double &kFactor,
-									int DTMsource, // key to source 
-									int ClutterSource)
+					double &Radius, // in meters
+					double &DistanceRes, // in meters
+					unsigned &NumAngles, // input in degrees
+					double &Frequency, // in MHz
+					double &FixedHeight, // in meters
+					double &MobileHeight,
+					double &kFactor,
+					int DTMsource, // key to source 
+					int ClutterSource)
 {
-	bool sameASthis = (	(mSiteID==SiteID)&&
-					((mFixedHeight-FixedHeight)<(0.1*LIGSNEL/Frequency/1000000.0))&&
+	bool sameASthis = ((mSiteID==SiteID)&&
+			((mFixedHeight-FixedHeight)<(0.1*LIGSNEL/Frequency/1000000.0))&&
 					((mMobileHeight-MobileHeight)<(0.1*LIGSNEL/Frequency/1000000.0))&&
 					(fabs((mFrequency-Frequency)/Frequency)<0.1)&&
 					(fabs((mkFactor-kFactor)/mkFactor)<0.001)&&
@@ -130,11 +130,11 @@ int cBTLPredict::Check_and_SetBTL(	int SiteID,
 		Frequency=mFrequency;
 		FixedHeight=mFixedHeight;
 		MobileHeight=mMobileHeight;
-		cout << "cBTLPredict::Check_and_Set" << endl; 
-		cout << "Freq: " << mFrequency << endl;
-		cout << "k: " << mkFactor << endl;
-		cout << "F_height: " << mFixedHeight << endl;
-		cout << "M_height: " << mMobileHeight << endl;
+		cout << "cBTLPredict::Check_and_Set: sameASthis .." << endl; 
+		cout << "	Freq: " << mFrequency;
+		cout << "	k: " << mkFactor;
+		cout << "	F_height: " << mFixedHeight;
+		cout << "	M_height: " << mMobileHeight << endl;
 		if (mArraysPopulated)
 			return mBTLid;
 	}
@@ -199,13 +199,13 @@ int cBTLPredict::Check_and_SetBTL(	int SiteID,
 			Frequency=mFrequency;
 			FixedHeight=mFixedHeight;
 			MobileHeight=mMobileHeight;
-			cout << "cBTLPredict::Check_and_Set 2" << endl; 
-			cout << "Freq: " << mFrequency << endl;
-			cout << "k: " << mkFactor << endl;
-			cout << "F_height: " << mFixedHeight << endl;
-			cout << "M_height: " << mMobileHeight << endl;
+			cout << "cBTLPredict::Check_and_Set 2:"; 
+			cout << "	Freq: " << mFrequency;
+			cout << "	k: " << mkFactor;
+			cout << "	F_height: " << mFixedHeight;
+			cout << "	M_height: " << mMobileHeight << endl;
 // \ TODO: This is again probably not windows ready			
-			ReadBTL();
+			mArraysPopulated = ReadBTL();
 			// Successfully got the data
 			delete [] temp;
 			return mBTLid;

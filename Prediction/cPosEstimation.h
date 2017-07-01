@@ -1,4 +1,4 @@
- /*
+/*
  *    QRAP Project
  *
  *    Version     : 0.1
@@ -21,24 +21,27 @@
  *   but WITHOUT ANY WARRANTY; See the GNU General Public License for      *
  *   more details                                                          *
  *                                                                         *
- ************************************************************************* */
+ ***************************************************************************/
 
 #ifndef cPosEstimation_h
 #define cPosEstimation_h 1
 
+#define PI 3.14159265358979323846 
 #define GAMMA 2.0
 #define MOBILEHEIGHT 1
-#define SIGMA2 (8*8)
+#define SIGMA2 (10*10)
 #define MARGIN 15
-#define SENSITIVITY -110
+#define SENSITIVITY -120
 #define NUMPARTICLES 20
-#define MINSTEPSIZE 30  
+#define MINSTEPSIZE 5  
 #define INERTIA 0.7
 #define Cp 1.4
 #define Cg 1.4
-#define STOPN 10
-#define MAXITERpos 20
+#define STOPN 50
+#define MAXITERpos 100
 #define DELTA 5e-8
+#define MAXBTLinMEMORY 16
+#define MAXPATHLOSS -175
 
 // include local headers
 #include "../DataBase/Config.h"
@@ -49,6 +52,7 @@
 #include "cAntpatn.h"
 #include "cMemmngr.h"
 #include "PredStructs.h"
+#include "cBTLPredict.h"
 #include "cRasterFileHandler.h"
 #include <iostream>
 #include <random>
@@ -91,7 +95,7 @@ struct tTestPoint
 	unsigned	sOriginalTP;
 	cGeoP		sEstimatedLocation;
 	cGeoP		sOriginalLocation;
-	eMethod	sMethodUsed;
+	eMethod		sMethodUsed;
 	double		sErrorEstimate;
 	double		sErrorActual;
 	double		sAzimuth; //with respect to serving cell/site
@@ -107,24 +111,23 @@ struct tMeas
 	unsigned 	sSiteID;
 	cGeoP		sSiteLocation;
 	unsigned	sCellID;
-	
 	cGeoP		sCentroid;
-	bool			sServingCell;
+	bool		sServingCell;
 	unsigned	sInstKeyFixed;
-	double 	sEIRP;
+	double 		sEIRP;
 	unsigned	sAntPatternKey;
 	double		sFrequency;
-	double 	sMeasValue;
+	double 		sMeasValue;
 	double		sPathLoss;
 	double		sRFDistEstimate; // "pathloss" corrected for frequency and EIRP 
-	double 	sPredValue;
-	float			sTilt;
+	double 		sPredValue;
+	float		sTilt;
 	double		sHeight;
 	double		sAzimuth;
-	double 	sBeamWidth;
+	double 		sBeamWidth;
 	double		sDistance;
-	int				sTA; 		// this could be GSM TA or UMTS timeDiff
-	double 	sResDist;
+	int		sTA; 		// this could be GSM TA or UMTS timeDiff
+	double 		sResDist;
 };
 
 typedef	vector<tMeas> vMeas;
@@ -140,10 +143,10 @@ typedef	vector<tPosSet> vPosSet;
 
 struct tBand
 {
-	double sFrequency;
-	int sAIndex;
-	int sBIndex;
-	double sMaxMeasValue;
+	double 	sFrequency;
+	int 	sAIndex;
+	int 	sBIndex;
+	double 	sMaxMeasValue;
 };
 typedef	vector<tBand> vBand;
 typedef vector<cGeoP> vPoints;
@@ -152,16 +155,19 @@ struct tSiteInfo
 {
 	unsigned	sSiteID;
 	cGeoP		sPosition;
-	vCellSet		sCellSet;
+	vCellSet	sCellSet;
 	double		sMaxDist;
 	unsigned	sNumInputs;
 	unsigned	sNumOutputsA;
 	unsigned	sNumOutputsD;
-	string			sANNfileA;	
-	string			sANNfileD;		
+	string		sANNfileA;	
+	string		sANNfileD;		
 };
 
 typedef	vector<tSiteInfo> vSiteInfo;
+
+typedef cBTLPredict * pcBTLPredict;
+typedef	vector<pcBTLPredict> VecBTL;
 
 //## Class cPosEstimation
 
@@ -174,10 +180,10 @@ class cPosEstimation
 	~cPosEstimation(); // destructor
 
 	bool LoadMeasurements(vPoints Points,
-									unsigned MeasType=0, 
-									unsigned MeasSource=0,
-									unsigned PosSource=0,
-									unsigned Technology=0);
+				unsigned MeasType=0, 
+				unsigned MeasSource=0,
+				unsigned PosSource=0,
+				unsigned Technology=0);
 
 	void SetUseAntANN( bool UseAntANN) { mUseAntANN = UseAntANN;};
 
@@ -197,25 +203,8 @@ class cPosEstimation
 	static cPathLossPredictor *mPathLoss;
 	static unsigned mClutterClassGroup;
 	static bool mUseClutter;
-	static	double mkFactor;
+	static double mkFactor;
 	static double mPlotResolution;
-
-
-//	vPosSet mPosSets;		/// an array with all the testpoints
-//	unsigned mNumInsts;	
-//	unsigned mCurPosI;
-//	double* mCellPathLoss;		/// Pathloss to each cell in a measurement set.
-//	cRasterFileHandler *mDEM;
-//	cRasterFileHandler *mClutter;
-//	cProfile mClutterProfile;
-//	cProfile mDEMProfile;
-//	cAntennaPattern* mFixedAnts;
-//	cPathLossPredictor *mPathLoss;
-//	unsigned mClutterClassGroup;
-//	bool mUseClutter;
-//	double mkFactor;
-//	double mPlotResolution;
-
 
    private:
 
@@ -244,8 +233,8 @@ class cPosEstimation
 	unsigned mNumSites;
 	unsigned mNum;
 	eOutputUnits mUnits;
-	short int mDEMsource;
-	short int mClutterSource;
+	int mDEMsource;
+	int mClutterSource;
 	unsigned *mClutterCount;
 	vector<tFixed>	mFixedInsts;	///< Information on the fixed installations
 	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
@@ -260,6 +249,7 @@ class cPosEstimation
 	double mPhi_min;
 	double mPhi_max_back;
 	double mPhi_min_back;
+	VecBTL mBTL;
 };
 }
 #endif

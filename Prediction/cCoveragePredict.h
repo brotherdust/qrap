@@ -93,11 +93,12 @@ namespace Qrap
 						double 	FixedHeight,
 						double 	MobileHeight,
 						double 	&Frequency,
-						double 	kFactor,
+						double 	&kFactor,
 						double 	&Radius,
 						double 	DistanceRes,
-						unsigned 	NumAngles,
+						unsigned NumAngles,
 						int 	DTMsource,
+						bool	UseClutter,
 						int 	ClutterSource);
 			
 			
@@ -130,24 +131,28 @@ namespace Qrap
 			// Note that the receive (Rx) and transmit (Tx) refer here to the T
 			// Tx and Rx on either side of the link and not the Tx and Rx of the same radio. 
 		
-			int			mSiteID;		///< Description
+			int		mSiteID;		///< Description
 			bool 		mDownLink;		///< Are we calculating the downlink (TRUE) or uplink (False)
 			double 		mEIRP;			///< In dBm
 			double		mTxPower;		///< In Watt
 			double		mTxSysLoss;		///< In dB
 			double		mRxSysLoss;		///< In dB
 			double		mRxSens;		///< In dBm
-			int			mFixedInst;	///< Description
+			int		mFixedInst;		///< Description
 			double		mFixedAzimuth;		///< In degrees 0 North, positive clockwise
 			double		mFixedMechTilt;		///< Description
-			int			mMobileInst; 	///< Description
+			int		mMobileInst; 		///< Description
 			cAntennaPattern mFixedAntenna;		///< Description
 			cAntennaPattern mMobileAntenna;		///< Description
 			bool		mBTLloaded;		///< Description
 			double  	mAngleRes;		///< In degrees
 			double		mDistRes;		///< In meters
-			unsigned 		mNumAngles;		///< Description
-			unsigned			mNumRadialPoints;	///< Description
+			unsigned 	mNumAngles;		///< Description
+			unsigned	mNumRadialPoints;	///< Description
+			double		mRadius;		///< The Radius of the prediction
+			double		mFrequency;		///< The prediction frequency
+			double		mkFactor;
+			bool		mUseClutter;
 			Float2DArray	mBTL;			///< Description
 			Float2DArray	mTilt;			///< Description
 			Float2DArray	mRxLev;			///< Description

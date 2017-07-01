@@ -29,12 +29,13 @@
 #define GAMMA 2.0
 #define MOBILEHEIGHT 1
 #define MARGIN 15
-#define SENSITIVITY -110
-#define FREQ_SCALE (0.3/450)
-#define FREQ_OFFSET (-945-450)
-#define MEAS_SCALE (2.0/(100-50))
-#define MEAS_OFFSET 75
-#define RFDist_OFFSET -65
+#define SENSITIVITY (-120)
+#define FREQ_SCALE (2/(2170-1553))
+#define FREQ_OFFSET (-1553)
+#define MEAS_SCALE (1/20)
+#define MEAS_OFFSET (-80)
+#define RFDist_SCALE (1.5/45)
+#define RFDist_OFFSET (75)
 
 #define MAXepoch 300000
 #define REPORTInt 10000

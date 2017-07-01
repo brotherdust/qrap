@@ -49,9 +49,7 @@ cTrainAntPattern::cTrainAntPattern() // default constructor
 	{
 		mPlotResolution = atof(setting.c_str());
 	}
-	else mPlotResolution = 30;
-
-	mPlotResolution = 30;
+	else mPlotResolution = 5;
 
 	setting = gDb.GetSetting("UseClutter");
 	if (setting=="true")

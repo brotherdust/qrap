@@ -2170,8 +2170,8 @@ double cPosEstimation::CostFunction(double rho, double phi)
 				mBTL.erase(mBTL.begin());
 			}
 			cBTLPredict* newBTL = new cBTLPredict();
-			Radius = 8000;		
-			Radius = max(max(mRho_max,Radius),Distance+200);
+			Radius = 5000;		
+			Radius = max(max(mRho_max,Radius),Distance+500);
 			DistRes = mPlotResolution;
 			NumAngles = round(0.6*2.0*PI*Radius/DistRes);
 			AngleRes = 360.0/NumAngles;

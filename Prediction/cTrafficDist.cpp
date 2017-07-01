@@ -430,7 +430,7 @@ unsigned cTrafficDist::UpdateActiveRasters(int Here, int Advance)
 										mMobile.sInstKey, FixedHeight, MobileHeight, 
 										mFixedInsts[i].sFrequency, kFactor,
 										mFixedInsts[i].sRange, mPlotResolution, 
-										mNumAngles, mDEMsource, mClutterSource);
+										mNumAngles, mDEMsource, mUseClutter, mClutterSource);
 				if (BTLkey==-1)
 				{
 //					err = "Loading DEM (and Clutter) Data for Site: ";
@@ -648,7 +648,7 @@ int cTrafficDist::OrderAllPred()
 										mFixedInsts[i].sFrequency, mkFactorServ,
 										mFixedInsts[i].sRange, 
 										mPlotResolution, mNumAngles, 
-										mDEMsource, mClutterSource);
+										mDEMsource, mUseClutter, mClutterSource);
 	}
 	
 	// Sort to ensure as little as possible 

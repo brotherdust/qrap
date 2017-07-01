@@ -1240,11 +1240,11 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 				BTLkey = Prediction.SetCommunicationLink(mFixedInsts[i].sSiteID,
 										mDownlink, EIRP, TxPower, TxSysLoss, 
 										RxSysLoss, RxSens,
-										mFixedInsts[i].sInstKey,	FixedAzimuth, FixedMechTilt,
+										mFixedInsts[i].sInstKey, FixedAzimuth, FixedMechTilt,
 										mMobile.sInstKey, FixedHeight, MobileHeight, 
 										mFixedInsts[i].sFrequency, kFactor,
 										mFixedInsts[i].sRange, mPlotResolution, 
-										mNumAngles, mDEMsource, mClutterSource);
+										mNumAngles, mDEMsource, mUseClutter, mClutterSource);
 				if (BTLkey==-1)
 				{
 //					err = "Loading DEM (and Clutter) Data for Site: ";
@@ -1458,15 +1458,15 @@ int cPlotTask::OrderAllPred()
 		}
 		
 		PredDone = Prediction.SetCommunicationLink(mFixedInsts[i].sSiteID,
-										mDownlink, EIRP, 
-										TxPower, TxSysLoss, RxSysLoss, RxSens,
-										mFixedInsts[i].sInstKey,	FixedAzimuth, 
-										FixedMechTilt,	mMobile.sInstKey,
-										FixedHeight, MobileHeight, 
-										mFixedInsts[i].sFrequency, mkFactorServ,
-										mFixedInsts[i].sRange, 
-										mPlotResolution, mNumAngles, 
-										mDEMsource, mClutterSource);
+								mDownlink, EIRP, 
+								TxPower, TxSysLoss, RxSysLoss, RxSens,
+								mFixedInsts[i].sInstKey,	FixedAzimuth, 
+								FixedMechTilt,	mMobile.sInstKey,
+								FixedHeight, MobileHeight, 
+								mFixedInsts[i].sFrequency, mkFactorServ,
+								mFixedInsts[i].sRange, 
+								mPlotResolution, mNumAngles, 
+								mDEMsource, mUseClutter, mClutterSource);
 	}
 	
 	// Sort to ensure as little as possible 

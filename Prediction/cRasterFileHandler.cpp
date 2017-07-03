@@ -404,9 +404,9 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 	
 	if (!Fixed)
 	{
-		for (j=0; j<4; j++) //Check for preferred files for all the edges.
+		for (j=0; j<6; j++) //Check for preferred files for all the edges.
 		{
-			edge.FromHere(SitePos,Range,j*90);
+			edge.FromHere(SitePos,Range,j*60);
 			IsInSet = false;
 			LoadedRastersList="'";
 			for (i=0; i<mCurrentRasters.size(); i++)

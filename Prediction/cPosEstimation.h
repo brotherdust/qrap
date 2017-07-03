@@ -26,12 +26,12 @@
 #ifndef cPosEstimation_h
 #define cPosEstimation_h 1
 
-#define PI 3.14159265358979323846 
+#define PI 3.1415926535897932384626433832795
 #define GAMMA 2.0
 #define MOBILEHEIGHT 1
 #define SIGMA2 (10*10)
 #define MARGIN 15
-#define SENSITIVITY -120
+#define SENSITIVITY (-120)
 #define NUMPARTICLES 20
 #define MINSTEPSIZE 5  
 #define INERTIA 0.7

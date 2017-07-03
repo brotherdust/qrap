@@ -40,7 +40,7 @@
 #define STOPN 50
 #define MAXITERpos 100
 #define DELTA 5e-8
-#define MAXBTLinMEMORY 16
+#define MAXBTLinMEMORY 21
 #define MAXPATHLOSS -175
 
 // include local headers
@@ -81,7 +81,7 @@ enum eMethod
 	DCM_PSO, //10
 	DCM_PSObestN, //11
 	DCM_CMA_ESmean, //12
-	DCM_CMA_ESbest, //13
+	ExhaustNbest, //13
 	DCM_CMA_ESbestSeen, //14
 	ANN, //15
 	ANNangleLineSearch, //16

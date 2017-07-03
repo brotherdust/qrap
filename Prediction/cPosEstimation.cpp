@@ -750,7 +750,7 @@ void cPosEstimation::EstimatePositions()
 						case DCM_PSO:			cout << "DCM_PSO			";	break; 
 						case DCM_PSObestN:		cout << "DCM_PSObestN		";	break; 
 						case DCM_CMA_ESmean:		cout << "DCM_CMA_ESmean		";	break; 
-						case DCM_CMA_ESbest:		cout << "DCM_CMA_ESbest		";	break; 
+						case ExhaustNbest:		cout << "ExhaustNbest		";	break; 
 						case DCM_CMA_ESbestSeen:	cout << "DCM_CMA_ESbestSeen	";	break; 
 						case Exhaustive: 		cout << "ExhaustiveSearch	";	break;
 						case ANN:			cout << "ANN			";	break; 
@@ -2081,7 +2081,7 @@ bool cPosEstimation::ExhaustiveSearch()
 		tTestPoint newTestPoint;
 		newTestPoint.sOriginalTP = mPosSets[mCurPosI].sTestPoints[0].sOriginalTP;
 		newTestPoint.sOriginalLocation = mPosSets[mCurPosI].sTestPoints[0].sOriginalLocation;
-		newTestPoint.sMethodUsed = DCM_PSObestN;
+		newTestPoint.sMethodUsed = ExhaustNbest;
 		newTestPoint.sEstimatedLocation.FromHere(
 				mPosSets[mCurPosI].sMeasurements[0].sSiteLocation, sbestRho, sbestPhi);
 		BeforeLast.FromHere(mPosSets[mCurPosI].sMeasurements[0].sSiteLocation, bestRho, bestPhi);
@@ -2146,15 +2146,14 @@ double cPosEstimation::CostFunction(double rho, double phi)
 		{
 			bool gaanaan=true;
 			iBTL = 0;
-			while ((gaanaan)&&(iBTL<MAXBTLinMEMORY)&&iBTL<(mBTL.size()))
+			while ((gaanaan)&&(iBTL<MAXBTLinMEMORY)&&(iBTL<mBTL.size()))
 			{
 				if(mPosSets[mCurPosI].sMeasurements[i].sSiteID==mBTL[iBTL]->mSiteID)
 					gaanaan=false;
 				else iBTL++;
 			}
  		}
-
-		Radius=5000;
+		Radius = 0;
 		if ((MAXBTLinMEMORY>iBTL)&&(mBTL.size()>iBTL))
 		{
 //			cout << "Found iBTL = " << iBTL << endl; 
@@ -2163,18 +2162,19 @@ double cPosEstimation::CostFunction(double rho, double phi)
 		}
 		if ((Radius<Distance)||(MAXBTLinMEMORY<=iBTL)||(mBTL.size()<=iBTL))
 		{
-//			cout << "Not Found iBTL = " << iBTL << endl; 
+			cout << "Radius = " << Radius << "	Distance = " << Distance <<endl;
 			if (MAXBTLinMEMORY<=mBTL.size())
 			{
 				cout << "Erasing" << endl;
 				mBTL.erase(mBTL.begin());
+				iBTL=mBTL.size()-1;
 			}
+//			cout << "Not Found iBTL = " << iBTL << endl; 
 			cBTLPredict* newBTL = new cBTLPredict();
-			Radius = 5000;		
-			Radius = max(max(mRho_max,Radius),Distance+500);
 			DistRes = mPlotResolution;
-			NumAngles = round(0.6*2.0*PI*Radius/DistRes);
+			NumAngles = round(PI*Distance/DistRes);
 			AngleRes = 360.0/NumAngles;
+			Radius = Distance;
 			double Freq = mPosSets[mCurPosI].sMeasurements[i].sFrequency;
 			double Height = mPosSets[mCurPosI].sMeasurements[i].sHeight;
 			double MHeight = MOBILEHEIGHT;
@@ -2183,8 +2183,14 @@ double cPosEstimation::CostFunction(double rho, double phi)
 					(mPosSets[mCurPosI].sMeasurements[i].sSiteID, Radius, DistRes, NumAngles,
 					Freq, Height, MHeight, kFactor, mDEMsource, mClutterSource);
 			NumDist=round(Radius/DistRes);
+			AngleRes = 360.0/NumAngles;
 			if (BTLkey==-1)
 			{
+				Radius = 5000;		
+				Radius = max(max(mRho_max,Radius),Distance+500);
+				DistRes = mPlotResolution;
+				NumAngles = round(0.6*2.0*PI*Radius/DistRes);
+				AngleRes = 360.0/NumAngles;
 				Float2DArray DTM;
 				DTM = new_Float2DArray(NumAngles,NumDist);
 				Float2DArray Clutter;
@@ -2225,10 +2231,13 @@ double cPosEstimation::CostFunction(double rho, double phi)
 				}
 				delete [] dummyS;
 			}
+			cout << NumAngles << "	" << NumDist << "	" << Radius << "	" << DistRes << endl; 
 			mBTL.push_back(newBTL);
 			iBTL = mBTL.size()-1;
 			mBTL[iBTL]->GetBTL (NumAngles, NumDist, Radius, DistRes);
-			cout << "new iBTL = " << iBTL << endl; 
+			AngleRes = 360.0/NumAngles;
+			cout << "new iBTL = " << iBTL << endl;
+			cout << NumAngles << "	" << NumDist << "	" << Radius << "	" << DistRes << endl; 
 		}
 //		cout << "iBTL now = " << iBTL << endl;
 

@@ -434,6 +434,8 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 	{
 		string err = "cRasterFileHandler::GetForCoverage; No raster files could be found. Confirm that File-Set Order exist.";
 		cout << err << endl;
+		cout << " LoadedRastersList:	" << LoadedRastersList << endl;
+		cout << " Fixed = " << Fixed << endl;
 		QRAP_ERROR(err.c_str());
 		return false;
 	}

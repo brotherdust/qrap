@@ -402,11 +402,11 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 	}
 
 	
-	if (!Fixed)
+	if (!IsInSet)
 	{
-		for (j=0; j<6; j++) //Check for preferred files for all the edges.
+		for (j=0; j<8; j++) //Check for preferred files for all the edges.
 		{
-			edge.FromHere(SitePos,Range,j*60);
+			edge.FromHere(SitePos,Range,j*45);
 			IsInSet = false;
 			LoadedRastersList="'";
 			for (i=0; i<mCurrentRasters.size(); i++)
@@ -422,8 +422,12 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 				AddRaster(edge,LoadedRastersList);
 			}
 		}
-//		for (i=0; i<mCurrentRasters.size(); i++)
-//			DistRes = min(DistRes,mCurrentRasters[i]->GetRes());
+	}
+
+	if (!Fixed)
+	{
+		for (i=0; i<mCurrentRasters.size(); i++)
+			DistRes = min(DistRes,mCurrentRasters[i]->GetRes());
 		NumDistance = (int)ceil(Range/DistRes);
 		Range = NumDistance*DistRes;
 		NumDistance++;
@@ -972,9 +976,9 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 				if (0==i)
 				{
 					if (!New->mNW.Between(mPreferedSetNW,mPreferedSetSE))
-					mPreferedSetNW=New->mNW;
+						mPreferedSetNW=New->mNW;
 					if (!New->mSE.Between(mPreferedSetNW,mPreferedSetSE))
-					mPreferedSetSE=New->mSE;
+						mPreferedSetSE=New->mSE;
 				}
 //				cout << "NumRastersLoaded: " << mCurrentRasters.size()  << endl << endl;
 			} // if r.size()

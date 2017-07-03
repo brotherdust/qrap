@@ -2186,7 +2186,9 @@ double cPosEstimation::CostFunction(double rho, double phi)
 			AngleRes = 360.0/NumAngles;
 			if (BTLkey==-1)
 			{
-				Radius = 5000;		
+				if (4050==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=12000;
+				else Radius = 4000;	
 				Radius = max(max(mRho_max,Radius),Distance+500);
 				DistRes = mPlotResolution;
 				NumAngles = round(0.6*2.0*PI*Radius/DistRes);

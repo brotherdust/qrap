@@ -1335,7 +1335,7 @@ SmoothClose=mSmoothWidthBest;
 		for (SmoothWidth=1; SmoothWidth<50; SmoothWidth=SmoothWidth+1)
 		{
 			mPathLoss.setSmoothWidth(SmoothWidth);
-			for (SeekWidth=1;SeekWidth<31; SeekWidth=SeekWidth+1)
+			for (SeekWidth=1;SeekWidth<50; SeekWidth=SeekWidth+1)
 			{
 				mPathLoss.setSeekWidth(SeekWidth);
 				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
@@ -1479,6 +1479,8 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	Passed = new bool[mPathLoss.mClutter.mNumber];
 	Change = new bool[mPathLoss.mClutter.mNumber];
 	NumClut = new unsigned[mPathLoss.mClutter.mNumber];
+
+	cout << "cMeasAnalysisCalc::OptimiseHeights for lus" << endl; 
 	for (i=0; i<mPathLoss.mClutter.mNumber; i++)
 	{
 		Change[i] = true;

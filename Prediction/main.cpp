@@ -140,13 +140,11 @@ int main (int argc, char **argv)
 	cMeasAnalysisCalc Meas;
 	int Num;
 
-
   	queryC = "update coefficients set coefficient=0.0;";
 	if (!gDb.PerformRawSql(queryC))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
-
 
   	queryN = "update qrap_config set value='false' where name = 'UseAntANN';";
 	if (!gDb.PerformRawSql(queryN))
@@ -228,13 +226,13 @@ int main (int argc, char **argv)
 	}
 
 	Meas.mPathLoss.mClutter.Reset(1);
-	Meas.SetPlotResolution(5);
+	Meas.SetPlotResolution(30);
 	Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.OptimiseModelCoefAllTotal(0);
    	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-	if (!gDb.PerformRawSql(queryC))
+/*	if (!gDb.PerformRawSql(queryC))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
@@ -245,12 +243,12 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-
-	if (!gDb.PerformRawSql(queryC))
+*/
+/*	if (!gDb.PerformRawSql(queryC))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
-//	Meas.mPathLoss.mClutter.Reset(1);
+	Meas.mPathLoss.mClutter.Reset(1);
 	Meas.SetPlotResolution(5);
 	Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.OptimiseOffsets(0);
@@ -258,9 +256,9 @@ int main (int argc, char **argv)
 	cout<< "PostOffsets" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 
-
-//	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
 */
+//	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
+
 /*
 	cTrainAntPattern NeuralNets;
 	double Azimuth;
@@ -353,35 +351,46 @@ for ( i=4; i>=0; i--)
 	
 	delete [] Hoek; 
 */
-/*
+
 	cTrainPosNetDistAngle NeuralNets;
 
 	vPoints Punte;
 	cGeoP *Hoek;
-	Hoek = new cGeoP[4];
-	Hoek[0].Set(-24.01, 30.99);
-	Hoek[1].Set(-30.01, 30.99);
-	Hoek[2].Set(-30.01, 23.00);
-	Hoek[3].Set(-24.01, 23.00);
+	Hoek = new cGeoP[6];
 
-	Hoek[0].Set(-26.053, 28.000);
-	Hoek[1].Set(-26.094, 28.000);
-	Hoek[2].Set(-26.094, 28.055);
-	Hoek[3].Set(-26.043, 28.055);
+//	Country
+//	Hoek[0].Set(-24.01, 30.99);
+//	Hoek[1].Set(-30.01, 30.99);
+//	Hoek[2].Set(-30.01, 23.00);
+//	Hoek[3].Set(-24.01, 23.00);
 
-	for (int i=0; i<4; i++)
+//	Bryanston
+//	Hoek[0].Set(-26.053, 28.000);
+//	Hoek[1].Set(-26.094, 28.000);
+//	Hoek[2].Set(-26.094, 28.055);
+//	Hoek[3].Set(-26.043, 28.055);
+
+//	Tembisa
+	Hoek[0].Set(-25.965, 28.210);
+	Hoek[1].Set(-25.970, 28.245);
+	Hoek[2].Set(-26.015, 28.255);
+	Hoek[3].Set(-26.062, 28.175);
+	Hoek[4].Set(-25.990, 28.150);
+	Hoek[5].Set(-25.965, 28.180);
+
+	for (int i=0; i<6; i++)
 		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek; 
 	
 	cout << "In main Loading measurements " << endl;
-	NeuralNets.LoadSites(Punte,1,1,1,1);
-	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Test",false);
-	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Train",true);
+	NeuralNets.LoadSites(Punte,2,6,1,1);
+	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Test",false);
+	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Train",true);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
+
 /*
 	query = "update coefficients set coefficient=0.0;";
 
@@ -482,24 +491,34 @@ for ( i=4; i>=0; i--)
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
 	cout << "Na constructor" << endl;
-	vPoints Punte;
-	cGeoP *Hoek;
-	Hoek = new cGeoP[4];
+//	vPoints Punte;
+//	cGeoP *Hoek;
+//	Hoek = new cGeoP[6];
 
-//	Hoek[0].Set(-26.036, 27.976);
-//	Hoek[1].Set(-26.109, 27.976);
-//	Hoek[2].Set(-26.109, 28.075);
-//	Hoek[3].Set(-26.036, 28.075);
+//	Country
+//	Hoek[0].Set(-24.01, 30.99);
+//	Hoek[1].Set(-30.01, 30.99);
+//	Hoek[2].Set(-30.01, 23.00);
+//	Hoek[3].Set(-24.01, 23.00);
 
-	Hoek[0].Set(-26.053, 28.000);
-	Hoek[1].Set(-26.094, 28.000);
-	Hoek[2].Set(-26.094, 28.055);
-	Hoek[3].Set(-26.043, 28.055);
+//	Bryanston
+//	Hoek[0].Set(-26.053, 28.000);
+//	Hoek[1].Set(-26.094, 28.000);
+//	Hoek[2].Set(-26.094, 28.055);
+//	Hoek[3].Set(-26.043, 28.055);
 
-	for (int i=0; i<4; i++)
-		Punte.push_back(Hoek[i]);
+//	Tembisa
+//	Hoek[0].Set(-25.965, 28.210);
+//	Hoek[1].Set(-25.970, 28.245);
+//	Hoek[2].Set(-26.015, 28.255);
+//	Hoek[3].Set(-26.062, 28.175);
+//	Hoek[4].Set(-25.990, 28.150);
+//	Hoek[5].Set(-25.965, 28.180);
+
+//	for (int i=0; i<6; i++)
+//		Punte.push_back(Hoek[i]);
 	
-	delete [] Hoek;
+//	delete [] Hoek;
 
  	queryP = "truncate positionestimate cascade;";
 	if (!gDb.PerformRawSql(queryP))
@@ -514,7 +533,7 @@ for ( i=4; i>=0; i--)
 
 	cout << "Voor LoadMeasurements" << endl;
 	Positioning.SetUseAntANN(false);	
-	Positioning.LoadMeasurements(Punte,1,1,1,1);
+	Positioning.LoadMeasurements(Punte,2,6,1,1);
 	cout << "Na LoadMeasurements" << endl;
 
 	cout << " Clearing Punte " << endl;

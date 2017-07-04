@@ -105,6 +105,9 @@ bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
    				}
 			    	i++;
 			    	mFileSetOrder.push_back(temp);
+				cout << " cRasterFileHandler::SetRasterFileRules. RuleKey = " << 
+					RuleKey << "	FileSet = " << temp << endl;
+				
 			}// end while i<NumBytes
    			Type = r[0]["type"].c_str();
    			if (Type=="DEM") mSampleMethod = 2;

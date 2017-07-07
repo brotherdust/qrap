@@ -356,7 +356,7 @@ for ( i=4; i>=0; i--)
 
 	vPoints Punte;
 	cGeoP *Hoek;
-	Hoek = new cGeoP[6];
+	Hoek = new cGeoP[46];
 
 //	Country
 //	Hoek[0].Set(-24.01, 30.99);
@@ -365,32 +365,32 @@ for ( i=4; i>=0; i--)
 //	Hoek[3].Set(-24.01, 23.00);
 
 //	Bryanston
-//	Hoek[0].Set(-26.053, 28.000);
-//	Hoek[1].Set(-26.094, 28.000);
-//	Hoek[2].Set(-26.094, 28.055);
-//	Hoek[3].Set(-26.043, 28.055);
+	Hoek[0].Set(-26.053, 28.000);
+	Hoek[1].Set(-26.094, 28.000);
+	Hoek[2].Set(-26.094, 28.055);
+	Hoek[3].Set(-26.043, 28.055);
 
 //	Tembisa
-	Hoek[0].Set(-25.965, 28.210);
-	Hoek[1].Set(-25.970, 28.245);
-	Hoek[2].Set(-26.015, 28.255);
-	Hoek[3].Set(-26.062, 28.175);
-	Hoek[4].Set(-25.990, 28.150);
-	Hoek[5].Set(-25.965, 28.180);
+//	Hoek[0].Set(-25.965, 28.210);
+//	Hoek[1].Set(-25.970, 28.245);
+//	Hoek[2].Set(-26.015, 28.255);
+//	Hoek[3].Set(-26.062, 28.175);
+//	Hoek[4].Set(-25.990, 28.150);
+//	Hoek[5].Set(-25.965, 28.180);
 
-	for (int i=0; i<6; i++)
+	for (int i=0; i<4; i++)
 		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek; 
 	
-	cout << "In main Loading measurements " << endl;
-	NeuralNets.LoadSites(Punte,2,6,1,1);
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Test",false);
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Train",true);
+/*	cout << "In main Loading measurements " << endl;
+	NeuralNets.LoadSites(Punte,1,1,1,1);
+	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Test",false);
+	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Train",true);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-
+*/
 /*
 	query = "update coefficients set coefficient=0.0;";
 
@@ -488,9 +488,7 @@ for ( i=4; i>=0; i--)
 	cout << hoek << "		" << angle << endl;
 */
 
-	cout << "Voor constructor" << endl;
-	cPosEstimation Positioning;
-	cout << "Na constructor" << endl;
+
 //	vPoints Punte;
 //	cGeoP *Hoek;
 //	Hoek = new cGeoP[6];
@@ -520,6 +518,10 @@ for ( i=4; i>=0; i--)
 	
 //	delete [] Hoek;
 
+	cout << "Voor constructor" << endl;
+	cPosEstimation Positioning;
+	cout << "Na constructor" << endl;
+
  	queryP = "truncate positionestimate cascade;";
 	if (!gDb.PerformRawSql(queryP))
 	{
@@ -533,7 +535,7 @@ for ( i=4; i>=0; i--)
 
 	cout << "Voor LoadMeasurements" << endl;
 	Positioning.SetUseAntANN(false);	
-	Positioning.LoadMeasurements(Punte,2,6,1,1);
+	Positioning.LoadMeasurements(Punte,1,1,1,1);
 	cout << "Na LoadMeasurements" << endl;
 
 	cout << " Clearing Punte " << endl;

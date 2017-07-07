@@ -34,6 +34,7 @@ cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 	mLTEsim = false;
 	mOriginal = true; 
 	mUMTS = false;
+	mNumSites = 0;
 }
 
 //*********************************************************************
@@ -631,8 +632,8 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 	TrainIndex = 0;
 	TestIndex = 0;
 
-//	for (i=0; i<mNumSites; i++)
-	for (i=25; i<mNumSites; i++)
+	for (i=0; i<mNumSites; i++)
+//	for (i=25; i<mNumSites; i++)
 	{
 		cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;
 		cout << "	mSites[i].sNumOutputsA = " << mSites[i].sNumOutputsA;

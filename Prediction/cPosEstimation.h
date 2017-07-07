@@ -42,6 +42,7 @@
 #define DELTA 5e-8
 #define MAXBTLinMEMORY 21
 #define MAXPATHLOSS -175
+#define PRECALCdist 3500
 
 // include local headers
 #include "../DataBase/Config.h"

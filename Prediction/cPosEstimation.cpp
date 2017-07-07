@@ -2109,6 +2109,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 		return 1.5*rho/120000;
 	if (0>=mNumInsts) return 999999.0;
 	unsigned i, iBTL, ii, jj;
+	bool found=false;
 	double* Delta;
 //	cout << "Before new" ;
 	Delta = new double[mNumInsts];
@@ -2143,6 +2144,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 		Azimuth = mPosSets[mCurPosI].sMeasurements[i].sSiteLocation.Bearing(ParticlePosition);
 //		cout << "mBTL.size() = " << mBTL.size() << "	i = "<< i << "	mCurposI = " << mCurPosI << endl;
 		iBTL = 0;
+		found=false;
 		if (mBTL.size()>0)
 		{
 			bool gaanaan=true;
@@ -2159,8 +2161,9 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //			cout << "Found iBTL = " << iBTL << endl; 
 			mBTL[iBTL]->GetBTL (NumAngles, NumDist, Radius, DistRes);
 			AngleRes=360.0/NumAngles;
+			found = (Radius>Distance);
 		}
-		if ((Radius<Distance)||(MAXBTLinMEMORY<=iBTL)||(mBTL.size()<=iBTL))
+		else
 		{
 			cout << "Radius = " << Radius << "	Distance = " << Distance <<endl;
 			if (MAXBTLinMEMORY<=mBTL.size())
@@ -2184,63 +2187,9 @@ double cPosEstimation::CostFunction(double rho, double phi)
 					Freq, Height, MHeight, kFactor, mDEMsource, mClutterSource);
 			NumDist=round(Radius/DistRes);
 			AngleRes = 360.0/NumAngles;
-			if (BTLkey==-1)
+			if ((BTLkey==-1)&&(Distance<PRECALCdist))
 			{
-				if (4050==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=12000;
-				else if (4048==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=15000;
-				else if (11800==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=8500;
-				else if (11772==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=8500;
-				else if (11798==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=7500;
-				else if (4894==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=7000;
-				else if (2328==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=7000;
-				else if (4067==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=7000;
-				else if (2533==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=6000;
-				else if (616==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=6000;
-				else if (5628==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=6000;
-				else if (11306==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=6000;
-				else if (111893==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=6000;
-				else if (9409==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=6000;
-				else if (237==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=6000;
-				else if (1539==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=6000;
-				else if (5077==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=2500;
-				else if (7821==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=2500;
-				else if (872==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=3000;
-				else if (11853==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=3000;
-				else if (618==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=3000;
-				else if (627==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=3000;
-				else if (11358==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=3000;
-				else if (6677==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=4000;
-				else if (4683==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=4500;
-				else if (3029==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=4500;
-				else if (5815==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
-					Radius=4500;
-				else Radius = 5000;	
+				Radius = PRECALCdist;
 				Radius = max(max(mRho_max,Radius),Distance+500);
 				DistRes = mPlotResolution;
 				NumAngles = round(0.6*2.0*PI*Radius/DistRes);
@@ -2284,51 +2233,56 @@ double cPosEstimation::CostFunction(double rho, double phi)
 					QRAP_WARN(err.c_str());
 				}
 				delete [] dummyS;
+				found = (Radius>Distance);
+				mBTL.push_back(newBTL);
+				iBTL = mBTL.size()-1;
+				cout << "new iBTL = " << iBTL << endl;
+
 			}
-			cout << NumAngles << "	" << NumDist << "	" << Radius << "	" << DistRes << endl; 
-			mBTL.push_back(newBTL);
-			iBTL = mBTL.size()-1;
+		}
+
+		if (found)
+		{
 			mBTL[iBTL]->GetBTL (NumAngles, NumDist, Radius, DistRes);
 			AngleRes = 360.0/NumAngles;
-			cout << "new iBTL = " << iBTL << endl;
-			cout << NumAngles << "	" << NumDist << "	" << Radius << "	" << DistRes << endl; 
-		}
-//		cout << "iBTL now = " << iBTL << endl;
+	
+//			cout << "iBTL now = " << iBTL << endl;
 
-		jj= (int)(Distance/DistRes);
-		ii = (int)(Azimuth/AngleRes);
-		if (ii==NumAngles) ii=0;
-		if (jj==NumDist) jj=NumDist-1;
-		if ((jj>=NumDist)||(ii>=NumAngles))
-		{
-			cout << "Vloekskoot " << (int)NumDist - round(Distance/DistRes) << "	DistRes = "<< DistRes
-			 <<"	Dist = " << Distance << "	Radius = " << Radius << endl;
-			return 999999.0;
+			jj= (int)(Distance/DistRes);
+			ii = (int)(Azimuth/AngleRes);
+			if (ii==NumAngles) ii=0;
+			if (jj==NumDist) jj=NumDist-1;
+			if ((jj>=NumDist)||(ii>=NumAngles))
+			{
+				cout << "Vloekskoot " << (int)NumDist - round(Distance/DistRes) << "	DistRes = "<< DistRes
+				 <<"	Dist = " << Distance << "	Radius = " << Radius << endl;
+				return 999999.0;
+			}
+			Tilt = mBTL[iBTL]->mTilt[ii][jj];
+			mCellPathLoss[i] = mBTL[iBTL]->mBTL[ii][jj];
 		}
-		Tilt = mBTL[iBTL]->mTilt[ii][jj];
-		mCellPathLoss[i] = mBTL[iBTL]->mBTL[ii][jj];
-/*	
-//		mPosSets[mCurPosI].sMeasurements[i].sSiteLocation.Display();
-//		cout << "i = " << i << "	mCurPosI =" << mCurPosI << endl;
-		mDEM->GetForLink(mPosSets[mCurPosI].sMeasurements[i].sSiteLocation,
+		else
+		{
+//			mPosSets[mCurPosI].sMeasurements[i].sSiteLocation.Display();
+//			cout << "i = " << i << "	mCurPosI =" << mCurPosI << endl;
+			mDEM->GetForLink(mPosSets[mCurPosI].sMeasurements[i].sSiteLocation,
 					ParticlePosition, mPlotResolution, mDEMProfile);
-//		cout << " Got DEM " << endl;
-		if (mUseClutter)
-		{
-			mClutter->GetForLink(mPosSets[mCurPosI].sMeasurements[i].sSiteLocation,
-					ParticlePosition, mPlotResolution, mClutterProfile);
-		}
-//		cout << " Got Clutter " << endl;
-//		cout << "Voor pathloss setParameter" << endl;
-		mPathLoss->setParameters(mkFactor,mPosSets[mCurPosI].sMeasurements[i].sFrequency,
+//			cout << " Got DEM " << endl;
+			if (mUseClutter)
+			{
+				mClutter->GetForLink(mPosSets[mCurPosI].sMeasurements[i].sSiteLocation,
+						ParticlePosition, mPlotResolution, mClutterProfile);
+			}
+//			cout << " Got Clutter " << endl;
+//			cout << "Voor pathloss setParameter" << endl;
+			mPathLoss->setParameters(mkFactor,mPosSets[mCurPosI].sMeasurements[i].sFrequency,
 						mPosSets[mCurPosI].sMeasurements[i].sHeight, MOBILEHEIGHT,
 						mUseClutter, mClutterClassGroup);
-//		cout << "Voor pathloss TotPathloss" << endl;
-		mCellPathLoss[i] = mPathLoss->TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
-*/
-//		cout << "Voor Bearing" << endl;
-	
-//		cout << "Get antvalue" << endl;
+//			cout << "Voor pathloss TotPathloss" << endl;
+			mCellPathLoss[i] = mPathLoss->TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
+//			cout << "Voor Bearing" << endl;
+//			cout << "Get antvalue" << endl;
+		}
 
 		AntValue = mFixedAnts[i].GetPatternValue(Azimuth, Tilt);
 		Prediction[i] =  mPosSets[mCurPosI].sMeasurements[i].sEIRP 

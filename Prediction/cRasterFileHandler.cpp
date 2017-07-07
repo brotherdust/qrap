@@ -30,12 +30,10 @@ using namespace Qrap;
 //*********************************************************************
 cRasterFileHandler::cRasterFileHandler()
 {
-	short int Source;
 	mSampleMethod=1;
 	mPreferedSetNW.Set(-90,180);
 	mPreferedSetSE.Set(90,-180);
-//	Source = atoi(gDb.GetSetting("DEMsource").c_str());
-//	SetRasterFileRules(Source);
+	mType = "NULL";
 }
 
 //*********************************************************************
@@ -49,6 +47,7 @@ void cRasterFileHandler::DirectChangeSetToUse(int OriginalSet)
 cRasterFileHandler::cRasterFileHandler(short int Source)
 {
 	mSampleMethod=1;
+	mType = "NULL";
 	SetRasterFileRules(Source);
 	mPreferedSetNW.Set(-90,180);
 	mPreferedSetSE.Set(90,-180);
@@ -67,7 +66,7 @@ cRasterFileHandler::~cRasterFileHandler()
 bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
 {
 	pqxx::result r;
-	string QueryResult, Type;
+	string QueryResult;
 	int temp;
 	unsigned i,NumBytes;
 	char *RuleStr;
@@ -109,9 +108,10 @@ bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
 					RuleKey << "	FileSet = " << temp << endl;
 				
 			}// end while i<NumBytes
-   			Type = r[0]["type"].c_str();
-   			if (Type=="DEM") mSampleMethod = 2;
+   			mType = r[0]["type"].c_str();
+   			if (mType=="DEM") mSampleMethod = 2;
    			else mSampleMethod = 1;
+			cout << mType << endl;
 		}//end if r.size
 		else
 		{
@@ -373,7 +373,7 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 					unsigned &NumAngles, unsigned &NumDistance,
 					Float2DArray &Data)
 {
-	unsigned i,j,k, Current;
+	unsigned i,j,k=0, Current=0;
 	cGeoP edge, point;
 	bool IsInSet = false;
 	bool AllFound = true;
@@ -382,6 +382,7 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 	point.SetGeoType(WGS84GC);
 	string LoadedRastersList="'";
 	
+	cout << "In cRasterFileHandler::GetForCoverage mType =     " << mType << endl;
 	if (!Fixed)
 	{
 		AngRes = (double)360.0/(double)NumAngles;
@@ -404,7 +405,6 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 		AddRaster(SitePos,LoadedRastersList);
 	}
 
-	
 	if (!IsInSet)
 	{
 		for (j=0; j<8; j++) //Check for preferred files for all the edges.

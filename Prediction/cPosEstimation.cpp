@@ -686,8 +686,8 @@ void cPosEstimation::EstimatePositions()
 
 	time_t beginTime = time(0);
 
-	for (i=0; i< mNumPoints; i++)
-//	for (i=2385; i<2395; i++)
+//	for (i=0; i< mNumPoints; i++)
+	for (i=274; i<mNumPoints; i++)
 	{
 		mCurPosI = i;
 		if ((mPosSets[mCurPosI].sMeasurements.size()>0)
@@ -2142,10 +2142,10 @@ double cPosEstimation::CostFunction(double rho, double phi)
 		Distance = mPosSets[mCurPosI].sMeasurements[i].sSiteLocation.Distance(ParticlePosition);
 		Azimuth = mPosSets[mCurPosI].sMeasurements[i].sSiteLocation.Bearing(ParticlePosition);
 //		cout << "mBTL.size() = " << mBTL.size() << "	i = "<< i << "	mCurposI = " << mCurPosI << endl;
+		iBTL = 0;
 		if (mBTL.size()>0)
 		{
 			bool gaanaan=true;
-			iBTL = 0;
 			while ((gaanaan)&&(iBTL<MAXBTLinMEMORY)&&(iBTL<mBTL.size()))
 			{
 				if(mPosSets[mCurPosI].sMeasurements[i].sSiteID==mBTL[iBTL]->mSiteID)
@@ -2188,7 +2188,59 @@ double cPosEstimation::CostFunction(double rho, double phi)
 			{
 				if (4050==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
 					Radius=12000;
-				else Radius = 4000;	
+				else if (4048==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=15000;
+				else if (11800==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=8500;
+				else if (11772==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=8500;
+				else if (11798==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=7500;
+				else if (4894==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=7000;
+				else if (2328==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=7000;
+				else if (4067==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=7000;
+				else if (2533==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=6000;
+				else if (616==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=6000;
+				else if (5628==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=6000;
+				else if (11306==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=6000;
+				else if (111893==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=6000;
+				else if (9409==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=6000;
+				else if (237==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=6000;
+				else if (1539==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=6000;
+				else if (5077==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=2500;
+				else if (7821==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=2500;
+				else if (872==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=3000;
+				else if (11853==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=3000;
+				else if (618==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=3000;
+				else if (627==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=3000;
+				else if (11358==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=3000;
+				else if (6677==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=4000;
+				else if (4683==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=4500;
+				else if (3029==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=4500;
+				else if (5815==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius=4500;
+				else Radius = 5000;	
 				Radius = max(max(mRho_max,Radius),Distance+500);
 				DistRes = mPlotResolution;
 				NumAngles = round(0.6*2.0*PI*Radius/DistRes);

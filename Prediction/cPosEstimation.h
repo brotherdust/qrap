@@ -37,12 +37,12 @@
 #define INERTIA 0.7
 #define Cp 1.4
 #define Cg 1.4
-#define STOPN 50
-#define MAXITERpos 100
+#define STOPN 10
+#define MAXITERpos 50
 #define DELTA 5e-8
-#define MAXBTLinMEMORY 21
+#define MAXBTLinMEMORY 12
 #define MAXPATHLOSS -175
-#define PRECALCdist 3500
+#define PRECALCdist 5500
 
 // include local headers
 #include "../DataBase/Config.h"
@@ -251,6 +251,7 @@ class cPosEstimation
 	double mPhi_max_back;
 	double mPhi_min_back;
 	VecBTL mBTL;
+	cGeoP mNW, mSE;
 };
 }
 #endif

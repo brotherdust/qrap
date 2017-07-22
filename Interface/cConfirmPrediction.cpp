@@ -648,7 +648,7 @@ void cConfirmPrediction::on_btnDo_clicked()
 
 	switch (plotTypeCombo->currentIndex())
 	{
-		case 0:		mPlotType = Cov;			break;
+		case 0:		mPlotType = Cov;		break;
 		case 1:		mPlotType = PrimServer;		break;
 		case 2:		mPlotType = SecondServer;	break;
 		case 3:		mPlotType = NumServers;		break;
@@ -659,10 +659,11 @@ void cConfirmPrediction::on_btnDo_clicked()
 		case 8:		mPlotType = PrimIntCo;		break;
 		case 9:		mPlotType = PrimIntAd;		break;
 		case 10:	mPlotType = SN;			break;
-		case 11:	mPlotType = DEM;			break;
-//		case 12:	mPlotType =  EbNo;		break;
-//		case 13:	mPlotType = ServiceLimits;	break;
-		default:	mPlotType = Cov;			break;			
+		case 11:	mPlotType = DEM;		break;
+		case 12:	mPlotType = CellCentroid;	break;
+//		case 13:	mPlotType =  EbNo;		break;
+//		case 14:	mPlotType = ServiceLimits;	break;
+		default:	mPlotType = Cov;		break;			
 	}
 	switch (displayUnitsCombo->currentIndex())
 	{
@@ -854,10 +855,19 @@ void cConfirmPrediction::on_btnDo_clicked()
 		delete_Float2DArray(Data);
 		cout << "Deleted DEM Output Array in cConfirmPrediction::on_btnDo_clicked()" << endl;
 	}//end if DEM
- 	else if ((mPlotType==Cov)||(mPlotType==PrimServer)||(mPlotType==SecondServer)
- 				||(mPlotType==NumServers)||(mPlotType==SN))
+	else if ((mPlotType==Cov)||(mPlotType==PrimServer)||(mPlotType==SecondServer)
+ 				||(mPlotType==NumServers)||(mPlotType==SN)
+				||(TrafficDist==mPlotType)||(CellCentroid==mPlotType))
  	{
 		Prediction.CombineCov();
+		if (CellCentroid==mPlotType)
+		{
+			Prediction.CellCentriods();
+		}
+		else if (TrafficDist==mPlotType)
+		{
+			Prediction.DetermineTrafficDist();
+		}
 		FileWritten = Prediction.WriteOutput(DEG);
  	}
  	else
@@ -886,21 +896,22 @@ void cConfirmPrediction::on_btnDo_clicked()
 	bool getFromDB;
 	switch(mPlotType) // set up of the prediction's colour type
 	{
-		case Cov:					Plot = "Coverage";			getFromDB = true;	discrete = false;	break;
+		case Cov:		Plot = "Coverage";			getFromDB = true;	discrete = false;	break;
 		case PrimServer:	Plot = "Primary Server";		getFromDB = false;	discrete = false;	break;
+		case CellCentroid:	Plot = "Primary Server";		getFromDB = false;	discrete = false;	break;
 		case SecondServer:	Plot = "Secondary Server";		getFromDB = false;	discrete = false;	break;
 		case NumServers:	Plot = "Number of Servers";		getFromDB = true;	discrete = false;	break;
-		case DEM:				Plot = "Digital Elevation Model";	getFromDB = true;	discrete = false;	break;
+		case DEM:		Plot = "Digital Elevation Model";	getFromDB = true;	discrete = false;	break;
 		case IntRatioCo:	Plot = "Carrier to Co-channel Interference Ratio"; 	getFromDB = true;	discrete = false;	break;
 		case IntRatioAd:	Plot = "Carrier to Adjacent-channel Interf Ratio";	getFromDB = true;	discrete = false;	break;
 		case IntAreas:		Plot = "Interfered Areas"; 		getFromDB = false;	discrete = false;	break;
-		case NumInt:			Plot = "Number of Interferers"; 	getFromDB = true;	discrete = false;	break;
+		case NumInt:		Plot = "Number of Interferers"; 	getFromDB = true;	discrete = false;	break;
 		case PrimIntCo:		Plot = "Primary Co-channel Interferers";	getFromDB = false;	discrete = false;	break;
 		case PrimIntAd:		Plot = "Primary Adjacent-channel Interferers"; 	getFromDB = false;	discrete = false;	break;
-		case SN:					Plot = "Signal to Noise Ratio"; 	getFromDB = true;	discrete = false;	break;	
+		case SN:		Plot = "Signal to Noise Ratio"; 	getFromDB = true;	discrete = false;	break;	
 //		case EbNo:		Plot = "Energy per Bit to Noise Power"; getFromDB = true;	discrete = false;	break;
 //		case ServiceLimits;	Plot = "Service Limiters"; 		getFromDB = true;	discrete = false;	break;	
-		default:					Plot = "";				getFromDB = true;	discrete = false;	break;
+		default:		Plot = "";				getFromDB = true;	discrete = false;	break;
 	}
 	QString File = DirectoryToStoreResult.c_str();
 	File +="/"; //\TODO: Windows....
@@ -1188,7 +1199,7 @@ void cConfirmPrediction::on_pushButtonPrint_clicked()
   	myPainter->drawText( myDateRect, Qt::AlignCenter, myDateText );
 
   	// Draw the map onto a pixmap
-  	// @TODO: we need to save teh extent of the screen map and
+  	// @TODO: we need to save the extent of the screen map and
   	// then set them again for the print map so that the map scales
   	// properly in the print
   	int myMapDimensionX = ( myDrawableWidth / 100 ) * myMapWidthPercent;

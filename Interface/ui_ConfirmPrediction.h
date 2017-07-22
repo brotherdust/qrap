@@ -1,8 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ConfirmPrediction.ui'
 **
-** Created: Wed Sep 18 21:34:20 2013
-**      by: Qt User Interface Compiler version 4.8.1
+** Created by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -124,7 +123,7 @@ public:
         tableWidget->setSortingEnabled(true);
         gridLayout = new QWidget(ConfirmPrediction);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        gridLayout->setGeometry(QRect(10, 260, 993, 305));
+        gridLayout->setGeometry(QRect(10, 260, 1011, 305));
         PlotInput = new QGridLayout(gridLayout);
         PlotInput->setObjectName(QString::fromUtf8("PlotInput"));
         PlotInput->setContentsMargins(0, 0, 0, 0);
@@ -368,7 +367,7 @@ public:
 
         horizontalLayout_2 = new QWidget(ConfirmPrediction);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        horizontalLayout_2->setGeometry(QRect(10, 570, 487, 25));
+        horizontalLayout_2->setGeometry(QRect(10, 570, 496, 25));
         hboxLayout1 = new QHBoxLayout(horizontalLayout_2);
         hboxLayout1->setObjectName(QString::fromUtf8("hboxLayout1"));
         hboxLayout1->setContentsMargins(0, 0, 0, 0);
@@ -452,6 +451,8 @@ public:
          << QApplication::translate("ConfirmPrediction", "Primary Adjacent-channel Interferers", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("ConfirmPrediction", "Signal to Noise Ratio", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("ConfirmPrediction", "Digital Elevation Model", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ConfirmPrediction", "Update Cell Centroids", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("ConfirmPrediction", "Estimate Traffic Distribution", 0, QApplication::UnicodeUTF8)
         );
         unitlbl->setText(QApplication::translate("ConfirmPrediction", "Output Units:", 0, QApplication::UnicodeUTF8));
         displayUnitsCombo->clear();

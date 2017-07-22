@@ -382,8 +382,8 @@ for ( i=4; i>=0; i--)
 		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek; 
-	
-/*	cout << "In main Loading measurements " << endl;
+/*	
+	cout << "In main Loading measurements " << endl;
 	NeuralNets.LoadSites(Punte,1,1,1,1);
 	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Test",false);
 	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Train",true);
@@ -418,11 +418,10 @@ for ( i=4; i>=0; i--)
 	}
 	
 	cout << "In main Loading measurements " << endl;
-	NeuralNets.LoadMeasurements(Punte,0,6);
+	NeuralNets.LoadMeasurements(Punte,0,1);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-
 
   	query = "update qrap_config set value='true' where name = 'UseAntANN';";
 	if (!gDb.PerformRawSql(query))
@@ -430,7 +429,7 @@ for ( i=4; i>=0; i--)
 		cout << "Error updating qrap_config" << endl;
 	}
 
-	Meas.LoadMeasurements(2,0,6);
+	Meas.LoadMeasurements(1,0,1);
 	Meas.SetUseAntANN(true);
 
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);

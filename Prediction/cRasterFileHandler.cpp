@@ -33,6 +33,8 @@ cRasterFileHandler::cRasterFileHandler()
 	mSampleMethod=1;
 	mPreferedSetNW.Set(-90,180);
 	mPreferedSetSE.Set(90,-180);
+	mAvailableSetNW.Set(-90,180);
+	mAvailableSetSE.Set(90,-180);
 	mType = "NULL";
 }
 
@@ -49,8 +51,8 @@ cRasterFileHandler::cRasterFileHandler(short int Source)
 	mSampleMethod=1;
 	mType = "NULL";
 	SetRasterFileRules(Source);
-	mPreferedSetNW.Set(-90,180);
-	mPreferedSetSE.Set(90,-180);
+	mAvailableSetNW.Set(-90,180);
+	mAvailableSetSE.Set(90,-180);
 }
 
 //*********************************************************************
@@ -173,7 +175,7 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	unsigned NumPoints;
 	bool IsInSet=false;
 	bool AllFound=false;
-	unsigned i,j,k,Current;
+	unsigned i,j,k=0,Current=0;
 	float *profile;
 //	TxLoc.SetGeoType(DEG);
 //	RxLoc.SetGeoType(DEG);
@@ -271,17 +273,28 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	
 	bool Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
 	bool ToSwitch=false;
+	bool Available = true;
 
 	for(j=1; j<NumPoints; j++)
 	{
 		point.FromHere(TxLoc,j*DistRes,Bearing);
-		profile[j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);
 		if (!Preferred)
+		{
 			ToSwitch=point.Between(mPreferedSetNW,mPreferedSetSE);
-		else ToSwitch=false;
+		}
+		else 
+		{	
+			ToSwitch=false;
+		}
+		
+		Available=point.Between(mAvailableSetNW,mAvailableSetSE);
+		if (Available)
+			profile[j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);
+		else profile[j]=0;
+
 //		cout << j << "	" << profile[j] << endl;
 
-		if ((profile[j] <-440.0)||(profile[j] >8880)||(profile[j]==OUTOFRASTER)||ToSwitch)
+		if (((profile[j] <-440.0)||(profile[j] >8880)||(profile[j]==OUTOFRASTER)||(ToSwitch))&&(Available))
 		// to allow for the Dead Sea shore and Mount Everest
 		{
 			LoadedRastersList="'";
@@ -405,27 +418,25 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 		AddRaster(SitePos,LoadedRastersList);
 	}
 
-	if (!IsInSet)
+	for (j=0; j<8; j++) //Check for preferred files for all the edges.
 	{
-		for (j=0; j<8; j++) //Check for preferred files for all the edges.
+		edge.FromHere(SitePos,Range,j*45);
+		IsInSet = false;
+		LoadedRastersList="'";
+		for (i=0; i<mCurrentRasters.size(); i++)
 		{
-			edge.FromHere(SitePos,Range,j*45);
-			IsInSet = false;
-			LoadedRastersList="'";
-			for (i=0; i<mCurrentRasters.size(); i++)
-			{
-				IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(edge))
-						&&(0==mCurrentRasters[i]->mFileSetLevel));
-				LoadedRastersList+=mCurrentRasters[i]->mFilename;
-				LoadedRastersList+="','";
-			}
-			if (!IsInSet)
-			{
-				LoadedRastersList+="'";
-				AddRaster(edge,LoadedRastersList);
-			}
+			IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(edge))
+					&&(0==mCurrentRasters[i]->mFileSetLevel));
+			LoadedRastersList+=mCurrentRasters[i]->mFilename;
+			LoadedRastersList+="','";
+		}
+		if (!IsInSet)
+		{
+			LoadedRastersList+="'";
+			AddRaster(edge,LoadedRastersList);
 		}
 	}
+
 
 	if (!Fixed)
 	{
@@ -497,17 +508,26 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 
 	bool Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
 	bool ToSwitch=false;
+	bool Available=true;
 
 	for (i=0; i<NumAngles; i++)
 	{
 		for(j=1; j<NumDistance; j++)
 		{
 			point.FromHere(SitePos,j*DistRes,i*AngRes);
-			Data[i][j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);		
 			if (!Preferred)
+			{
 				ToSwitch=point.Between(mPreferedSetNW,mPreferedSetSE);
-			else ToSwitch=false;
-			if ((Data[i][j] <-440.0)||(Data[i][j] >8880)||(Data[i][j]==OUTOFRASTER)||ToSwitch)
+			}
+			else 
+			{	
+				ToSwitch=false;
+			}
+			Available=point.Between(mAvailableSetNW,mAvailableSetSE);
+			if (Available)
+				Data[i][j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);
+			else Data[i][j]=0;
+			if (((Data[i][j] <-440.0)||(Data[i][j] >8880)||(Data[i][j]==OUTOFRASTER)||(ToSwitch))&&(Available))
 			{
 //				cout << "OUT: " << OUTOFRASTER << endl;
 //				point.SetGeoType(DEG);
@@ -584,8 +604,8 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 			}
 			else mCurrentRasters[Current]->mUsed = true;
 		}
-//		if (((double)i/10.0)==(i/10))
-//			cout << "Get Raster Data: " << 100*i/NumAngles << endl;
+		if (((double)(25*i)/NumAngles)==((25*i)/NumAngles))
+			cout << "Get Raster Data: " << 100*i/NumAngles << endl;
 	}
 
 	for (k=0;k<mCurrentRasters.size(); k++)
@@ -610,7 +630,6 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	GeoType Proj=ProjIn;
 	bool Hemisphere=true;
 	bool IsInSet=false;
-	bool InPreferredSet=false;
 	double DistRes;
 	double Res=InRes;
 	string LoadedRastersList="'";
@@ -789,7 +808,8 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	}
 
 	bool Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
-	bool ToSwitch=false;	
+	bool ToSwitch=false;
+	bool Available=true;	
 	for (i=0; (i<Rows); i++)
 	{
 //		Sign = i-midRow;
@@ -803,12 +823,20 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 			Xdist = (double)((int)j-(int)midCol)*Res;
 			Point.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
 //			Point.FromHere(tempP,Sign*(j-midCol)*DistRes,90+(double)(1.0-Sign)*90.0);
-			Data[i][j]=mCurrentRasters[Current]->GetValue(Point,mSampleMethod);
 			if (!Preferred)
+			{
 				ToSwitch=Point.Between(mPreferedSetNW,mPreferedSetSE);
-			else ToSwitch=false;
+			}
+			else 
+			{	
+				ToSwitch=false;
+			}
+			Available=Point.Between(mAvailableSetNW,mAvailableSetSE);
+			if (Available)
+				Data[i][j]=mCurrentRasters[Current]->GetValue(Point,mSampleMethod);
+			else Data[i][j] = 0;
 			tempD= Data[i][j];
-			if ((Data[i][j] == OUTOFRASTER)||(Data[i][j]<-440)||(Data[i][j]>8880)||ToSwitch)
+			if (((Data[i][j] == OUTOFRASTER)||(Data[i][j]<-440)||(Data[i][j]>8880)||(ToSwitch))&&(Available))
 			{
 //				mCurrentRasters[Current]->mUsed = false;
 				k=0;
@@ -983,6 +1011,11 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 					if (!New->mSE.Between(mPreferedSetNW,mPreferedSetSE))
 						mPreferedSetSE=New->mSE;
 				}
+				if (!New->mNW.Between(mAvailableSetNW,mAvailableSetSE))
+					mAvailableSetNW=New->mNW;
+				if (!New->mSE.Between(mAvailableSetNW,mAvailableSetSE))
+					mAvailableSetSE=New->mSE;
+
 //				cout << "NumRastersLoaded: " << mCurrentRasters.size()  << endl << endl;
 			} // if r.size()
 			else

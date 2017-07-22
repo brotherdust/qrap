@@ -43,6 +43,7 @@ namespace Qrap
 	{
 		int	sInstKey;	///< Primary key of Radio installation
 		int 	sSiteID;	///< Primary key of site where it is installed
+		int	sTechKey;	///< Primary key of the technology
 		string  sSiteName;	///< Name of site
 		cGeoP	sSitePos;	///< Position of installation
 		double	sFrequency;	///< Frequency at which prediction will be done
@@ -66,6 +67,10 @@ namespace Qrap
 		double  sRange;		///< The range for which the prediction must be carried out
 		double	sFEdge;		///< The "front-edge" of the forseen coverage plot in degrees North (or West)
 		double	sBEdge; 	///< The "back-edge" of the forseen coverage plot in degrees North (or West)
+		double 	sCentroidX;	///< Location of centroid with respect to Left edge of plot in pixels
+		double 	sCentroidY;	///< Location of centroid with respect to Top edge of plot in pixels
+		int	sPixelCount;	///< Number of pixels where installation is primary server
+		cGeoP	sCentroid;	///< Centroid of the coverage area of the installation
 		vector<double> sFreqList;	///< List of actual center frequencies in MHz		
 		double 	sBandWidth;	///< Bandwidth of the channels in MHz
 	};
@@ -84,6 +89,8 @@ namespace Qrap
 		Left.sFrequency		= Right.sFrequency;
 		Left.sEIRP		= Right.sEIRP;
 		Left.sLayerThres	= Right.sLayerThres;
+		Left.sCStraffic		= Right.sCStraffic;
+		Left.sPStraffic		= Left.sPStraffic;
 		Left.sTxPower		= Right.sTxPower;
 		Left.sTxSysLoss		= Right.sTxSysLoss;
 		Left.sRxSysLoss		= Right.sRxSysLoss;
@@ -100,6 +107,10 @@ namespace Qrap
 		Left.sRange		= Right.sRange;
 		Left.sFEdge		= Right.sFEdge;
 		Left.sBEdge		= Right.sBEdge;
+		Left.sCentroid		= Right.sCentroid;
+		Left.sCentroidX		= Right.sCentroidX;
+		Left.sCentroidY		= Right.sCentroidY;
+		Left.sPixelCount	= Right.sPixelCount;
 		Left.sBandWidth 	= Right.sBandWidth;
 		Left.sFreqList.clear();
 		for (unsigned i=0; i<Right.sFreqList.size(); i++)

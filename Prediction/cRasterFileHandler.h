@@ -149,6 +149,8 @@ namespace Qrap
 			int 		mSampleMethod;
 			cGeoP		mPreferedSetNW;
 			cGeoP		mPreferedSetSE;
+			cGeoP		mAvailableSetNW;
+			cGeoP		mAvailableSetSE;
 			string		mType;
 	};
 }

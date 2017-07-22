@@ -120,10 +120,11 @@ int cCoveragePredict::SetCommunicationLink(	int		SiteID,
 	}
 	mEIRP = EIRP;
 	
-	cout << "Freq: " << Frequency << endl;
-	cout << "k: " << kFactor << endl;
-	cout << "F_height: " << FixedHeight << endl;
-	cout << "M_height: " << MobileHeight << endl;
+	cout << "In cCoveragePredict::SetCommunicationLink:";
+	cout << "	Freq: " << Frequency;
+	cout << "	k: " << kFactor;
+	cout << "	F_height: " << FixedHeight;
+	cout << "	M_height: " << MobileHeight << endl;
 	int BTLkey = mBTLPredict.Check_and_SetBTL
 					(SiteID, Radius, mDistRes, mNumAngles,
 					Frequency, FixedHeight, MobileHeight, 
@@ -223,6 +224,8 @@ bool cCoveragePredict::InterpolateToSquare(cGeoP SitePos, cGeoP NW, // the centr
 	delete_Float2DArray(Result);
 	Result = new_Float2DArray(rows,cols);
 	
+	cout << "cCoveragePredict::InterpolateToSquare ... Interpolating " << endl;
+
 	for (i=0; i<rows; i++)
 	{
 		for (j=0; j<cols; j++)
@@ -290,8 +293,8 @@ bool cCoveragePredict::InterpolateToSquare(cGeoP SitePos, cGeoP NW, // the centr
 			} //end if (Rij<R)
 			else Result[i][j]= -9999;
 		} // end for (j
-		if (((double)i/100.0)==(i/100))
-			cout << "Interpolate to Square: " << 100*i/rows << endl;
+//		if (((double)i/100.0)==(i/100))
+//			cout << "Interpolate to Square: " << 100*i/rows << endl;
 	} // end for (i
 	return true;
 }

@@ -57,6 +57,8 @@ cPlotTask::cPlotTask()
 	mMobile.sRxSens = -104;
 	mMobile.sPatternKey = 0;
 	mMobile.sMobileHeight = 1;
+	mCSweights = new double[2];
+	mPSweights = new double[2];
 	mPlot = new_Float2DArray(2,2);
 	mSupportPlot = new_Float2DArray(2,2);
 	mDir = "/home/maggie/Data/qrap/Predictions/";
@@ -66,6 +68,8 @@ cPlotTask::cPlotTask()
 //**************************************************************************
 cPlotTask::~cPlotTask()
 {
+	delete [] mCSweights;
+	delete [] mPSweights;
 	delete_Float2DArray(mPlot);
 	delete_Float2DArray(mSupportPlot);
 	mFixedInsts.clear();
@@ -76,30 +80,30 @@ cPlotTask::~cPlotTask()
 
 //**************************************************************************
 bool cPlotTask::SetPlotTask(	ePlotType PlotType,
-								eOutputUnits DisplayUnits,
-								bool Downlink,
-								double RequiredSignalToNoise,
-								double RequiredMinimumReceiverLevel,
-								double FadeMargin,
-								double RequiredCoChannelCarrierToInterference,
-								double RequiredAdjacentCarrierToInterference,
-								double RequiredEnergyPerBitToNoiseRatio,
-								double NoiseLevel,
-								double kFactorForServers,
-								double kFactorForInterferers,
-								short int DEMsourceList,
-								short int ClutterSourceList,
-								bool UseClutterDataInPathLossCalculations,
-								cGeoP NorthWestCorner,
-								cGeoP SouthEastCorner,
-								double PlotResolution,
-								double MinimumAngularResolution,
-								unsigned MobileInstallationKey,
-								unsigned NumberOfFixedInstallations,
-								unsigned *FixedInstallationKeys,
-								double *CoverangeRanges, // In Kilometer
-								string DirectoryToStoreResult,
-								string OutputFileForResult)
+				eOutputUnits DisplayUnits,
+				bool Downlink,
+				double RequiredSignalToNoise,
+				double RequiredMinimumReceiverLevel,
+				double FadeMargin,
+				double RequiredCoChannelCarrierToInterference,
+				double RequiredAdjacentCarrierToInterference,
+				double RequiredEnergyPerBitToNoiseRatio,
+				double NoiseLevel,
+				double kFactorForServers,
+				double kFactorForInterferers,
+				short int DEMsourceList,
+				short int ClutterSourceList,
+				bool UseClutterDataInPathLossCalculations,
+				cGeoP NorthWestCorner,
+				cGeoP SouthEastCorner,
+				double PlotResolution,
+				double MinimumAngularResolution,
+				unsigned MobileInstallationKey,
+				unsigned NumberOfFixedInstallations,
+				unsigned *FixedInstallationKeys,
+				double *CoverangeRanges, // In Kilometer
+				string DirectoryToStoreResult,
+				string OutputFileForResult)
 {
 	string err = "Preparing for Requested Prediction.";
 //	QRAP_INFO(err.c_str());
@@ -114,7 +118,7 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 	mRqCIad		= RequiredAdjacentCarrierToInterference;							
 	mRqEbNo 	= RequiredEnergyPerBitToNoiseRatio;							
 	mNoiseLevel	= NoiseLevel;		
-	mkFactorServ= kFactorForServers;						
+	mkFactorServ	= kFactorForServers;						
 	mkFactorInt	= kFactorForInterferers;							
 	mDEMsource	= DEMsourceList;				
 	mClutterSource  = ClutterSourceList;					
@@ -144,6 +148,9 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 		tempInst.sInstKey = FixedInstallationKeys[i];
 		tempInst.sRange = CoverangeRanges[i];
 		tempInst.sRange *= 1000;
+		tempInst.sCentroidX = 0;
+		tempInst.sCentroidY = 0;
+		tempInst.sPixelCount = 0;
 		if (tempInst.sRange>mMaxRange) 
 			mMaxRange = tempInst.sRange;
 		mFixedInsts.push_back(tempInst);
@@ -233,19 +240,21 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 			string temp;
 			switch (mPlotType)
 			{
-				case DEM:			temp = "DEM"; 			break;
-				case Cov:			temp = "Coverage"; 		break;
+				case DEM:		temp = "DEM"; 		break;
+				case Cov:		temp = "Coverage"; 	break;
 				case PrimServer:	temp = "PrimServer"; 	break;
 				case SecondServer:	temp = "SecondServer"; 	break;
 				case NumServers:	temp = "NumServers"; 	break;
 				case IntRatioCo:	temp = "IntRatioCo";	break;
 				case IntRatioAd:	temp = "IntRatioAd"; 	break;
-				case IntAreas:		temp = "IntAreas"; 		break;
-				case NumInt:		temp = "NumInt";		break;
-				case PrimIntCo:		temp = "PrimIntCo";		break;
-				case PrimIntAd:		temp = "PrimOntAd";		break;
-				case SN:			temp = "SN";			break;
-				case EbNo:			temp = "EbNo";			break;
+				case IntAreas:		temp = "IntAreas"; 	break;
+				case NumInt:		temp = "NumInt";	break;
+				case PrimIntCo:		temp = "PrimIntCo";	break;
+				case PrimIntAd:		temp = "PrimOntAd";	break;
+				case SN:		temp = "SN";		break;
+				case EbNo:		temp = "EbNo";		break;
+				case CellCentroid:	temp = "CellCentroid";	break;
+				case TrafficDist:	temp = "TrafficDist";	break;
 				case ServiceLimits:	temp = "ServiceLimits";	break;
 			}
 			fprintf(fp,"%s\n",temp.c_str());
@@ -272,6 +281,12 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 			fprintf(fp,"Area\n");
 			fprintf(fp,"N %f S %f W %f E %f\n",N,S,W,E);
 			fprintf(fp,"DEM %d\n", mDEMsource);
+			if (mUseClutter)
+			{
+				fprintf(fp,"UseClutter TRUE\n");
+				fprintf(fp,"Clutter %d\n", mClutterSource);
+			}
+			else fprintf(fp,"UseClutter FALSE\n");
 			fprintf(fp,"OutputDir %s\n",mDir.c_str());
 			fprintf(fp,"OutputFile %s\n",mOutputFile.c_str());
 			
@@ -320,6 +335,10 @@ bool cPlotTask::ReadPlotRequest(const char *filename)
 		mPlotType = Cov;
 	else if (!strcasecmp(temp,"PrimServer"))
 		mPlotType = PrimServer;
+	else if (!strcasecmp(temp,"CellCentroid"))
+		mPlotType = CellCentroid;
+	else if (!strcasecmp(temp,"TrafficDist"))
+		mPlotType = TrafficDist;
 	else if (!strcasecmp(temp,"SecondServer"))
 		mPlotType = SecondServer;	
 	else if (!strcasecmp(temp,"NumServers"))
@@ -477,6 +496,9 @@ bool cPlotTask::ReadPlotRequest(const char *filename)
 				infile >> tempInst.sInstKey;
 				infile >> tempInst.sRange;
 				tempInst.sRange *= 1000;
+				tempInst.sCentroidX = 0;
+				tempInst.sCentroidY = 0;
+				tempInst.sPixelCount = 0;
 				if (tempInst.sRange>mMaxRange) 
 					mMaxRange = tempInst.sRange;
 				mFixedInsts.push_back(tempInst);
@@ -485,21 +507,21 @@ bool cPlotTask::ReadPlotRequest(const char *filename)
 			{
 				if (mMinAngleRes<(270*mPlotResolution/mMaxRange/PI))
 				{
-					if (mPlotResolution<0.5) mPlotResolution=20; 
+					if (mPlotResolution<0.5) mPlotResolution=5; 
 					int mNumAngles = (int)ceil(1.5*PI*mMaxRange/mPlotResolution);
 					mMinAngleRes=360.0/(double)mNumAngles;
 				}
 			}
 			if (mMinAngleRes<0.0001)
 			{
-				mMinAngleRes=1;
-				mNumAngles =360;
+				mMinAngleRes=0.2;
+				mNumAngles =1800;
 			}
 			mNumAngles = (unsigned)(360.0/mMinAngleRes);
 			if (mNumAngles<4)
 			{
-				mMinAngleRes = 20;
-				mNumAngles = 18;
+				mMinAngleRes = 10;
+				mNumAngles = 36;
 			}
 			infile >> temp;
 		}
@@ -632,6 +654,14 @@ bool cPlotTask::ReadPlotRequest(const char *filename)
 		}
 		infile >> temp;
 	}
+	if (!strcasecmp(temp, "UseClutter"))
+	{
+		infile >> temp;
+		if (!strcasecmp(temp, "TRUE"))
+			mUseClutter=true;
+		else mUseClutter=false;
+		infile >> temp;
+	}
 	if (!strcasecmp(temp, "Clutter"))
 	{
 		infile >> mClutterSource;
@@ -664,13 +694,17 @@ bool cPlotTask::CombineCov()
 	unsigned i,j,k,Prows,Pcols;
 	int ki,kj;
 	unsigned Advance = 10;
-//	cout << "In cPlotTask::CombineCov()" << endl;
+	cout << "In cPlotTask::CombineCov()" << endl;
 	string err = "Starting requested Prediction.";
 	cout << err<< endl;
 //	QRAP_INFO(err.c_str());
 	
 	Float2DArray Test2;
 	Float2DArray Inst;
+
+	if (mCols<mRows) 
+		cout << "vertical" << endl;
+	else cout << "horisontal" << endl;
 	
 	if (mPlotType==SecondServer)
 	{
@@ -683,25 +717,34 @@ bool cPlotTask::CombineCov()
 				Inst[i][j]=0;
 			}
 	}
-		
-	for (i=0;i<mRows;i++)
-		for (j=0;j<mCols;j++)
-			mPlot[i][j]=-9999;
+	
 	for (i=0;i<mRows;i++)
 		for (j=0;j<mCols;j++)
 			mSupportPlot[i][j]=-9999;
 	
 	if ((mPlotType==NumServers)||(mPlotType==NumInt))
+	{
 		for (i=0;i<mRows;i++)
 			for (j=0;j<mCols;j++)
 				mPlot[i][j]=0;
+	}
+	else
+	{
+		for (i=0;i<mRows;i++)
+			for (j=0;j<mCols;j++)
+				mPlot[i][j]=-9999;
+	}	
 
 	cout << "cPlotTask::CombineCov():  Before Order array;" << endl;
 	if (OrderAllPred()==0)
 		return false;
 	
 	cout << "cPlotTask::CombineCov():  First UpdateActiveRasters;" << endl;
-	Advance = max(mRows,mCols)/(mFixedInsts.size()); 
+	double RangeSum=0;
+	for (k=0; k<mFixedInsts.size(); k++)
+		RangeSum += mFixedInsts[k].sRange;
+	Advance = RangeSum/mFixedInsts.size(); 
+	
 	UpdateActiveRasters(0,Advance+2);
 	for (k=0;k<mActiveRasters.size();k++)
 	{
@@ -737,6 +780,22 @@ bool cPlotTask::CombineCov()
 									mPlot[i][j]++;
 								break;
 							case PrimServer:
+								if ((mActiveRasters[k].sRaster[ki][kj]>mRxMin)
+									&&(mActiveRasters[k].sRaster[ki][kj]>mSupportPlot[i][j]))
+								{
+									mSupportPlot[i][j]=mActiveRasters[k].sRaster[ki][kj];
+									mPlot[i][j]=mActiveRasters[k].sInstKey;
+								}
+								break;
+							case CellCentroid:
+								if ((mActiveRasters[k].sRaster[ki][kj]>mRxMin)
+									&&(mActiveRasters[k].sRaster[ki][kj]>mSupportPlot[i][j]))
+								{
+									mSupportPlot[i][j]=mActiveRasters[k].sRaster[ki][kj];
+									mPlot[i][j]=mActiveRasters[k].sInstKey;
+								}
+								break;
+							case TrafficDist:
 								if ((mActiveRasters[k].sRaster[ki][kj]>mRxMin)
 									&&(mActiveRasters[k].sRaster[ki][kj]>mSupportPlot[i][j]))
 								{
@@ -793,6 +852,22 @@ bool cPlotTask::CombineCov()
 									mPlot[i][j]++;
 								break;
 							case PrimServer:
+								if ((mActiveRasters[k].sRaster[ki][kj]>mRxMin)
+									&&(mActiveRasters[k].sRaster[ki][kj]>mSupportPlot[i][j]))
+								{
+									mSupportPlot[i][j]=mActiveRasters[k].sRaster[ki][kj];
+									mPlot[i][j]=mActiveRasters[k].sInstKey;
+								}
+								break;
+							case CellCentroid:
+								if ((mActiveRasters[k].sRaster[ki][kj]>mRxMin)
+									&&(mActiveRasters[k].sRaster[ki][kj]>mSupportPlot[i][j]))
+								{
+									mSupportPlot[i][j]=mActiveRasters[k].sRaster[ki][kj];
+									mPlot[i][j]=mActiveRasters[k].sInstKey;
+								}
+								break;
+							case TrafficDist:
 								if ((mActiveRasters[k].sRaster[ki][kj]>mRxMin)
 									&&(mActiveRasters[k].sRaster[ki][kj]>mSupportPlot[i][j]))
 								{
@@ -880,7 +955,10 @@ bool cPlotTask::InterferencePlot()
 		return false;
 	
 	cout << "cPlotTask::InterferencePlot():  First UpdateActiveRasters;" << endl;
-	Advance = max(mRows,mCols)/(mFixedInsts.size()); 
+	double RangeSum=0;
+	for (k=0; k<mFixedInsts.size(); k++)
+		RangeSum += mFixedInsts[k].sRange;
+	Advance = RangeSum/mFixedInsts.size(); 
 	UpdateActiveRasters(0,Advance+2);
 
 /*	for (k=0;k<mActiveRasters.size();k++)
@@ -1137,8 +1215,11 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 	{	
 		for (i=0; i<mActiveRasters.size(); i++)
 		{
-			if ((mActiveRasters[i].sTop+mActiveRasters[i].sNSsize)<(Here-1))
+			if ((mActiveRasters[i].sTop+mActiveRasters[i].sNSsize)<(Here-2))
 			{
+				cout << endl <<"cPlotTask::UpdateActiveRasters. ";
+				cout << "Deleting ActiveRaster of Inst: " << mActiveRasters[i].sInstKey << endl;
+				cout << " Here = " << Here << endl << endl;
 				delete_Float2DArray(mActiveRasters[i].sRaster);
 				mActiveRasters.erase(mActiveRasters.begin()+i);
 			}
@@ -1147,15 +1228,18 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 //		Marker.Get(DoneEdge,dummy);
 //		Marker.FromHere(mNorthWest,(Here+Advance+1)*mPlotResolution,180);
 //		Marker.Get(FrontEdge,dummy);
-		DoneEdge = N - (Here-1)*mPlotResolution*0.00083333/90.0;
+		DoneEdge = N - (Here)*mPlotResolution*0.00083333/90.0;
 		FrontEdge = N - (Here+Advance+1)*mPlotResolution*0.00083333/90.0;
 	}
 	else //horisontal
 	{
 		for (i=0; i<mActiveRasters.size(); i++)
 		{
-			if ((mActiveRasters[i].sLeft+mActiveRasters[i].sEWsize)<(Here-1))
+			if ((mActiveRasters[i].sLeft+mActiveRasters[i].sEWsize)<(Here-2))
 			{
+				cout << endl << "cPlotTask::UpdateActiveRasters. ";
+				cout << "Deleting ActiveRaster of Inst: " << mActiveRasters[i].sInstKey << endl;
+				cout << " Here = " << Here << endl << endl;
 				delete_Float2DArray(mActiveRasters[i].sRaster);
 				mActiveRasters.erase(mActiveRasters.begin()+i);
 			}
@@ -1164,11 +1248,11 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 //		Marker.Get(dummy,DoneEdge);
 //		Marker.FromHere(mNorthWest,(Here+Advance+1)*mPlotResolution,90);
 //		Marker.Get(dummy,FrontEdge);
-		DoneEdge = W + (Here-1)*mPlotResolution*0.00083333/90.0;
+		DoneEdge = W + (Here)*mPlotResolution*0.00083333/90.0;
 		FrontEdge = W + (Here+Advance+1)*mPlotResolution*0.00083333/90.0;
 	}
 	
-	bool Loaded;
+	bool Loaded=false;
 	cGeoP Corner, Temp;
 	double pLat, pLon;
 	cCoveragePredict Prediction;
@@ -1185,8 +1269,8 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 	char dummyS[33], numSiteStr[33];
 	int BTLkey;
 	bool AfterReceiver = (mUnits==dBW)||(mUnits==dBm)||(mUnits==dBuV);
-	bool CovOrInt = ((mPlotType==Cov)||(mPlotType==PrimServer)
-					||(mPlotType==SecondServer)||(mPlotType==NumServers));
+	bool CovOrInt = ((mPlotType==Cov)||(mPlotType==PrimServer)||(mPlotType==CellCentroid)||
+			(mPlotType==TrafficDist)||(mPlotType==SecondServer)||(mPlotType==NumServers));
 	double kFactor = 1.33;
 	if (CovOrInt)
 		kFactor = mkFactorServ;
@@ -1194,20 +1278,23 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 	gcvt(mFixedInsts.size(),8,numSiteStr);
 	mNorthWest.Get(gLat,gLon);
 
+	cout << "cPlotTask::UpdateActiveRasters. ";
+	cout << "FrontEdge = " << FrontEdge << "	DoneEdge = " <<  DoneEdge << endl;
+
 	for (i=0; i<mFixedInsts.size(); i++)
 	{
-/*		cout << "i: " << i << "  InstKey: " << mFixedInsts[i].sInstKey 	
+		if (((mCols<mRows)&&((mFixedInsts[i].sFEdge>=FrontEdge)
+						&&(mFixedInsts[i].sBEdge<=DoneEdge)))
+			||((mCols>=mRows)&&((mFixedInsts[i].sFEdge<=FrontEdge)
+							&&(mFixedInsts[i].sBEdge>=DoneEdge))))
+		{
+			cout << "i: " << i << "  InstKey: " << mFixedInsts[i].sInstKey 	
 							<< " FE: " << mFixedInsts[i].sFEdge 
 							<< "   BE: " <<  mFixedInsts[i].sBEdge << endl;
-*/		if (((mCols<mRows)&&((mFixedInsts[i].sFEdge>FrontEdge)
-						&&(mFixedInsts[i].sBEdge<DoneEdge)))
-			||((mCols>=mRows)&&((mFixedInsts[i].sFEdge<FrontEdge)
-							&&(mFixedInsts[i].sBEdge>DoneEdge))))
-		{
 			Loaded = false;
 			for (j=0;j<mActiveRasters.size();j++)
 				Loaded = Loaded || 
-						(mActiveRasters[j].sInstKey==mFixedInsts[i].sInstKey);
+					(mActiveRasters[j].sInstKey==mFixedInsts[i].sInstKey);
 			if (!Loaded)
 			{
 				
@@ -1268,7 +1355,7 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 					Float2DArray DTM;
 					DTM = new_Float2DArray(tempNumAngles,tempNumDist);
 					Float2DArray Clutter;
-					cout << "NA: " << tempNumAngles << "	ND: " << tempNumDist << endl; 
+//					cout << "NA: " << tempNumAngles << "	ND: " << tempNumDist << endl; 
 					if (mUseClutter)
 						Clutter = new_Float2DArray(tempNumAngles,tempNumDist);
 					mDEM.GetForCoverage(false, mFixedInsts[i].sSitePos, 
@@ -1408,7 +1495,7 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 			}
 		}
 	}
-//	cout << "#Rasters: " << mActiveRasters.size() << endl; 
+	cout << "#Rasters: " << mActiveRasters.size() << endl; 
 	return mActiveRasters.size();
 }
 
@@ -1429,6 +1516,8 @@ int cPlotTask::OrderAllPred()
 	double FixedHeight;
 	int PredDone = 3;
 	
+	cout << "In cPlotTask::OrderAllPred(). " << endl;
+
 	// Where prediction does exist update with the values from the prediction
 	for (i=0 ; i<mFixedInsts.size() ; i++)
 	{
@@ -1505,7 +1594,315 @@ int cPlotTask::OrderAllPred()
 			}
 		}
 	}
+
+	cout << "Leaving cPlotTask::OrderAllPred(). " << endl;
 	return mFixedInsts.size();
+}
+
+//***************************************************************************
+bool cPlotTask::CellCentriods()
+{
+	cout << "In cPlotTask::CellCentriods()	" << endl;
+	cout << "Calculating cell centroids." << endl;
+
+	pqxx::result r;
+	string PreQuery = "update cell set centriod = ST_SetSRID(ST_MakePoint(";
+	string query = "";
+	string MidQuery = "),4326) where risector = ";
+	char* temp;
+	temp = new char[33];
+	double lat, lon;
+
+	unsigned i,j;
+	unsigned CII = 0; //Current Installation Index
+	unsigned NumInsts = mFixedInsts.size();
+	cGeoP North;
+	for (i=0; i<mRows; i++)
+	{
+		for (j=0; j<mCols; j++)
+		{
+			if (mPlot[i][j]>=0)
+			{
+				while ((mPlot[i][j]!=mFixedInsts[CII].sInstKey)&&(CII<NumInsts))
+					CII++;
+				if ((mPlot[i][j]!=mFixedInsts[CII].sInstKey)&&(CII>=NumInsts))
+				{
+					CII=0;
+					while ((mPlot[i][j]!=mFixedInsts[CII].sInstKey)&&(CII<NumInsts))
+						CII++;
+				}
+				mFixedInsts[CII].sCentroidX += j;
+				mFixedInsts[CII].sCentroidY += i;
+				mFixedInsts[CII].sPixelCount++;
+			}
+		}
+	}
+
+	for (i=0; i<NumInsts; i++)
+	{
+		mFixedInsts[i].sCentroidX /=mFixedInsts[i].sPixelCount;
+		mFixedInsts[i].sCentroidY /=mFixedInsts[i].sPixelCount; 
+		North.FromHere(mNorthWest,mFixedInsts[i].sCentroidX*mPlotResolution,90);
+		mFixedInsts[i].sCentroid.FromHere(North,mFixedInsts[i].sCentroidY*mPlotResolution,180);
+		mFixedInsts[i].sCentroid.SetGeoType(DEG);
+		mFixedInsts[i].sCentroid.Get(lat,lon);
+
+		query = PreQuery;
+		gcvt(lon,8,temp);
+		query += temp;
+		query += ",";
+		gcvt(lat,8,temp);
+		query += temp;
+		query += MidQuery;
+		gcvt(mFixedInsts[i].sInstKey,8,temp);
+		query += temp;
+		query += ";";	
+		if(!gDb.PerformRawSql(query))
+		{
+			string err = "Error in Updating cell centroids. Query:";
+			err+=query; 
+			QRAP_ERROR(err.c_str());
+			delete [] temp;
+			return false;
+		}
+	}
+	delete [] temp;
+	return true;	
+}
+
+//***************************************************************************
+bool cPlotTask::DetermineTrafficDist()
+{
+	unsigned i, j, k;
+	unsigned NumInsts = mFixedInsts.size();
+	cClutter ClutterUsed(mClutterClassGroup);
+	Float2DArray ClutterDist;
+	ClutterDist = new_Float2DArray(NumInsts,ClutterUsed.mNumber+1); 
+	for (i=0; i<NumInsts; i++)
+		for (j=0; j<ClutterUsed.mNumber; j++)
+				ClutterDist[i][j] = 0.0;
+
+	cout << "In cPlottask::DetermineTrafficDist(). NumInsts = " 
+		<< NumInsts << "ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl;	
+	Float2DArray ClutterRaster;
+	ClutterRaster = new_Float2DArray(2,2);
+	cGeoP NW = mNorthWest;
+	cGeoP SE = mSouthEast;
+	double PlotRes=mPlotResolution;
+	unsigned Rows = mRows;
+	unsigned Cols = mCols;
+	mClutter.GetForDEM(NW, SE, PlotRes, Rows, Cols, ClutterRaster);
+	cout << "In cPlottask::DetermineTrafficDist() " << endl;
+	cout << "PlotRes:	Voor:	" << mPlotResolution << "	Na:	" <<  PlotRes << endl;
+	cout << "Rows:	Voor:	" << mRows<< "	Na:	" <<  Rows << endl;
+	cout << "Cols:	Voor:	" << mCols<< "	Na:	" <<  Cols << endl;
+	cout << "North West:" << endl;
+	mNorthWest.Display();
+	NW.Display();
+	cout << "South East: " << endl;
+	mSouthEast.Display();
+	SE.Display();
+
+	unsigned CurrentRadInstID = 0;
+
+	// Fill in Matrix
+	for (i=0; i<mRows; i++)
+	{
+		for (j=0; j<mCols; j++)
+		{
+			if (mPlot[i][j] != mFixedInsts[CurrentRadInstID].sInstKey)
+			{
+				while ((mFixedInsts[CurrentRadInstID].sInstKey!=mPlot[i][j])&&(CurrentRadInstID<NumInsts-1))
+					CurrentRadInstID++;
+				if ((mFixedInsts[CurrentRadInstID].sInstKey!=mPlot[i][j])&&(CurrentRadInstID==NumInsts-1))
+				{
+					CurrentRadInstID=0;
+					while ((mFixedInsts[CurrentRadInstID].sInstKey!=mPlot[i][j])&&(CurrentRadInstID<NumInsts-1))
+						CurrentRadInstID++;
+				}
+			}
+			ClutterDist[CurrentRadInstID][(int)ClutterRaster[i][j]] += mPlotResolution*mPlotResolution/1000/1000;
+	
+		}
+	}
+	delete_Float2DArray(ClutterRaster);
+
+	double *TotalsPerInst;
+	TotalsPerInst = new double[NumInsts];
+	for (i=0; i<NumInsts; i++)
+	{
+		TotalsPerInst[i] = 0.0;
+		for (j=0; j<=ClutterUsed.mNumber; j++)
+		{
+			TotalsPerInst[i]+=ClutterDist[i][j];
+//			cout << ClutterDist[i][j] << "	";
+		}
+//		cout << endl;
+	}
+
+
+	// Determine size of matrix ... i.e. How many Cluttertypes are represented
+	double *TotalsPerClutter;
+	TotalsPerClutter = new double[ClutterUsed.mNumber+1];
+	for (j=0; j<=ClutterUsed.mNumber; j++)
+	{
+		TotalsPerClutter[j] = 0.0;
+		for (i=0; i<NumInsts; i++)
+		{
+//			cout << ClutterDist[i][j] << "	";
+			TotalsPerClutter[j]+=ClutterDist[i][j];
+		}
+//		cout << endl;
+//		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
+	}
+	
+	unsigned ClutterCount = 0;
+	for (j=0; j<=ClutterUsed.mNumber; j++)
+	{
+		if (TotalsPerClutter[j]>0) 
+			ClutterCount++;
+	}
+
+
+	if (NumInsts<ClutterCount)
+	{
+		cout << "Too few cells are included. Retry with more cells." << endl;
+		delete [] TotalsPerClutter;
+		delete [] TotalsPerInst;
+		delete_Float2DArray(ClutterDist);
+		return false;
+	}
+
+
+	mTheMatrix.resize(ClutterCount,ClutterCount);
+	mTraffic.resize(ClutterCount,1);
+
+	for( i=0; i<ClutterCount; i++)
+	{
+		mTraffic(i,0)=0.0;
+		for(j=0; j<ClutterCount; j++)
+		{
+			mTheMatrix(i,j) = 0.0;
+		}
+	}
+
+	// Fill in square matrix
+
+	unsigned *RadInstOrder;
+	RadInstOrder = new unsigned[NumInsts];
+	for(i=0; i<NumInsts; i++)
+	{
+		RadInstOrder[i] = i;
+	}
+	
+	
+	unsigned swap;
+	for (i=0;i<NumInsts;i++)
+	{
+		for (j=i+1; j<NumInsts; j++)
+		{
+			if (TotalsPerInst[RadInstOrder[j]]>TotalsPerInst[RadInstOrder[i]])
+			{
+				swap = RadInstOrder[i];
+				RadInstOrder[i] = RadInstOrder[j];
+				RadInstOrder[j] = swap; 
+			}
+		}
+	}
+
+//	cout << "In cPlottask::DetermineTrafficDist(). ClutterCount = " << ClutterCount << endl; 
+//	cout << "In cPlottask::DetermineTrafficDist(). ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl; 
+	unsigned *ClutterIndex;
+	ClutterIndex = new unsigned[ClutterCount];
+	for (j=0; j<ClutterCount; j++)
+	{
+		ClutterIndex[j]=0;
+	}
+	unsigned Index = 0;
+	j=0;
+	for (j=0; j<=ClutterUsed.mNumber; j++)
+	{
+//		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
+		if ((TotalsPerClutter[j]>0)&&(Index<ClutterCount))
+		{
+			ClutterIndex[Index] = j;
+			Index++;
+		} 
+	}
+
+//	cout << "Index = " << Index << endl;
+//	cout << "In cPlottask::DetermineTrafficDist() before Completing matrixes" << endl;
+
+	for(i=0; i<ClutterCount; i++)
+	{
+//		cout << "i=" << i << "	RadInstOrder[i] = " << RadInstOrder[i] << endl;
+		mTraffic(i,0) = mFixedInsts[RadInstOrder[i]].sCStraffic;
+		for(j=0; j<ClutterCount; j++)
+		{
+//			cout << "j=" << j << ": " << ClutterIndex[j] << "	";
+			mTheMatrix(i,j) = ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
+		}
+//		cout << endl;
+	}
+
+/*	unsigned CountWrap = ceil(((double)NumInsts)/((double)ClutterCount));
+	for (k=1;k<=CountWrap; k++)
+	{
+		for (i=ClutterCount*k+1;i<min(NumInsts,ClutterCount*(k+1));i++)
+		{
+			mTraffic(ClutterCount-(i-ClutterCount*k),0) += mFixedInsts[RadInstOrder[i]].sCStraffic;
+			for(j=0; j<ClutterCount; j++)
+				mTheMatrix(ClutterCount-(i-ClutterCount*k),j) += ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
+		}
+ 	}
+*/
+	cout << "In cPlottask::DetermineTrafficDist() before Solving fo CStraffic" << endl;
+
+	mWeights = mTheMatrix.fullPivLu().solve(mTraffic);
+
+	cout << "In cPlottask::DetermineTrafficDist() before writing back to mCSweights" << endl;
+	delete [] mCSweights;
+	mCSweights = new double[ClutterUsed.mNumber+1];
+	for (i=0;i<ClutterCount;i++)
+	{
+		mCSweights[ClutterIndex[i]] = mWeights(i);
+		cout << "ClutterIndex[i]=" << ClutterIndex[i] 
+			<< "	mCSweights[ClutterIndex[i]] = " << mCSweights[ClutterIndex[i]] << endl;
+	}
+
+	cout << "In cPlottask::DetermineTrafficDist() Doing PS traffice now" << endl;
+	for(i=0; i<ClutterCount; i++)
+	{
+		mTraffic(i,0) = mFixedInsts[RadInstOrder[i]].sPStraffic;
+		for(j=0; j<ClutterCount; j++)
+			mTheMatrix(i,j) = ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
+	}
+
+/*	for (k=1;k<=CountWrap; k++)
+	{
+		for (i=ClutterCount*k+1;i<min(NumInsts,ClutterCount*(k+1));i++)
+		{
+			mTraffic(ClutterCount-(i-ClutterCount*k),0) += mFixedInsts[RadInstOrder[i]].sPStraffic;
+			for(j=0; j<ClutterCount; j++)
+				mTheMatrix(ClutterCount-(i-ClutterCount*k),j) += ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
+		}
+ 	}
+*/
+	cout << "In cPlottask::DetermineTrafficDist() before Solving fo CStraffic" << endl;
+	mWeights = mTheMatrix.fullPivLu().solve(mTraffic);
+
+	delete [] mPSweights;
+	mPSweights = new double[ClutterUsed.mNumber+1];
+	for (i=0;i<ClutterCount;i++)
+		mPSweights[ClutterIndex[i]] = mWeights(i);
+	
+	delete [] RadInstOrder;
+	delete [] TotalsPerClutter;
+	delete [] TotalsPerInst;
+	delete [] ClutterIndex;
+	delete_Float2DArray(ClutterDist);
+	return true;
+
 }
 
 //***************************************************************************
@@ -1513,7 +1910,8 @@ bool cPlotTask::GetDBinfo()
 {
 	pqxx::result r;
 	string query;
-	char temp[33];
+	char* temp;
+	temp = new char[33];
 	unsigned i,j;
 	double dloffset, upoffset, chansep; 
 	query = "SELECT eirp,txpower,txlosses,rxlosses,rxsensitivity,antpatternkey,mobileheight,btlfreq,maxpathloss ";
@@ -1558,14 +1956,20 @@ bool cPlotTask::GetDBinfo()
 	for(i=0 ; i<mFixedInsts.size() ; i++)
 	{
 		gcvt(mFixedInsts[i].sInstKey,8,temp);
-		query = "SELECT siteid, ST_AsText(location) as location, eirp,txpower,txlosses,rxlosses,rxsensitivity,";
-		query +="txantpatternkey,txbearing,txmechtilt,rxantpatternkey,rxbearing,rxmechtilt,txantennaheight,rxantennaheight, ";
-		query +="btlfreq, spacing, bandwidth, downlink, uplink ";
-		query += "FROM radioinstallation CROSS JOIN technology CROSS JOIN site ";
+		query = "SELECT siteid, ST_AsText(location) as location, eirp, max(cell.txpower) as txpower";
+		query += "txlosses, txantpatternkey,txbearing,txmechtilt, txantennaheight,";
+		query += "rxantpatternkey,rxbearing,rxmechtilt,rxlosses,rxsensitivity,rxantennaheight, ";
+		query += "btlfreq, spacing, bandwidth, downlink, uplink ";
+		query += "sum(cstraffic) as cstraffic, sum(pstraffic) as pstraffic, techkey ";
+		query += "FROM radioinstallation LEFT OUTER JOIN cell on (radioinstallation.id=risector) ";
+		query += "CROSS JOIN technology CROSS JOIN site ";
 		query += "WHERE techkey=technology.id and siteid=site.id ";
 		query += " and radioinstallation.id ="; 
 		query += temp;
-		query += ";";
+		query += " group by siteid, location, eirp, txlosses, rxlosses,";
+		query += "txantpatternkey, txbearing, txmechtilt, ";
+		query += "rxantpatternkey, rxbearing, rxmechtilt, txantennaheight, rxantennaheight, ";
+		query += "btlfreq, spacing, bandwidth, downlink, uplink, rxsensitivity;";
 				
 		// Perform a Raw SQL query
 		if(!gDb.PerformRawSql(query))
@@ -1573,6 +1977,7 @@ bool cPlotTask::GetDBinfo()
 			string err = "Error in Database Select on tables radioinstallation and technology failed. Query:";
 			err+=query; 
 			QRAP_ERROR(err.c_str());
+			delete [] temp;
 			return false;
 		} // if
 		else
@@ -1604,6 +2009,9 @@ bool cPlotTask::GetDBinfo()
 				mFixedInsts[i].sRxHeight = atof(r[0]["rxantennaheight"].c_str());
 				mFixedInsts[i].sFrequency = atof(r[0]["btlfreq"].c_str());
 				mFixedInsts[i].sBandWidth = atof(r[0]["bandwidth"].c_str());
+				mFixedInsts[i].sCStraffic = atof(r[0]["cstraffic"].c_str());
+				mFixedInsts[i].sPStraffic = atof(r[0]["pstraffic"].c_str());
+				mFixedInsts[i].sTechKey = atof(r[0]["techkey"].c_str());
 				dloffset = atof(r[0]["downlink"].c_str());
 				upoffset = atof(r[0]["uplink"].c_str());
 				chansep = atof(r[0]["spacing"].c_str());
@@ -1652,6 +2060,7 @@ bool cPlotTask::GetDBinfo()
 		} // else
 	} // for
 	if (n>0) mMobile.sFrequency = aveUpFreq/n;
+	delete [] temp;
 	return true;
 }
 
@@ -1705,6 +2114,7 @@ bool cPlotTask::GetDBIntInfo()
 		string err = "Error in Database Select to get Interfering RadioInst. Query:";
 		err+=query; 
 		QRAP_ERROR(err.c_str());
+		delete [] temp;
 		return false;
 	} // if
 	else
@@ -1722,6 +2132,9 @@ bool cPlotTask::GetDBIntInfo()
 				tFixed tempInst;
 				tempInst.sInstKey = atoi(r[i]["id"].c_str());
 				tempInst.sRange = mMaxRange;
+				tempInst.sCentroidX = 0;
+				tempInst.sCentroidY = 0;
+				tempInst.sPixelCount = 0;
 				mFixedInsts.push_back(tempInst);
 			}
 		}

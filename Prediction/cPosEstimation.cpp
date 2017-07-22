@@ -122,6 +122,8 @@ cPosEstimation::cPosEstimation() // default constructor
 	mCurSiteI = 0;
 	mNumSites = 0;
 	mCurPosI = 0;
+	mNW.Set(-90,180);
+	mSE.Set(90,-180);
 
 }
 
@@ -183,7 +185,9 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
    		areaQuery += ",";
    	}
    	NorthWestCorner.Set(mNorth,mWest,DEG);
+	mNW.Set(mNorth,mWest,DEG);
    	SouthEastCorner.Set(mSouth,mEast,DEG);
+	mSE.Set(mSouth,mEast,DEG);
 	cout << "North West corner: " << endl;
 	NorthWestCorner.Display();
 	cout << "South East corner: " << endl;
@@ -687,7 +691,7 @@ void cPosEstimation::EstimatePositions()
 	time_t beginTime = time(0);
 
 //	for (i=0; i< mNumPoints; i++)
-	for (i=274; i<mNumPoints; i++)
+	for (i=2150; i<mNumPoints; i++)
 	{
 		mCurPosI = i;
 		if ((mPosSets[mCurPosI].sMeasurements.size()>0)
@@ -732,13 +736,12 @@ void cPosEstimation::EstimatePositions()
 				cout << endl << "# " << mCurPosI << endl;
 				for (j=0; j<mPosSets[mCurPosI].sTestPoints.size(); j++)
 				{
-//					cout << endl;
 					distance = mPosSets[mCurPosI].sTestPoints[j].sOriginalLocation.
 							Distance(mPosSets[mCurPosI].sTestPoints[j].sEstimatedLocation);
-//					cout << distance << "	";
+					cout << distance << "	";
 					switch (mPosSets[mCurPosI].sTestPoints[j].sMethodUsed)
 					{
-						case GPS: 			cout << endl << "GPS			";	break;  
+						case GPS: 			cout << "GPS				";	break;  
 						case CellID: 			cout << "CellID			";	break; 
 						case CellID_TA: 		cout << "CellID_TA		";	break; 
 						case SSiteDir:			cout << "SSiteDir		";	break; 
@@ -2136,8 +2139,10 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //	cout << "rho=" << rho << "	phi=" << phi << endl;
 //	mPosSets[mCurPosI].sMeasurements[0].sSiteLocation.Display();
 	ParticlePosition.FromHere(mPosSets[mCurPosI].sMeasurements[0].sSiteLocation, rho, phi);
-
 //	ParticlePosition.Display();
+	if (!ParticlePosition.Between(mNW,mSE))
+		return (999999.0);
+
 	for (i=0; i<mNumInsts; i++)
 	{
 		Distance = mPosSets[mCurPosI].sMeasurements[i].sSiteLocation.Distance(ParticlePosition);
@@ -2161,9 +2166,9 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //			cout << "Found iBTL = " << iBTL << endl; 
 			mBTL[iBTL]->GetBTL (NumAngles, NumDist, Radius, DistRes);
 			AngleRes=360.0/NumAngles;
-			found = (Radius>Distance);
+			found = (Radius>=Distance);
 		}
-		else
+		if ((MAXBTLinMEMORY<=iBTL)||(mBTL.size()<=iBTL)||((Radius+500)<Distance)) 
 		{
 			cout << "Radius = " << Radius << "	Distance = " << Distance <<endl;
 			if (MAXBTLinMEMORY<=mBTL.size())
@@ -2187,12 +2192,73 @@ double cPosEstimation::CostFunction(double rho, double phi)
 					Freq, Height, MHeight, kFactor, mDEMsource, mClutterSource);
 			NumDist=round(Radius/DistRes);
 			AngleRes = 360.0/NumAngles;
-			if ((BTLkey==-1)&&(Distance<PRECALCdist))
+			if (BTLkey==-1)
 			{
 				Radius = PRECALCdist;
+				if (12628==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 6600;
+				else if (472==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 7300;
+				else if (10740==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 7700;
+				else if (627==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 7900;
+				else if (872==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 7900;
+				else if (618==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 8000;
+				else if (370==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 8000;
+				else if (7475==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 8100;
+				else if (6677==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 8300;
+				else if (11363==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 8600;
+				else if (3029==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 8600;
+				else if (2537==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 8750;
+				else if (11835==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 8750;
+				else if (13158==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 8850;
+				else if (856==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 8900;
+				else if (3039==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 9100;
+				else if (5815==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 9100;
+				else if (4067==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 9300;
+				else if (10795==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 9300;
+				else if (3776==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 9300;
+				else if (3800==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 9300;
+				else if (11003==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 9700;
+				else if (14648==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 9750;
+				else if (1539==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 10000;
+				else if (13151==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 10000;
+				else if (5628==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 10600;
+				else if (2328==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 10700;
+				else if (616==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 10700;
+				else if (4050==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 13100;
+				else if (9404==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 7800;
+
 				Radius = max(max(mRho_max,Radius),Distance+500);
 				DistRes = mPlotResolution;
-				NumAngles = round(0.6*2.0*PI*Radius/DistRes);
+				NumAngles = round(PI*Radius/DistRes);
 				AngleRes = 360.0/NumAngles;
 				Float2DArray DTM;
 				DTM = new_Float2DArray(NumAngles,NumDist);
@@ -2233,11 +2299,10 @@ double cPosEstimation::CostFunction(double rho, double phi)
 					QRAP_WARN(err.c_str());
 				}
 				delete [] dummyS;
-				found = (Radius>Distance);
+				found = (Radius>=Distance);
 				mBTL.push_back(newBTL);
 				iBTL = mBTL.size()-1;
 				cout << "new iBTL = " << iBTL << endl;
-
 			}
 		}
 
@@ -2621,10 +2686,10 @@ bool cPosEstimation::ANNrun()
 	Input = new double[mSites[mCurSiteI].sNumInputs];
 
 	Input[0] = 1;	
-	Input[1] = 1.5*cos(mPosSets[mCurPosI].sMeasurements[0].sAzimuth*PI/180);
-	Input[2] = 1.5*sin(mPosSets[mCurPosI].sMeasurements[0].sAzimuth*PI/180);
-	Input[3] = 2.5*(((double)mPosSets[mCurPosI].sMeasurements[0].sTA+0.5)*mPosSets[mCurPosI].sMeasurements[0].sResDist
-						- mSites[mCurSiteI].sMaxDist/2.5)/mSites[mCurSiteI].sMaxDist;
+	Input[1] = cos(mPosSets[mCurPosI].sMeasurements[0].sAzimuth*PI/180);
+	Input[2] = sin(mPosSets[mCurPosI].sMeasurements[0].sAzimuth*PI/180);
+	Input[3] = 1.8*(((double)mPosSets[mCurPosI].sMeasurements[0].sTA+0.5)*mPosSets[mCurPosI].sMeasurements[0].sResDist
+						- 4*mSites[mCurSiteI].sMaxDist/9)/mSites[mCurSiteI].sMaxDist;
 	Input[4] = (mPosSets[mCurPosI].sMeasurements[0].sResDist)/600;
 
 	for (q=0; q<mSites[mCurSiteI].sCellSet.size(); q++)
@@ -2669,7 +2734,7 @@ bool cPosEstimation::ANNrun()
 	newTestPoint.sAzimuth = 180*atan2(OutputA[1]/0.8,OutputA[0]/0.8)/PI;
 
 	OutputD = mCurANNd->run(Input);
-	newTestPoint.sDistance = (OutputD[0]+0.8)*mSites[mCurSiteI].sMaxDist/1.6;
+	newTestPoint.sDistance = (OutputD[0]+0.8)*mSites[mCurSiteI].sMaxDist/1.8;
 
 	newTestPoint.sEstimatedLocation.FromHere(mSites[mCurSiteI].sPosition, 
 						newTestPoint.sDistance, newTestPoint.sAzimuth);

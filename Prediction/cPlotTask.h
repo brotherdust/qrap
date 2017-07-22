@@ -33,7 +33,9 @@
 #include "cGeoP.h"
 #include "cRasterFileHandler.h"
 #include <string>
+#include <Eigen/Dense>
 
+using namespace Eigen;
 
 namespace Qrap
 {
@@ -43,9 +45,11 @@ namespace Qrap
 enum ePlotType
 {
 	DEM,		///< Simply display the heights in the given area. Implemented in cRasterFileHandler::GetForDEM
+	CellCentroid,	///< Determine and store the cell centroids and display the Primary Server plot.
+	TrafficDist,	///< Estimate traffic density per clutter type.  
 	Cov,		///< Combined Coverage, providing the strongest receivable signal strength at each point. Implemented in CombineCov
 	PrimServer,	///< Primary Server providing the installation key of the strongest server. Implemented in CombineCov 
-	SecondServer,///< Secondary Server, proving the key to second strongest server. Implemented in CombineCov
+	SecondServer,	///< Secondary Server, proving the key to second strongest server. Implemented in CombineCov
 	NumServers,	///< The number of server above Minimum required signal strength. Implemented in CombineCov
 	IntRatioCo,	///< Co-channel Interference Ratio in dB. Implemented in InterferencePlot.
 	IntRatioAd,	///< Adjacent channel Interference Ratio in dB. Implemented in InterferencePlot.
@@ -53,7 +57,7 @@ enum ePlotType
 	NumInt,		///< Number of interferers above the threshold. Implemented in InterferencePlot.	
 	PrimIntCo,	///< The dominant co-channel interferer. Implemented in InterferencePlot.	
 	PrimIntAd,	///< The dominant adjacent channel interferer.Implemented in InterferencePlot.
-	SN,			///< Signal to Noise Ratio. Implemented in CombineCov
+	SN,		///< Signal to Noise Ratio. Implemented in CombineCov
 	EbNo,		///< Energy per Bit to Noise energy ratio -- not yet implemented
 	ServiceLimits	///< -- not yet implemented
 };	
@@ -112,6 +116,22 @@ enum ePlotType
 			 * @return A boolean.
 			 */
 			bool InterferencePlot();
+
+			/**
+			 * CellCentroids calculate the cell centroids and updates them in the database. 
+			 * after a primary server plot has been performed by calling CombineCov (). 
+			 * @return A boolean indicating success of calculation.
+			 */
+			bool CellCentriods();
+
+			/**
+			 * Estimatess and stores the traffic density in each cluttertype for th
+			 * given technology (e.g. GSM, UMTS ot LTE) and 
+			 * traffictype (e.g. circuit switched or packet switched) 
+			 * after a primary server plot has been performed by calling CombineCov (). 
+			 * @return A boolean indicating success of calculation.
+			 */
+			bool DetermineTrafficDist();
 			
 			/*
 			 * 
@@ -141,6 +161,9 @@ enum ePlotType
 						double *CoverangeRanges, // In Kilometer
 						string DirectoryToStoreResult,
 						string OutputFileForResult);
+
+			double *mPSweights;
+			double *mCSweights;
 		
 		private:
 			
@@ -209,6 +232,9 @@ enum ePlotType
 			double			mMaxRange;		///< Maximum range that will be considered
 			string			mDir;			///< Directory of the output file
 			string			mOutputFile;	///< Name of the output file
+			MatrixXd mTheMatrix;	// matrix representing the set of linear equations to be solved
+			MatrixXd mTraffic;
+			MatrixXd mWeights;
 	};
 }
 #endif /*CPLOTTASK_H_*/

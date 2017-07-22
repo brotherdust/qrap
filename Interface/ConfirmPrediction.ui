@@ -86,7 +86,7 @@
     <rect>
      <x>10</x>
      <y>260</y>
-     <width>993</width>
+     <width>1011</width>
      <height>305</height>
     </rect>
    </property>
@@ -405,6 +405,16 @@
         <string>Digital Elevation Model</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>Update Cell Centroids</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Estimate Traffic Distribution</string>
+       </property>
+      </item>
      </widget>
     </item>
     <item row="1" column="2">
@@ -534,7 +544,7 @@
     <rect>
      <x>10</x>
      <y>570</y>
-     <width>487</width>
+     <width>496</width>
      <height>25</height>
     </rect>
    </property>

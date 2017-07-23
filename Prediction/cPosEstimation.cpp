@@ -75,9 +75,9 @@ cPosEstimation::cPosEstimation() // default constructor
 	{
 		mPlotResolution = atof(setting.c_str());
 	}
-	else mPlotResolution = 5;
+	else mPlotResolution = 30;
 
-	mPlotResolution = 5;
+	mPlotResolution = 30;
 
 	setting = gDb.GetSetting("UseClutter");
 	if (setting=="true")
@@ -422,7 +422,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 		query += "rad.siteid as nsite, ST_AsText(site.location) as nsiteLocation, rad.id as InstKeyFixed, ";
 		query += "rad.txantennaheight as antheight, rad.EIRP as EIRP, rad.txbearing as bearing, "; 
 		query += "rad.txmechtilt as tilt, rad.txantpatternkey as antkey, azibeamwidth, ";
-		query += "ci, measurement.frequency as frequency, ";
+		query += "ci, ST_AsText(cell.centriod) as centriod, measurement.frequency as frequency, ";
 		query += "max(measvalue) as measvalue, min(pathloss) as pathloss, ";
 		query += "tp1.TA as TA, technology.DistRes as DistRes ";
 		query += "from measurement left outer join test as tp1 ";
@@ -441,6 +441,8 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 		query += "and testpoint.positionsource<2 ";
 		query += "and measurement.tp in (select tp from test) ";
 		query += "and servsite.Location @ ST_GeomFromText('POLYGON((";
+
+
 		for ( i = 0 ; i < Points.size();i++)
 	   	{
 			Points[i].Get(Lat, Lon);
@@ -494,7 +496,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 			query += text;
 		}
 		query+=" group by ssite, tp2.servci, nsite, mid, InstKeyFixed, azibeamwidth, origLocation, "; 
-		query+=" measurement.frequency, measurement.tp, tp1.TA, ci, nsiteLocation,  DistRes ";
+		query+=" measurement.frequency, measurement.tp, tp1.TA, ci, nsiteLocation, centroid, DistRes ";
 		query+=" order by ssite, tp2.servci, measurement.tp, TA, measvalue desc;";
 
 		cout << query << endl;
@@ -564,6 +566,11 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 					NumInPosSet++; 
 					NewMeasurement.sSiteLocation.Set(latitude,longitude,DEG);
 					NewMeasurement.sCellID = atoi(r[i]["ci"].c_str());
+					PointString = r[i]["centriod"].c_str();
+					spacePos = PointString.find_first_of(' ');
+					longitude = atof((PointString.substr(6,spacePos).c_str())); 
+					latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
+					NewMeasurement.sCentroid.Set(latitude,longitude,DEG);
 //					cout << "	ci = " <<  NewMeasurement.sCellID << endl;
 					NewMeasurement.sInstKeyFixed = atoi(r[i]["InstKeyFixed"].c_str());
 //					cout << "	Risector = " <<  NewMeasurement.sInstKeyFixed <<endl;
@@ -716,8 +723,6 @@ void cPosEstimation::EstimatePositions()
 						mPosSets[mCurPosI].sMeasurements[0].sHeight, MOBILEHEIGHT,
 						mUseClutter, mClutterClassGroup);
 			SetSearchBoundaries();
-			mRho_max = 2500.0;
-			mRho_min = mPlotResolution;
 
 			if (ANNrun())
 			{
@@ -1368,7 +1373,7 @@ bool cPosEstimation::CoSinRule()
 
 
 // If one has the Rx-Tx time difference from active sets from different sites
-	if (-1!=OtherDistanceIndex)
+/*	if (-1!=OtherDistanceIndex)
 	{
 //		cout << "In cPosEstimation::CoSinRule() OtherDistance" << endl;	
 		tTestPoint newTestPoint;
@@ -1399,7 +1404,7 @@ bool cPosEstimation::CoSinRule()
 		newTestPoint.sNewTP = mNewTP;	
 		mPosSets[mCurPosI].sTestPoints.push_back(newTestPoint);
 		mNewTP++;
-/*
+
 		if (haveOwnAngle)
 		{
 			beta = (servSiteAzi-mPosSets[mCurPosI].sMeasurements[0].sSiteLocation.Bearing
@@ -1421,9 +1426,9 @@ bool cPosEstimation::CoSinRule()
 			newTestPoint.sAzimuth = servSiteAzi;
 			newTestPoint.sDistance = A;
 		}
-*/
-	}
 
+	}
+*/
 // Have other site angle
 	if ((-1!=OtherAziIndex)&&(-1!=BIndex))
 	{
@@ -2372,11 +2377,11 @@ double cPosEstimation::CostFunction(double rho, double phi)
 //	double Aexp=1.0;
 	for (i=0; i<mNumInsts; i++)
 	{
-/*		if (i>0) Cost += Delta[i-1] + Delta[i] 
-			     -2*((mPosSets[mCurPosI].sMeasurements[i-1].sMeasValue-Prediction[i-1])
-				*(mPosSets[mCurPosI].sMeasurements[i].sMeasValue-Prediction[i]));
-		else Cost += Delta[i];
-*/
+//		if (i>0) Cost += Delta[i-1] + Delta[i] 
+//			     -2*((mPosSets[mCurPosI].sMeasurements[i-1].sMeasValue-Prediction[i-1])
+//				*(mPosSets[mCurPosI].sMeasurements[i].sMeasValue-Prediction[i]));
+//		else Cost += Delta[i];
+
 		Cost += Delta[i];
 		teller += (mPosSets[mCurPosI].sMeasurements[i].sMeasValue - meanMeas)*
 						(Prediction[i] - meanPred);
@@ -2384,11 +2389,11 @@ double cPosEstimation::CostFunction(double rho, double phi)
 				 (mPosSets[mCurPosI].sMeasurements[i].sMeasValue - meanMeas);
 		varPred += (Prediction[i] - meanPred)*(Prediction[i] - meanPred);
 
-/*		if (i>0) Aexp = Aexp*exp(Delta[i-1] + Delta[i] 
-			     -2*((mPosSets[mCurPosI].sMeasurements[i-1].sMeasValue-Prediction[i-1])
-			*(mPosSets[mCurPosI].sMeasurements[i].sMeasValue-Prediction[i]))/SIGMA2);
-		cout << SIGMA2 << "	"	<<exp(-Delta[i]/(SIGMA2)) << endl;
-*/
+//		if (i>0) Aexp = Aexp*exp(Delta[i-1] + Delta[i] 
+//			     -2*((mPosSets[mCurPosI].sMeasurements[i-1].sMeasValue-Prediction[i-1])
+//			*(mPosSets[mCurPosI].sMeasurements[i].sMeasValue-Prediction[i]))/SIGMA2);
+//		cout << SIGMA2 << "	"	<<exp(-Delta[i]/(SIGMA2)) << endl;
+
 		Sexp = Sexp*exp(-Delta[i]/(SIGMA2));
 	}
 	
@@ -2410,6 +2415,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 	return Pcost;
 //	return altCost;
 }
+
 
 /*
 // ***********************************************************************************************

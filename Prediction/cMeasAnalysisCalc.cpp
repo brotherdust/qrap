@@ -99,6 +99,7 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 	cout << "mDEMsource = " << mDEMsource << endl;
 	mDEM.SetRasterFileRules(mDEMsource);
 	mDEM.SetSampleMethod(2);
+	cout << "Existing cMeasAnalysisCalc::contructor" << endl;
 
 }
 

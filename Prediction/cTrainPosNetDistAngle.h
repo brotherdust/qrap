@@ -26,20 +26,20 @@
 #ifndef cTrainPosNetDistAngle_h
 #define cTrainPosNetDistAngle_h 1
 
-#define GAMMA 2.0
+#define GAMMA 2.4
 #define MOBILEHEIGHT 1
 #define MARGIN 15
 #define SENSITIVITY (-120)
 #define FREQ_SCALE (2/(2170-1553))
 #define FREQ_OFFSET (-1553)
-#define MEAS_SCALE (1/20)
+#define MEAS_SCALE (1/35)
 #define MEAS_OFFSET (-80)
 #define RFDist_SCALE (1.5/45)
 #define RFDist_OFFSET (75)
 
 #define MAXepoch 300000
 #define REPORTInt 10000
-#define TERROR 0.0015/5000
+#define TERROR (0.0015/5000)
 
 // include local headers
 #include "../DataBase/Config.h"

@@ -496,7 +496,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 			query += text;
 		}
 		query+=" group by ssite, tp2.servci, nsite, mid, InstKeyFixed, azibeamwidth, origLocation, "; 
-		query+=" measurement.frequency, measurement.tp, tp1.TA, ci, nsiteLocation, centroid, DistRes ";
+		query+=" measurement.frequency, measurement.tp, tp1.TA, ci, nsiteLocation, cell.centriod, DistRes ";
 		query+=" order by ssite, tp2.servci, measurement.tp, TA, measvalue desc;";
 
 		cout << query << endl;
@@ -568,9 +568,14 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 					NewMeasurement.sCellID = atoi(r[i]["ci"].c_str());
 					PointString = r[i]["centriod"].c_str();
 					spacePos = PointString.find_first_of(' ');
-					longitude = atof((PointString.substr(6,spacePos).c_str())); 
-					latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
-					NewMeasurement.sCentroid.Set(latitude,longitude,DEG);
+					cout << PointString << "	space:" << spacePos << endl;
+					if ((spacePos>0)&&(spacePos<35))
+					{
+						longitude = atof((PointString.substr(6,spacePos).c_str())); 
+						latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
+						NewMeasurement.sCentroid.Set(latitude,longitude,DEG);
+					}
+					else NewMeasurement.sCentroid = NewMeasurement.sSiteLocation;
 //					cout << "	ci = " <<  NewMeasurement.sCellID << endl;
 					NewMeasurement.sInstKeyFixed = atoi(r[i]["InstKeyFixed"].c_str());
 //					cout << "	Risector = " <<  NewMeasurement.sInstKeyFixed <<endl;

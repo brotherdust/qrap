@@ -222,6 +222,7 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 		LoadedRastersList+="'";
 		AddRaster(RxLoc,LoadedRastersList);
 	}
+	
 	LoadedRastersList="'";
 	IsInSet=false;
 //	cout << "In cRasterFileHandler::GetForLink(...). After loading file for RxLoc" << endl;
@@ -969,8 +970,6 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 			if (r.size())
 			for (unsigned j=0; j<r.size(); j++)
 			{
-				cout << query << endl;	
-				cout << "cRasterFileHandler::AddRaster: r.size() = " << r.size() << endl;
 				if (!NewFound)
 				{				
 					NewFound = true;
@@ -1003,6 +1002,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 				cRaster* New = new cRaster(Directory, FileName, filetype, GeoProj,proj4string, centmer);
 				New->mUsed=true;
 				New->mFileSetLevel=i;
+//				cout << "FileSetLevel = " << i << endl;
 				mCurrentRasters.push_back(New);
 				if (0==i)
 				{
@@ -1020,7 +1020,6 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 			} // if r.size()
 			else
 			{
-				NotFoundCount++;
 				if (NewFound)
 				{
 //					cout << " mFileSetOrder.size() = "; 
@@ -1031,7 +1030,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 					NewFound = false;
 				}
 				else NotFoundPoint = point; 
-				if (NotFoundCount>100000)
+				if ((NotFoundCount>100000)||(NotFoundCount<1))
 				{
 //					cout << " mFileSetOrder.size() = "; 
 //					cout << mFileSetOrder.size() << "	i=" << i << endl;
@@ -1040,7 +1039,10 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 					NotFoundCount = 0;
 					NewFound = false;
 				}
+				NotFoundCount++;
 			}
+//				cout << query << endl;	
+//				cout << "cRasterFileHandler::AddRaster: r.size() = " << r.size() << endl;
 			
 		} // else !gDb->PerformRawSq	// Select filename  and Directory from files 
 		i++;

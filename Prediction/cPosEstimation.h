@@ -27,18 +27,18 @@
 #define cPosEstimation_h 1
 
 #define PI 3.1415926535897932384626433832795
-#define GAMMA 2.0
+#define GAMMA 2.4
 #define MOBILEHEIGHT 1
-#define SIGMA2 (10*10)
+#define SIGMA2 (8*8)
 #define MARGIN 15
 #define SENSITIVITY (-120)
 #define NUMPARTICLES 20
-#define MINSTEPSIZE 5  
+#define MINSTEPSIZE 30  
 #define INERTIA 0.7
 #define Cp 1.4
 #define Cg 1.4
 #define STOPN 10
-#define MAXITERpos 50
+#define MAXITERpos 20
 #define DELTA 5e-8
 #define MAXBTLinMEMORY 12
 #define MAXPATHLOSS -175

@@ -943,7 +943,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 
 	temp = (double)(EndIndex-BeginIndex)*m_interPixelDist/2.0;
 
-/*	if ((!Vertical)&&(radius>0)&&(rho<=1.4)&&(radius<0.5*m_reR)&&(mhu>-0.6))
+	if ((!Vertical)&&(radius>0)&&(rho<=1.4)&&(radius<0.5*m_reR)&&(mhu>-0.6))
 	{
 		// Parsons  //if (rho<=1.4)   //For horizontal polirization 
 		// Dougherty & Maloney 1964 Radio Science Journal of Research
@@ -1006,11 +1006,11 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 //		RoundHill = max(R1,R2);
 	}
 
-	else if ((radius>0)&&(radius<3*m_reR)&&(rho<1.3)&&(mhu>-0.6))
+/*	else if ((radius>0)&&(radius<3*m_reR)&&(rho<1.3)&&(mhu>-0.6))
 	{
 		//  Rec. ITU-R P.526-12 Feb 2012 $4.2 
 //		if (mCalcMarker==142423) 
-		cout << " RoundHill	";
+//			cout << " RoundHill	";
 		RoundHill = 7.2*rho - 2.0*rho*rho + 3.6*rho*rho*rho
 						- 0.8*rho*rho*rho*rho;
 		double xhi;

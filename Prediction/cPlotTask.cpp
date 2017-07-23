@@ -1631,9 +1631,12 @@ bool cPlotTask::CellCentriods()
 					while ((mPlot[i][j]!=mFixedInsts[CII].sInstKey)&&(CII<NumInsts))
 						CII++;
 				}
-				mFixedInsts[CII].sCentroidX += j;
-				mFixedInsts[CII].sCentroidY += i;
-				mFixedInsts[CII].sPixelCount++;
+				if (mPlot[i][j]==mFixedInsts[CII].sInstKey)
+				{
+					mFixedInsts[CII].sCentroidX += j;
+					mFixedInsts[CII].sCentroidY += i;
+					mFixedInsts[CII].sPixelCount++;
+				}
 			}
 		}
 	}
@@ -1642,10 +1645,11 @@ bool cPlotTask::CellCentriods()
 	{
 		mFixedInsts[i].sCentroidX /=mFixedInsts[i].sPixelCount;
 		mFixedInsts[i].sCentroidY /=mFixedInsts[i].sPixelCount; 
-		North.FromHere(mNorthWest,mFixedInsts[i].sCentroidX*mPlotResolution,90);
-		mFixedInsts[i].sCentroid.FromHere(North,mFixedInsts[i].sCentroidY*mPlotResolution,180);
-		mFixedInsts[i].sCentroid.SetGeoType(DEG);
-		mFixedInsts[i].sCentroid.Get(lat,lon);
+		mNorthWest.SetGeoType(DEG);
+		mNorthWest.Get(lat,lon);
+		lat-=mFixedInsts[i].sCentroidY*mNSres;
+		lon+=mFixedInsts[i].sCentroidX*mEWres;
+		mFixedInsts[i].sCentroid.Set(lat,lon,DEG);
 
 		query = PreQuery;
 		gcvt(lon,8,temp);
@@ -1956,10 +1960,10 @@ bool cPlotTask::GetDBinfo()
 	for(i=0 ; i<mFixedInsts.size() ; i++)
 	{
 		gcvt(mFixedInsts[i].sInstKey,8,temp);
-		query = "SELECT siteid, ST_AsText(location) as location, eirp, max(cell.txpower) as txpower";
+		query = "SELECT siteid, ST_AsText(location) as location, eirp, max(cell.txpower) as txpower,";
 		query += "txlosses, txantpatternkey,txbearing,txmechtilt, txantennaheight,";
 		query += "rxantpatternkey,rxbearing,rxmechtilt,rxlosses,rxsensitivity,rxantennaheight, ";
-		query += "btlfreq, spacing, bandwidth, downlink, uplink ";
+		query += "btlfreq, spacing, bandwidth, downlink, uplink, ";
 		query += "sum(cstraffic) as cstraffic, sum(pstraffic) as pstraffic, techkey ";
 		query += "FROM radioinstallation LEFT OUTER JOIN cell on (radioinstallation.id=risector) ";
 		query += "CROSS JOIN technology CROSS JOIN site ";
@@ -1969,7 +1973,7 @@ bool cPlotTask::GetDBinfo()
 		query += " group by siteid, location, eirp, txlosses, rxlosses,";
 		query += "txantpatternkey, txbearing, txmechtilt, ";
 		query += "rxantpatternkey, rxbearing, rxmechtilt, txantennaheight, rxantennaheight, ";
-		query += "btlfreq, spacing, bandwidth, downlink, uplink, rxsensitivity;";
+		query += "techkey, btlfreq, spacing, bandwidth, downlink, uplink, rxsensitivity;";
 				
 		// Perform a Raw SQL query
 		if(!gDb.PerformRawSql(query))

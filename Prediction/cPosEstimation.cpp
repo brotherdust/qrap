@@ -75,9 +75,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	{
 		mPlotResolution = atof(setting.c_str());
 	}
-	else mPlotResolution = 30;
-
-	mPlotResolution = 30;
+	else mPlotResolution = 5;
 
 	setting = gDb.GetSetting("UseClutter");
 	if (setting=="true")
@@ -702,8 +700,8 @@ void cPosEstimation::EstimatePositions()
 
 	time_t beginTime = time(0);
 
-//	for (i=0; i< mNumPoints; i++)
-	for (i=2150; i<mNumPoints; i++)
+	for (i=0; i< mNumPoints; i++)
+//	for (i=2150; i<mNumPoints; i++)
 	{
 		mCurPosI = i;
 		if ((mPosSets[mCurPosI].sMeasurements.size()>0)

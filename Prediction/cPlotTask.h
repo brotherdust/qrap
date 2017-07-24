@@ -131,7 +131,7 @@ enum ePlotType
 			 * after a primary server plot has been performed by calling CombineCov (). 
 			 * @return A boolean indicating success of calculation.
 			 */
-			bool DetermineTrafficDist();
+			bool DetermineTrafficDist(bool Packet=true);
 			
 			/*
 			 * 
@@ -161,9 +161,6 @@ enum ePlotType
 						double *CoverangeRanges, // In Kilometer
 						string DirectoryToStoreResult,
 						string OutputFileForResult);
-
-			double *mPSweights;
-			double *mCSweights;
 		
 		private:
 			
@@ -208,33 +205,33 @@ enum ePlotType
 			bool			mUseClutter;	///< Is clutter data used in the calculations?
 			unsigned		mClutterClassGroup; ///< The classification used for the clutter ... it depends on the file-set. 
 			cRasterFileHandler 	mClutter;	///< RasterFileHandler to get the rasters containing the Clutter for the upcoming prediction Radials at different angels 
-			cGeoP			mNorthWest;		///< North-Western corner of plot area
-			cGeoP			mSouthWest;		///< South-Western corner of plot area
-			cGeoP			mNorthEast;		///< North-Eastern corner of plot area
-			cGeoP			mSouthEast;		///< South-Eastern corner of plot area
-			double			mCentMer;		///< CentralMeridian of Output
+			cGeoP			mNorthWest;	///< North-Western corner of plot area
+			cGeoP			mSouthWest;	///< South-Western corner of plot area
+			cGeoP			mNorthEast;	///< North-Eastern corner of plot area
+			cGeoP			mSouthEast;	///< South-Eastern corner of plot area
+			double			mCentMer;	///< CentralMeridian of Output
 			double			mPlotResolution;///< Resolution of the plot in meters
-			double			mNSres;			///< North-South resolution in degrees
-			double			mEWres;			///< West-East resolution in degrees
+			double			mNSres;		///< North-South resolution in degrees
+			double			mEWres;		///< West-East resolution in degrees
 			double			mMinAngleRes;	///< Minimum angle resolution for individual coverage plots in degrees
-			unsigned		mNumAngles;		///< Number of angles in 360 used individual coverage plots
-			tMobile			mMobile;		///< Information on the mobile units
-			unsigned		mNumFixed;		///< Number of fixed radion installations.
-			vector<tFixed>	mFixedInsts;	///< Inforamtion on the fixed installations
-			Float2DArray	mPlot;			///< Result of the plot
-			Float2DArray	mSupportPlot;	///< secodary/supporting information e.g. signal strength incase of Prim Server
-			unsigned		mRows;			///< Number of rows of the plot
-			unsigned		mCols;			///< Number of colunms of the plot
-			unsigned		mInstCounter; 	///< Ag ek kan nie onthou nie .. ek si nie eens seker of dit gebruik word nie ...???
+			unsigned		mNumAngles;	///< Number of angles in 360 used individual coverage plots
+			tMobile			mMobile;	///< Information on the mobile units
+			unsigned		mNumFixed;	///< Number of fixed radion installations.
+			vector<tFixed>		mFixedInsts;	///< Inforamtion on the fixed installations
+			Float2DArray		mPlot;		///< Result of the plot
+			Float2DArray		mSupportPlot;	///< secodary/supporting information e.g. signal strength incase of Prim Server
+			unsigned		mRows;		///< Number of rows of the plot
+			unsigned		mCols;		///< Number of colunms of the plot
+			unsigned		mInstCounter; 	///< Used to display progres of big calculations ... 'installation M of N'
 			vPred 			mActiveRasters;	///< Rasters containing individual plots (in rectangular coordinates) ... normally the signal strenth in dBm
 			double			mCurrentEdge;	///< indicate how the plot progress through the area sourthern (or eastern) edge of the area already calculated  
 			double			mMaxPathLoss;	///< Maximum pathloss that needs to be considers 
-			double			mMaxRange;		///< Maximum range that will be considered
-			string			mDir;			///< Directory of the output file
+			double			mMaxRange;	///< Maximum range that will be considered
+			string			mDir;		///< Directory of the output file
 			string			mOutputFile;	///< Name of the output file
 			MatrixXd mTheMatrix;	// matrix representing the set of linear equations to be solved
-			MatrixXd mTraffic;
-			MatrixXd mWeights;
+			MatrixXd mRight;
+			MatrixXd mTrafficDens;
 	};
 }
 #endif /*CPLOTTASK_H_*/

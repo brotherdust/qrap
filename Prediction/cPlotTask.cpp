@@ -57,8 +57,6 @@ cPlotTask::cPlotTask()
 	mMobile.sRxSens = -104;
 	mMobile.sPatternKey = 0;
 	mMobile.sMobileHeight = 1;
-	mCSweights = new double[2];
-	mPSweights = new double[2];
 	mPlot = new_Float2DArray(2,2);
 	mSupportPlot = new_Float2DArray(2,2);
 	mDir = "/home/maggie/Data/qrap/Predictions/";
@@ -68,8 +66,6 @@ cPlotTask::cPlotTask()
 //**************************************************************************
 cPlotTask::~cPlotTask()
 {
-	delete [] mCSweights;
-	delete [] mPSweights;
 	delete_Float2DArray(mPlot);
 	delete_Float2DArray(mSupportPlot);
 	mFixedInsts.clear();
@@ -1675,16 +1671,30 @@ bool cPlotTask::CellCentriods()
 }
 
 //***************************************************************************
-bool cPlotTask::DetermineTrafficDist()
+bool cPlotTask::DetermineTrafficDist(bool Packet)
 {
-	unsigned i, j, k;
+	unsigned i, j, k, n, m;
 	unsigned NumInsts = mFixedInsts.size();
+	double *CellTraffic;
+	CellTraffic = new double[NumInsts];
+
+	if (Packet)
+	{
+		for (n=0; n<NumInsts; n++)
+			CellTraffic[n] = mFixedInsts[n].sPStraffic; 
+	}
+	else
+	{
+		for (n=0; n<NumInsts; n++)
+			CellTraffic[n] = mFixedInsts[n].sCStraffic; 
+	}
+
 	cClutter ClutterUsed(mClutterClassGroup);
-	Float2DArray ClutterDist;
-	ClutterDist = new_Float2DArray(NumInsts,ClutterUsed.mNumber+1); 
+	Float2DArray ClutterArea;
+	ClutterArea = new_Float2DArray(NumInsts,ClutterUsed.mNumber+1); 
 	for (i=0; i<NumInsts; i++)
 		for (j=0; j<ClutterUsed.mNumber; j++)
-				ClutterDist[i][j] = 0.0;
+				ClutterArea[i][j] = 0.0;
 
 	cout << "In cPlottask::DetermineTrafficDist(). NumInsts = " 
 		<< NumInsts << "ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl;	
@@ -1695,7 +1705,8 @@ bool cPlotTask::DetermineTrafficDist()
 	double PlotRes=mPlotResolution;
 	unsigned Rows = mRows;
 	unsigned Cols = mCols;
-	mClutter.GetForDEM(NW, SE, PlotRes, Rows, Cols, ClutterRaster);
+	GeoType Type = NW.GetGeoType();
+	mClutter.GetForDEM(NW, SE, PlotRes, Rows, Cols, ClutterRaster, Type, true);
 	cout << "In cPlottask::DetermineTrafficDist() " << endl;
 	cout << "PlotRes:	Voor:	" << mPlotResolution << "	Na:	" <<  PlotRes << endl;
 	cout << "Rows:	Voor:	" << mRows<< "	Na:	" <<  Rows << endl;
@@ -1709,7 +1720,7 @@ bool cPlotTask::DetermineTrafficDist()
 
 	unsigned CurrentRadInstID = 0;
 
-	// Fill in Matrix
+	// determine area matrix
 	for (i=0; i<mRows; i++)
 	{
 		for (j=0; j<mCols; j++)
@@ -1725,25 +1736,11 @@ bool cPlotTask::DetermineTrafficDist()
 						CurrentRadInstID++;
 				}
 			}
-			ClutterDist[CurrentRadInstID][(int)ClutterRaster[i][j]] += mPlotResolution*mPlotResolution/1000/1000;
-	
+			if (mPlot[i][j] == mFixedInsts[CurrentRadInstID].sInstKey)
+				ClutterArea[CurrentRadInstID][(int)ClutterRaster[i][j]] += PlotRes*PlotRes/1000/1000;
 		}
 	}
 	delete_Float2DArray(ClutterRaster);
-
-	double *TotalsPerInst;
-	TotalsPerInst = new double[NumInsts];
-	for (i=0; i<NumInsts; i++)
-	{
-		TotalsPerInst[i] = 0.0;
-		for (j=0; j<=ClutterUsed.mNumber; j++)
-		{
-			TotalsPerInst[i]+=ClutterDist[i][j];
-//			cout << ClutterDist[i][j] << "	";
-		}
-//		cout << endl;
-	}
-
 
 	// Determine size of matrix ... i.e. How many Cluttertypes are represented
 	double *TotalsPerClutter;
@@ -1754,7 +1751,7 @@ bool cPlotTask::DetermineTrafficDist()
 		for (i=0; i<NumInsts; i++)
 		{
 //			cout << ClutterDist[i][j] << "	";
-			TotalsPerClutter[j]+=ClutterDist[i][j];
+			TotalsPerClutter[j]+=ClutterArea[i][j];
 		}
 //		cout << endl;
 //		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
@@ -1767,31 +1764,118 @@ bool cPlotTask::DetermineTrafficDist()
 			ClutterCount++;
 	}
 
+//	cout << "In cPlottask::DetermineTrafficDist(). ClutterCount = " << ClutterCount << endl; 
+//	cout << "In cPlottask::DetermineTrafficDist(). ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl; 
+	unsigned *ClutterIndex;
+	ClutterIndex = new unsigned[ClutterCount];
+	for (j=0; j<ClutterCount; j++)
+	{
+		ClutterIndex[j]=0;
+	}
+	unsigned Index = 0;
+	j=0;
+	for (j=0; j<=ClutterUsed.mNumber; j++)
+	{
+//		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
+		if ((TotalsPerClutter[j]>0)&&(Index<ClutterCount))
+		{
+			ClutterIndex[Index] = j;
+			Index++;
+		} 
+	}
+//	cout << "Index = " << Index << endl;
+
+	// Implementation of equating derivative to zero
+	mTheMatrix.resize(ClutterCount,ClutterCount);
+	mRight.resize(ClutterCount,1);
+
+	for( m=0; m<ClutterCount; m++)
+	{
+		mRight(m,0)=0.0;
+		for(k=0; k<ClutterCount; k++)
+		{
+			mTheMatrix(m,k) = 0.0;
+		}
+	}
+
+	for (n=0; n<NumInsts; n++)
+	{	
+		for( m=0; m<ClutterCount; m++)
+		{
+			mRight(m,0)+=ClutterArea[n][ClutterIndex[m]]*CellTraffic[n];			
+			for(k=0; k<ClutterCount; k++)
+			{
+				mTheMatrix(m,k) += ClutterArea[n][ClutterIndex[m]]
+							*ClutterArea[n][ClutterIndex[k]];
+			}
+		}
+	}
+
+	cout << "In cPlottask::DetermineTrafficDist() before finding zero of derivative solution " << endl;
+
+	mTrafficDens = mTheMatrix.fullPivLu().solve(mRight);
+
+	cout << "In cPlottask::DetermineTrafficDist() After finding zero of derivative solution" << endl;
+	for (i=0;i<ClutterCount;i++)
+	{
+		cout << "ClutterIndex[i] = " << ClutterIndex[i] 
+			<< "	mTrafficDens(i) = " << mTrafficDens(i) << endl;
+	}
+
+	cout << "In cPlottask::DetermineTrafficDist():  Saving estimations" << endl;
+	string queryB, query;
+	queryB = "INSERT into TrafficDensity ";
+	queryB += "(lastmodified, traffictype, technology, cluttertype, value) values ";
+	queryB += "(now(), ";
+	if (Packet) queryB += "'Packet Switched', ";
+	else queryB += "'Circuit Switched', ";
+	char* temp;
+	temp = new char[33];
+	gcvt(mFixedInsts[0].sTechKey,8,temp);
+	queryB += temp;
+	queryB += ", ";
+
+	for (m=0; m<ClutterCount; m++)
+	{	
+		query = queryB;
+		gcvt(ClutterIndex[m],8,temp);
+		query += temp;
+		query += ", ";
+		gcvt(mTrafficDens(m),8,temp);
+		query += temp;
+		query += ");";
+	}
+	
+
+	// Implementation of 'straight' matrix inversion
 
 	if (NumInsts<ClutterCount)
 	{
 		cout << "Too few cells are included. Retry with more cells." << endl;
+		delete [] ClutterIndex;
 		delete [] TotalsPerClutter;
-		delete [] TotalsPerInst;
-		delete_Float2DArray(ClutterDist);
+		delete_Float2DArray(ClutterArea);
 		return false;
 	}
 
-
-	mTheMatrix.resize(ClutterCount,ClutterCount);
-	mTraffic.resize(ClutterCount,1);
-
-	for( i=0; i<ClutterCount; i++)
+	//Determine total area per Installation
+	double *TotalsPerInst;
+	TotalsPerInst = new double[NumInsts];
+	for (i=0; i<NumInsts; i++)
 	{
-		mTraffic(i,0)=0.0;
-		for(j=0; j<ClutterCount; j++)
+		TotalsPerInst[i] = 0.0;
+		for (j=0; j<=ClutterUsed.mNumber; j++)
 		{
-			mTheMatrix(i,j) = 0.0;
+			TotalsPerInst[i]+=ClutterArea[i][j];
+//			cout << ClutterDist[i][j] << "	";
 		}
+//		cout << endl;
 	}
 
-	// Fill in square matrix
+	mTheMatrix.resize(ClutterCount,ClutterCount);
+	mRight.resize(ClutterCount,1);
 
+	// Fill in square matrix
 	unsigned *RadInstOrder;
 	RadInstOrder = new unsigned[NumInsts];
 	for(i=0; i<NumInsts; i++)
@@ -1814,99 +1898,71 @@ bool cPlotTask::DetermineTrafficDist()
 		}
 	}
 
-//	cout << "In cPlottask::DetermineTrafficDist(). ClutterCount = " << ClutterCount << endl; 
-//	cout << "In cPlottask::DetermineTrafficDist(). ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl; 
-	unsigned *ClutterIndex;
-	ClutterIndex = new unsigned[ClutterCount];
-	for (j=0; j<ClutterCount; j++)
-	{
-		ClutterIndex[j]=0;
-	}
-	unsigned Index = 0;
-	j=0;
-	for (j=0; j<=ClutterUsed.mNumber; j++)
-	{
-//		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
-		if ((TotalsPerClutter[j]>0)&&(Index<ClutterCount))
-		{
-			ClutterIndex[Index] = j;
-			Index++;
-		} 
-	}
-
-//	cout << "Index = " << Index << endl;
 //	cout << "In cPlottask::DetermineTrafficDist() before Completing matrixes" << endl;
 
 	for(i=0; i<ClutterCount; i++)
 	{
 //		cout << "i=" << i << "	RadInstOrder[i] = " << RadInstOrder[i] << endl;
-		mTraffic(i,0) = mFixedInsts[RadInstOrder[i]].sCStraffic;
+		mRight(i,0) = CellTraffic[RadInstOrder[i]];
 		for(j=0; j<ClutterCount; j++)
 		{
 //			cout << "j=" << j << ": " << ClutterIndex[j] << "	";
-			mTheMatrix(i,j) = ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
+			mTheMatrix(i,j) = ClutterArea[RadInstOrder[i]][ClutterIndex[j]];
 		}
 //		cout << endl;
 	}
 
-/*	unsigned CountWrap = ceil(((double)NumInsts)/((double)ClutterCount));
+	unsigned CountWrap = ceil(((double)NumInsts)/((double)ClutterCount));
 	for (k=1;k<=CountWrap; k++)
 	{
 		for (i=ClutterCount*k+1;i<min(NumInsts,ClutterCount*(k+1));i++)
 		{
-			mTraffic(ClutterCount-(i-ClutterCount*k),0) += mFixedInsts[RadInstOrder[i]].sCStraffic;
+			mRight(ClutterCount-(i-ClutterCount*k),0) += CellTraffic[RadInstOrder[i]];
 			for(j=0; j<ClutterCount; j++)
-				mTheMatrix(ClutterCount-(i-ClutterCount*k),j) += ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
+				mTheMatrix(ClutterCount-(i-ClutterCount*k),j) += ClutterArea[RadInstOrder[i]][ClutterIndex[j]];
 		}
  	}
-*/
-	cout << "In cPlottask::DetermineTrafficDist() before Solving fo CStraffic" << endl;
 
-	mWeights = mTheMatrix.fullPivLu().solve(mTraffic);
+	cout << "In cPlottask::DetermineTrafficDist() before Solving 'straight' matrix inversion " << endl;
 
-	cout << "In cPlottask::DetermineTrafficDist() before writing back to mCSweights" << endl;
-	delete [] mCSweights;
-	mCSweights = new double[ClutterUsed.mNumber+1];
+	mTrafficDens = mTheMatrix.fullPivLu().solve(mRight);
+
+	cout << "In cPlottask::DetermineTrafficDist() After 'straight' matrix invertion" << endl;
 	for (i=0;i<ClutterCount;i++)
 	{
-		mCSweights[ClutterIndex[i]] = mWeights(i);
 		cout << "ClutterIndex[i]=" << ClutterIndex[i] 
-			<< "	mCSweights[ClutterIndex[i]] = " << mCSweights[ClutterIndex[i]] << endl;
+			<< "	mTrafficDens(i) = " << mTrafficDens(i) << endl;
 	}
 
-	cout << "In cPlottask::DetermineTrafficDist() Doing PS traffice now" << endl;
-	for(i=0; i<ClutterCount; i++)
-	{
-		mTraffic(i,0) = mFixedInsts[RadInstOrder[i]].sPStraffic;
-		for(j=0; j<ClutterCount; j++)
-			mTheMatrix(i,j) = ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
+	cout << "In cPlottask::DetermineTrafficDist():  Saving estimations" << endl;
+	queryB = "INSERT into TrafficDensity ";
+	queryB += "(lastmodified, traffictype, technology, cluttertype, value) values ";
+	queryB += "(now(), ";
+	if (Packet) queryB += "'Packet Switched', ";
+	else queryB += "'Circuit Switched', ";
+	gcvt(mFixedInsts[0].sTechKey,8,temp);
+	queryB += temp;
+	queryB += ", ";
+
+	for (m=0; m<ClutterCount; m++)
+	{	
+		query = queryB;
+		gcvt(ClutterIndex[m],8,temp);
+		query += temp;
+		query += ", ";
+		gcvt(mTrafficDens(m),8,temp);
+		query += temp;
+		query += ");";
 	}
 
-/*	for (k=1;k<=CountWrap; k++)
-	{
-		for (i=ClutterCount*k+1;i<min(NumInsts,ClutterCount*(k+1));i++)
-		{
-			mTraffic(ClutterCount-(i-ClutterCount*k),0) += mFixedInsts[RadInstOrder[i]].sPStraffic;
-			for(j=0; j<ClutterCount; j++)
-				mTheMatrix(ClutterCount-(i-ClutterCount*k),j) += ClutterDist[RadInstOrder[i]][ClutterIndex[j]];
-		}
- 	}
-*/
-	cout << "In cPlottask::DetermineTrafficDist() before Solving fo CStraffic" << endl;
-	mWeights = mTheMatrix.fullPivLu().solve(mTraffic);
-
-	delete [] mPSweights;
-	mPSweights = new double[ClutterUsed.mNumber+1];
-	for (i=0;i<ClutterCount;i++)
-		mPSweights[ClutterIndex[i]] = mWeights(i);
-	
+	cout << "In cPlottask::DetermineTrafficDist() Leaving" << endl;
+	delete [] temp;
 	delete [] RadInstOrder;
 	delete [] TotalsPerClutter;
 	delete [] TotalsPerInst;
 	delete [] ClutterIndex;
-	delete_Float2DArray(ClutterDist);
+	delete_Float2DArray(ClutterArea);
 	return true;
-
 }
 
 //***************************************************************************

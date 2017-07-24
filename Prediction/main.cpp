@@ -187,12 +187,12 @@ int main (int argc, char **argv)
 //	Hoek[3].Set(-24.01, 23.00);
 
 //	Bryanston
-//	NumHoek=4;
-//	Hoek = new cGeoP[NumHoek];
-//	Hoek[0].Set(-26.036, 27.976);
-//	Hoek[1].Set(-26.109, 27.976);
-//	Hoek[2].Set(-26.109, 28.075);
-//	Hoek[3].Set(-26.036, 28.075);
+	NumHoek=4;
+	Hoek = new cGeoP[NumHoek];
+	Hoek[0].Set(-26.036, 27.976);
+	Hoek[1].Set(-26.109, 27.976);
+	Hoek[2].Set(-26.109, 28.075);
+	Hoek[3].Set(-26.036, 28.075);
 
 //	Tembisa
 /*	NumHoek=6;
@@ -205,15 +205,14 @@ int main (int argc, char **argv)
 	Hoek[5].Set(-25.965, 28.180);
 */
 	//Tembisa bigger
-	NumHoek=5;	
-	Hoek = new cGeoP[NumHoek];
-
-	Hoek[0].Set(-26.06, 28.26);
-	Hoek[1].Set(-25.94, 28.26);
-	Hoek[2].Set(-25.94, 28.113);
-	Hoek[3].Set(-26.06, 28.113);
-	Hoek[4].Set(-26.06, 28.26);
-
+//	NumHoek=5;	
+//	Hoek = new cGeoP[NumHoek];
+//
+//	Hoek[0].Set(-26.06, 28.26);
+//	Hoek[1].Set(-25.94, 28.26);
+//	Hoek[2].Set(-25.94, 28.113);
+//	Hoek[3].Set(-26.06, 28.113);
+//	Hoek[4].Set(-26.06, 28.26);
 
 	vPoints Punte;
 	for (unsigned i=0; i<NumHoek; i++)
@@ -354,17 +353,17 @@ for ( i=4; i>=0; i--)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-/*	
+	
 	cTrainPosNetDistAngle NeuralNets;
 	cout << "In main Loading measurements " << endl;
-	NeuralNets.LoadSites(Punte,2,6,1,1);
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Test",false);
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Train",true);
+	NeuralNets.LoadSites(Punte,1,1,1,1);
+	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Test",false);
+	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Train",true);
 
 	cout << "In main training nets " << endl;
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
+
 /*
 	query = "update coefficients set coefficient=0.0;";
 
@@ -478,7 +477,7 @@ for ( i=4; i>=0; i--)
 
 	cout << "Voor LoadMeasurements" << endl;
 	Positioning.SetUseAntANN(false);	
-	Positioning.LoadMeasurements(Punte,2,6,1,1);
+	Positioning.LoadMeasurements(Punte,1,1,1,1);
 	cout << "Na LoadMeasurements" << endl;
 
 	cout << " Clearing Punte " << endl;

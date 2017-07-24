@@ -618,7 +618,7 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE, 
 					double &InRes,
 					unsigned &Rows, unsigned &Cols, 
-					Float2DArray &Data, GeoType ProjIn) 
+					Float2DArray &Data, GeoType ProjIn, bool Fixed) 
 {
 //	cout << "In GetForDEM" << endl;
 	mCurrentRasters.clear();
@@ -631,7 +631,7 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	GeoType Proj=ProjIn;
 	bool Hemisphere=true;
 	bool IsInSet=false;
-	double DistRes;
+	double DistRes, NSres, EWres;
 	double Res=InRes;
 	string LoadedRastersList="'";
 	
@@ -657,27 +657,54 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	tempP.SetGeoType(ProjIn,central);
 	Point.SetGeoType(ProjIn,central);
 	
-	if (ProjIn==DEG)
+	if (Fixed)
 	{
-		Res=cDegResT*InRes;
-		Rows = 2*(int)ceil((N-S)/(2.0*Res)+0.5)+1;
-		Cols = 2*(int)ceil((E-W)/(2.0*Res)+0.5)+1;
-		DistRes = Res*max(	min(NW.Distance(NE),SW.Distance(SE))/fabs(E-W),
-							min(SE.Distance(NE), SW.Distance(NW))/fabs(N-S));
-		Sign = 1;
+		if (ProjIn==DEG)
+		{
+			NSres=fabs(N-S)/Rows;
+			EWres=fabs(E-W)/Cols;
+			Sign = 1;
+			Res = (NSres+EWres)/2.0;
+			DistRes=Res/cDegResT;
+		}
+		else
+		{
+			NSres=NW.Distance(SW)/Rows;
+			WE = (NW.Distance(NE)+SW.Distance(SE))/2.0;
+			EWres = WE/Cols;
+			Res = (NSres+EWres)/2.0;
+			DistRes = Res;
+			if (ProjIn==WGS84GC) Sign = -1;
+			else Sign = 1;
+		}
 	}
 	else
 	{
-		DistRes = InRes;
-		Res = InRes;
-		WE = max(NW.Distance(NE),SW.Distance(SE));
-		Rows = 2*(int)ceil(NW.Distance(SW)/(2.0*DistRes)+0.5)+1;
-		Cols = 2*(int)ceil(WE/(2.0*DistRes)+0.5)+1;
-		if (ProjIn==WGS84GC) Sign = -1;
-		else Sign = 1;
+		if (ProjIn==DEG)
+		{
+			Res=cDegResT*InRes;
+			Rows = 2*(int)ceil((N-S)/(2.0*Res)+0.5)+1;
+			Cols = 2*(int)ceil((E-W)/(2.0*Res)+0.5)+1;
+			DistRes = Res*max(min(NW.Distance(NE),SW.Distance(SE))/fabs(E-W),
+					min(SE.Distance(NE), SW.Distance(NW))/fabs(N-S));
+			Sign = 1;
+		}
+		else
+		{
+			DistRes = InRes;
+			Res = InRes;
+			WE = max(NW.Distance(NE),SW.Distance(SE));
+			Rows = 2*(int)ceil(NW.Distance(SW)/(2.0*DistRes)+0.5)+1;
+			Cols = 2*(int)ceil(WE/(2.0*DistRes)+0.5)+1;
+			if (ProjIn==WGS84GC) Sign = -1;
+			else Sign = 1;
+		}
+		NSres=Res;
+		EWres=Res;
 	}
-	
-	if (Rows*Cols==0)
+	InRes=DistRes;
+
+	if (0==Rows*Cols)
 	{
 		string err = "Empty Raster ... Rows of Cols is 0 ";
 //		QRAP_ERROR(err.c_str());
@@ -691,20 +718,20 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	delete_Float2DArray(Data);
 	Data = new_Float2DArray(Rows,Cols);
 
-	Ydist = (double)(0-(int)midRow)*Res;
-	Xdist = (double)(0-(int)midCol)*Res;
+	Ydist = (double)(0-(int)midRow)*NSres;
+	Xdist = (double)(0-(int)midCol)*EWres;
 	NW.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
 //	cout << " In  cRasterFileHandler::GetForDEM.   NW: " << endl;
 //	NW.Display();
-	Ydist = (double)((int)Rows-1-(int)midRow)*Res;
+	Ydist = (double)((int)Rows-1-(int)midRow)*NSres;
 	SW.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
 //	cout << " In  cRasterFileHandler::GetForDEM.   SW: " << endl;
 //	SW.Display();
-	Xdist = (double)((int)Cols-1-(int)midCol)*Res;
+	Xdist = (double)((int)Cols-1-(int)midCol)*EWres;
 	SE.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
 //	cout << " In  cRasterFileHandler::GetForDEM.   SE: " << endl;
 //	SE.Display();
-	Ydist = (double)(0-(int)midRow)*Res;
+	Ydist = (double)(0-(int)midRow)*NSres;
 	NE.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
 //	cout << " In  cRasterFileHandler::GetForDEM.   NE: " << endl;
 //	NE.Display();
@@ -815,13 +842,13 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 	{
 //		Sign = i-midRow;
 //		Sign = (int)Sign/fabs(Sign);
-		Ydist = (double)((int)i-(int)midRow)*Res;
+		Ydist = (double)((int)i-(int)midRow)*NSres;
 		for (j=0; (j<Cols); j++)
 		{
 //			tempP.FromHere(Mid,Sign*(i-midRow)*DistRes,(double)(1.0+Sign)*90.0);
 //			Sign = j-midCol;
 //			Sign = (int)Sign/fabs(Sign);
-			Xdist = (double)((int)j-(int)midCol)*Res;
+			Xdist = (double)((int)j-(int)midCol)*EWres;
 			Point.Set(MidY-Ydist,MidX+Sign*Xdist,ProjIn,central);
 //			Point.FromHere(tempP,Sign*(j-midCol)*DistRes,90+(double)(1.0-Sign)*90.0);
 			if (!Preferred)
@@ -836,7 +863,7 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 			if (Available)
 				Data[i][j]=mCurrentRasters[Current]->GetValue(Point,mSampleMethod);
 			else Data[i][j] = 0;
-			tempD= Data[i][j];
+			tempD = Data[i][j];
 			if (((Data[i][j] == OUTOFRASTER)||(Data[i][j]<-440)||(Data[i][j]>8880)||(ToSwitch))&&(Available))
 			{
 //				mCurrentRasters[Current]->mUsed = false;

@@ -942,7 +942,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 	KnifeEdge = -20.0*log10(KnifeEdge);
 
 	temp = (double)(EndIndex-BeginIndex)*m_interPixelDist/2.0;
-
+/*
 	if ((!Vertical)&&(radius>0)&&(rho<=1.4)&&(radius<0.5*m_reR)&&(mhu>-0.6))
 	{
 		// Parsons  //if (rho<=1.4)   //For horizontal polirization 
@@ -1005,7 +1005,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 //		double R2 = RoundHill;
 //		RoundHill = max(R1,R2);
 	}
-
+*/
 /*	else if ((radius>0)&&(radius<3*m_reR)&&(rho<1.3)&&(mhu>-0.6))
 	{
 		//  Rec. ITU-R P.526-12 Feb 2012 $4.2 

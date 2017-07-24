@@ -1895,8 +1895,64 @@ www.QRap.org.za
 	</table> <!-- cluttertype  -->
 
 <!-- ********************************************************************************************************************* -->
-<!-- This "clutterterms" table should rather not be edited unless you change the code too. The clutter terms should be reflected 
-in #define statements in qrap/Prediction/cClutter.h -->
+	<table name="TrafficDensity" label="Traffic Density" fulldownload="true"
+	description="This table presents the estimated traffic density in different clutter types." >
+		<field name="id"
+		       type="serial primary key unique not null"
+		       label="ID"
+		       description="Primary key"
+		       readonly="true" />
+		
+		<field name="lastmodified"
+		      type="timestamp without time zone"
+		      label="Last modified"
+			description="The time when this entry was last modified. This field is used during synchronisation of different machines / copies of the database"
+		      visible="false" />
+		
+		<field name="machineid"
+			type="smallint references machine(id)"
+			label="MachineID"
+			description="QRap Installation/Machine ID. This is used to identify from which machine this entry originated when the system is synchronised"
+			visible="false"/>
+
+		<field name = "cluttertype"
+		       type = "integer references cluttertype(id)"
+		       label = "Clutter Type"
+			description="Foreign Key referencing the Clutter Type for which this is the traffic density."
+		       ui = "dropdown(fromtable,cluttertype,cluttername)" />
+
+		<field 	name = "Technology"
+		       	type = "integer references technology(id)"
+			label = "Technology"
+			description="Foreign Key referencing the Technology on which the input of the calculations was based."
+		       	ui = "dropdown(fromtable,technology,technologytype)" />
+
+		<field 	name = "flagz"
+		       	type = "smallint references flagz(id)"
+			label = "Other (flagZ)"
+			description="Foreign Key referencing flagz which can be used to distinguish for example the area for which the traffic density was estimated."
+		       	ui = "dropdown(fromtable,flagz,shortname)" />
+
+		<field name="TrafficType"
+		       type="varchar(30)"
+		       label="Traffic Type"
+		       description="The traffic type. Options can be altered in structure.xml"
+		       ui="dropdown(fixed, {'Circuit Switched', 'Packet Switched'})" />
+
+		<field name = "value"
+		       type = "real"
+		       label = "Traffic Density"
+			description="The traffic density" />
+		
+		<view name = "trafficdensity_view" as = 'select * from trafficdensity;'>
+		</view>			
+
+	</table> <!-- TrafficDesities  -->
+
+
+<!-- ********************************************************************************************************************* -->
+<!-- This "clutterterms" table should rather not be edited unless you change the code too. -->
+<!-- The clutter terms should be reflected in #define statements in qrap/Prediction/cClutter.h -->
 
 	<table name="clutterterms" label="Clutter Tuning Terms" fulldownload="true"
 	description="This table presents the different terms for which the coefficients or parameters needs to be tuned. It should not be altered unless you change the propagation prediction code." >

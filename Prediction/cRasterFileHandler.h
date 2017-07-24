@@ -132,7 +132,8 @@ namespace Qrap
 							unsigned &Rows, 
 							unsigned &Cols, 
 							Float2DArray &Data, 
-							GeoType ProjIn=DEG);
+							GeoType ProjIn=DEG,
+							bool Fixed=false);
 						
 		private:
 			/**

@@ -632,7 +632,6 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 	TrainIndex = 0;
 	TestIndex = 0;
 
-//	for (i=2; i<3; i++)
 	for (i=0; i<mNumSites; i++)
 	{
 		cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;

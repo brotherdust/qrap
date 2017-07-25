@@ -498,7 +498,6 @@ void cConfirmPrediction::SetOwnColours()
 /***********************************************************/
 void cConfirmPrediction::on_btnDo_clicked()
 {
-	
 	rxMinSpinBox->setEnabled(false);
 	plotResolutionSpinBox->setEnabled(false);
 	kFactorIntSpinBox->setEnabled(false);
@@ -661,8 +660,9 @@ void cConfirmPrediction::on_btnDo_clicked()
 		case 10:	mPlotType = SN;			break;
 		case 11:	mPlotType = DEM;		break;
 		case 12:	mPlotType = CellCentroid;	break;
-//		case 13:	mPlotType =  EbNo;		break;
-//		case 14:	mPlotType = ServiceLimits;	break;
+		case 13:	mPlotTyoe = TrafficDist;	break;
+//		case 14:	mPlotType =  EbNo;		break;
+//		case 15:	mPlotType = ServiceLimits;	break;
 		default:	mPlotType = Cov;		break;			
 	}
 	switch (displayUnitsCombo->currentIndex())
@@ -825,7 +825,6 @@ void cConfirmPrediction::on_btnDo_clicked()
 				NumberOfFixedInstallations, FixedInstallationKeys,
 				CoverangeRanges, // In Kilometer
 				DirectoryToStoreResult, OutputFileForResult);
-			
 	if (mPlotType == DEM)
 	{	
 		cout << "Entering DEM in cConfirmPrediction::on_btnDo_clicked()" << endl;

@@ -67,7 +67,7 @@ void cFilterDialog::accept()
 		string query;
 		query = "INSERT INTO customareafilter (areaname,the_geom) VALUES ('";
 		query += lineEditName->text().toStdString();
-		query += "', GeomFromText('POLYGON((";
+		query += "', ST_GeomFromText('POLYGON((";
         	for (int i = 0 ; i < mPoints.size();i++)
         	{
 			gcvt(mPoints[i].x(),10,text);

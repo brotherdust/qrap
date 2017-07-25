@@ -310,11 +310,10 @@ bool QRap::openDatabaseConnection()
 //		dbusername = loginDialog->getUserName();
 //		dbpassword = loginDialog->getPassword();
 //		gDb.Connect (dbusername, dbpassword,);
-		//Why was this happening twice ... probably part of Christo's junk ... 
+		//Why was this happening twice ...   ??????
 		
 		//***********************************************************************************	
-		/*Christo du Plessis se junk 	
-  		cout << "Voor new IdResolve in QRap::openDatabaseConnection() " << endl;
+		/*cout << "Voor new IdResolve in QRap::openDatabaseConnection() " << endl;
 		// resolve the host id using id resolve
 		IdResolve idr;
 		int ret,id;
@@ -341,8 +340,6 @@ bool QRap::openDatabaseConnection()
 		machinename = string(buf);
 
 		printf("machinename: [%s]\n",machinename.c_str());
-
-		//einde van Christo se junk
 		*/
 
 		if (gDb.Connected())
@@ -716,9 +713,6 @@ void QRap::DesRubberBand()
 	delete mRubberBand;
 	mQGisIface->mapCanvas()->setCursor(Qt::ArrowCursor);
 }
-
-
-
 
 //***************************************************************
 void QRap::PerformLink()

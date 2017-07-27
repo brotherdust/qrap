@@ -40,7 +40,7 @@
 #define STOPN 10
 #define MAXITERpos 20
 #define DELTA 5e-8
-#define MAXBTLinMEMORY 12
+#define MAXBTLinMEMORY 15
 #define MAXPATHLOSS -175
 #define PRECALCdist 5500
 

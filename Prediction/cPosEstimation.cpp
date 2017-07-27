@@ -701,7 +701,7 @@ void cPosEstimation::EstimatePositions()
 	time_t beginTime = time(0);
 
 	for (i=0; i< mNumPoints; i++)
-//	for (i=2150; i<mNumPoints; i++)
+//	for (i=4040; i<mNumPoints; i++)
 	{
 		mCurPosI = i;
 		if ((mPosSets[mCurPosI].sMeasurements.size()>0)
@@ -775,7 +775,6 @@ void cPosEstimation::EstimatePositions()
 //					cout << "rho = " << mPosSets[mCurPosI].sTestPoints[j].sDistance 
 //							<< "	phi = " << mPosSets[mCurPosI].sTestPoints[j].sAzimuth << endl;
 	
-	
 					distERR = mPosSets[mCurPosI].sTestPoints[j].sDistance 
 									- mPosSets[mCurPosI].sTestPoints[0].sDistance;
 					phiERR = mPosSets[mCurPosI].sTestPoints[j].sAzimuth 
@@ -786,6 +785,10 @@ void cPosEstimation::EstimatePositions()
 							<< "	phiERR = " << phiERR  << endl;
 					
 				} 
+			}
+			else
+			{
+				cout << endl << "# " << mCurPosI << "	No ANN." << endl;
 			}
 		}		
 	}
@@ -2182,6 +2185,8 @@ double cPosEstimation::CostFunction(double rho, double phi)
 			if (MAXBTLinMEMORY<=mBTL.size())
 			{
 				cout << "Erasing" << endl;
+				delete_Float2DArray(mBTL[0]->mBTL);
+				delete_Float2DArray(mBTL[0]->mTilt);
 				mBTL.erase(mBTL.begin());
 				iBTL=mBTL.size()-1;
 			}

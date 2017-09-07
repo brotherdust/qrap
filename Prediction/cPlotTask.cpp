@@ -33,7 +33,7 @@ cPlotTask::cPlotTask()
 	mPlotType = Cov;
 	mUnits = dBm;
 	mInstCounter =0;
-	mRqSN = 8;				//dB
+	mRqSN = 8;			//dB
 	mRxMin = -110;			//dBm
 	mFadeMargin = 3;		//dB
 	mRqCIco = 9;			//dB
@@ -214,7 +214,6 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 	if (mUseClutter)
 		mClutterClassGroup = mClutter.GetClutterClassGroup();
 	mUseClutter = (mUseClutter) && (mClutterClassGroup>0);
-	
 
 	cout << "North West corner: " << endl;
 	NorthWestCorner.Display();
@@ -783,7 +782,7 @@ bool cPlotTask::CombineCov()
 									mPlot[i][j]=mActiveRasters[k].sInstKey;
 								}
 								break;
-							case CellCentroid:
+							case CellCentroid: //Same as Primary Server
 								if ((mActiveRasters[k].sRaster[ki][kj]>mRxMin)
 									&&(mActiveRasters[k].sRaster[ki][kj]>mSupportPlot[i][j]))
 								{
@@ -791,7 +790,7 @@ bool cPlotTask::CombineCov()
 									mPlot[i][j]=mActiveRasters[k].sInstKey;
 								}
 								break;
-							case TrafficDist:
+							case TrafficDist: // Same as Primary Server
 								if ((mActiveRasters[k].sRaster[ki][kj]>mRxMin)
 									&&(mActiveRasters[k].sRaster[ki][kj]>mSupportPlot[i][j]))
 								{
@@ -855,7 +854,7 @@ bool cPlotTask::CombineCov()
 									mPlot[i][j]=mActiveRasters[k].sInstKey;
 								}
 								break;
-							case CellCentroid:
+							case CellCentroid: // Same as primary server
 								if ((mActiveRasters[k].sRaster[ki][kj]>mRxMin)
 									&&(mActiveRasters[k].sRaster[ki][kj]>mSupportPlot[i][j]))
 								{
@@ -863,7 +862,7 @@ bool cPlotTask::CombineCov()
 									mPlot[i][j]=mActiveRasters[k].sInstKey;
 								}
 								break;
-							case TrafficDist:
+							case TrafficDist: //Same as primary server
 								if ((mActiveRasters[k].sRaster[ki][kj]>mRxMin)
 									&&(mActiveRasters[k].sRaster[ki][kj]>mSupportPlot[i][j]))
 								{
@@ -1674,7 +1673,85 @@ bool cPlotTask::CellCentriods()
 bool cPlotTask::DetermineTrafficDist(bool Packet)
 {
 	unsigned i, j, k, n, m;
+
+	cClutter ClutterUsed(mClutterClassGroup);
+	cout << "In cPlottask::DetermineTrafficDist(). ClutterUsed.mNumber = " 
+		<< ClutterUsed.mNumber << endl;	
+	Float2DArray ClutterRaster;
+	ClutterRaster = new_Float2DArray(2,2);
+	cGeoP NW = mNorthWest;
+	cGeoP SE = mSouthEast;
+	double PlotRes=mPlotResolution;
+	unsigned Rows = mRows;
+	unsigned Cols = mCols;
+	GeoType Type = NW.GetGeoType();
+	cout << "In cPlottask::DetermineTrafficDist(). Getting Clutter ..."  << endl;
+	mClutter.GetForDEM(NW, SE, PlotRes, Rows, Cols, ClutterRaster, Type, true);
+	cout << "In cPlottask::DetermineTrafficDist() " << endl;
+	cout << "PlotRes:	Voor:	" << mPlotResolution << "	Na:	" <<  PlotRes << endl;
+	cout << "Rows:	Voor:	" << mRows<< "	Na:	" <<  Rows << endl;
+	cout << "Cols:	Voor:	" << mCols<< "	Na:	" <<  Cols << endl;
+	cout << "North West:" << endl;
+	mNorthWest.Display();
+	NW.Display();
+	cout << "South East: " << endl;
+	mSouthEast.Display();
+	SE.Display();
+
+
+	cout << "Deleting installations that will not be included in the traffic calculations." << endl;
+	
+	string query = "SELECT distinct radioinstallation_view.id AS radinst"; 
+	query += " from radioinstallation_view cross join site_view_only cross join customareafilter";
+	query += " WHERE (radioinstallation_view.siteid = site_view_only.id)";
+	query += " and customareafilter.areaname ='TrafficArea' ";
+	query += "and location @ the_geom";
+
+	pqxx::result QResult;
+	string errormessage="";
+	if (!gDb.PerformRawSql(query))
+	{
+		errormessage =" In cPlottask::DetermineTrafficDist(). ";
+		errormessage += "Error in query to get sites included in TrafficArea";
+		cout << errormessage << endl;
+		QRAP_ERROR(errormessage);
+	}
+	else
+	{
+		gDb.GetLastResult(QResult);
+		if (QResult.size()>0)
+		{
+			unsigned ListSize=QResult.size();
+			unsigned * InstList;
+			InstList = new unsigned[ListSize];
+ 			for (i=0; i<ListSize; i++)
+				InstList[i]=atoi(QResult[i]["radinst"].c_str());
+			bool found = false;
+			for (j=0; j<mFixedInsts.size(); j++)
+			{
+				found = false;
+				for (i=0; (i<ListSize)&&(!found); i++)
+					found = (mFixedInsts[j].sInstKey==InstList[i]);
+				if (!found)
+				{
+					mFixedInsts.erase(mFixedInsts.begin()+j);
+					j--;
+				}
+			}
+		}
+		else
+		{
+			errormessage = "In cPlottask::DetermineTrafficDist(). ";
+			errormessage += "Empty query to get sites included in TrafficArea\n";
+			errormessage += "Is there a 'TrafficArea' polygon defined in the 'customareafilter' table?";
+			cout << errormessage;
+			QRAP_ERROR(errormessage);
+		} 
+	}
+
 	unsigned NumInsts = mFixedInsts.size();
+
+	cout << "In cPlottask::DetermineTrafficDist(). NumInsts = " << NumInsts << endl;	
 	double *CellTraffic;
 	CellTraffic = new double[NumInsts];
 
@@ -1688,39 +1765,15 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		for (n=0; n<NumInsts; n++)
 			CellTraffic[n] = mFixedInsts[n].sCStraffic; 
 	}
-
-	cClutter ClutterUsed(mClutterClassGroup);
 	Float2DArray ClutterArea;
 	ClutterArea = new_Float2DArray(NumInsts,ClutterUsed.mNumber+1); 
 	for (i=0; i<NumInsts; i++)
 		for (j=0; j<ClutterUsed.mNumber; j++)
 				ClutterArea[i][j] = 0.0;
 
-	cout << "In cPlottask::DetermineTrafficDist(). NumInsts = " 
-		<< NumInsts << "ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl;	
-	Float2DArray ClutterRaster;
-	ClutterRaster = new_Float2DArray(2,2);
-	cGeoP NW = mNorthWest;
-	cGeoP SE = mSouthEast;
-	double PlotRes=mPlotResolution;
-	unsigned Rows = mRows;
-	unsigned Cols = mCols;
-	GeoType Type = NW.GetGeoType();
-	mClutter.GetForDEM(NW, SE, PlotRes, Rows, Cols, ClutterRaster, Type, true);
-	cout << "In cPlottask::DetermineTrafficDist() " << endl;
-	cout << "PlotRes:	Voor:	" << mPlotResolution << "	Na:	" <<  PlotRes << endl;
-	cout << "Rows:	Voor:	" << mRows<< "	Na:	" <<  Rows << endl;
-	cout << "Cols:	Voor:	" << mCols<< "	Na:	" <<  Cols << endl;
-	cout << "North West:" << endl;
-	mNorthWest.Display();
-	NW.Display();
-	cout << "South East: " << endl;
-	mSouthEast.Display();
-	SE.Display();
-
-	unsigned CurrentRadInstID = 0;
 
 	// determine area matrix
+	unsigned CurrentRadInstID = 0;
 	for (i=0; i<mRows; i++)
 	{
 		for (j=0; j<mCols; j++)
@@ -1823,7 +1876,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	}
 
 	cout << "In cPlottask::DetermineTrafficDist():  Saving estimations" << endl;
-	string queryB, query;
+	string queryB;
 	queryB = "INSERT into TrafficDensity ";
 	queryB += "(lastmodified, traffictype, technology, cluttertype, value) values ";
 	queryB += "(now(), ";

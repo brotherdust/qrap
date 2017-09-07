@@ -1,3 +1,5 @@
+select count(*) from test;
+
 delete from testpoint where positionsource>1;
 
 select * from anninputlist;
@@ -5,16 +7,6 @@ select * from anninputlist;
 truncate table neuralnet cascade;
 truncate table anninputlist cascade;
 truncate table positionestimate cascade;
-
-truncate table btl;
-
-update radioinstallation set btlplot=null;
-
-select positionsource, count(*)
-from testpoint 
-group by positionsource
-order by positionsource;
-
 
 create table Results as
 select servci, tp1.id as tp, tp2.id as origtp, tp1.positionsource, 
@@ -131,4 +123,3 @@ group by siteid, InstKeyFixed, azibeamwidth, origLocation,
 measurement.frequency, measurement.tp, tp1.TA, ci, nsiteLocation, centriod, DistRes  
 order by measurement.tp, TA, measvalue desc;
 
-update qrap_config set value=30 where name='PlotResolution';

@@ -353,9 +353,9 @@ for ( i=4; i>=0; i--)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-/*	
+	
 	cTrainPosNetDistAngle NeuralNets;
-	cout << "In main Loading measurements " << endl;
+	cout << "In main Loading measurements for Training" << endl;
 	NeuralNets.LoadSites(Punte,1,1,1,1);
 	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Test",false);
 	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Train",true);
@@ -363,7 +363,7 @@ for ( i=4; i>=0; i--)
 	cout << "In main training nets " << endl;
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
+
 /*
 	query = "update coefficients set coefficient=0.0;";
 

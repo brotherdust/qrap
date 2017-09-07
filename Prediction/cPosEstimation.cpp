@@ -53,6 +53,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	mLTEsim = false;
 	mOriginal = true;
 	mUMTS = false;
+	mTAUnknown = true;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -601,7 +602,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 					if (strlen(r[i]["TA"].c_str())>0)
 					{
 						NewMeasurement.sServingCell = true;
-						Distance =NewMeasurement.sSiteLocation.Distance(NewTestPoint.sOriginalLocation);
+						Distance = NewMeasurement.sSiteLocation.Distance(NewTestPoint.sOriginalLocation);
 						if (mLTEsim)
 						{
 							NewMeasurement.sResDist = 4.88;
@@ -701,7 +702,6 @@ void cPosEstimation::EstimatePositions()
 	time_t beginTime = time(0);
 
 	for (i=0; i< mNumPoints; i++)
-//	for (i=4040; i<mNumPoints; i++)
 	{
 		mCurPosI = i;
 		if ((mPosSets[mCurPosI].sMeasurements.size()>0)
@@ -726,6 +726,8 @@ void cPosEstimation::EstimatePositions()
 						mPosSets[mCurPosI].sMeasurements[0].sHeight, MOBILEHEIGHT,
 						mUseClutter, mClutterClassGroup);
 			SetSearchBoundaries();
+			if (mTAUnknown)
+				mRho_max=2800;
 
 			if (ANNrun())
 			{
@@ -2268,6 +2270,8 @@ double cPosEstimation::CostFunction(double rho, double phi)
 					Radius = 13100;
 				else if (9404==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
 					Radius = 7800;
+				else if (4048==mPosSets[mCurPosI].sMeasurements[i].sSiteID)
+					Radius = 12500;
 
 				Radius = max(max(mRho_max,Radius),Distance+500);
 				DistRes = mPlotResolution;

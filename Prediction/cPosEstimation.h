@@ -243,6 +243,7 @@ class cPosEstimation
 	bool mLTEsim;
 	bool mUMTS;	
 	bool mOriginal;
+	bool mTAUnknown;
 	bool mUseAntANN;
 	double mRho_max;
 	double mRho_min;

@@ -660,7 +660,7 @@ void cConfirmPrediction::on_btnDo_clicked()
 		case 10:	mPlotType = SN;			break;
 		case 11:	mPlotType = DEM;		break;
 		case 12:	mPlotType = CellCentroid;	break;
-		case 13:	mPlotTyoe = TrafficDist;	break;
+		case 13:	mPlotType = TrafficDist;	break;
 //		case 14:	mPlotType =  EbNo;		break;
 //		case 15:	mPlotType = ServiceLimits;	break;
 		default:	mPlotType = Cov;		break;			
@@ -898,6 +898,7 @@ void cConfirmPrediction::on_btnDo_clicked()
 		case Cov:		Plot = "Coverage";			getFromDB = true;	discrete = false;	break;
 		case PrimServer:	Plot = "Primary Server";		getFromDB = false;	discrete = false;	break;
 		case CellCentroid:	Plot = "Primary Server";		getFromDB = false;	discrete = false;	break;
+		case TrafficDist:	Plot = "Primary Server";		getFromDB = false;	discrete = false;	break;
 		case SecondServer:	Plot = "Secondary Server";		getFromDB = false;	discrete = false;	break;
 		case NumServers:	Plot = "Number of Servers";		getFromDB = true;	discrete = false;	break;
 		case DEM:		Plot = "Digital Elevation Model";	getFromDB = true;	discrete = false;	break;

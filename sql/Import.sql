@@ -89,6 +89,8 @@ id		bigserial primary key
 
 select count(*) from tempmeas;
 
+truncate table TPtempmeas31;
+
 create table TPtempmeas31(
 Position	geometry(Point,4326),
 Times		char(50),		
@@ -271,7 +273,7 @@ NCell31		integer,		NARFCN31	integer,
 NRxLev31	integer,
 id		bigserial primary key);
 
-create table tempmeas25(
+create table tempmeas18(
 Times		char(50),		
 Longitude	double precision,	Latitude	double precision, Speed	integer,
 Operatorname	char(20),		Operator	char(20),
@@ -384,7 +386,8 @@ NDistance17	real,			NBearing17	real,
 NTech18		char(5),		NCellName18	char(50),
 NCellid18	integer,		NLAC18		integer,
 NCell18		integer,		NARFCN18	integer,
-NRxLev18	integer,		NQual18		integer,
+NRxLev18	integer);
+,		NQual18		integer,
 NDistance18	real,			NBearing18	real,
 NTech19		char(5),		NCellName19	char(50),
 NCellid19	integer,		NLAC19		integer,
@@ -480,7 +483,10 @@ NDistance36	real,			NBearing36	real
 
 insert into tptempmeas31
 select ST_SetSRID(ST_MakePoint(Longitude, Latitude),4326), *
-from tempmeas31;
+from aug2017tempmeas;
+
+insert into aug2017tempmeas 
+select * from tempmeas3;
 
 drop table celllist2017;
 
@@ -1139,4 +1145,43 @@ tempmeasuse2017
 where lac<10000
 and networktech='4G';
 
-select * from servNodesFound;
+truncate table pcimissing;
+
+insert into pcimissing 
+select min(substring(times from 1 for 10)) as eerste, 
+max(substring(times from 1 for 10)) as laaste, count(*) as num,
+ncell8 
+from tempmeasuse2017
+where ntech8='4G' and networktech='4G' and networkmode='LTE'
+and node::integer in (select siteid from sitelist)
+and lac < 10000 and cellid<10 and ncell8 not in 
+(select pci from celllist2017
+where node::integer in 
+(select siteid from sitelist))
+group by ncell8;  
+
+select min(eerste) as eerste, max(laaste) as laaste,  ncell1 as pci, sum(num) as num
+from pcimissing
+where ncell1 in (select nbpci from pcioutofregion)
+group by ncell1
+
+delete from tempmeasuse2017
+where networktech = '4G'
+and networkmode = 'LTE'
+and node::integer not in
+(select siteid from sitelist);
+
+select min(substring(times from 1 for 10)) as eerste, 
+max(substring(times from 1 for 10)) as laaste, 
+arfcn, cellid, psc, count(*) as num
+from tempmeasuse2017
+where  networktech='3G' 
+and lac > 10000 and cellid>2
+and arfcn is not null 
+and psc is not null
+group by cellid, arfcn, psc
+order by cellid, arfcn, psc;  
+
+select count(*) 
+from tempmeasuse2017
+where  networktech='3G';  

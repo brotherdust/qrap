@@ -1698,7 +1698,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	mSouthEast.Display();
 	SE.Display();
 
-
+	cout << "Number of installations in plot:	" << mFixedInsts.size() << endl;
 	cout << "Deleting installations that will not be included in the traffic calculations." << endl;
 	
 	string query = "SELECT distinct radioinstallation_view.id AS radinst"; 
@@ -1752,6 +1752,10 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	unsigned NumInsts = mFixedInsts.size();
 
 	cout << "In cPlottask::DetermineTrafficDist(). NumInsts = " << NumInsts << endl;	
+	for (n=0; n<NumInsts; n++)
+		cout << mFixedInsts[n].sInstKey << "	";
+	cout << endl;
+
 	double *CellTraffic;
 	CellTraffic = new double[NumInsts];
 
@@ -1780,14 +1784,9 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		{
 			if (mPlot[i][j] != mFixedInsts[CurrentRadInstID].sInstKey)
 			{
+				CurrentRadInstID=0;
 				while ((mFixedInsts[CurrentRadInstID].sInstKey!=mPlot[i][j])&&(CurrentRadInstID<NumInsts-1))
 					CurrentRadInstID++;
-				if ((mFixedInsts[CurrentRadInstID].sInstKey!=mPlot[i][j])&&(CurrentRadInstID==NumInsts-1))
-				{
-					CurrentRadInstID=0;
-					while ((mFixedInsts[CurrentRadInstID].sInstKey!=mPlot[i][j])&&(CurrentRadInstID<NumInsts-1))
-						CurrentRadInstID++;
-				}
 			}
 			if (mPlot[i][j] == mFixedInsts[CurrentRadInstID].sInstKey)
 				ClutterArea[CurrentRadInstID][(int)ClutterRaster[i][j]] += PlotRes*PlotRes/1000/1000;
@@ -1803,11 +1802,11 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		TotalsPerClutter[j] = 0.0;
 		for (i=0; i<NumInsts; i++)
 		{
-//			cout << ClutterDist[i][j] << "	";
+//			cout << ClutterArea[i][j] << "	";
 			TotalsPerClutter[j]+=ClutterArea[i][j];
 		}
-//		cout << endl;
-//		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
+		cout << endl;
+		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
 	}
 	
 	unsigned ClutterCount = 0;
@@ -1817,8 +1816,8 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 			ClutterCount++;
 	}
 
-//	cout << "In cPlottask::DetermineTrafficDist(). ClutterCount = " << ClutterCount << endl; 
-//	cout << "In cPlottask::DetermineTrafficDist(). ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl; 
+	cout << "In cPlottask::DetermineTrafficDist(). ClutterCount = " << ClutterCount << endl; 
+	cout << "In cPlottask::DetermineTrafficDist(). ClutterUsed.mNumber = " << ClutterUsed.mNumber << endl; 
 	unsigned *ClutterIndex;
 	ClutterIndex = new unsigned[ClutterCount];
 	for (j=0; j<ClutterCount; j++)
@@ -1829,14 +1828,14 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	j=0;
 	for (j=0; j<=ClutterUsed.mNumber; j++)
 	{
-//		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
+		cout << "j=" <<j <<"	" <<TotalsPerClutter[j] << endl;
 		if ((TotalsPerClutter[j]>0)&&(Index<ClutterCount))
 		{
 			ClutterIndex[Index] = j;
 			Index++;
 		} 
 	}
-//	cout << "Index = " << Index << endl;
+	cout << "Index = " << Index << endl;
 
 	// Implementation of equating derivative to zero
 	mTheMatrix.resize(ClutterCount,ClutterCount);
@@ -1920,13 +1919,22 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		for (j=0; j<=ClutterUsed.mNumber; j++)
 		{
 			TotalsPerInst[i]+=ClutterArea[i][j];
-//			cout << ClutterDist[i][j] << "	";
+			cout << ClutterArea[i][j] << "	";
 		}
-//		cout << endl;
+		cout << endl;
 	}
 
 	mTheMatrix.resize(ClutterCount,ClutterCount);
 	mRight.resize(ClutterCount,1);
+
+	for( m=0; m<ClutterCount; m++)
+	{
+		mRight(m,0)=0.0;
+		for(k=0; k<ClutterCount; k++)
+		{
+			mTheMatrix(m,k) = 0.0;
+		}
+	}
 
 	// Fill in square matrix
 	unsigned *RadInstOrder;

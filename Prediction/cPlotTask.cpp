@@ -906,15 +906,29 @@ bool cPlotTask::CombineCov()
 				if (mPlot[i][j]==0)
 					mPlot[i][j]=-9999;
 	
+//	Calculate % coverage.
+	double CoveredPixels = mRows*mCols;
+	for (i=0;i<mRows;i++)
+		for (j=0;j<mCols;j++)
+			if (mPlot[i][j]<-200)
+				CoveredPixels--;
+
+	double PercCoverage = 100*CoveredPixels/ mRows*mCols;	
+
 	if (mPlotType==SecondServer)
 	{
 		delete_Float2DArray(Test2);
 		delete_Float2DArray(Inst);
 	}
 	cout << " Exiting cPlotTask::CombineCov()" << endl;
-	err = "End of Prediction";
+	err = "End of Prediction: Percentage Coverage = ";
+	char *temp;
+	temp = new char[30];
+	gcvt(PercCoverage,8,temp);
+	err += temp;
 	cout << err << endl;
-//	QRAP_INFO(err.c_str());
+	QRAP_INFO(err.c_str());
+	delete [] temp;
 	return true;
 }
 
@@ -1185,13 +1199,24 @@ bool cPlotTask::InterferencePlot()
 					mPlot[i][j]=-9999;
 	}
 	
+	double CoveredPixels = mRows*mCols;
+	for (i=0;i<mRows;i++)
+		for (j=0;j<mCols;j++)
+			if (mPlot[i][j]<-200)
+				CoveredPixels--;
+
+	double PercCoverage = 100*CoveredPixels/ mRows*mCols;
+
 	if ((mPlotType==PrimIntAd)||(mPlotType==PrimIntCo))
 		delete_Float2DArray(Test2);
-//	cout << " Exiting cPlotTask::InterferencePlot()" << endl;
-//	cout << "In cPlotTask::InterferencePlot()" << endl;
-	err = "End of Interference Prediction";
+	cout << " Exiting cPlotTask::InterferencePlot()" << endl;
+	err = "End of Interference Prediction: Percentage Coverage = ";
+	char *temp;
+	temp = new char[30];
+	gcvt(PercCoverage,8,temp);
+	err += temp;
 	cout << err << endl;
-//	QRAP_INFO(err.c_str());
+	QRAP_INFO(err.c_str());
 	return true;
 }
 

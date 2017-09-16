@@ -958,6 +958,13 @@ position @ ST_GeomFromText('POLYGON((28.0218767 -26.04847747,
 28.03898665 -26.05790988,
 28.0218767 -26.04847747))',4326));
 
+drop table tempmeasUse2017;
+
+create table tempmeasUse2017 as
+(select tptempmeas31.* from tptempmeas31 cross join customareafilter 
+where areaname='Filter2'
+and position @ the_geom);
+
 INSERT INTO customareafilter (areaname,the_geom) VALUES ('Bryanston', 
 ST_GeomFromText('POLYGON((28.0218767 -26.04847747,
 28.00377964 -26.06021314,
@@ -966,6 +973,8 @@ ST_GeomFromText('POLYGON((28.0218767 -26.04847747,
 28.05181911 -26.06898747,
 28.03898665 -26.05790988,
 28.0218767 -26.04847747))',4326));
+
+truncate table customareafilter;
 
 truncate table temprad;
 
@@ -1185,3 +1194,97 @@ order by cellid, arfcn, psc;
 select count(*) 
 from tempmeasuse2017
 where  networktech='3G';  
+
+create table Use2017 as select * from tempmeasuse2017;
+
+delete from use2017
+where 
+node::integer not in (select id from site where sitename is not null)
+and ncell1 not in 
+(select pci from celllist2017 cross join site
+where id=node::integer and sitename is not null)
+and ncell2 not in 
+(select pci from celllist2017 cross join site
+where id=node::integer and sitename is not null)
+and ncell3 not in 
+(select pci from celllist2017 cross join site
+where id=node::integer and sitename is not null);
+
+drop table tpused;
+drop table tpused;
+
+create table tpused as 
+select id as tp from temp2017
+where node is not null
+and node::integer>0
+and cellid is not null
+and ncell1 is not null
+and nrxlev1 is not null
+and accuracy<30
+;
+
+create table TPsequence
+(sq bigserial primary key unique not null,
+tp bigint);
+
+truncate table tpsequence;
+
+insert into TPsequence (tp)
+select tp from tpused
+order by tp;
+
+drop table temp2017; 
+
+create TABLE  Temp2017 as
+select sq, use2017.* 
+from use2017 cross join TPsequence cross join tpUsed
+where use2017.id=TPsequence.tp
+and use2017.id=tpUsed.tp;
+
+drop table tpDistance;
+
+commit;
+
+create table tpDistance as
+(select t0.id as tp0, t1.id as tp1, 
+t0.sq as sq0, t1.sq as sq1, 
+t0.node as n0, t1.node as n1, 
+t0.cellid as c0, t1.cellid as c1, 
+t0.ncell1 as pci0, t1.ncell1 as pci1,
+t0.ncell2 as pci02, t1.ncell2 as pci12,
+t0.ncell3 as pci03, t1.ncell3 as pci13,
+t0.ncell4 as pci04, t1.ncell4 as pci14,
+t0.ncell5 as pci05, t1.ncell5 as pci15,
+t0.lterssi as rxs0, t1.lterssi as rxs1,
+t0.nrxlev1 as rxn0, t1.nrxlev1 as rxn1,
+st_DistanceSphere(t0.position, t1.position) as distance
+from Temp2017 as t0
+cross join Temp2017 as t1
+where t0.sq=t1.sq+1);
+
+delete from tpUsed where tp in
+(select tp0 as tp from tpDistance
+where distance<5
+and abs(rxs1-rxs0)<2
+and abs(rxn1-rxn0)<2
+and sq0%2=0
+and ((n0=n1) or (n0 is null)) 
+and ((pci0=pci1) or (pci0 is null)) 
+and ((c0=c1) or (c0 is null))
+and ((pci02=pci12) or (pci12 is not null))
+and ((pci03=pci13) or (pci13 is not null))
+and ((pci04=pci14) or (pci14 is not null))
+and ((pci05=pci15) or (pci15 is not null))
+);
+
+select count(*) from tpused;
+
+select 1*round(distance/1) as dist, count(*) as num
+ from tpDistance
+ group by dist
+ order by dist;
+ 
+select 1*round(accuracy/1) as accu, count(*) as num
+ from Temp2017
+ group by accu
+ order by accu;

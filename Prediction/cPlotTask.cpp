@@ -2119,7 +2119,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		
 		for (j=0; j < ClutterCount; j++)
 		{
-			if (mTrafficDens(j)<0)
+			if (mTrafficDens(j)<-0.00001)
 				ActiveSet.push_back(j);
 		}
 		for (j=0; j < CurrentActiveSetSize; j++)
@@ -2190,7 +2190,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		while ((m<ClutterCount+1)&&(Solution))
 		{
 			cout << "ClutterIndex=" << ClutterIndex[m] << "	Traffic Density = " << mTrafficDens(m) << endl;
-			Solution = (mTrafficDens(m)>=0);
+			Solution = (mTrafficDens(m)>=-0.000001);
 			m++;
 		}
 		numAttempts++;

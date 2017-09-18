@@ -34,6 +34,7 @@
 #include "cRasterFileHandler.h"
 #include <string>
 #include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
 
 using namespace Eigen;
 

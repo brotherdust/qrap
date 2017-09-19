@@ -1825,8 +1825,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	cout << "In cPlottask::DetermineTrafficDist(). TotalsPerClutter " << endl; 
 	double *TotalsPerClutter;
 	TotalsPerClutter = new double[ClutterUsed.mNumber+1];
-	TotalsPerClutter[0] = 0.0;
-	for (j=1; j<=ClutterUsed.mNumber; j++)
+	for (j=0; j<=ClutterUsed.mNumber; j++)
 	{
 		TotalsPerClutter[j] = 0.0;
 		for (i=0; i<NumInsts; i++)
@@ -1958,13 +1957,14 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	for (i=0;i<CurrentActiveSetSize;i++)
 		OldActiveSet[i]=ActiveSet[i];
 
+	
+/*
+	// first make each induvidual constraint active
 	mTheMatrix.resize(ClutterCount+1,ClutterCount+1);
 	mRight.resize(ClutterCount+1,1);
-
-	if (!Solution) mRight(ClutterCount,0)=0.0;
-	// first make each induvidual constraint active
 	for (j=0; (j<CurrentActiveSetSize)&&(!Solution); j++)
 	{
+		mRight(ClutterCount,0)=0.0;
 		for( m=0; m<ClutterCount+1; m++)
 		{
 			mRight(m,0)=0.0;
@@ -2039,7 +2039,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		return true;
 	}
 	else cout << "In cPlottask::DetermineTrafficDist(): Solution NOT found" << endl; 
-
+*/
 
 	mTheMatrix.resize(ClutterCount+CurrentActiveSetSize,ClutterCount+CurrentActiveSetSize);
 	mRight.resize(ClutterCount+CurrentActiveSetSize,1);
@@ -2116,18 +2116,13 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	while ((numAttempts<=MAXattempts)&&(!Solution))
 	{
 		ActiveSet.clear();
-		
-		for (j=0; j < ClutterCount; j++)
-		{
-			if (mTrafficDens(j)<-0.00001)
-				ActiveSet.push_back(j);
-		}
 		for (j=0; j < CurrentActiveSetSize; j++)
 		{
-			if ((0==mTrafficDens(OldActiveSet[j]))&&(mTrafficDens(j+ClutterCount)>=0))
+			if (((0==mTrafficDens(OldActiveSet[j]))&&(mTrafficDens(j+ClutterCount)>=0))
+				||(mTrafficDens(OldActiveSet[j])<=-0.00001))
 				ActiveSet.push_back(OldActiveSet[j]);
 		}
-		if (CurrentActiveSetSize == ActiveSet.size());
+		if (CurrentActiveSetSize == ActiveSet.size())
 			ActiveSet.erase(ActiveSet.begin() + numAttempts % CurrentActiveSetSize);
 		CurrentActiveSetSize = ActiveSet.size();
 		delete [] OldActiveSet;
@@ -2180,6 +2175,16 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 				mTheMatrix(k,j+ClutterCount) = 0;
 			}
 		}
+		for( m=0; m<ClutterCount+CurrentActiveSetSize; m++)
+		{
+			cout << endl<< mRight(m,0) << endl;			
+			for(k=0; k<ClutterCount+CurrentActiveSetSize; k++)
+			{
+				cout << mTheMatrix(m,k) << "	";
+			}
+		}
+		cout << endl;
+	
 		mTrafficDens = mTheMatrix.fullPivLu().solve(mRight);
 		m=0;
 		Solution = true;
@@ -2187,10 +2192,19 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		// If the traffic density is negative then this is not a solution
 		// If one of the langragian variables is negative then it is not the optimal solution.  
 		cout << "CurrentActiveSetSize = " << CurrentActiveSetSize << endl;
-		while ((m<ClutterCount+1)&&(Solution))
+		while ((m<ClutterCount+CurrentActiveSetSize)&&(Solution))
 		{
 			cout << "ClutterIndex=" << ClutterIndex[m] << "	Traffic Density = " << mTrafficDens(m) << endl;
 			Solution = (mTrafficDens(m)>=-0.000001);
+			m++;
+		}
+		m=0;
+		while ((m<CurrentActiveSetSize)&&(Solution))
+		{
+			cout << "ClutterIndex=" << ClutterIndex[ActiveSet[m]] 
+				<< "	Traffic Density = " << mTrafficDens(ActiveSet[m]) 
+				<< "	lamdda= "<< mTrafficDens(m+ClutterCount) <<	endl;
+			Solution = (0==mTrafficDens(m+ClutterCount)*mTrafficDens(ActiveSet[m]));
 			m++;
 		}
 		numAttempts++;

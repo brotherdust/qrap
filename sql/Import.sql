@@ -1265,8 +1265,8 @@ where t0.sq=t1.sq+1);
 delete from tpUsed where tp in
 (select tp0 as tp from tpDistance
 where distance<5
-and abs(rxs1-rxs0)<2
-and abs(rxn1-rxn0)<2
+and abs(rxs1-rxs0)<3
+and abs(rxn1-rxn0)<3
 and sq0%2=0
 and ((n0=n1) or (n0 is null)) 
 and ((pci0=pci1) or (pci0 is null)) 

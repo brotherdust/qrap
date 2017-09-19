@@ -237,24 +237,24 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	}
 	
 	LoadedRastersList="'";
-	k=mCurrentRasters.size()-1; 
+	k=0; 
 	IsInSet = (mCurrentRasters[k]->IsIn(TxLoc))&&(0==mCurrentRasters[k]->mFileSetLevel);
-	while ((k>0)&&(!IsInSet))
+	while ((k<mCurrentRasters.size())&&(!IsInSet))
 	{
 		LoadedRastersList+=mCurrentRasters[k]->mFilename;
 		LoadedRastersList+="','";
-		k--;
+		k++;
 		IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(TxLoc))&&(0==mCurrentRasters[k]->mFileSetLevel));
 	}
 	if (!IsInSet)
 	{
 		LoadedRastersList+="'";
 		IsInSet = AddRaster(TxLoc,LoadedRastersList);
-		k=mCurrentRasters.size()-1;
+		k=0;
 		IsInSet = mCurrentRasters[k]->IsIn(TxLoc);
-		while ((k>0)&&(!IsInSet))
+		while ((k<mCurrentRasters.size())&&(!IsInSet))
 		{
-			k--;
+			k++;
 			IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(TxLoc));
 		}
 	}
@@ -419,9 +419,9 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 		AddRaster(SitePos,LoadedRastersList);
 	}
 
-	for (j=0; j<8; j++) //Check for preferred files for all the edges.
+	for (j=0; j<12; j++) //Check for preferred files for all the edges.
 	{
-		edge.FromHere(SitePos,Range,j*45);
+		edge.FromHere(SitePos,Range,j*30);
 		IsInSet = false;
 		LoadedRastersList="'";
 		for (i=0; i<mCurrentRasters.size(); i++)
@@ -463,14 +463,14 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 
 //	cout << "NA: " << NumAngles << "	ND: "  << NumDistance << endl;
 
-	k=mCurrentRasters.size()-1; 
+	k=0; 
 	IsInSet = (mCurrentRasters[k]->IsIn(SitePos))&&(0==mCurrentRasters[k]->mFileSetLevel);
 	LoadedRastersList="'";
-	while ((k>0)&&(!IsInSet))
+	while ((k<mCurrentRasters.size())&&(!IsInSet))
 	{
 		LoadedRastersList+=mCurrentRasters[k]->mFilename;
 		LoadedRastersList+="','";
-		k--;
+		k++;
 		IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(SitePos))
 					&&(0==mCurrentRasters[k]->mFileSetLevel));
 	}
@@ -478,11 +478,11 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 	{
 		LoadedRastersList+="'";
 		IsInSet = AddRaster(SitePos,LoadedRastersList);
-		k=mCurrentRasters.size()-1;
+		k=0;
 		IsInSet = mCurrentRasters[k]->IsIn(SitePos);
-		while ((k>0)&&(!IsInSet))
+		while ((k<mCurrentRasters.size())&&(!IsInSet))
 		{
-			k--;
+			k++;
 			IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(SitePos));
 		}
 	}
@@ -983,11 +983,11 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 		query += temp; 
 		query += " AND filename NOT IN ("+LoadedRastersNames;
 		query += ") AND "+ PointString + " <@"+"areasquare;";
-	
+		
 //		cout << query << endl;				
 		if(!gDb.PerformRawSql(query))
 		{
-			string err = "In cRasterFileHandler::AddRaste. Database Select for RasterFile failed. Query: ";
+			string err = "In cRasterFileHandler::AddRaster. Database Select for RasterFile failed. Query: ";
 			err += query;
 			QRAP_WARN(err.c_str());
 		}

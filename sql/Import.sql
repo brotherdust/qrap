@@ -19,6 +19,8 @@ regexp_replace(AntennaPattern, '\\', '_') as antfile,
 *
 from allimport);
 
+select * from tempcells2017 where siteid=5077;
+
 select * from TempCells;
 
 SELECT regexp_matches(substring (CGI from 8 for (char_length(CGI)-7)), '(.*)(\-)(.*)'), CGI
@@ -488,15 +490,14 @@ from aug2017tempmeas;
 insert into aug2017tempmeas 
 select * from tempmeas3;
 
-drop table celllist2017;
-
 create table celllist2017 as
 select lac, node, cellid, arfcn, psc as pci, 
-substring(times from 1 for 10) as datum, count(*) as num
+min(substring(times from 1 for 10)) as begin,
+max(substring(times from 1 for 10)) as einde, count(*) as num
 from tptempmeas31
 where networktech='4G'
 and cellid<10 and psc is not null
-group by lac, node, cellid, arfcn, psc, datum
+group by lac, node, cellid, arfcn, psc
 order by PCI;
 
 create table LTElist2017 as
@@ -1197,20 +1198,18 @@ where  networktech='3G';
 
 create table Use2017 as select * from tempmeasuse2017;
 
-delete from use2017
-where 
+delete from temp2017 where 
 node::integer not in (select id from site where sitename is not null)
 and ncell1 not in 
 (select pci from celllist2017 cross join site
-where id=node::integer and sitename is not null)
+where id=node::integer and sitename is not null);
 and ncell2 not in 
 (select pci from celllist2017 cross join site
-where id=node::integer and sitename is not null)
+where id=node::integer and sitename is not null);
 and ncell3 not in 
 (select pci from celllist2017 cross join site
 where id=node::integer and sitename is not null);
 
-drop table tpused;
 drop table tpused;
 
 create table tpused as 
@@ -1272,9 +1271,8 @@ and ((n0=n1) or (n0 is null))
 and ((pci0=pci1) or (pci0 is null)) 
 and ((c0=c1) or (c0 is null))
 and ((pci02=pci12) or (pci12 is not null))
-and ((pci03=pci13) or (pci13 is not null))
+and ((pci03=pci13) or (pci13 is not null)));
 and ((pci04=pci14) or (pci14 is not null))
-and ((pci05=pci15) or (pci15 is not null))
 );
 
 select count(*) from tpused;
@@ -1288,3 +1286,198 @@ select 1*round(accuracy/1) as accu, count(*) as num
  from Temp2017
  group by accu
  order by accu;
+
+drop table celllistlinked2017;
+
+create table celllistlinked2017 as
+select radioinstallation.id, celllist2017.*
+from celllist2017 left outer join radioinstallation
+on (celllist2017.node::integer=radioinstallation.siteid
+and celllist2017.cellid::integer+1=radioinstallation.sector
+and radioinstallation.techkey=5)
+left outer join cell on (cell.risector=radioinstallation.id);
+
+update celllistlinked2017 set id = 100*node::integer+40+cellid::integer+1
+where id is null;
+
+
+create table temp2017 as select * from measuse2017;
+
+update temp2017 set ncellid8=null
+where ntech8='4G';
+
+
+
+update temp2017 set ncellid1=celllistlinked2017.id
+from celllistlinked2017
+where temp2017.ncell1=celllistlinked2017.pci
+and temp2017.ntech1='4G'
+and temp2017.ncellid1 is null
+
+and substring(temp2017.times from 1 for 10)>= begin
+and substring(temp2017.times from 1 for 10)<= einde
+and temp2017.lac=celllistlinked2017.lac; 
+
+drop table measuse2017;
+create table measuse2017 as select * from temp2017;
+
+truncate table unresolvedPCI;
+
+insert into unresolvedPCI
+select lac, ncell8 as pci, node, cellid, count(*) as num,
+min(substring(temp2017.times from 1 for 10)) as aanvang,
+max(substring(temp2017.times from 1 for 10)) as einde
+from temp2017 
+where ncellid8 is null
+and ntech8='4G'
+group by lac, pci, node, cellid;
+
+select pci as neighbourPCI, node as servingSite, cellid as ci, 
+sum(num) as num, min(aanvang) as firstdate, max(einde) as lastdate 
+from unresolvedPCI 
+group by pci, node, ci
+order by num desc;
+
+delete from unresolvedPCI where cellid>10;
+
+drop table PCIunresolved;
+
+select * from site where id=5077; 
+
+create table PCIunresolved as
+(select lac, node, pci, sum(num) as num, min(begin) as aanvang, max(einde) as einde
+from unresolvedPCI
+group by lac, node, pci);
+
+delete from PCIunresolved where lac>10000;
+
+delete from temp2017 where lac>10000 and networktech='4G';
+
+select PCIunresolved.*, celllistlinked2017.*
+from PCIunresolved cross join celllistlinked2017
+where PCIunresolved.pci = celllistlinked2017.pci;
+
+select pci, sum(Num) as num
+from pciunresolved
+group by pci
+order by num desc;
+
+create table InfoSep2017 (
+OWNER		char(100),	TECHNOLOGY	char(5),	SUBTECH	char(10),	PROPERTY char(30),
+SITEID		integer,	NODEID		char(10),	CellID	char(20),	CellID2	char(20),
+SECTORID	char(10),	Status		char(20),	Antenna	char(50),	
+sector		smallint,	Slot		smallint,	HEIGHT	real,		Azimuth	real,	
+ElectTilt 	real,		MechTilt 	real,		AntennaDesc char(150),
+PropLong	double precision,	PropLat	double precision,
+AntLong		double precision,	AntLat	double precision,			
+ANTENNADEF	char(50));
+
+drop table InfowithEIRPSep2017
+create table InfowithEIRPSep2017 (
+CELL_NAME	char(10),	CellID		char(10),	
+SectorGSM	smallint,	SectorLTE	smallint,	CGI	char(20),
+SITE_ID		integer,	TECHNOLOGY	char(5),	FREQUENCY_BAND	char(10),
+ANTENNA_LONGITUDE	double precision,	ANTENNA_LATITUDE	double precision,
+CellOutputPower	integer,	PCI	integer,	
+ANTENNA_TYPE	char(50),	ANTENNA_AZIMUTH	real,	ANTENNA_BEAMWIDTH	real,
+ANTENNA_MDT	real,		ANTENNA_EDT real,	EIRP	char(10),	
+EIRPnum	real,	HEIGHT	real);
+
+create table extraPCISep2017(
+CELL_NAME	char(10),	SITE_ID		integer,	Sector	smallint,
+TECHNOLOGY	char(5),	FREQUENCY_BAND	integer,	
+ANTENNA_LONGITUDE	double precision,	ANTENNA_LATITUDE	double precision,
+CellOutputPower		integer,	PCI	integer,	ANTENNA_TYPE	char(50),
+ANTENNA_AZIMUTH	real,	ANTENNA_BEAMWIDTH	real,
+ANTENNA_MDT	real,	ANTENNA_EDT		real,		
+EIRPdBM		real,	Height	real);
+
+insert into TempCells2017 
+(antfile,
+cell_name, site_id, sectorLTE, technology, pci, antenna_Longitude, Antenna_Latitude, Antenna_type,
+antenna_azimuth, antenna_beamwidth, antenna_mdt, antenna_edt, EIRPnum, Height) 
+select regexp_replace(Antenna_type, '\\', '_'),
+cell_name, site_id, sector, technology, pci, Antenna_longitude, Antenna_latitude, antenna_type,
+antenna_azimuth, antenna_beamwidth, Antenna_mdt, antenna_edt, EIRPdBM, Height
+from extraPCISep2017
+
+drop table TempCells2017;
+create table TempCells2017 as
+(select
+regexp_replace(Antenna_tyPe, '\\', '_') as antfile,
+InfowithEIRPSep2017.*
+from InfowithEIRPSep2017);
+
+select * from tempcells2017;
+
+insert into radioinstallation
+(id,lastmodified,siteid,sector,techkey,eirp,
+txantennaheight, txantpatternkey, txbearing, txmechtilt,
+rxantennaheight, rxantpatternkey, rxbearing, rxmechtilt)
+select 1469041,now(),14690,1,5,eirpnum,
+height, 558, antenna_azimuth, antenna_mdt,
+height, 558, antenna_azimuth, antenna_mdt
+from tempcells2017
+where site_id=14690;
+
+
+select * from 
+tempcells2017
+where antfile not in
+(select left(patternfile,length(patternfile)-4) from antennapattern)
+order by antfile;
+
+drop table temprad2017;
+create table temprad2017
+(radid integer, siteid integer, sector smallint, technology char(5), techkey integer,
+pci integer, logitude double precision, latitude double precision, 
+antenna char(50), antpatid integer, 
+azimuth real, mechtilt real, electilt real, eirp real, height real);
+
+truncate table temprad2017;
+insert into temprad2017
+(select site_id*100+40+sectorlte as radid, site_id, sectorlte as sector,
+technology, 5 as techkey, pci, antenna_longitude,  antenna_latitude, antfile, antennapattern.id,
+antenna_azimuth, antenna_mdt, antenna_edt, eirpnum, height
+from tempcells2017 cross join antennapattern 
+where antfile=left(patternfile, length(patternfile)-4)
+and technology='LTE' and left(antfile,1)<>'U'); 
+
+select * from radioinstallation; 
+
+update radioinstallation set
+id=radid, lastmodified=now(), siteid=temprad2017.siteid, sector=temprad2017.sector, 
+eirp=temprad2017.eirp, 
+txantennaheight=height, txantpatternkey=antpatid, txbearing=azimuth, txmechtilt=mechtilt,
+rxantennaheight=height, rxantpatternkey=antpatid, rxbearing=azimuth, rxmechtilt=mechtilt
+from temprad2017 
+where id=radid 
+
+
+not in 
+(select id from radioinstallation)
+
+order by radid; 
+
+update radioinstallation set eirp=temprad2017 
+
+create table sitelist2017 as 
+select distinct SITEID, PropLong as longitude, PropLat as Latitude
+from InfoSep2017;
+
+insert into sitelist2017
+select Site_ID, Antenna_longitude, Antenna_latitude 
+from extraPCISep2017;
+
+select * from sitelist2017;
+
+insert into site 
+(id, status, location)
+select distinct siteid, 'Operational', 
+ST_SetSRID(ST_MakePoint(Logitude, Latitude),4326)
+from temprad2017
+where siteid not in
+(select id from site);
+
+select * from site; 
+

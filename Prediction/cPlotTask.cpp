@@ -1952,10 +1952,16 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		}
 	}
 	unsigned CurrentActiveSetSize = ActiveSet.size();
+	unsigned OriginalSetSize = ActiveSet.size();
 	unsigned *OldActiveSet;
+	unsigned *OriginalSet;
 	OldActiveSet = new unsigned[CurrentActiveSetSize];
+	OriginalSet = new unsigned[OriginalSetSize];
 	for (i=0;i<CurrentActiveSetSize;i++)
+	{
 		OldActiveSet[i]=ActiveSet[i];
+		OriginalSet[i]=ActiveSet[i];
+	}
 
 	
 /*
@@ -2116,10 +2122,16 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	while ((numAttempts<=MAXattempts)&&(!Solution))
 	{
 		ActiveSet.clear();
+		for (j=0; j < OriginalSetSize; j++)
+		{
+			if (mTrafficDens(OriginalSet[j])<-0.00001)
+			{
+				ActiveSet.push_back(OriginalSet[j]);
+			}
+		}
 		for (j=0; j < CurrentActiveSetSize; j++)
 		{
-			if (((0==mTrafficDens(OldActiveSet[j]))&&(mTrafficDens(j+ClutterCount)>=0))
-				||(mTrafficDens(OldActiveSet[j])<=-0.00001))
+			if ((0==mTrafficDens(OldActiveSet[j]))&&(mTrafficDens(j+ClutterCount)>=0))
 				ActiveSet.push_back(OldActiveSet[j]);
 		}
 		if (CurrentActiveSetSize == ActiveSet.size())

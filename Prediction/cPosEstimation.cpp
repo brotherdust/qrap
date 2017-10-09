@@ -52,8 +52,8 @@ cPosEstimation::cPosEstimation() // default constructor
 	mPathLoss= new cPathLossPredictor();
 	mLTEsim = false;
 	mOriginal = true;
-	mUMTS = false;
-	mTAUnknown = true;
+	mUMTSsim = false;
+	mTAUnknown = false;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -417,6 +417,8 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 		pqxx::result MeasSelect;
 
 		query ="SELECT distinct servrad.siteid as ssite, tp2.servci as servci, measurement.tp as tp,  ";
+		query += "tp2.imei as imei, extract(hour from timeofmeas) as uur, ";
+		query += "extract(minute from timeofmeas)*60+extract(sec from timeofmeas) as sek, ";
 		query += "measurement.id as mid, ST_AsText(testpoint.location) as origLocation, ";
 		query += "rad.siteid as nsite, ST_AsText(site.location) as nsiteLocation, rad.id as InstKeyFixed, ";
 		query += "rad.txantennaheight as antheight, rad.EIRP as EIRP, rad.txbearing as bearing, "; 
@@ -488,14 +490,14 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 			gcvt(PosSource,9,text);
 			query += text;
 		}
-		if (Technology>0)
+/*		if (Technology>0)
 		{
 			query += " and Technology.id=";
 			gcvt(Technology,9,text);
 			query += text;
 		}
-		query+=" group by ssite, tp2.servci, nsite, mid, InstKeyFixed, azibeamwidth, origLocation, "; 
-		query+=" measurement.frequency, measurement.tp, tp1.TA, ci, nsiteLocation, cell.centriod, DistRes ";
+*/		query+=" group by timeofmeas, ssite, tp2.servci, nsite, mid, InstKeyFixed, azibeamwidth, origLocation, "; 
+		query+=" tp2.imei, measurement.frequency, measurement.tp, tp1.TA, ci, nsiteLocation, cell.centriod, DistRes ";
 		query+=" order by ssite, tp2.servci, measurement.tp, TA, measvalue desc;";
 
 		cout << query << endl;
@@ -567,7 +569,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 					NewMeasurement.sCellID = atoi(r[i]["ci"].c_str());
 					PointString = r[i]["centriod"].c_str();
 					spacePos = PointString.find_first_of(' ');
-					cout << PointString << "	space:" << spacePos << endl;
+//					cout << PointString << "	space:" << spacePos << endl;
 					if ((spacePos>0)&&(spacePos<35))
 					{
 						longitude = atof((PointString.substr(6,spacePos).c_str())); 
@@ -592,13 +594,19 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 					else if (NewMeasurement.sAzimuth<-180)
 						NewMeasurement.sAzimuth+=360;
 					NewMeasurement.sTA = atoi(r[i]["TA"].c_str());
+					NewMeasurement.sIMEI = atof(r[i]["imei"].c_str());
+					NewMeasurement.sHour = atof(r[i]["uur"].c_str());
+					NewMeasurement.sSeconds = atof(r[i]["sek"].c_str());
+//					cout << " IMEI: " << NewMeasurement.sIMEI << "	Uur: " << NewMeasurement.sHour
+//						<< "	Sek: " << NewMeasurement.sSeconds << endl;
 					NewMeasurement.sBeamWidth = atof(r[i]["azibeamwidth"].c_str());
 					NewMeasurement.sTilt = atof(r[i]["tilt"].c_str());
 					NewMeasurement.sHeight = atof(r[i]["antheight"].c_str());
+
 //					cout << "	Height = " <<  NewMeasurement.sHeight << endl;
 					NewMeasurement.sDistance = 999999;
 					NewMeasurement.sServingCell = false;
-					NewMeasurement.sResDist = 553.5;
+//					NewMeasurement.sResDist = 156.14;
 					if (strlen(r[i]["TA"].c_str())>0)
 					{
 						NewMeasurement.sServingCell = true;
@@ -612,7 +620,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 							Distance = Distance + addDist;
 						}
 
-						if (mUMTS)
+						if (mUMTSsim)
 						{
 							NewMeasurement.sResDist = 38;
 							addDist =  50.0*distError(LTEdistance);
@@ -731,7 +739,7 @@ void cPosEstimation::EstimatePositions()
 
 			if (ANNrun())
 			{
-				CI();
+/*				CI();
 				if (mPosSets[mCurPosI].sMeasurements[0].sDistance<120001)		
 				{
 					CoSinRule();
@@ -742,7 +750,7 @@ void cPosEstimation::EstimatePositions()
 				DCM_ParticleSwarm();
 				ExhaustiveSearch();
 //				DCM_CMA_ES();
-			
+*/			
 				cout << endl << "# " << mCurPosI << endl;
 				for (j=0; j<mPosSets[mCurPosI].sTestPoints.size(); j++)
 				{
@@ -1069,7 +1077,6 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 //
 double cPosEstimation::SearchDistance(double Azimuth, double min, double max)
 {
-	
 	int i;
 	int StopNum = ceil((max-min)/mPlotResolution);
 //	cout << "In cPosEstimation::SearchDistance    StopNum = " << StopNum << "	mPlotResolution = " << mPlotResolution 
@@ -2114,7 +2121,7 @@ bool cPosEstimation::ExhaustiveSearch()
 	delete [] NbestPhi;
 	delete [] NbestValue;
 
-//	cout << "In cPosEstimation::DCM_ParticleSwarm() tata" << endl;	
+//	cout << "In cPosEstimation::Exhaustive tata" << endl;	
 	return true;
 }
 
@@ -2714,8 +2721,12 @@ bool cPosEstimation::ANNrun()
 	{
 		Input[3*q+5] = -1; // scaled
 		Input[3*q+6] = -1; // scaled
-		Input[3*q+7] = (945+FREQ_OFFSET)*FREQ_SCALE; 	
+		Input[3*q+7] = (1822.7+FREQ_OFFSET)*FREQ_SCALE; 	
 	}
+	Input[3*q+5] = (mPosSets[mCurPosI].sMeasurements[0].sIMEI-355441066956633.5)/2947003210268.5;
+	Input[3*q+6] = (mPosSets[mCurPosI].sMeasurements[0].sHour-16)/4;
+	Input[3*q+7] = (mPosSets[mCurPosI].sMeasurements[0].sSeconds-1800)/1800;
+//	cout << " IMEI: " << Input[3*q+5] << "	Uur: " << Input[3*q+6] << "	Sek: " << Input[3*q+7] << endl;
 
 	for (p=0; p<mPosSets[mCurPosI].sNumMeas; p++)
 	{
@@ -2762,7 +2773,7 @@ bool cPosEstimation::ANNrun()
 	mPosSets[mCurPosI].sTestPoints.push_back(newTestPoint);
 	mNewTP++;
 
-	newTestPoint2.sOriginalTP = mPosSets[mCurPosI].sTestPoints[0].sOriginalTP;
+/*	newTestPoint2.sOriginalTP = mPosSets[mCurPosI].sTestPoints[0].sOriginalTP;
 	newTestPoint2.sOriginalLocation = mPosSets[mCurPosI].sTestPoints[0].sOriginalLocation;
 	newTestPoint2.sMethodUsed = ANNangleLineSearch;
 	newTestPoint2.sAzimuth = newTestPoint.sAzimuth;
@@ -2777,7 +2788,7 @@ bool cPosEstimation::ANNrun()
 	newTestPoint2.sNewTP = mNewTP;	
 	mPosSets[mCurPosI].sTestPoints.push_back(newTestPoint2);
 	mNewTP++;
-
+*/
 //	cout << " In cPosEstimation::ANNrun(): before delete" << endl;
 
 //	if (Input!=NULL) delete [] Input;

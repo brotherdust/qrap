@@ -33,7 +33,7 @@ cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 {
 	mLTEsim = false;
 	mOriginal = true; 
-	mUMTS = false;
+	mUMTSsim = false;
 	mNumSites = 0;
 }
 
@@ -95,6 +95,7 @@ bool cTrainPosNetDistAngle::LoadSites(vPoints Points,
 					unsigned PosSource,
 					unsigned Technology)
 {
+	// Get List of all sites that is picked up in the measurements
 
 	if (Points.size() < 2)
 	{
@@ -123,16 +124,16 @@ bool cTrainPosNetDistAngle::LoadSites(vPoints Points,
 	for (i = 0 ; i < Points.size();i++)
   	{
 		Points[i].Get(Lat, Lon);
-     	mNorth = max(mNorth,Lat);
-     	mSouth = min(mSouth,Lat);
-     	mEast = max(mEast,Lon);
-     	mWest = min(mWest,Lon);
+	     	mNorth = max(mNorth,Lat);
+	     	mSouth = min(mSouth,Lat);
+	     	mEast = max(mEast,Lon);
+	     	mWest = min(mWest,Lon);
 		gcvt(Lon,12,text);
-     	areaQuery += text;
-     	areaQuery += " ";
+	     	areaQuery += text;
+	     	areaQuery += " ";
 		gcvt(Lat,12,text);
-     	areaQuery += text;
-     	areaQuery += ",";
+	     	areaQuery += text;
+	     	areaQuery += ",";
   	}
 
   	NorthWestCorner.Set(mNorth,mWest,DEG);
@@ -152,10 +153,10 @@ bool cTrainPosNetDistAngle::LoadSites(vPoints Points,
 	query = "select siteid, sitelocation, ci from ";
 	query += "(select siteid, ST_AsText(site.location) as siteLocation, ";
 	query += "ci, count(measurement.tp) as numPoints ";
-	query += "from measurement cross join testpointauxGSM cross join cell ";
+	query += "from measurement cross join testpointauxLTE cross join cell ";
 	query += "cross join radioinstallation cross join site ";
 	query += "where servci=cell.id and cell.risector = radioinstallation.id ";
-	query += "and measurement.tp=testpointauxGSM.tp and siteid =site.id ";
+	query += "and measurement.tp=testpointauxLTE.tp and siteid =site.id ";
 	query += "and site.location";
 	query += areaQuery;
 	query += "group by siteid, ci, site.location ";
@@ -198,7 +199,7 @@ bool cTrainPosNetDistAngle::LoadSites(vPoints Points,
 				{
 //					cout << "cTrainPosNetDistAngle::Sites: Site in list. SiteID = " 
 //						<< NewSite.sSiteID << endl;
-					NewSite.sNumInputs = 3*NewSite.sCellSet.size() + 5;
+					NewSite.sNumInputs = 3*NewSite.sCellSet.size() + 8;
 					mSites.push_back(NewSite);
 					NewSite.sCellSet.clear();
 					NewSite.sMaxDist = 0;
@@ -224,7 +225,7 @@ bool cTrainPosNetDistAngle::LoadSites(vPoints Points,
 		if (NewSite.sSiteID>0)
 		{
 			cout << "cTrainPosNetDistAngle::LoadMeasurements: Site in list. SiteID = " << NewSite.sSiteID << endl;
-			NewSite.sNumInputs = 3*NewSite.sCellSet.size() + 5;
+			NewSite.sNumInputs = 3*NewSite.sCellSet.size() + 8;
 			mSites.push_back(NewSite);
 			NewSite.sCellSet.clear();
 		}
@@ -332,7 +333,10 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
   	areaQuery += text;
   	areaQuery += "))',4326) ";
 
-	query = "select distinct siteid, min(txbearing) as antbearing, ci, ";
+	query = "select distinct ";
+	query += "tp2.imei as imei, extract(hour from timeofmeas) as uur, ";
+	query += "extract(minute from timeofmeas)*60+extract(sec from timeofmeas) as sek, ";
+	query += "siteid, min(txbearing) as antbearing, ci, cell.id as scell, ";
 	query += "testpoint.id as tp, ST_AsText(testpoint.location) as origLocation, ";
 	query += "measurement.id as mid, measvalue, frequency, EIRP, tp1.TA as TA, ";
 	query += "technology.DistRes as DistRes ";
@@ -367,14 +371,15 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 		gcvt(PosSource,9,text);
 		query += text;
 	}
-	if (Technology>0)
+/*	if (Technology>0)
 	{
 		query += " and Technology.id=";
 		gcvt(Technology,9,text);
 		query += text;
 	}
-	query += " group by siteid, testpoint.id, tp1.TA, mid, ci, measvalue, frequency, EIRP, DistRes ";
-	query += "order by siteid, tp, TA, measvalue desc;";
+*/	query += " group by tp2.imei, uur, sek, scell, siteid, testpoint.id, ";
+	query += "tp1.TA, mid, ci, measvalue, frequency, EIRP, DistRes ";
+	query += "order by siteid, imei, tp, TA, measvalue desc;";
 	cout << query << endl;
 
 	if (!gDb.PerformRawSql(query))
@@ -454,6 +459,7 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 						NewPosSet.sTestPoints.clear();
 						NewPosSet.sMeasurements.clear();
 					}
+
 					NumInPosSet = 0;
 					NewTestPoint.sOriginalTP = tp;
 					PointString = r[i]["origLocation"].c_str();
@@ -463,13 +469,18 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 					NewTestPoint.sOriginalLocation.Set(latitude,longitude,DEG);
 					NewTestPoint.sServCellAzimuth = atof(r[i]["antbearing"].c_str());
 					NewTestPoint.sServSite = atoi(r[i]["siteid"].c_str()); 
-		
+					NewTestPoint.sIMEI = atof(r[i]["imei"].c_str()); 
+					NewTestPoint.sHour = atof(r[i]["uur"].c_str()); 
+					NewTestPoint.sSeconds = atof(r[i]["sek"].c_str()); 
+//					cout << "Query ... IMEI: " << NewTestPoint.sIMEI << "	Uur: " << NewTestPoint.sHour
+//						<< "	Sek: " << NewTestPoint.sHour << endl;
+
 //					NewTestPoint.sOriginalLocation.Display();
 //					mSites[siteIndex].sPosition.Display();
 					Distance =mSites[siteIndex].sPosition.Distance(NewTestPoint.sOriginalLocation);
 					NewTestPoint.sDistance = Distance;
 					NewTestPoint.sResDist = atof(r[i]["DistRes"].c_str());
-					NewTestPoint.sResDist = 553.5;
+//					NewTestPoint.sResDist = 156.14;
 						
 					if (mLTEsim)
 					{
@@ -480,7 +491,7 @@ bool cTrainPosNetDistAngle::LoadMeasurements(vPoints Points,
 						Distance = Distance + addDist;
 					}
 
-					if (mUMTS)
+					if (mUMTSsim)
 					{
 						NewTestPoint.sResDist = 38;
 						addDist =  50.0*distError(LTEdistance);
@@ -633,6 +644,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 	TestIndex = 0;
 
 	for (i=0; i<mNumSites; i++)
+//	for (i=26; i<mNumSites; i++)
 	{
 		cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;
 		cout << "	mSites[i].sNumOutputsA = " << mSites[i].sNumOutputsA;
@@ -685,14 +697,22 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 								*mPosSetsTrain[TrainIndex].sTestPoints[0].sResDist 
 								- 4*mSites[i].sMaxDist/9)/mSites[i].sMaxDist;
 				mSites[i].sInputTrain[j][4] = (mPosSetsTrain[TrainIndex].sTestPoints[0].sResDist)/600;
+
 				mSites[i].sInputTrain[j][0] = 1;
 	
 				for (q=0; q<mSites[i].sCellSet.size(); q++)
 				{
 					mSites[i].sInputTrain[j][3*q+5] = -1; // scaled
 					mSites[i].sInputTrain[j][3*q+6] = -1; // scaled
-					mSites[i].sInputTrain[j][3*q+7] = (945+FREQ_OFFSET)*FREQ_SCALE; 	
+					mSites[i].sInputTrain[j][3*q+7] = (1822.7+FREQ_OFFSET)*FREQ_SCALE; 	
 				}
+				mSites[i].sInputTrain[j][3*q+5] = (double(mPosSetsTrain[TrainIndex].sTestPoints[0].sIMEI)
+									-355441066956633.5)/2947003210268.5;
+				mSites[i].sInputTrain[j][3*q+6] = (double(mPosSetsTrain[TrainIndex].sTestPoints[0].sHour)-16.0)/4.0;
+				mSites[i].sInputTrain[j][3*q+7] = (double(mPosSetsTrain[TrainIndex].sTestPoints[0].sSeconds)-1800.0)/1800.0;
+//				cout << "IMEI: " << mSites[i].sInputTrain[j][3*q+5] 
+//					<< "	Uur: " << mSites[i].sInputTrain[j][3*q+6]
+//					<< "	Sek: " << mSites[i].sInputTrain[j][3*q+7] << endl;
 
 				mSites[i].sOutputDistTrain[j][0] = 1.8*(mPosSetsTrain[TrainIndex].sTestPoints[0].sDistance 
 									- 4*mSites[i].sMaxDist/9)/mSites[i].sMaxDist;
@@ -772,8 +792,12 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 				{
 					mSites[i].sInputTest[j][3*q+5] = -1; // scaled
 					mSites[i].sInputTest[j][3*q+6] = -1; // scaled
-					mSites[i].sInputTest[j][3*q+7] = (945+FREQ_OFFSET)*FREQ_SCALE; 	
+					mSites[i].sInputTest[j][3*q+7] = (1822.7+FREQ_OFFSET)*FREQ_SCALE; 	
 				}
+				mSites[i].sInputTest[j][3*q+5] = (double(mPosSetsTest[TestIndex].sTestPoints[0].sIMEI)
+									-355441066956633.5)/2947003210268.5;
+				mSites[i].sInputTest[j][3*q+6] = (double(mPosSetsTest[TestIndex].sTestPoints[0].sHour)-16.0)/4.0;
+				mSites[i].sInputTest[j][3*q+7] = (double(mPosSetsTest[TestIndex].sTestPoints[0].sSeconds)-1800.0)/1800.0;
 
 				mSites[i].sOutputDistTest[j][0] = 1.8*(mPosSetsTest[TestIndex].sTestPoints[0].sDistance 
 								- 4*mSites[i].sMaxDist/9)/mSites[i].sMaxDist;

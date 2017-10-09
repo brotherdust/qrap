@@ -127,8 +127,11 @@ struct tMeas
 	double		sAzimuth;
 	double 		sBeamWidth;
 	double		sDistance;
-	int		sTA; 		// this could be GSM TA or UMTS timeDiff
+	int		sTA; 		// this could be GSM/LTE TA or UMTS timeDiff
 	double 		sResDist;
+	double		sIMEI;		// the IMEI of the measurement phone
+	double		sHour;		// the hour of the measurement
+	double		sSeconds;	// the second within the hour (between 0 and 3600)
 };
 
 typedef	vector<tMeas> vMeas;
@@ -241,7 +244,7 @@ class cPosEstimation
 	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
 	vSiteInfo mSites;
 	bool mLTEsim;
-	bool mUMTS;	
+	bool mUMTSsim;	
 	bool mOriginal;
 	bool mTAUnknown;
 	bool mUseAntANN;

@@ -1,5 +1,7 @@
 update testpoint set measdatasource=1;
 
+select * from tptempmeas31;
+
 drop table allimport;
 
 create table allImport(
@@ -18,6 +20,15 @@ regexp_matches(substring (CGI from 8 for (char_length(CGI)-7)), '(.*)(\-)(.*)') 
 regexp_replace(AntennaPattern, '\\', '_') as antfile,
 *
 from allimport);
+
+create table allgsmcelllist(
+MSC	char(10),	BSC	char(10),	SITE	char(10),
+siteid	integer,	CELL	chAR(12),	cellid	INTEGER,
+bcchno	INTEGER,	ncc	SMALLINT,	bcc	SMALLINT,
+BSIC	INTEGER,	lac	INTEGER,	ci	INTEGER,
+CGIC	CHAR(20),	CI2	iNTEGER,	LLAC	BIGINT,
+MNCLL	bIGINT,		CGI	BIGINT);
+
 
 select * from tempcells2017 where siteid=5077;
 
@@ -93,7 +104,7 @@ select count(*) from tempmeas;
 
 truncate table TPtempmeas31;
 
-create table TPtempmeas31(
+create table TPtempmeas6GSM(
 Position	geometry(Point,4326),
 Times		char(50),		
 Longitude	double precision,	Latitude	double precision, Speed	integer,
@@ -102,8 +113,8 @@ CGI		bigint,			Cellname	char(30),	Node	char(20),
 CellID		integer,		LAC		integer,
 NetworkTech	char(10),		NetworkMode	char(10),
 RxLev		integer,		Qual		integer,	
-SNR		real,			CQI		real,
-LTERSSI		integer,		ARFCN		integer,
+SNR		char(5),		CQI		char(5),
+LTERSSI		char(5),		ARFCN		integer,
 DL_bitrate	integer,		UL_bitrate	integer,	PSC	integer,
 Altitude	real,			Height		real,		Accuracy	real,
 Location	char(3),		Status		char(3),
@@ -147,7 +158,9 @@ NDistance5	real,			NBearing5	real,
 NTech6		char(5),		NCellName6	char(50),
 NCellid6	integer,		NLAC6		integer,
 NCell6		integer,		NARFCN6		integer,
-NRxLev6		integer,		NQual6		integer,
+NRxLev6		integer,
+id		bigserial primary key);
+		NQual6		integer,
 NDistance6	real,			NBearing6	real,
 NTech7		char(5),		NCellName7	char(50),
 NCellid7	integer,		NLAC7		integer,
@@ -275,7 +288,8 @@ NCell31		integer,		NARFCN31	integer,
 NRxLev31	integer,
 id		bigserial primary key);
 
-create table tempmeas18(
+drop table tempmeas36GSM;
+create table tempmeas6GSM(
 Times		char(50),		
 Longitude	double precision,	Latitude	double precision, Speed	integer,
 Operatorname	char(20),		Operator	char(20),
@@ -283,8 +297,8 @@ CGI		bigint,			Cellname	char(30),	Node	char(20),
 CellID		integer,		LAC		integer,
 NetworkTech	char(10),		NetworkMode	char(10),
 RxLev		integer,		Qual		integer,	
-SNR		real,			CQI		real,
-LTERSSI		integer,		ARFCN		integer,
+SNR		char(5),		CQI		char(5),
+LTERSSI		char(5),		ARFCN		integer,
 DL_bitrate	integer,		UL_bitrate	integer,	PSC	integer,
 Altitude	real,			Height		real,		Accuracy	real,
 Location	char(3),		Status		char(3),
@@ -328,7 +342,8 @@ NDistance5	real,			NBearing5	real,
 NTech6		char(5),		NCellName6	char(50),
 NCellid6	integer,		NLAC6		integer,
 NCell6		integer,		NARFCN6		integer,
-NRxLev6		integer,		NQual6		integer,
+NRxLev6		integer);
+,		NQual6		integer,
 NDistance6	real,			NBearing6	real,
 NTech7		char(5),		NCellName7	char(50),
 NCellid7	integer,		NLAC7		integer,
@@ -388,8 +403,7 @@ NDistance17	real,			NBearing17	real,
 NTech18		char(5),		NCellName18	char(50),
 NCellid18	integer,		NLAC18		integer,
 NCell18		integer,		NARFCN18	integer,
-NRxLev18	integer);
-,		NQual18		integer,
+NRxLev18	integer,		NQual18		integer,
 NDistance18	real,			NBearing18	real,
 NTech19		char(5),		NCellName19	char(50),
 NCellid19	integer,		NLAC19		integer,
@@ -483,12 +497,18 @@ NRxLev36	integer,		NQual36		integer,
 NDistance36	real,			NBearing36	real
 );
 
-insert into tptempmeas31
+truncate table tptempmeas6GSM;
+
+insert into tptempmeas6GSM
 select ST_SetSRID(ST_MakePoint(Longitude, Latitude),4326), *
-from aug2017tempmeas;
+from tempmeas6GSM;
+
+truncate table aug2017tempmeas;
 
 insert into aug2017tempmeas 
-select * from tempmeas3;
+select * from tempmeas31;
+
+drop table celllist2017;
 
 create table celllist2017 as
 select lac, node, cellid, arfcn, psc as pci, 
@@ -499,6 +519,24 @@ where networktech='4G'
 and cellid<10 and psc is not null
 group by lac, node, cellid, arfcn, psc
 order by PCI;
+
+
+
+select * from celllist2017;
+
+drop table find294;
+
+create table Find293 as
+
+insert into find293
+select position, node, cellid, rxlev, lterssi, ncell8 as ncell, nrxlev8 as nrxlev
+from tptempmeas31
+where networktech='4G' and ntech8='4G' and ncell8=293
+;
+
+
+
+select max(timeofmeas), min(timeofmeas) from testpoint;
 
 create table LTElist2017 as
 select node, cellid, pci, sum(num) as num 
@@ -525,7 +563,7 @@ create table unfoundPCI as
 insert into unfoundPCI
 select lac, node as servnode, cellid as servCI, 
 9 as NBrank, ncell9 as unknownPCI, count(*) as num
-from tempmeasUse2017
+from 
 where networktech='4G' 
 and lac<20000
 and ntech9='4G'
@@ -705,10 +743,6 @@ from CellsInList
 where siteid not in
 (select id from site)
 and occur > 80;
-
-delete from site where sitename is null;
-delete from radioinstallation where siteid not in 
-(select id from site);
 
 create table tempLTEsite as 
 (select cast(trim(both 'L' from sitelnumber) as int) as siteid, 
@@ -947,9 +981,9 @@ and cellid not in
 and allnum>80
 order by allnum desc;
 
-drop table tempmeasUse2017;
+drop table ;
 
-create table tempmeasUse2017 as
+create table  as
 (select * from tptempmeas31 where
 position @ ST_GeomFromText('POLYGON((28.0218767 -26.04847747,
 28.00377964 -26.06021314,
@@ -959,9 +993,9 @@ position @ ST_GeomFromText('POLYGON((28.0218767 -26.04847747,
 28.03898665 -26.05790988,
 28.0218767 -26.04847747))',4326));
 
-drop table tempmeasUse2017;
+drop table ;
 
-create table tempmeasUse2017 as
+create table  as
 (select tptempmeas31.* from tptempmeas31 cross join customareafilter 
 where areaname='Filter2'
 and position @ the_geom);
@@ -1013,6 +1047,8 @@ and ci not in (select id from cell);
 
 select * from cellsinlist;
 
+truncate table tpused;
+
 
 select * from antennapattern 
 order by patternfile;
@@ -1029,12 +1065,82 @@ where ncellid6 not in
 (select id from cell);
 
 insert into testpoint
-(id, timeofmeas, originaltp, height, location)
+(id, timeofmeas, originaltp, measdatasource, positionsource, meastype, height, location)
 (select id,
-cast(('2016-11-24 '||substr(times,12,2)||':'||substr(times,15,2)||':'||substr(times,18,2)) as timestamp),
-id, 1.5 as height, position
-from tempmeasuse);
+cast((substr(times,1,4)||'-'||substr(times,6,2)||'-'||substr(times,9,2)||' '||substr(times,12,2)||':'||substr(times,15,2)||':'||substr(times,18,2)) as timestamp),
+id, 1,1,1,1 as height, position
+from tptempmeas31);
 
+select * from tptempmeas6GSM;
+
+create table testpointauxLTE
+(id bigserial primary key unique not null,
+tp bigint references testpoint(id),
+servci integer references cell(id) on delete cascade,
+TA integer,
+rxlev integer,
+qual integer,
+snr integer,
+lterssi integer);
+
+insert into testpointauxLTE
+(id, tp, servci, ta, rxlev, qual, snr, lterssi)
+select id, id, node::integer*100+41+cellid as servci, ta, rxlev, qual, snr, lterssi
+from tptempmeas31
+where networktech='4G' 
+and networkmode='LTE'
+and arfcn=1377
+and cellid<10 and lac>5000 
+and ta is not null 
+and lterssi is not null
+and node is not null
+and cellid is not null
+and node::integer*100+41+cellid in (select id from cell);
+
+insert into testpointauxGSM
+(id, tp, servci, msrxpower)
+select id, id, cellid as servci, rxlev
+from tptempmeas6GSM
+where cellid is not null
+and cellid in (select id from cell);
+
+select distinct siteid, cell, ci, count(8)
+from tptempmeas6GSM cross join allgsmcelllist
+where tptempmeas6GSM.cellid=ci
+and tptempmeas6GSM.cellid not in (select id from cell)
+group by siteid, cell, ci;
+
+truncate table measurement;
+
+insert into measurement
+(ci, tp, frequency, measvalue)
+select cellid, id, 950, rxlev
+from tptempmeas6GSM
+where rxlev is not null
+and cellid is not null
+and cellid in (select id from cell);
+
+select tp, ci, count(*) as num
+from measurement
+group by tp,ci
+order by num desc;
+
+insert into measurement
+(ci, tp, frequency, measvalue)
+select ncellid8 as ci, id, 1822.7, nrxlev8
+from tptempmeas31
+where networktech='4G' 
+and networkmode='LTE'
+and arfcn=1377
+and cellid<10 and lac<5000 
+and ta is not null 
+and lterssi is not null
+and node is not null
+and cellid is not null
+and ntech8='4G'
+and ncellid8 in (select id from cell);
+
+ 
 insert into measurement
 (ci, tp, measvalue)
 select ncellid6, id, nrxlev6
@@ -1132,10 +1238,11 @@ select count(*) from test;
 drop table LTEta;
 
 create table LTEta as 
-select tptempmeas.id as tp, 
+select temp2017.id as tp, node, cellid,
 round(CAST(ST_Distance_Spheroid(site.location, position, 'SPHEROID["WGS 84",6378137,298.257223563]') As numeric),2) As distance, ta
-from site cross join tptempmeas
+from site cross join temp2017
 where site.id=cast(node as int);
+
 
 drop table LTEsimta;
 
@@ -1144,14 +1251,20 @@ select LTEta.*, round(distance/156.142-0.5) as simTA, ta-round(distance/156.142-
 from LTEta
 order by distance desc;
 
-select delta, count(*)
+
+
+delete from use2017 
+using LTEsimta where delta>4
+and use2017.id=LTEsimta.tp;
+
+select avg(delta) as gimerr, stddev(delta) as dev, node
 from LTEsimta
-group by delta
-order by delta;
+group by node
+order by gimerr;
 
 create table ServNodesFound as
 select distinct node from 
-tempmeasuse2017
+
 where lac<10000
 and networktech='4G';
 
@@ -1161,7 +1274,7 @@ insert into pcimissing
 select min(substring(times from 1 for 10)) as eerste, 
 max(substring(times from 1 for 10)) as laaste, count(*) as num,
 ncell8 
-from tempmeasuse2017
+from 
 where ntech8='4G' and networktech='4G' and networkmode='LTE'
 and node::integer in (select siteid from sitelist)
 and lac < 10000 and cellid<10 and ncell8 not in 
@@ -1175,16 +1288,10 @@ from pcimissing
 where ncell1 in (select nbpci from pcioutofregion)
 group by ncell1
 
-delete from tempmeasuse2017
-where networktech = '4G'
-and networkmode = 'LTE'
-and node::integer not in
-(select siteid from sitelist);
-
 select min(substring(times from 1 for 10)) as eerste, 
 max(substring(times from 1 for 10)) as laaste, 
 arfcn, cellid, psc, count(*) as num
-from tempmeasuse2017
+from 
 where  networktech='3G' 
 and lac > 10000 and cellid>2
 and arfcn is not null 
@@ -1193,15 +1300,28 @@ group by cellid, arfcn, psc
 order by cellid, arfcn, psc;  
 
 select count(*) 
-from tempmeasuse2017
+from 
 where  networktech='3G';  
 
-create table Use2017 as select * from tempmeasuse2017;
+drop table temp2017;
 
-delete from temp2017 where 
+drop table use2017;
+create table use2017 as select * from tptempmeas31;
+
+delete from use2017 where 
 node::integer not in (select id from site where sitename is not null)
+or ta is null
+or networktech<>'4G'
+or cellid>10
+or lac>5000
+or node is null
+or cellid is null;
+
+delete from use2017 where ncell1 not in 
+(select pci from celllistlinked2017);
+
 and ncell1 not in 
-(select pci from celllist2017 cross join site
+(select pci from celllistlinked2017 cross join site
 where id=node::integer and sitename is not null);
 and ncell2 not in 
 (select pci from celllist2017 cross join site
@@ -1210,7 +1330,13 @@ and ncell3 not in
 (select pci from celllist2017 cross join site
 where id=node::integer and sitename is not null);
 
+drop table use2017;
+
+create table use2017 as select * from tptempmeas6GSM;
+
 drop table tpused;
+
+create table tpused as select id as tp from tptempmeas6GSM;
 
 create table tpused as 
 select id as tp from temp2017
@@ -1219,8 +1345,15 @@ and node::integer>0
 and cellid is not null
 and ncell1 is not null
 and nrxlev1 is not null
+and lterssi is not null
 and accuracy<30
 ;
+
+create table MeasPerTP as
+select tp, count(*) as num
+from measurement
+group by tp
+order by num desc;
 
 create table TPsequence
 (sq bigserial primary key unique not null,
@@ -1245,35 +1378,32 @@ drop table tpDistance;
 commit;
 
 create table tpDistance as
-(select t0.id as tp0, t1.id as tp1, 
-t0.sq as sq0, t1.sq as sq1, 
-t0.node as n0, t1.node as n1, 
+(select t0.id as tp0, t1.id as tp1, t0.sq as sq0, t1.sq as sq1, 
 t0.cellid as c0, t1.cellid as c1, 
-t0.ncell1 as pci0, t1.ncell1 as pci1,
-t0.ncell2 as pci02, t1.ncell2 as pci12,
-t0.ncell3 as pci03, t1.ncell3 as pci13,
-t0.ncell4 as pci04, t1.ncell4 as pci14,
-t0.ncell5 as pci05, t1.ncell5 as pci15,
-t0.lterssi as rxs0, t1.lterssi as rxs1,
-t0.nrxlev1 as rxn0, t1.nrxlev1 as rxn1,
-st_DistanceSphere(t0.position, t1.position) as distance
-from Temp2017 as t0
-cross join Temp2017 as t1
-where t0.sq=t1.sq+1);
+t0.ncellid1 as ci01, t1.ncellid1 as ci11,
+t0.ncellid2 as ci02, t1.ncellid2 as ci12,
+t0.ncellid3 as ci03, t1.ncellid3 as ci13,
+t0.ncellid4 as ci04, t1.ncellid4 as ci14,
+t0.ncellid5 as ci05, t1.ncellid5 as ci15,
+t0.rxlev as rxs0, t1.rxlev as rxs1, t0.nrxlev1 as rxn0, t1.nrxlev1 as rxn1,
+m0.num as num0, m1.num as num1, st_DistanceSphere(t0.position, t1.position) as distance
+from temp2017 as t0 cross join temp2017 as t1
+cross join MeasPerTP as m0 cross join MeasPerTP as m1
+where m0.tp=t0.id and m1.tp=t1.id
+and t0.sq=t1.sq+1);
 
 delete from tpUsed where tp in
 (select tp0 as tp from tpDistance
-where distance<5
+where distance<3
 and abs(rxs1-rxs0)<3
 and abs(rxn1-rxn0)<3
-and sq0%2=0
-and ((n0=n1) or (n0 is null)) 
-and ((pci0=pci1) or (pci0 is null)) 
+and sq0%2=1
 and ((c0=c1) or (c0 is null))
-and ((pci02=pci12) or (pci12 is not null))
-and ((pci03=pci13) or (pci13 is not null)));
-and ((pci04=pci14) or (pci14 is not null))
-);
+and ((ci01=ci01) or (ci11 is not null))
+and ((ci02=ci12) or (ci12 is not null))
+and num1>=num0) 
+as todelete;
+
 
 select count(*) from tpused;
 
@@ -1287,7 +1417,7 @@ select 1*round(accuracy/1) as accu, count(*) as num
  group by accu
  order by accu;
 
-drop table celllistlinked2017;
+ truncate table celllistlinked2017;
 
 create table celllistlinked2017 as
 select radioinstallation.id, celllist2017.*
@@ -1300,26 +1430,63 @@ left outer join cell on (cell.risector=radioinstallation.id);
 update celllistlinked2017 set id = 100*node::integer+40+cellid::integer+1
 where id is null;
 
+drop table measuse2017;
+
+create table measuse2017 as select * from temp2017;
+
+update temp2017 set ncellid1=null
+where ntech1='4G';
+
+update tptempmeas31 set ncellid1=celllistlinked2017.id
+from celllistlinked2017
+where tptempmeas31.ncell1=celllistlinked2017.pci
+and tptempmeas31.ntech1='4G'
+and tptempmeas31.ncellid1 is null
+and substring(tptempmeas31.times from 1 for 10)>= begin
+and substring(tptempmeas31.times from 1 for 10)<= einde
+and einde is not null
+and tptempmeas31.lac=celllistlinked2017.lac
+
+update tptempmeas6GSM set ncellname6=allgsmcelllist.cellid
+from allgsmcelllist
+where tptempmeas6GSM.ncellid6=allgsmcelllist.ci
+and tptempmeas6GSM.nlac6=allgsmcelllist.lac
+and tptempmeas6GSM.ncellname6 is null
+and tptempmeas6GSM.ncellid6 is not null
+
+select distinct nlac1, ncellname1, ncellid1, count(*) 
+from tptempmeas6GSM 
+where ncellname1 is null
+group by  nlac1, ncellname1, ncellid1;
+
+delete from tptempmeas6GSM 
+where ncellid1 is null
+and ncellid2 is null
+and ncellid3 is null
+and ncellid4 is null
+and ncellid5 is null
+and ncellid6 is null
+
+select imei, count(*) from tptempmeas6GSM
+group by imei;
+
+
+select distinct ncellname1::integer as ci, ncellid1 from 
+tptempmeas6GSM
+where cellname::integer<>cellid
+order by ncellid1
+
+drop table measuse2017;
+create table measuse2017 as 
+select distinct temp2017.* from temp2017 cross join customareafilter
+where position@the_geom
+and areaname='BryanstonSep2017';
+
+drop table temp2017;
 
 create table temp2017 as select * from measuse2017;
 
-update temp2017 set ncellid8=null
-where ntech8='4G';
 
-
-
-update temp2017 set ncellid1=celllistlinked2017.id
-from celllistlinked2017
-where temp2017.ncell1=celllistlinked2017.pci
-and temp2017.ntech1='4G'
-and temp2017.ncellid1 is null
-
-and substring(temp2017.times from 1 for 10)>= begin
-and substring(temp2017.times from 1 for 10)<= einde
-and temp2017.lac=celllistlinked2017.lac; 
-
-drop table measuse2017;
-create table measuse2017 as select * from temp2017;
 
 truncate table unresolvedPCI;
 
@@ -1338,16 +1505,19 @@ from unresolvedPCI
 group by pci, node, ci
 order by num desc;
 
-delete from unresolvedPCI where cellid>10;
+delete from unresolvedPCI where lac>5000;
 
 drop table PCIunresolved;
 
 select * from site where id=5077; 
 
+drop table pciunresolved;
 create table PCIunresolved as
-(select lac, node, pci, sum(num) as num, min(begin) as aanvang, max(einde) as einde
+(select lac, node, pci, sum(num) as num, min(aanvang) as aanvang, max(einde) as einde
 from unresolvedPCI
 group by lac, node, pci);
+
+select * from pciunresolved where pci=184;
 
 delete from PCIunresolved where lac>10000;
 
@@ -1361,6 +1531,13 @@ select pci, sum(Num) as num
 from pciunresolved
 group by pci
 order by num desc;
+
+insert into celllistlinked2017
+select node::integer*100+40+cellid::integer+1 as id, lac, node, cellid, 1377, pci, aanvang, einde, num
+from celllist2017new 
+where celllist2017new.pci 
+not in 
+(select pci from celllistlinked2017);
 
 create table InfoSep2017 (
 OWNER		char(100),	TECHNOLOGY	char(5),	SUBTECH	char(10),	PROPERTY char(30),
@@ -1481,3 +1658,175 @@ where siteid not in
 
 select * from site; 
 
+create table celllist2017new as
+select lac, node, cellid, psc as pci, min(times) as aanvang, max(times) as einde, count(*) as num
+from tptempmeas31
+group by lac, node, cellid, psc
+order by psc;
+
+drop table use2017;
+create table use2017 as select * from temp2017;
+drop table tempmeasuse2017;
+
+delete from celllist2017new where pci is null;
+
+insert into cellnumberstemp
+select distinct ncellid8 from temp2017
+
+create table celllistSep2017 as
+select distinct ncellid1 as ci, node, cellid
+from cellnumbers cross join celllistlinked2017
+where ncellid1=id;
+
+insert into cell
+(id, lastmodified, risector) 
+select distinct ci, now(), ci from celllistSep2017
+where ci not in (select id from cell);
+
+insert into frequencyallocationlist
+(lastmodified, ci, carrier, channel)
+select now(), ci, 0, 1377
+from celllistSep2017
+where ci not in (select ci from frequencyallocationlist)
+
+update cell set beacon=pci
+from celllistlinked2017 where cell.id=celllistlinked2017.id;
+
+insert into parametersettings
+(lastmodified, ci, parameterid, setting)
+select distinct now(), celllistlinked2017.id, 3, lac 
+from celllistlinked2017  
+where celllistlinked2017.id not in (select ci from parametersettings where parameterid=3)
+and celllistlinked2017.id in (select ci from celllistSep2017);
+
+select imei, operatorname,count(*) as num 
+from temp2017
+group by imei, operatorname
+order by imei;
+
+select imei, count(*) as num 
+from train
+group by imei
+order by imei;
+
+select * from temp2017;
+
+create table keepsite as
+select sitei as siteid from
+(select round(ci/100-0.5) as sitei, count(*) as num from measurement
+where ci not in 
+(select radioinstallation.id from
+radioinstallation cross join site
+where siteid=site.id
+and location is not null)
+and measvalue> -115
+and tp in (select tp from tpused)
+group by sitei
+order by num desc) as posnotfound
+where num>200;
+
+select * from keepsite;
+
+delete from measurement 
+where round((ci-40)/100) not in 
+(select id from site where location is not null)
+and round((ci-40)/100) not in 
+(select siteid from keepsite)
+
+drop table testGSMseperate; 
+
+create table testGSMseperate as 
+select id as tp, cellid as servci, ta, imei
+from tptempmeas6GSM
+where id in 
+(select id from temp2017
+where sq%2=0
+and imei=354187074241040)
+
+drop table testdependant;
+
+create table testdependant as 
+select id as tp, node::integer*100+41+cellid as servci, ta, imei
+from tptempmeas31 
+where id in 
+(select id from temp2017
+where sq%9=0)
+
+drop table testGSMdependant;
+
+create table testGSMdependant as 
+select id as tp, cellid as servci, ta, imei
+from tptempmeas6GSM 
+where id in 
+(select id from temp2017
+where sq%7=0)
+
+drop table trainGSMseperate;
+
+create table trainGSMseperate as
+select id as tp, cellid as servci, ta, imei
+from tptempmeas6GSM 
+where id in 
+(select tp from tpused
+where tp not in
+(select tp from testGSMseperate))
+
+update measurement set frequency=1845
+where ci in
+(select cell.id from cell cross join radioinstallation
+where risector=radioinstallation.id
+and techkey=3);
+
+drop table traindependant;
+create table traindependant as
+select tptempmeas31.id as tp, node::integer*100+41+cellid as servci, ta, imei
+from tptempmeas31 cross join radioinstallation cross join site
+where node::integer*100+41+cellid=radioinstallation.id
+and siteid=site.id
+and sitename is not null
+and tptempmeas31.id not in
+(select tp from test)
+
+delete from neuralnet where id<15;
+
+drop table train;
+drop table test;
+
+create table test as select * from testdependant;
+
+create table train as select * from traindependant;
+
+
+select count(*) from testpoint 
+where id not in
+(select distinct tp from measurement);
+
+select imei, 2*round(accuracy/2) as aku, count(*) from tempmeas6GSM
+group by imei, aku
+order by aku desc;
+
+select imei, count(*) from tptempmeas6GSM
+group by imei;
+
+select count(*) from tptempmeas6GSM;
+
+select imei, count(*) 
+from tempmeas6GSM
+where accuracy>35
+group by imei;
+
+delete from tptempmeas6GSM where accuracy>35
+
+create table tempmeas6GSMbackup as select * from tempmeas6GSM;
+
+delete from tpused where tp not in 
+(select testpointauxGSM.tp
+from testpointauxGSM cross join cell cross join radioinstallation cross join site
+cross join tpused
+where servci=cell.id and risector=radioinstallation.id and siteid=site.id
+and testpointauxGSM.tp=tpused.tp and sitename is not null);
+
+select imei, count(*) as num 
+from tptempmeas6GSM cross join tpused 
+where tp=id
+group by imei;

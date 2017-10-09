@@ -2389,7 +2389,7 @@ www.QRap.org.za
 		<field name = "MStxpower"
 		       type = "smallint"
 		       label = "Mobile Station Transmit Power"
-		       description="Base station power level. It is calculated using the Base Station Power Control level received and information on the frequency band according to 3GPP 45.005 paragraph 4.1.1 " 
+		       description="Mobile station power level. According to 3GPP 45.005 paragraph 4.1.1 " 
 			unittype="power"/>
 
 		<field name = "BSrxpower"
@@ -2423,11 +2423,61 @@ www.QRap.org.za
 						where RxTxDiff2 is not null
 						union
 						select tp, servci, ta
-						from testpointauxGSM)'>
+						from testpointauxGSM
+						where ta is not null
+						union tp servci, ta 
+						from testpointauxLTE
+						where ta is not null)'>
 				</view>
 ;
 	</table> <!-- testpointauxGSM -->
 
+<!-- *********************************************************************************************************************
+	<table name="testpointauxLTE" label="LTE Auxiliary Test Point info">
+	       <field name="id"
+		      type="bigserial primary key unique not null"
+		      label="ID"
+		      description="Primary key"
+		      readonly="true" />
+	       
+		<field name="tp"
+		       type="bigint references testpoint(id)"
+		       label="Test Point"
+		       description="Test Point of which this record contains the auxiliary data" />		
+
+		<field name = "servci"
+		       type = "integer references cell(id) on delete cascade"
+		       label = "Serving Cell ID"
+		       ui = "dropdown(fromtable,cell_view,sectorname)" />
+
+		<field name = "TA"
+		       type = "smallint"
+		       label = "Timing Advance"
+		       description="Timing Advance as reported with Andriod phones" />
+
+		<field name = "rxlev"
+		       type = "integer"
+		       label = "reported RSCP"
+			description="Reported RSCP"
+			unittype="power"/>
+
+		<field name = "Qual"
+		       type = "integer"
+		       label = "Quality"
+		       description=" "/>
+
+		<field name = "SNR"
+		       type = "integer"
+		       label = "Signal to Noise level"
+		       description=" "/>
+
+		<field name = "LTERSSI"
+		       type = "integer"
+		       label = "RSSI on serving cell"
+		       description=" " 
+			unittype="power"/>
+
+	</table> <!testpointauxLTE -->
 
 <!-- ********************************************************************************************************************* -->
 	<table name="testpointauxUTRAN" label="UTRAN Auxiliary Test Point info">

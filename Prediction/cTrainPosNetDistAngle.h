@@ -61,10 +61,13 @@ struct tTestPointNN
 	cGeoP		sOriginalLocation;
 	unsigned	sServSite;
 	double		sServCellAzimuth;
-	unsigned	sTA; 		// this could be GSM TA or UMTS timeDiff
-	double 		sResDist; 	// resolution of the above (554m or 36m)
+	unsigned	sTA; 		// this could be GSM or LTE TA or UMTS timeDiff
+	double 		sResDist; 	// resolution of the above (554m, 156m or 36m)
 	double		sBearing; 	// testpoint direction from serving site
 	double		sDistance; 	// from testpoint to serving site
+	double	sIMEI;		// the IMEI of the measurement phone
+	unsigned	sHour;		// the hour of the measurement
+	unsigned	sSeconds;	// the second within the hour (between 0 and 3600)
 };
 
 typedef	vector<tTestPointNN> vTestPointNN;
@@ -160,7 +163,7 @@ class cTrainPosNetDistAngle
 	unsigned mNumTrain;
 	unsigned mNumTest;
 	bool mLTEsim;
-	bool mUMTS;
+	bool mUMTSsim;
 	bool mOriginal;
 };
 }

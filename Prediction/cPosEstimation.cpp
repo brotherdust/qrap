@@ -747,7 +747,9 @@ void cPosEstimation::EstimatePositions()
 						SecondSite();
 				}
 				else SecondSite();
-				DCM_ParticleSwarm();
+				cout << "Before PSO" << endl;
+//				DCM_ParticleSwarm();
+				cout << "Before Exhaustive Search" << endl;
 				ExhaustiveSearch();
 //				DCM_CMA_ES();
 */			
@@ -794,7 +796,7 @@ void cPosEstimation::EstimatePositions()
 					cout << "	rhoERR = " << distERR
 							<< "	phiERR = " << phiERR  << endl;
 					
-				} 
+				}
 			}
 			else
 			{
@@ -2669,13 +2671,13 @@ bool cPosEstimation::ANNrun()
 
 	if (mPosSets[mCurPosI].sMeasurements[0].sSiteID!=mSites[mCurSiteI].sSiteID)
 	{
-/*		if (mNumSites==0)
+		if (mNumSites==0)
 			cout << "Wat nou?" << endl;
 		if (mSites[mCurSiteI].sSiteID==0)
-			cout "????" << endl;
+			cout << "????" << endl;
 		if (mPosSets[mCurPosI].sMeasurements[0].sSiteID==0)
 			cout << "weird" << endl;
-*/			
+			
 		while ((mPosSets[mCurPosI].sMeasurements[0].sSiteID!=mSites[mCurSiteI].sSiteID)
 			&&(mCurSiteI<mNumSites))
 			mCurSiteI++;
@@ -2707,7 +2709,7 @@ bool cPosEstimation::ANNrun()
 	}
 
 //	cout << " In cPosEstimation::ANNrun():  Found Site." << endl;
-//	cout << "mSites[mCurSiteI].sNumInputs = " << mSites[mCurSiteI].sNumInputs << endl;
+	cout << "mSites[mCurSiteI].sNumInputs = " << mSites[mCurSiteI].sNumInputs << endl;
 	Input = new double[mSites[mCurSiteI].sNumInputs];
 
 	Input[0] = 1;	
@@ -2772,7 +2774,7 @@ bool cPosEstimation::ANNrun()
 	newTestPoint.sNewTP = mNewTP;	
 	mPosSets[mCurPosI].sTestPoints.push_back(newTestPoint);
 	mNewTP++;
-
+/*
 /*	newTestPoint2.sOriginalTP = mPosSets[mCurPosI].sTestPoints[0].sOriginalTP;
 	newTestPoint2.sOriginalLocation = mPosSets[mCurPosI].sTestPoints[0].sOriginalLocation;
 	newTestPoint2.sMethodUsed = ANNangleLineSearch;

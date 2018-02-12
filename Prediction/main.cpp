@@ -189,10 +189,10 @@ int main (int argc, char **argv)
 //	Bryanston
 	NumHoek=4;
 	Hoek = new cGeoP[NumHoek];
-	Hoek[0].Set(-26.036, 27.976);
-	Hoek[1].Set(-26.109, 27.976);
+	Hoek[0].Set(-26.035, 27.975);
+	Hoek[1].Set(-26.109, 27.975);
 	Hoek[2].Set(-26.109, 28.075);
-	Hoek[3].Set(-26.036, 28.075);
+	Hoek[3].Set(-26.035, 28.075);
 
 //	Tembisa
 /*	NumHoek=6;
@@ -204,43 +204,57 @@ int main (int argc, char **argv)
 	Hoek[4].Set(-25.990, 28.150);
 	Hoek[5].Set(-25.965, 28.180);
 */
-	//Tembisa bigger
-//	NumHoek=5;	
-//	Hoek = new cGeoP[NumHoek];
-//
-//	Hoek[0].Set(-26.06, 28.26);
-//	Hoek[1].Set(-25.94, 28.26);
-//	Hoek[2].Set(-25.94, 28.113);
-//	Hoek[3].Set(-26.06, 28.113);
-//	Hoek[4].Set(-26.06, 28.26);
+/*	//Tembisa bigger
+	NumHoek=5;	
+	Hoek = new cGeoP[NumHoek];
 
+	Hoek[0].Set(-26.06, 28.26);
+	Hoek[1].Set(-25.94, 28.26);
+	Hoek[2].Set(-25.94, 28.113);
+	Hoek[3].Set(-26.06, 28.113);
+	Hoek[4].Set(-26.06, 28.26);
+*/
 	vPoints Punte;
 	for (unsigned i=0; i<NumHoek; i++)
 		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek;
 
-	double Mean, MSE, StDev, CorrC;
+/*	if (!gDb.PerformRawSql(queryC))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+*/	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 	int Num;
-/*
+
 	Meas.SetUseAntANN(false);
 
-//	Meas.mPathLoss.mClutter.Reset(2);
+	Meas.mPathLoss.mClutter.Reset(1);
 
 	cout << "Loading measurements ... in main()" << endl;
 
-	Meas.SetPlotResolution(30);
-	Meas.LoadMeasurements(Punte,2,1,6);
+	Meas.SetPlotResolution(5);
+	Meas.LoadMeasurements(Punte,1,1,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
+	Meas.SaveResults();
+
+
 //	Meas.SetSeekWidthBest(1);
 //	Meas.SetSmoothWidthBest(1);
 //	Meas.OptimiseSeekWidth();
-//        Meas.OptimiseHeights(0);
-	if (!gDb.PerformRawSql(queryC))
+//	Meas.OptimiseModelCoefAllTotal(3);
+//	Meas.OptimiseModelCoefD(3);
+//      Meas.OptimiseHeights(3);
+//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+
+//	cout<< "Nach4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+
+/*	if (!gDb.PerformRawSql(queryC))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
@@ -305,7 +319,7 @@ int main (int argc, char **argv)
    Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-//   Meas.OptimiseHeights(1);
+//   Meas.OptimiseHeights(4);
 /*
 	Meas.OptimiseModelCoefAllTotal(1);
    Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
@@ -334,8 +348,6 @@ for ( i=4; i>=0; i--)
 }
 */
 //
-
-
 /*
   	query = "update coefficients set coefficient=0.0;";
 	if (!gDb.PerformRawSql(query))
@@ -353,17 +365,17 @@ for ( i=4; i>=0; i--)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
-	
+/*	
 	cTrainPosNetDistAngle NeuralNets;
 	cout << "In main Loading measurements for Training" << endl;
-	NeuralNets.LoadSites(Punte,1,1,1,1);
-	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Test",false);
-	NeuralNets.LoadMeasurements(Punte,1,1,1,1,"Train",true);
+	NeuralNets.LoadSites(Punte,2,6,1,1);
+	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Test",false);
+	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Train",true);
 
 	cout << "In main training nets " << endl;
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-
+*/
 /*
 	query = "update coefficients set coefficient=0.0;";
 
@@ -459,7 +471,7 @@ for ( i=4; i>=0; i--)
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-
+/*
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
 	cout << "Na constructor" << endl;
@@ -477,7 +489,7 @@ for ( i=4; i>=0; i--)
 
 	cout << "Voor LoadMeasurements" << endl;
 	Positioning.SetUseAntANN(false);	
-	Positioning.LoadMeasurements(Punte,1,1,1,1);
+	Positioning.LoadMeasurements(Punte,2,6,1,1);
 	cout << "Na LoadMeasurements" << endl;
 
 	cout << " Clearing Punte " << endl;
@@ -488,7 +500,7 @@ for ( i=4; i>=0; i--)
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-
+*/
 /*
 	if (!gDb.PerformRawSql(query))
 	{

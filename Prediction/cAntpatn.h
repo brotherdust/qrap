@@ -97,32 +97,34 @@ namespace Qrap
 			double GetPatternValue(double Azimuth, double Elevation);
 			
 			
-			char *mFile;				///< Filename containing antenna pattern or neural net
-			char *mName; 			///< Antenna Pattern unique name
-			char *mMake; 			///< Manufacturer
-			char *mDescription;		///< Describtion of antenna pattern 
-			char *mPol;					///< Polarisation of transmitted/received E-field
-			double mFreq;			///< Frequency where antenna was measured
-			double mGain;			///< Maximum Gain of antenna pattern
-			double mBeamW;			///< Azimuth beamwidth
-			double mVBeamW;			///< Elevation beamwidth
-			double mFtoB;			///< Front to Back ratio			
-			double mPrice;			///< Price of antenna
+			char *mFile;		///< Filename containing antenna pattern or neural net
+			char *mPol;		///< Polarisation of transmitted/received E-field
+			double mFreq;		///< Frequency where antenna was measured
+			double mGain;		///< Maximum Gain of antenna pattern
+			double mBeamW;		///< Azimuth beamwidth
+			double mVBeamW;		///< Elevation beamwidth
+			double mFtoB;		///< Front to Back ratio			
+			double mPrice;		///< Price of antenna
 			float *mAziAngles;	///< Array linked to mAziValues that indicate the angle[i] at which the azimuth pattern is mAziValues[i]
 			float *mAziValues;	///< The relative value[i] of the antenna pattern at azimuth mAziAngles[i]. (Antenna Radiation Level = Gain - mAziValues[i])
 			float *mElevAngles;	///< Array linked to mElevValues that indicate the angle[i] at which the elevation pattern is mElevValues[i]
 			float *mElevValues;	///< The relative value[i] of the antenna pattern at elevation mElevAngles[i]. (Antenna Radiation Level = Gain - mElevValues[i])
-			unsigned mNAA;			///< Number of Elevation Values
-			unsigned mNEA;			///< Number of Azimuth Values
+			unsigned mNAA;		///< Number of Elevation Values
+			unsigned mNEA;		///< Number of Azimuth Values
 		
 		private:	
-			double mBearing;				///< The bearing /azimuth direction the antenna is pointing at
-			double mMechTilt;			///< The mechanical downtilt of the antanna
-			unsigned mRef180az;		///< Reference index of the "back" of the antenna
-			unsigned mRef0el;			///< Reference index to the "horizon" of the antanna
+			double mBearing;	///< The bearing /azimuth direction the antenna is pointing at
+			double mMechTilt;	///< The mechanical downtilt of the antanna
+			unsigned mRef180az;	///< Reference index of the "back" of the antenna
+			unsigned mRef0el;	///< Reference index to the "horizon" of the antanna
 			Float2DArray mAntPattern;	///< Matrix containing the values of the antenna pattern at all mAziAngles and mElevAngles
 			FANN::neural_net *mAntennasANN;
 			bool mUseANN;
+			int mElecTiltRef;
+			double mElecTiltValue;
+			double mMinValueElev;
+			double mMinValueAzi;
+			double mScale;
 	};
 }
 

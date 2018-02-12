@@ -1,4 +1,32 @@
-select count(*) from test;
+delete from measurement where frequency < 500;
+
+delete from testpoint where id not in (select tp from measurement);
+
+delete from testpointauxlte where tp not in 
+(select id from testpoint where
+location @ ST_GeomFromText('POLYGON((27.9750 -26.0350,
+28.0750 -26.0350,
+28.0750 -26.109,
+27.9750 -26.109,
+27.9750 -26.0350))',4326));
+
+delete from testpointauxLTE where servci not in 
+(select cell.id 
+from cell cross join radioinstallation cross join site
+where risector=radioinstallation.id
+and siteid= site.id and
+location @ ST_GeomFromText('POLYGON((28.0218767 -26.04847747,
+28.00377964 -26.06021314,
+28.01408948 -26.08763293,
+28.05653532 -26.08927812,
+28.05181911 -26.06898747,
+28.03898665 -26.05790988,
+28.0218767 -26.04847747))',4326));
+
+delete from testpoint where id not in (select tp from testpointauxLTE);
+
+
+
 
 delete from testpoint where positionsource>1;
 
@@ -77,6 +105,12 @@ and cell.risector= radioinstallation.id) as temp
 group by siteid, Error
 order by siteid, Error;
 
+select num, count(*) from
+(select tp, count(*) as num 
+from measurement
+group by tp) as binne
+group by num
+order by num;
 
 create table LTEnumPerTP as
 select measurement.tp as tp, count(*) as num 

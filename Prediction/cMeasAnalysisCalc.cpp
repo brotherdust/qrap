@@ -630,7 +630,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	if (0==mFixedInsts.size()) return 0;
 
 //	cout <<"cMeasAnalysisCalc::PerformAnalysis: mNumMeas = " << mNumMeas << endl;
-	for (i=0; i<mNumMeas; i++) 
+	for (i=0; i<mNumMeas; i++)
 	{
 		if ((0==Clutterfilter)||(0==mMeasPoints[i].sClutter)||(Clutterfilter==mMeasPoints[i].sClutter))
 		{
@@ -661,7 +661,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			//Change settings if the Fixed Installation changed
 			if (mMeasPoints[i].sInstKeyFixed!=currentInst)
 			{
-//				cout << "NextInst = " << mMeasPoints[i].sInstKeyFixed << endl;
+//				cout << "i=" << i << "	NextInst = " << mMeasPoints[i].sInstKeyFixed << endl;
 				if (CNumUsed>0)
 				{
 					CMean = CTotalError/CNumUsed;
@@ -671,14 +671,14 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
-/*
+
 					cout << "Inst: " << currentInst << "	#: " << CNumUsed  
 						<< "	Freq =" << mFixedInsts[FixedNum].sFrequency 
 						<< "	M: "<< CMean 					
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-*/
+
 			}
 
 				CNumUsed = 0;
@@ -847,11 +847,11 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
 		double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 		CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
-/*  	cout << "Inst: " << currentInst << "	#: " << CNumUsed <<"	M: " << CMean 
+  	cout << "Inst: " << currentInst << "	#: " << CNumUsed <<"	M: " << CMean 
 			<< "	MSE: " << CMeanSquareError 
 			<< "	StDev: " << CStDev
 			<< "	Corr: " << CCorrC << endl;
-*/
+
 	}
 
 	if (NumUsed>0)
@@ -874,13 +874,12 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	}
 */
 
+	cout << " Leaving cMeasAnalysisCalc::PerformAnalysis   NumUsed = " << NumUsed << endl;
 	delete [] LOS;
 	delete [] NLOS;
 	delete [] ClutterOccur;
 	delete [] terms;
 	delete [] TempClutter;
-
-//	cout << " In cMeasAnalysisCalc::PerformAnalysis   NumUsed = " << NumUsed << endl;
 
 	return NumUsed;
 }

@@ -32,6 +32,8 @@
 #include "cProfile.h"
 #include "cMemmngr.h"
 
+#define MAX_NUM_RASTERS 5
+
 
 namespace Qrap
 {

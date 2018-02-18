@@ -46,7 +46,7 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	m_size = 2;
 	mCalcMarker = 0;
 	mTuning=false;
-	mClutterIndex = 1000;
+	mClutterIndex = 0;
 
 	delete [] m_profile;
 	m_profile = new float[m_size];
@@ -124,6 +124,7 @@ cPathLossPredictor::cPathLossPredictor(const cPathLossPredictor &right)
 	m_TempProfile = new float[m_size];
 	m_profile = new float[m_size];
 	mClutterProfile = new int[m_size];
+	mNLOS = new bool[m_size];
 
 	for (i=0; i<m_size; i++)
     	{
@@ -204,6 +205,7 @@ const cPathLossPredictor & cPathLossPredictor::operator=
 	m_TempProfile = new float[m_size];
 	m_profile = new float[m_size];
 	mClutterProfile = new int[m_size];
+	mNLOS = new bool[m_size];
 	for (i=0; i<m_size; i++)
 	{
 		*(m_CurvedProfile+i) = *(right.m_CurvedProfile+i);
@@ -240,7 +242,7 @@ int cPathLossPredictor::setParameters(double k, double f,
 	m_htx = TxHeight;
 	m_hrx = RxHeight;
 	
-	mClutterIndex = 1000;
+	mClutterIndex = 0;
 
 	mUseClutter = UseClutter;
 	if ((ClutterClassGroup!=mClutter.mClassificationGroup)&&(mUseClutter))
@@ -555,6 +557,10 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 
 //	m_startLoc = InputProfile.GetStartLoc();
 //	m_endLoc = InputProfile.GetEndLoc();
+	delete [] mNLOS;
+	mNLOS = new bool[m_size];
+	for (i=0; i<m_size; i++)
+		mNLOS[i]=false;
 	delete [] m_CurvedProfile;
 	m_CurvedProfile = new float[m_size];
 	delete [] m_TempProfile;

@@ -32,6 +32,7 @@ cGPpropModel::cGPpropModel()
 {
 	mNumCandidates = NUM_INIT_CANDIDATES; 
 	mNumToDie = (unsigned)(mNumCandidates*DEATH_RATE/100);
+	cout << "Leaving cGPpropModel::cGPpropModel()" << endl;
 }
 
 //*************************************************************************
@@ -51,6 +52,7 @@ cGPpropModel::~cGPpropModel()
 //*************************************************************************
 int cGPpropModel:: mainTuning()
 {
+	cout << "Entering cGPpropModel:: mainTuning()" << endl;
 	unsigned i=0, j=0, k=0;
 	string queryC, queryN;
 	

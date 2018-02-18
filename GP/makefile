@@ -1,13 +1,13 @@
 CC = g++ -g -std=c++11 -std=gnu++11 -Wall -W -D_REENTRANT -c -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I../DataBase  -I/usr/include/eigen3 -I/usr/local/ -I/usr/include/c++/5.4.0/
 
-OBJECTS =  cMemmngr.o cGeoP.o cAntpatn.o cClutter.o cPthlssp.o cProfile.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cMeasAnalysisCalc.o cGPpropModel.o cGPFunctions.o main.o
+OBJECTS =  cMemmngr.o cGeoP.o cAntpatn.o cClutter.o cPthlssp.o cProfile.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o cMeasAnalysisCalc.o cGPpropModel.o cGPFunctions.o main.o
 
 all: GP makefile
 
 GP: $(OBJECTS) makefile
 	c++ -g -o GP $(OBJECTS) -L/usr/local/pgsql/lib  -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal -lproj  -lssl -lPocoXML  -lPocoFoundation -lQtCore -ldoublefann -lfann
 
-main.o: main.cpp cGPFunctions.h cGPpropModel.h makefile
+main.o: main.cpp makefile
 	$(CC) main.cpp
 
 cSettings.o: ../DataBase/cSettings.h ../DataBase/cSettings.cpp makefile
@@ -19,8 +19,11 @@ cAlert.o: ../DataBase/cAlert.h ../DataBase/cAlert.cpp makefile
 cBase.o: ../DataBase/cBase.h ../DataBase/cBase.cpp makefile
 	$(CC) ../DataBase/cBase.cpp 
 	
-cDatabase.o: ../DataBase/cDatabase.h ../DataBase/cDatabase.cpp makefile
+cDatabase.o: ../DataBase/Types.h ../DataBase/cDatabase.h ../DataBase/cDatabase.cpp makefile
 	$(CC) ../DataBase/cDatabase.cpp 
+
+cSiteEditTools.o: ../DataBase/cSiteEditTools.h ../DataBase/cSiteEditTools.cpp makefile
+	$(CC) ../DataBase/cSiteEditTools.cpp 
 
 cPthlssp.o: ../Prediction/cPthlssp.h ../Prediction/cPthlssp.cpp makefile
 	$(CC) ../Prediction/cPthlssp.cpp 

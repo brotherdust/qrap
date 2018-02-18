@@ -36,44 +36,37 @@
 // Include local headers
 #include "../Prediction/cMeasAnalysisCalc.h"
 #include "../Prediction/cClutter.h"
-#include "../DataBase/Config.h"
 #include "cGPFunctions.h"
 
-//general debugging print macro
-#ifndef   DEBUG
-	#define   PRINTD(arg, ...)
-#else
-	#define   PRINTD(arg, ...)     printf(arg, ##__VA_ARGS__)
-#endif
+// local defines
+#define NUM_INIT_CANDIDATES 300
+#define NUM_GENERATIONS 200
+#define NUM_POINT_PER_EVAL 2000
+//how much of the population we loose per generation
+#define DEATH_RATE 30 
+
+#define MAX_TREE_DEPTH 4 
+#define MUTATION_THRESH 0.1
+
+struct SCandidate
+{ 
+	unsigned	sNumClutter;
+	unsigned * 	sClutterType;
+	double * 	sClutterHeight;
+	GOftn * 	sTree;
+	double		sCorrC;
+	double		sMSE;
+	unsigned	sRank;
+};
+
+typedef vector<SCandidate> vCandidates;
+
 
 using namespace std;
-
-// local defines
-const int NUM_INIT_CANDIDATES = 300;
-const int NUM_GENERATIONS = 200;
-const int NUM_POINT_PER_EVAL = 2000;
-//how much of the population we loose per generation
-const int DEATH_RATE = 30; 
-
-const int MAX_TREE_DEPTH = 4; 
-const double MUTATION_THRESH = 0.1;
+using namespace Qrap;
 
 namespace Qrap
 {
-
-	struct SCandidate
-	{ 
-		unsigned	sNumClutter;
-		unsigned * 	sClutterType;
-		double * 	sClutterHeight;
-		GOftn * 	sTree;
-		double		sCorrC;
-		double		sMSE;
-		unsigned	sRank;
-	};
-
-	typedef vector<SCandidate> vCandidates;
-
 	class cMeasAnalysisCalc; 
 
 	class cGPpropModel 

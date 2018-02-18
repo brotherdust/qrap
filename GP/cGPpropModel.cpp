@@ -30,6 +30,7 @@ using namespace std;
 //**************************************************************************
 cGPpropModel::cGPpropModel()
 {
+	cout << "Entering cGPpropModel::cGPpropModel()" << endl;
 	mNumCandidates = NUM_INIT_CANDIDATES; 
 	mNumToDie = (unsigned)(mNumCandidates*DEATH_RATE/100);
 	cout << "Leaving cGPpropModel::cGPpropModel()" << endl;
@@ -54,34 +55,10 @@ int cGPpropModel:: mainTuning()
 {
 	cout << "Entering cGPpropModel:: mainTuning()" << endl;
 	unsigned i=0, j=0, k=0;
-	string queryC, queryN;
-	
-	if (!gSettings.LoadFromFile("/usr/lib/qgis/plugins/settings.xml"))
-		return 0;
-
-	if(!gDb.Connect ("postgres", "postqrap"))
-	{
-		cout << "Database connect failed:" << endl;
-		return 0;
-	}
-
-	cout << "Connected " << endl;
-
-  	queryC = "update coefficients set coefficient=0.0;";
-	if (!gDb.PerformRawSql(queryC))
-	{
-		cout << "Error clearing coefficients" << endl;
-	}
-
-  	queryN = "update qrap_config set value='false' where name = 'UseAntANN';";
-	if (!gDb.PerformRawSql(queryN))
-	{
-		cout << "Error updating qrap_config" << endl;
-	}
 
 	cGeoP *Hoek;
 	unsigned NumHoek=19;
-/*
+
 //Gauteng 20m DEM
 	NumHoek=19;
 	Hoek = new cGeoP[NumHoek];
@@ -105,7 +82,6 @@ int cGPpropModel:: mainTuning()
 	Hoek[16].Set(-25.26, 29.24);
 	Hoek[17].Set(-26.26, 28.99);
 	Hoek[18].Set(-25.01, 28.99);
-*/
 
 	vPoints Punte;
 	for (i=0; i<NumHoek; i++)

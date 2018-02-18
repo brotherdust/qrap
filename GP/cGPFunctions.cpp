@@ -268,7 +268,7 @@ ClutterHeightNode::ClutterHeightNode()
 tMeasPoint ClutterHeightNode::eval(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
-	outPoint.sReturn = mClutter.mClutterTypes[inPoint.sClutter].sHeight;
+	outPoint.sReturn = inPoint.sClutterHeight;
 	return outPoint;
 }
 

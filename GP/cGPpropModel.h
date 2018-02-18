@@ -69,6 +69,7 @@ namespace Qrap
 		GOftn * 	sTree;
 		double		sCorrC;
 		double		sMSE;
+		unsigned	sRank;
 	};
 
 	typedef vector<SCandidate> vCandidates;
@@ -97,11 +98,15 @@ namespace Qrap
 	
 			void deleteTree(GOftn* inTree);
 	
-			bool treeSortPredIncre(GOftn* t1, GOftn* t2);
+			static bool SortCriteriaOnCorrC(SCandidate c1, SCandidate c2);
+			static bool SortCriteriaOnMSE(SCandidate c1, SCandidate c2);
+			static bool SortCriteriaOnRank(SCandidate c1, SCandidate c2);
 		
 			GOftn* createRandomNode(int depth);
 	
 			GOftn* createRandomTree(int depth=0);
+
+			int getRandSurvivor(unsigned popSize);
 
 		private:
 

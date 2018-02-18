@@ -2142,7 +2142,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 	Prediction = new double[mNumInsts];
 	double DistRes=mPlotResolution;
 	double Radius=DistRes; 
-	double AngleRes=1;
+	double AngleRes=1, ClutterDepth=0;
 
 	unsigned NumAngles, NumDist;
 //	cout << "Before delete"  << endl;
@@ -2370,7 +2370,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 						mPosSets[mCurPosI].sMeasurements[i].sHeight, MOBILEHEIGHT,
 						mUseClutter, mClutterClassGroup);
 //			cout << "Voor pathloss TotPathloss" << endl;
-			mCellPathLoss[i] = mPathLoss->TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
+			mCellPathLoss[i] = mPathLoss->TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
 //			cout << "Voor Bearing" << endl;
 //			cout << "Get antvalue" << endl;
 		}
@@ -2487,7 +2487,7 @@ FitFunc cPosEstimation::CostCMA_ES = [&](const double *x, const int N)
 						mPosSets[mCurPosI].sMeasurements[i].sHeight, MOBILEHEIGHT,
 						mUseClutter, mClutterClassGroup);
 //			cout << "Voor pathloss TotPathloss" << endl;
-			mCellPathLoss[i] = mPathLoss->TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
+			mCellPathLoss[i] = mPathLoss->TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss,ClutterDepth);
 //			cout << "Voor Bearing" << endl;
 			Azimuth = mPosSets[mCurPosI].sMeasurements[i].sSiteLocation.Bearing(ParticlePosition);
 

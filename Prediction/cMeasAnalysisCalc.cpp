@@ -69,9 +69,8 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 	{
 		mPlotResolution = atof(setting.c_str());
 	}
-	else mPlotResolution = 5;
+	else mPlotResolution = 30;
 	cout << " In cMeasAnalysisCalc::cMeasAnalysisCalc() mPlotResolution = " << mPlotResolution << endl;
-
 
 	setting = gDb.GetSetting("UseClutter");
 	if (setting=="true")
@@ -81,19 +80,19 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 	mClutterSource = atoi(gDb.GetSetting("ClutterSource").c_str());
 	cout << "mClutterSource = " << mClutterSource << endl;
 	if (mUseClutter)
-		mUseClutter = mClutter.SetRasterFileRules(mClutterSource);
+		mUseClutter = mClutterRaster.SetRasterFileRules(mClutterSource);
 	cout << "cMeasAnalysisCalc::contructor: 1) mUseClutter=";
 	if (mUseClutter) cout << "true" << endl;
 		else cout << "False" << endl;
 	if (mUseClutter)
-		mClutterClassGroup = mClutter.GetClutterClassGroup();
+		mClutterClassGroup = mClutterRaster.GetClutterClassGroup();
 	mUseClutter = (mUseClutter)&&(mClutterClassGroup>=0);
 	cout << "cMeasAnalysisCalc::contructor: 2) mUseClutter=";
 	if (mUseClutter) cout << "true" << endl;
 		else cout << "False" << endl;
 	if (mUseClutter) mClutterCount = new unsigned[mPathLoss.mClutter.mNumber];
 	else mClutterCount = new unsigned[2];
-	if (mUseClutter) mClutter.SetSampleMethod(1);
+	if (mUseClutter) mClutterRaster.SetSampleMethod(1);
 
 	mDEMsource = atoi(gDb.GetSetting("DEMsource").c_str());
 	cout << "mDEMsource = " << mDEMsource << endl;
@@ -175,7 +174,8 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 */
 //	Where site is in area
 	string query ="SELECT mobile, ci, frequency, ST_AsText(testpoint.location) as location, ";
-	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth ";
+	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth, ";
+	query += "mobileheight, txantennaheight ";
 	query += "from measurement cross join testpoint cross join measdatasource ";
 	query += "cross join cell cross join radioinstallation cross join site ";
 	query += "where ci=cell.id and risector= radioinstallation.id and siteid=site.id "; 
@@ -256,6 +256,9 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 				mMeasPoints[i].sDistance = atof(r[i]["distance"].c_str());
 				mMeasPoints[i].sAzimuth = atof(r[i]["azimuth"].c_str());
 				mMeasPoints[i].sTilt = atof(r[i]["tilt"].c_str());
+				mMeasPoints[i].sFrequency = atof(r[i]["frequency"].c_str());
+				mMeasPoints[i].sTxHeight = atof(r[i]["txantennaheight"].c_str());
+				mMeasPoints[i].sRxHeight = atof(r[i]["mobileheight"].c_str());
 				mMeasPoints[i].sClutter = 0;
 				
 				if (mMeasPoints[i].sInstKeyMobile != currentMobile)
@@ -375,9 +378,12 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 	pqxx::result r, rMobile, rFixed;
 
 	string query ="SELECT mobile, ci, frequency, ST_AsText(location) as location, ";
-	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth ";
+	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth, ";
+	query += "mobileheight, txantennaheight ";
 	query += "from measurement cross join testpoint cross join measdatasource ";
-	query += "where tp=testpoint.id and measdatasource=measdatasource.id";
+	query += "cross join cell cross join radioinstallation ";
+	query += "where ci=cell.id and risector= radioinstallation.id "; 
+	query += "and tp=testpoint.id and measdatasource=measdatasource.id";
 
 	if (MeasType>0)
 	{
@@ -450,6 +456,9 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 				mMeasPoints[i].sDistance = atof(r[i]["distance"].c_str());
 				mMeasPoints[i].sAzimuth = atof(r[i]["azimuth"].c_str());
 				mMeasPoints[i].sTilt = atof(r[i]["tilt"].c_str());
+				mMeasPoints[i].sFrequency = atof(r[i]["frequency"].c_str());
+				mMeasPoints[i].sTxHeight = atof(r[i]["txantennaheight"].c_str());
+				mMeasPoints[i].sRxHeight = atof(r[i]["mobileheight"].c_str());
 				mMeasPoints[i].sClutter = 0;
 				
 				if (mMeasPoints[i].sInstKeyMobile != currentMobile)
@@ -584,7 +593,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	cAntennaPattern FixedAnt, MobileAnt;
 	double *terms;
 
-	double DiffLoss =0;
+	double DiffLoss = 0;
 	terms = new double[NUMTERMS];
 	double CMean = 0, CMeanSquareError=0, CCorrC=0.0, CStDev=0.0;
 	Mean = 0; 
@@ -746,14 +755,15 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				if (mUseClutter)
 				{
 //					cout << "cMeasAnalysisCalc::PerformAnalysis:  Before mClutter.GetForLink" << endl;
-					mClutter.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution,Clutter);
+					mClutterRaster.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution,Clutter);
 					Clutter.GetProfile(ClutterLength,TempClutter);
 
 					for (k=0; k<ClutterLength; k++)
 						mClutterCount[(int)TempClutter[k]]++;
 				}
 
-				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter,DiffLoss);
+				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter,
+								mMeasPoints[i].sDiffLoss, mMeasPoints[i].sClutterDistance);
 				if ((NUMTERMS>6)&&(mUseClutter)) terms[6]=DiffLoss;
  
 				mMeasPoints[i].sClutter = mPathLoss.get_Clutter();
@@ -883,6 +893,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 
 	return NumUsed;
 }
+
+
 
 
 //************************************************************************************************************************************

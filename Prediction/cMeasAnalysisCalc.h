@@ -26,10 +26,10 @@
 #ifndef cMeasAnalysisCalc_h
 #define cMeasAnalysisCalc_h 1
 
-
 // include local headers
 #include "../DataBase/Config.h"
 #include "../DataBase/cDatabase.h"
+#include "../DataBase/cBase.h"
 #include "cGeoP.h"
 #include "PredStructs.h"
 #include "cPthlssp.h"
@@ -58,10 +58,41 @@ struct tMeasPoint
 	double 		sMeasValue;
 	double		sPathLoss;
 	double 		sPredValue;
+	double		sDiffLoss;
+	double 		sFrequency;
+	double 		sTxHeight;
+	double		sRxHeight;
 	float		sTilt;
 	double		sAzimuth;
 	double		sDistance;
 	unsigned 	sClutter;
+	double		sClutterHeight;
+	double		sClutterDistance;
+	double		sReturn;
+
+	tMeasPoint operator=(tMeasPoint Right)
+	{
+		sID		= Right.sID;
+		sCell		= Right.sCell;
+		sInstKeyMobile	= Right.sInstKeyMobile;
+		sInstKeyFixed	= Right.sInstKeyFixed;
+		sPoint		= Right.sPoint;
+		sMeasValue	= Right.sMeasValue;
+		sPathLoss	= Right.sPathLoss;
+		sPredValue	= Right.sPredValue;
+		sDiffLoss	= Right.sDiffLoss;
+		sFrequency	= Right.sFrequency;
+		sTxHeight	= Right.sTxHeight;
+		sRxHeight	= Right.sRxHeight;
+		sTilt		= Right.sTilt;
+		sAzimuth	= Right.sAzimuth;
+		sDistance	= Right.sDistance;
+		sClutter	= Right.sClutter;
+		sClutterHeight	= Right.sClutterHeight;
+		sClutterDistance= Right.sClutterDistance;
+		sReturn		= Right.sReturn;
+		return *this;
+	}
 };
 
 typedef vector<cGeoP> vPoints;
@@ -72,6 +103,8 @@ namespace Qrap
 {
 class cMeasAnalysisCalc 
 {
+   friend class cGPpropModel;
+
    public:
 	cMeasAnalysisCalc(); // default constructor
 	~cMeasAnalysisCalc(); // destructor
@@ -121,7 +154,7 @@ class cMeasAnalysisCalc
 	short int mDEMsource;
 	short int mClutterSource;
 	cRasterFileHandler mDEM;
-	cRasterFileHandler mClutter;
+	cRasterFileHandler mClutterRaster;
 	vector<tFixed>	mFixedInsts;	///< Information on the fixed installations
 	vector<tMobile>	mMobiles;	/// Information on all the mobile instruments used during the measurements
 	MatrixXd mSolveCoefMatrix;	// matrix representing the set of linear equations to be solved

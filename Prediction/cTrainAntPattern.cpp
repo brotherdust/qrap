@@ -153,7 +153,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 	NewCell.sCI=0;
 
 	double longitude, latitude;
-	double Total, Delta, DiffLoss, PathLoss;
+	double Total, Delta, DiffLoss, PathLoss, ClutterDepth;
 	float Tilt;
 	string PointString;
 	unsigned spacePos;
@@ -161,32 +161,32 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 	
 	areaQuery += " @ ST_GeomFromText('POLYGON((";
 	for (i = 0 ; i < Points.size();i++)
-   {
+   	{
 		Points[i].Get(Lat, Lon);
-     	mNorth = max(mNorth,Lat);
-     	mSouth = min(mSouth,Lat);
-     	mEast = max(mEast,Lon);
-     	mWest = min(mWest,Lon);
+	     	mNorth = max(mNorth,Lat);
+     		mSouth = min(mSouth,Lat);
+     		mEast = max(mEast,Lon);
+     		mWest = min(mWest,Lon);
 		gcvt(Lon,12,text);
-     	areaQuery += text;
-     	areaQuery += " ";
+     		areaQuery += text;
+     		areaQuery += " ";
 		gcvt(Lat,12,text);
-     	areaQuery += text;
-     	areaQuery += ",";
-   }
-   NorthWestCorner.Set(mNorth,mWest,DEG);
-   SouthEastCorner.Set(mSouth,mEast,DEG);
+     		areaQuery += text;
+     		areaQuery += ",";
+   	}
+   	NorthWestCorner.Set(mNorth,mWest,DEG);
+   	SouthEastCorner.Set(mSouth,mEast,DEG);
 	cout << "North West corner: " << endl;
 	NorthWestCorner.Display();
 	cout << "South East corner: " << endl;
 	SouthEastCorner.Display();
 	Points[0].Get(Lat,Lon);
 	gcvt(Lon,12,text);
-   areaQuery += text;
-   areaQuery += " ";
+   	areaQuery += text;
+   	areaQuery += " ";
 	gcvt(Lat,12,text);
-   areaQuery += text;
-   areaQuery += "))',4326) ";
+   	areaQuery += text;
+   	areaQuery += "))',4326) ";
 
 	query = "select ci, ST_AsText(site.location) as siteLocation, ";
 	query += "radioinstallation.txantennaheight as height, radioinstallation.txpower as txpwr,  ";
@@ -299,7 +299,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 			}
 			mPathLoss.setParameters(mkFactor,NewMeasurement.sFrequency,
 						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
-			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
+			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
 
 			if (DiffLoss < 10)
 			{
@@ -349,7 +349,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 
 	FANN::training_data	TrainData;
 	FANN::training_data	TestData;
-	double PathLoss, Delta;
+	double PathLoss, Delta, ClutterDepth;
 	double TrainError, TestError;
 	double EIRP;
 	double minTrainError = MAXDOUBLE;
@@ -434,7 +434,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 								mPlotResolution,mClutterProfile);
 				}
 
-				PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
+				PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
 				Azimuth = mCells[i].sPosition.Bearing( mCells[i].sMeasTrain[j].sLocation);
 
 				mCells[i].sInputTrain[j][0] = 1;
@@ -503,7 +503,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				}
 				mPathLoss.setParameters(mkFactor,mCells[i].sMeasTest[j].sFrequency,
 							mCells[i].sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
-				PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss);
+				PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
 				Azimuth = mCells[i].sPosition.Bearing(mCells[i].sMeasTest[j].sLocation);
 	
 				mCells[i].sInputTest[j][0] = 1;

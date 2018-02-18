@@ -295,6 +295,7 @@ bool cLink::SetRxSite(int RxInst, tFixed Inst)
 bool cLink::DoLink(bool Trial, double MaxDist)
 {
 	bool DBworked = true;
+	double ClutterDepth;
 	if (!Trial) // else the information should be already loaded via SetTxSite, StRxSite and GetDBinfoS
 	{
 		DBworked = GetDBinfo(mTxInst);
@@ -387,7 +388,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 		cout << "In cLink::DoLink Link has 0 lenght" << endl;
 		return false;
 	}
-	mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss);
+	mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss, ClutterDepth);
 	mTxBearing = mTxInst.sSitePos.Bearing(mRxInst.sSitePos);
 	if (mTxBearing < 180.0)
 		mRxBearing = mTxBearing + 180.0;
@@ -397,7 +398,7 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 //	cout << "cLink::DoLink( ... ) before mPropLoss loop" << endl;
 	for (j=(Length-1); j>0 ; j--)
 	{
-		mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss);
+		mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss, ClutterDepth);
 		if (!Trial)
 		{
 			TxAntValue = mTxAnt.GetPatternValue(mTxBearing, Tilt[j])

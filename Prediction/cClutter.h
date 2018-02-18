@@ -61,11 +61,11 @@ namespace Qrap
 
 	struct sClutter 
 	{
-		unsigned		sLandCoverID;
-		double  		sRho;
+		unsigned	sLandCoverID;
+		double  	sRho;			//reflection coefficient ... not used
 		double 		sHeight;
 		double*		sCoefficients;
-		bool*				sAllowCchange;		
+		bool*		sAllowCchange;		
 	};
 
 

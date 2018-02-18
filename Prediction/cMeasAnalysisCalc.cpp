@@ -177,8 +177,10 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth, ";
 	query += "mobileheight, txantennaheight ";
 	query += "from measurement cross join testpoint cross join measdatasource ";
+	query += "cross join mobile ";
 	query += "cross join cell cross join radioinstallation cross join site ";
 	query += "where ci=cell.id and risector= radioinstallation.id and siteid=site.id "; 
+	query += "and mobile=mobile.id ";
 	query += "and tp=testpoint.id and measdatasource=measdatasource.id";	
 	if (MeasType>0)
 	{
@@ -381,8 +383,10 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth, ";
 	query += "mobileheight, txantennaheight ";
 	query += "from measurement cross join testpoint cross join measdatasource ";
+	query += "cross join mobile ";
 	query += "cross join cell cross join radioinstallation ";
 	query += "where ci=cell.id and risector= radioinstallation.id "; 
+	query += "and mobile=mobile.id ";
 	query += "and tp=testpoint.id and measdatasource=measdatasource.id";
 
 	if (MeasType>0)
@@ -577,8 +581,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	ClutterOccur = new bool[mPathLoss.mClutter.mNumber];
 	unsigned * LOS;
 	unsigned * NLOS;
-	LOS = new unsigned[mPathLoss.mClutter.mNumber];
-	NLOS = new unsigned[mPathLoss.mClutter.mNumber];
+	LOS = new unsigned[mPathLoss.mClutter.mNumber+1];
+	NLOS = new unsigned[mPathLoss.mClutter.mNumber+1];
 	TempClutter = new float[2];
 	int ClutterLength;
 	mClutterFilter = Clutterfilter;
@@ -680,14 +684,14 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
-
+/*
 					cout << "Inst: " << currentInst << "	#: " << CNumUsed  
 						<< "	Freq =" << mFixedInsts[FixedNum].sFrequency 
 						<< "	M: "<< CMean 					
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-
+*/
 			}
 
 				CNumUsed = 0;
@@ -767,6 +771,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				if ((NUMTERMS>6)&&(mUseClutter)) terms[6]=DiffLoss;
  
 				mMeasPoints[i].sClutter = mPathLoss.get_Clutter();
+//				cout << "In cMeasAnalysisCalc::PerformAnalysis MeasPoints[i].sClutter = " 
+//					<< mMeasPoints[i].sClutter << endl;
 
 				if (DiffLoss>0)
 					NLOS[mMeasPoints[i].sClutter]++;
@@ -857,12 +863,12 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
 		double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 		CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
-  	cout << "Inst: " << currentInst << "	#: " << CNumUsed <<"	M: " << CMean 
+/*  		cout << "Inst: " << currentInst << "	#: " << CNumUsed <<"	M: " << CMean 
 			<< "	MSE: " << CMeanSquareError 
 			<< "	StDev: " << CStDev
 			<< "	Corr: " << CCorrC << endl;
 
-	}
+*/	}
 
 	if (NumUsed>0)
 	{

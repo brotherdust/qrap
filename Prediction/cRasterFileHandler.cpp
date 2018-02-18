@@ -1075,7 +1075,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 		i++;
 	}
 	
-	if ((RasterFound)&&(mCurrentRasters.size()>4))
+	if ((RasterFound)&&(mCurrentRasters.size()>MAX_NUM_RASTERS))
 	{	
 		for (i=0; i<mCurrentRasters.size(); i++)
 		{

@@ -101,6 +101,7 @@ int cGPpropModel:: mainTuning()
 	double Mean, MSE, StDev, CorrC;
 	mMeas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
+	cout << "Initial calculation done" << endl;
 	GOftn* newTree = nullptr;
 	SCandidate newCandidate;
 	unsigned ClutterFilter = 0;

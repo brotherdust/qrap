@@ -167,7 +167,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	}
 	
 //	cout << "cAntennaPattern::SetAntennaPattern. Na if (mUseANN) " << endl;
-	cout << "RadKey = "	<< Key << "	Bearing = " << Bearing << "	Tilt = " << MechTilt;
+//	cout << "RadKey = "	<< Key << "	Bearing = " << Bearing << "	Tilt = " << MechTilt;
 
 	int pp, ss, sign; 	//point position
 	float *TempAziAngles;
@@ -189,7 +189,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		query += "from mobile cross join antennapattern where " ;
 		query += "mobile.antpatternkey = AntennaPattern.id ";
  		query += "and mobile.id = ";
-		cout << "Mobile Antenna";
+//		cout << "Mobile Antenna";
 	}
 	else
 	{
@@ -254,7 +254,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 //   	cout << "After setting basic CmdStr"  << endl;
  
 	gcvt(AntKey, 8, Temp);
-	cout << "	Antenna Pattern Key = " << Temp << endl;
+//	cout << "	Antenna Pattern Key = " << Temp << endl;
 	CmdStr += Temp;
 	CmdStr += ";";
 	

@@ -123,9 +123,9 @@ int cGPpropModel:: mainTuning()
 	double Mean, MSE, StDev, CorrC;
 	mMeas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
-	int Num;
 	GOftn* newTree = nullptr;
 	SCandidate newCandidate;
+	unsigned ClutterFilter = 0;
 
 	// ***********************************************************************
 	// Initialise candidates of known models
@@ -185,8 +185,9 @@ int cGPpropModel:: mainTuning()
 	mNumCandidates = mCandidate.size();
 	for (i=0; i<mNumCandidates; i++)
 	{
-		mCandidate[i].sCorrC = -100.0;
+		mCandidate[i].sCorrC = -1.0;
 		mCandidate[i].sMSE = 9999999;
+		mCandidate[i].sRank = 2*(mNumCandidates-1);
 		mCandidate[i].sNumClutter = mClutter.mNumber;
 		mCandidate[i].sClutterType  = new unsigned[mClutter.mNumber];
 		mCandidate[i].sClutterHeight = new double[mClutter.mNumber];
@@ -197,43 +198,50 @@ int cGPpropModel:: mainTuning()
 		} 
 	}
 
-/*	
+	
 	for (k=0; k<NUM_GENERATIONS; k++) 
 	{
 		mNumCandidates = mCandidate.size();
 		// test the performance of each one
 		// this should be problem-dependent, and implemented in another file
-		for (i=0; i<mNumTrees; i++)
+		for (i=0; i<mNumCandidates; i++)
 		{
-
+			CostFunction(i, Mean,mCandidate[i].sMSE,
+					StDev, mCandidate[i].sCorrC, ClutterFilter);
 			
 		}
 		
 		//sort by performance (sort in increasing order so we work on first N)
-		sort(tree.begin(), tree.end(), treeSortPredIncre);
+		sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnCorrC);
+		for (i=0; i<mNumCandidates; i++)
+			mCandidate[i].sRank = i;
+		sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnMSE);
+		for (i=0; i<mNumCandidates; i++)
+			mCandidate[i].sRank += i;
+		sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnRank);
 		
-		numToDie = (unsigned)(mNumTrees*DEATH_RATE/100);
+		mNumToDie = (unsigned)(mNumCandidates*DEATH_RATE/100);
 		for (i=0; i<mNumToDie; i++)
 		{
 			//toss out losers
-			deleteTree(mTree[i]);			
+			deleteTree(mCandidate[i].sTree);
 			//randomly select one of the survivors and clone
-			mTree[i] = mTree[getRandSurvior(mNumTrees)]->clone();
+			mCandidate[i].sTree = mCandidate[getRandSurvivor(mNumCandidates)].sTree->clone();
 			//do cross over with survivors 
-			//crossOver(mTree[i], mTree[getRandSurvior(numTrees)]);
+			//crossOver(mTree[i], mTree[getRandSurvior(mNumCandidates)]);
 			//cross over with best
-			crossOver(mTree[i], mTree[mNumTrees - 1]);  
-			mutateTree(&mTree[i]);	//mutate
+			crossOver(mCandidate[i].sTree, mCandidate[mNumCandidates - 1].sTree);  
+			mutateTree(&mCandidate[i].sTree);	//mutate
+			for (j=0; j<mClutter.mNumber; j++)
+			{
+				mCandidate[i].sClutterType[j] = mCandidate[mNumCandidates - 1].sClutterType[j];	
+				mCandidate[i].sClutterHeight[j] = mCandidate[mNumCandidates - 1].sClutterHeight[j];
+			}
 		}
-		printf("Generation %d the best score is: %f\n", k, mTree[mNumTrees - 1]->mPerfScore);
+		cout << "Best candidate: CorrC = " << mCandidate[mNumCandidates - 1].sCorrC 
+			<< "	MSE = " << mCandidate[mNumCandidates - 1].sMSE;
 	}
-	printTree(mTree[mNumTrees - 1]);
-	for (i=0; i<mNumTrees; i++)
-	{
-		deleteTree(mTree[i]);
-	} 
-	mTree.clear();
-*/
+	printTree(mCandidate[mNumCandidates - 1].sTree);
     	return 0;
 }
 
@@ -667,7 +675,23 @@ void cGPpropModel::deleteTree(GOftn* inTree)
 }
 
 //***************************************************************************
-bool cGPpropModel::treeSortPredIncre(GOftn* t1, GOftn* t2)
+bool cGPpropModel::SortCriteriaOnCorrC(SCandidate c1, SCandidate c2)
 {
-	return t1->mPerfScore > t2->mPerfScore;
+	return (c1.sCorrC < c2.sCorrC);
+}
+//***************************************************************************
+bool cGPpropModel::SortCriteriaOnMSE(SCandidate c1, SCandidate c2)
+{
+	return (c1.sMSE > c2.sMSE);
+}
+//***************************************************************************
+bool cGPpropModel::SortCriteriaOnRank(SCandidate c1, SCandidate c2)
+{
+	return (c1.sRank>c2.sRank);
+}
+//******************************************************
+int cGPpropModel::getRandSurvivor(unsigned popSize)
+{
+	int randn = rand() % (popSize - mNumToDie);
+	return (mNumToDie + randn);
 }

@@ -4,7 +4,7 @@
  *    Version     : 0.1
  *    Date        : 2008/04/01
  *    License     : GNU GPLv3
- *    File        : cPthlssp.h
+ *    File        : cPthlssp.cpp
  *    Copyright   : (c) Meraka Institute CSIR (1997) & University of Pretoria
  *    Author      : Magdaleen Ballot (magdaleen.ballot@up.ac.za)
  *    Description : Core propagation prediction algorithm
@@ -46,13 +46,16 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	m_size = 2;
 	mCalcMarker = 0;
 	mTuning=false;
-	mClutterIndex = 0;
+	mClutterIndex = 1000;
 
 	delete [] m_profile;
 	m_profile = new float[m_size];
 	m_TempProfile = new float[m_size];
 	m_CurvedProfile = new float[m_size];
 	mClutterProfile = new int[m_size];
+	mNLOS = new bool[m_size];
+	for (i=0; i<m_size; i++)
+		mNLOS[i]=false;
 	m_markers = new int[MAXPEAK];
 	m_peakwidth = new int[MAXPEAK];
 	m_aboveEarth = new double[MAXPEAK];
@@ -123,12 +126,13 @@ cPathLossPredictor::cPathLossPredictor(const cPathLossPredictor &right)
 	mClutterProfile = new int[m_size];
 
 	for (i=0; i<m_size; i++)
-    {
+    	{
 		m_CurvedProfile[i] = right.m_CurvedProfile[i];
                 m_TempProfile[i]=  right.m_TempProfile[i];
 		m_profile[i] = right.m_profile[i];
-		mClutterProfile[i] = right.mClutterProfile[i];	
-    }
+		mClutterProfile[i] = right.mClutterProfile[i];
+		mNLOS[i]=right.mNLOS[i];	
+    	}
 
 	m_markers = new int[MAXPEAK];
 	m_peakwidth = new int[MAXPEAK];
@@ -158,6 +162,7 @@ cPathLossPredictor::~cPathLossPredictor()
 	delete [] m_CurvedProfile;
 	delete [] mClutterProfile;
 	delete [] mCterms;
+	delete [] mNLOS;
 }/* end CPathLossPredictor:: Destructor */
 
 
@@ -194,6 +199,7 @@ const cPathLossPredictor & cPathLossPredictor::operator=
 	delete [] m_TempProfile;
 	delete [] m_profile;
 	delete [] mClutterProfile;
+	delete [] mNLOS;
 	m_CurvedProfile = new float [m_size];
 	m_TempProfile = new float[m_size];
 	m_profile = new float[m_size];
@@ -204,6 +210,7 @@ const cPathLossPredictor & cPathLossPredictor::operator=
 		*(m_TempProfile+i) = *(right.m_TempProfile+i);
 		*(m_profile+i) = *(right.m_profile+i);
 		*(mClutterProfile+i) = *(right.mClutterProfile+i);
+		*(mNLOS+i) = *(right.mNLOS+i);
 	}
 
 	for (i=0; i<MAXPEAK; i++)
@@ -233,7 +240,7 @@ int cPathLossPredictor::setParameters(double k, double f,
 	m_htx = TxHeight;
 	m_hrx = RxHeight;
 	
-	mClutterIndex = 0;
+	mClutterIndex = 1000;
 
 	mUseClutter = UseClutter;
 	if ((ClutterClassGroup!=mClutter.mClassificationGroup)&&(mUseClutter))
@@ -271,7 +278,9 @@ void cPathLossPredictor::set_Clutter(bool &UseClutter, unsigned ClutterClassGrou
 // Calculates the Total Path Loss
 float cPathLossPredictor::TotPathLoss(cProfile &InputProfile, 
 					float &ElevAngleTX,  
-					cProfile &ClutterProfile, double &DiffLoss)
+					cProfile &ClutterProfile, 
+					double &DiffLoss,
+					double &ClutterDepth)
 {
 	double MinClearance=DBL_MAX;
 	double OldMinClear=DBL_MAX;
@@ -313,7 +322,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		if (mUseClutter) 
 		{
 			if ((MinClearance<1.0)&&(PeakIndex!=0)) 
-					mClutterIndex = mClutterProfile[PeakIndex];
+				mClutterIndex = mClutterProfile[PeakIndex];
 			else
 			    mClutterIndex = mClutterProfile[m_size-1];
 		}
@@ -385,12 +394,26 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //	DiffLoss = 0;
 
 
-	if ((NUMTERMS>6)&&(mUseClutter)&&(mClutterIndex>=0)&&(mClutterIndex<100))
+	// Estimate the distance the wave travels through the primary clutter type
+	ClutterDepth = 0.0;
+	for (i=0; i<m_size; i++)
+	{
+		if ((mNLOS)&&(mClutterProfile[i]==mClutterIndex))
+			ClutterDepth+=m_interPixelDist;
+	}
+	if ((0==ClutterDepth)&&(mClutterProfile[m_size-1]==mClutterIndex))
+	{
+		ClutterDepth = (mClutter.mClutterTypes[mClutterIndex].sHeight - m_hrx)/sqrt(2.0);
+	}
+
+	//Incorporate the Obstruction loss
+	if ((NUMTERMS>6)&&(mUseClutter)&&(mClutterIndex>=0)&&(mClutterIndex<200))
 	{
 		if (( mClutter.mClutterTypes[mClutterIndex].sCoefficients[6]>0)||(mTuning))	mCterms[6] = DiffLoss;
 		else m_Loss+=DiffLoss;
 	}
 	else m_Loss+=DiffLoss;
+	
 	
 	if (mUseClutter)
 	{
@@ -426,7 +449,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //			mCterms[8] = TERM8;
 //		else mCterms[8] = 100;
 
-		if ((mClutterIndex>=0)&&(mClutterIndex<100))
+		if ((mClutterIndex>=0)&&(mClutterIndex<200))
 		{
 			for (i=0; i<NUMTERMS; i++)
 				m_Loss += mClutter.mClutterTypes[mClutterIndex].sCoefficients[i]*mCterms[i];
@@ -741,6 +764,7 @@ int cPathLossPredictor::FindMainPeak(const int BeginMarkerIndex,
 			sqrtd1d2 = sqrt((double)((i-begin)*(end-i))*m_tempIPD
 						/ (double)(end-begin));
 			Clear = (ReffHeight-(double)m_TempProfile[i])/(rootLambda*sqrtd1d2);
+			if (Clear<=0)	mNLOS[i]=true;
 			if (Clear<MinClear)
 			{
 				MinClear = Clear;

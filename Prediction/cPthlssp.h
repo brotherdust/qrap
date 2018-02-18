@@ -92,17 +92,18 @@ namespace Qrap
 			/**
 			 * Main routine to calculate path loss
 			 * 
-			 * @param DTMProfile Description
-			 * @param Tilt Description
-			 * @param UseClutter Description
-			 * @param ClutterProfile Description
-			 *
+			 * @param DTMProfile Elevation profile along the path
+			 * @param Tilt returns the transmitter tilt angle towards the receiver 
+			 * @param ClutterProfile The profile with the indexes of the culttertypes along the path
+			 * @param DiffLoss returns the obstruction loss along the path 
+			 * @param ClutterDepth returns an estimate of the distance in meters that the wave travveled through clutter.  
 			 * @return The total pathloss.
 			 */
 			float TotPathLoss (cProfile &DTMProfile, 
 						float &Tilt, 
 						cProfile &ClutterProfile,
-						double &DiffLoss);
+						double &DiffLoss,
+						double &ClutterDepth);
 			
 			/**
 			 * Find the elevation angle in which the main ray is directed.
@@ -313,7 +314,8 @@ namespace Qrap
 			double m_hrx;			///< The height of the receiver antenna in meter.
 			float *m_TempProfile;		///< Temporary (horizontilized profile).
 			float *m_CurvedProfile;		///< Storage for original profile.
-			int *mClutterProfile;
+			int *mClutterProfile;		///< Index of the cluttertype alone the profile
+			bool *mNLOS;			///< Is the direct line obstructed at the point along the profile.
 			double m_tempIPD;		///< Temporary InterPixelDist used to "flatten" the profile in meter
 			double m_slope;			///< (temporary) slope of the profile.
 			double mTuning;
@@ -326,6 +328,7 @@ namespace Qrap
 			bool mUseClutter;		///< indicates whether clutter dependancies should be included. 
 			double *mCterms;		///< values of the clutter terms
 			int mClutterIndex;		///< index to the clutter type where the profile has least clearance
+			double mClutterDepth;		///< estimated distance that the wave travvelled through the clutter
 			unsigned mCalcMarker;
 		public:
 			cClutter mClutter;		///< 'container' class that has the coefficients and heights to be used in the pathloss calculations. It must be public for the optimiser to see it. 

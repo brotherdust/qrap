@@ -55,7 +55,10 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	mClutterProfile = new int[m_size];
 	mNLOS = new bool[m_size];
 	for (i=0; i<m_size; i++)
+	{
 		mNLOS[i]=false;
+		mClutterProfile[i] = 0;
+	}
 	m_markers = new int[MAXPEAK];
 	m_peakwidth = new int[MAXPEAK];
 	m_aboveEarth = new double[MAXPEAK];
@@ -400,7 +403,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	ClutterDepth = 0.0;
 	for (i=0; i<m_size; i++)
 	{
-		if ((mNLOS)&&(mClutterProfile[i]==mClutterIndex))
+		if ((mNLOS[i])&&(mClutterProfile[i]==mClutterIndex))
 			ClutterDepth+=m_interPixelDist;
 	}
 	if ((0==ClutterDepth)&&(mClutterProfile[m_size-1]==mClutterIndex))

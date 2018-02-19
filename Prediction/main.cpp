@@ -39,7 +39,6 @@
 #include "cTrainAntPattern.h"
 #include "cTrafficDist.h"
 
-
 using namespace std;
 using namespace Qrap;
 
@@ -234,8 +233,8 @@ int main (int argc, char **argv)
 
 	cout << "Loading measurements ... in main()" << endl;
 
-	Meas.SetPlotResolution(5);
-	Meas.LoadMeasurements(Punte,1,1,1);
+	Meas.SetPlotResolution(30);
+	Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;

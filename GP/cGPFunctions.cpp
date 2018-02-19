@@ -36,6 +36,21 @@ string GOftn::getLabel()
 	return mLabel;
 }
 
+//************************************************************************
+unsigned GOftn::getTreeDepth(unsigned &CurrentDepth)
+{
+	unsigned i, MaxDepth=0, childDepth;
+	for (i=0; i < mNumChildren; i++)
+	{
+		childDepth = mChild[i]->getTreeDepth(CurrentDepth);
+		if ( childDepth > MaxDepth)
+			MaxDepth = childDepth;
+	}
+	CurrentDepth = MaxDepth;
+	if (0<mNumChildren) CurrentDepth++;
+	return CurrentDepth;
+}
+
 //**************************************************************************
 //**************************************************************************
 //
@@ -49,7 +64,7 @@ ConstNode::ConstNode()
 	mConstVal = rand()/(double)RAND_MAX;
 	char* str;
 	str = new char[20];
-	sprintf(str, "Const: %f", mConstVal);
+	sprintf(str, " C: %f", mConstVal);
 	mLabel = str;
 	delete [] str;
 }
@@ -62,7 +77,7 @@ ConstNode::ConstNode(double preSetVal)
 	mConstVal = preSetVal;
 	char* str;
 	str = new char[20];
-	sprintf(str, "Const: %f", mConstVal);
+	sprintf(str, " C: %f", mConstVal);
 	mLabel = str;
 	delete [] str;
 }
@@ -72,6 +87,7 @@ tMeasPoint ConstNode::eval(tMeasPoint InPoint)
 {
 	tMeasPoint outPoint = InPoint;
 	outPoint.sReturn = mConstVal;
+//	cout << mLabel << outPoint.sReturn;
 	return outPoint;
 }
 
@@ -100,7 +116,8 @@ DistanceNode::DistanceNode()
 tMeasPoint DistanceNode::eval(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
-	outPoint.sReturn = inPoint.sDistance;
+	outPoint.sReturn = inPoint.sDistance/1000;
+//	cout <<"	"<< mLabel << outPoint.sReturn;
 	return outPoint;
 }
 
@@ -129,6 +146,7 @@ tMeasPoint FrequencyNode::eval(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	outPoint.sReturn = inPoint.sFrequency;
+//	cout <<"	"<< mLabel << outPoint.sReturn;
 	return outPoint;
 }
 
@@ -213,6 +231,7 @@ tMeasPoint ObstructionNode::eval(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	outPoint.sReturn = inPoint.sDiffLoss;
+//	cout <<"	"<< mLabel << outPoint.sReturn;
 	return outPoint;
 }
 
@@ -337,6 +356,7 @@ tMeasPoint Add::eval(tMeasPoint inPoint)
 		cerr << "left and right not defined in power"<<endl;
 		outPoint.sReturn = -1000.0;
 	}
+//	cout << "	" << mLabel << outPoint.sReturn;
 	return outPoint;
 }
 
@@ -424,6 +444,7 @@ tMeasPoint Multiply::eval(tMeasPoint inPoint)
 		cerr << "left and right not defined in Multiply."<<endl;
 		outPoint.sReturn = -1000.0;
 	}
+//	cout <<"	"<< mLabel << outPoint.sReturn;
 	return outPoint;
 }
 
@@ -467,7 +488,7 @@ tMeasPoint Divide::eval(tMeasPoint inPoint)
 		}
 		else
 		{
-			cerr << "almost divide by zero "<<endl;
+//			cerr << "almost divide by zero "<<endl;
 			outPoint.sReturn = -1000.0;
 		}
 	}
@@ -516,15 +537,16 @@ tMeasPoint Log10Node::eval(tMeasPoint inPoint)
 			outPoint.sReturn = log10(c1.sReturn);
 		else
 		{
-			cerr << "input to log10 not positive"<<endl;
+//			cerr << "input to log10 not positive"<<endl;
 			outPoint.sReturn = -1000.0;
 		}
 	}
 	else 
 	{
-		cerr << "input not defined in square"<<endl;
+		cerr << "input not defined in log10"<<endl;
 		outPoint.sReturn = -1000.0;
 	}
+//	cout <<"	"<< mLabel << outPoint.sReturn;
 	return outPoint;
 }
 

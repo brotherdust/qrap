@@ -86,6 +86,7 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 		else cout << "False" << endl;
 	if (mUseClutter)
 		mClutterClassGroup = mClutterRaster.GetClutterClassGroup();
+	cout << "cMeasAnalysisCalc::contructor: 2) mClutterClassGroup=" << mClutterClassGroup << endl;
 	mUseClutter = (mUseClutter)&&(mClutterClassGroup>=0);
 	cout << "cMeasAnalysisCalc::contructor: 2) mUseClutter=";
 	if (mUseClutter) cout << "true" << endl;

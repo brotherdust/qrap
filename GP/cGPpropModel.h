@@ -39,14 +39,13 @@
 #include "cGPFunctions.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 300
+#define NUM_INIT_CANDIDATES 6
 #define NUM_GENERATIONS 200
 #define NUM_POINT_PER_EVAL 2000
 //how much of the population we loose per generation
-#define DEATH_RATE 30 
+#define DEATH_RATE 40 
 
-#define MAX_TREE_DEPTH 4 
-#define MUTATION_THRESH 0.1
+#define MAX_TREE_DEPTH 5 
 
 struct SCandidate
 { 
@@ -57,6 +56,26 @@ struct SCandidate
 	double		sCorrC;
 	double		sMSE;
 	unsigned	sRank;
+	unsigned	sDepth;
+
+	SCandidate operator=(SCandidate Right)
+	{
+		unsigned i;
+		sNumClutter	= Right.sNumClutter;
+		sClutterType = new unsigned[sNumClutter];
+		sClutterHeight = new double[sNumClutter];
+		for (i=0; i<sNumClutter; i++)
+		{
+			sClutterType[i] = Right.sClutterType[i];
+			sClutterHeight[i] = Right.sClutterHeight[i];
+		}
+		sTree		= Right.sTree->clone();
+		sCorrC		= Right.sCorrC;
+		sMSE		= Right.sMSE;
+		sRank		= Right.sRank;
+		sDepth		= Right.sDepth;
+		return *this;
+	}
 };
 
 typedef vector<SCandidate> vCandidates;
@@ -79,17 +98,27 @@ namespace Qrap
 		
 			int mainTuning();
 
+		private:
+
 			int CostFunction(unsigned CanIndex, double &Mean, double &MeanSquareError,
 				double &StDev, double &CorrC, unsigned Clutterfilter=0);
 
 
 			void printTree(GOftn* inTree, int depth=0);
 
-			void mutateTree(GOftn** inTree, int depth=0);
+			void mutateTree(GOftn** inTree, int depth=0, double PropMutate=0.3);
 
-			void crossOver(GOftn* treeToAlter, GOftn* donatingTree);
+			void crossOverTree(GOftn* treeToAlter, GOftn* donatingTree);
 	
 			void deleteTree(GOftn* inTree);
+
+			void mutateCandidate(unsigned Index);
+
+			void crossOverCandidate(unsigned Index, unsigned donatorIndex);
+
+			void replaceTree(unsigned Index);
+	
+			void deleteCandidate(unsigned Index);
 	
 			static bool SortCriteriaOnCorrC(SCandidate c1, SCandidate c2);
 			static bool SortCriteriaOnMSE(SCandidate c1, SCandidate c2);

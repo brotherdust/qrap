@@ -412,7 +412,7 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 	Rows = (unsigned) (SizeNS*100000 / OrigRes);
 	Cols = (unsigned) (SizeEW*100000 / OrigRes);
 	Size = Rows*Cols;
-	while (Size> 100000000) 
+/*	while (Size> 100000000) 
 	{
 		if (Cols>Rows)	SizeEW/=2.0;
 		else			SizeNS/=2.0;
@@ -421,7 +421,7 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 		Size = Rows*Cols;	
 	}
 
-	unsigned NumMapRows, NumMapCols;
+*/	unsigned NumMapRows, NumMapCols;
 	NumMapRows = (unsigned)((maxN-minS)/SizeNS +1.0);
 	NumMapCols = (unsigned)((maxE-minW)/SizeEW +1.0);
 

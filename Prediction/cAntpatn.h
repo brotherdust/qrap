@@ -120,7 +120,7 @@ namespace Qrap
 			Float2DArray mAntPattern;	///< Matrix containing the values of the antenna pattern at all mAziAngles and mElevAngles
 			FANN::neural_net *mAntennasANN;
 			bool mUseANN;
-			int mElecTiltRef;
+			unsigned mElecTiltRef;
 			double mElecTiltValue;
 			double mMinValueElev;
 			double mMinValueAzi;

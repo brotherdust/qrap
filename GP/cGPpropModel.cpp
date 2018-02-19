@@ -24,6 +24,12 @@
 
 #include "cGPpropModel.h"
 
+#ifndef GLOBALS
+#define GLOBALS 1
+std::default_random_engine 		gRandomGen;
+std::normal_distribution<double> 	gGauss;
+#endif
+
 using namespace Qrap;
 using namespace std;
 
@@ -96,15 +102,16 @@ int cGPpropModel:: mainTuning()
 	cout << "Loading measurements ... in main()" << endl;
 
 	mMeas.SetPlotResolution(30);
-	mMeas.LoadMeasurements(Punte,1,1,1);
+	mMeas.LoadMeasurements(Punte,0,0,0);
 
 	double Mean, MSE, StDev, CorrC;
-	mMeas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	mMeas.PerformAnalysis(Mean, MSE, StDev, CorrC);
 
 	cout << "Initial calculation done" << endl;
+	cout << "Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl << endl << endl;
 	GOftn* newTree = nullptr;
 	SCandidate newCandidate;
-	unsigned ClutterFilter = 0;
+	
 
 	// ***********************************************************************
 	// Initialise candidates of known models
@@ -127,6 +134,7 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[1]->mChild[1]->mChild[1] = new ObstructionNode();
 
 	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 4;
 	mCandidate.push_back(newCandidate);
 
 	// Hata - Suburban
@@ -147,6 +155,7 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[1]->mChild[1]->mChild[1] = new ObstructionNode();
 
 	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 4;
 	mCandidate.push_back(newCandidate);
 */
 	mNumCandidates = mCandidate.size();
@@ -178,6 +187,8 @@ int cGPpropModel:: mainTuning()
 	}
 
 	
+	unsigned IndexForCrossOver = 0;
+	unsigned Nsamples=0;
 	for (k=0; k<NUM_GENERATIONS; k++) 
 	{
 		mNumCandidates = mCandidate.size();
@@ -185,42 +196,45 @@ int cGPpropModel:: mainTuning()
 		// this should be problem-dependent, and implemented in another file
 		for (i=0; i<mNumCandidates; i++)
 		{
-			CostFunction(i, Mean,mCandidate[i].sMSE,
-					StDev, mCandidate[i].sCorrC, ClutterFilter);
+			Nsamples = CostFunction(i, Mean,mCandidate[i].sMSE,
+					StDev, mCandidate[i].sCorrC);
+			cout << "i = " << i <<"		CorrC=" << mCandidate[i].sCorrC << "	MSE=" << mCandidate[i].sMSE  
+				<< "	Mean=" << Mean  << "	StDev=" << StDev <<"	N=" << Nsamples << endl ;
 			
 		}
 		
 		//sort by performance (sort in increasing order so we work on first N)
 		sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnCorrC);
 		for (i=0; i<mNumCandidates; i++)
+		{
+//			cout << i << "	CorrC = " << mCandidate[i].sCorrC << endl;
 			mCandidate[i].sRank = i;
+		}
 		sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnMSE);
 		for (i=0; i<mNumCandidates; i++)
+		{
+//			cout << i << "	MSE = " << mCandidate[i].sMSE << endl;
 			mCandidate[i].sRank += i;
+		}
 		sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnRank);
+		for (i=0; i<mNumCandidates; i++)
+		{
+//			cout << i << "	Rank = " << mCandidate[i].sRank << endl;
+		}
 		
 		mNumToDie = (unsigned)(mNumCandidates*DEATH_RATE/100);
 		for (i=0; i<mNumToDie; i++)
 		{
-			//toss out losers
-			deleteTree(mCandidate[i].sTree);
-			//randomly select one of the survivors and clone
-			mCandidate[i].sTree = mCandidate[getRandSurvivor(mNumCandidates)].sTree->clone();
-			//do cross over with survivors 
-			//crossOver(mTree[i], mTree[getRandSurvior(mNumCandidates)]);
-			//cross over with best
-			crossOver(mCandidate[i].sTree, mCandidate[mNumCandidates - 1].sTree);  
-			mutateTree(&mCandidate[i].sTree);	//mutate
-			for (j=0; j<mClutter.mNumber; j++)
-			{
-				mCandidate[i].sClutterType[j] = mCandidate[mNumCandidates - 1].sClutterType[j];	
-				mCandidate[i].sClutterHeight[j] = mCandidate[mNumCandidates - 1].sClutterHeight[j];
-			}
+			//replace worst of population with mutations of best
+			mCandidate[mNumCandidates-1-i] = mCandidate[i];
+			mutateCandidate(mNumCandidates-1-i);
+			IndexForCrossOver = (unsigned)(gGauss(gRandomGen)*(mNumCandidates-mNumToDie));		
+			crossOverTree(mCandidate[mNumCandidates-1-i].sTree, mCandidate[IndexForCrossOver].sTree);  
 		}
-		cout << "Best candidate: CorrC = " << mCandidate[mNumCandidates - 1].sCorrC 
-			<< "	MSE = " << mCandidate[mNumCandidates - 1].sMSE;
+		cout << "Best candidate:	CorrC = " << mCandidate[0].sCorrC 
+			<< "	MSE = " << mCandidate[0].sMSE << endl;
 	}
-	printTree(mCandidate[mNumCandidates - 1].sTree);
+	printTree(mCandidate[0].sTree);
     	return 0;
 }
 
@@ -228,9 +242,6 @@ int cGPpropModel:: mainTuning()
 int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquareError,
 					double &StDev, double &CorrC, unsigned Clutterfilter)
 {
-
-	unsigned SkipNumber = (unsigned)(mMeas.mNumMeas/NUM_POINT_PER_EVAL);
-	unsigned FirstMeas = rand() % SkipNumber;
 	bool *ClutterOccur;
 	ClutterOccur = new bool[mCandidate[CIndex].sNumClutter];
 	unsigned * LOS;
@@ -263,7 +274,7 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 //	unsigned tClutter = 0;
 
 	//These varaibles are local and are such that they can be used with the TERMs defined in cClutter.h
-	double freq, htx;
+//	double freq, htx;
 	
 	for (j=0;j<mMeas.mPathLoss.mClutter.mNumber;j++)
 	{
@@ -274,10 +285,15 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 	}
 
 	NumUsed = 0;
+	CNumUsed = 0;
 
 	if (0==mMeas.mFixedInsts.size()) return 0;
 
-//	cout <<"cMeasAnalysisCalc::PerformAnalysis: mNumMeas = " << mNumMeas << endl;
+//	cout <<"cGPpropModel::CostFunction: mNumMeas = " << mNumMeas << endl;
+
+//	unsigned SkipNumber = (unsigned)(mMeas.mNumMeas/NUM_POINT_PER_EVAL);
+	unsigned SkipNumber = (mCandidate[CIndex].sRank+1)*10;
+	unsigned FirstMeas = rand() % SkipNumber;
 	for (i=FirstMeas; i<mMeas.mNumMeas; i=i+SkipNumber)
 	{
 		if ((0==Clutterfilter)||(0==mMeas.mMeasPoints[i].sClutter)
@@ -321,14 +337,14 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 					double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
-
+/*
 					cout << "Inst: " << currentInst << "	#: " << CNumUsed  
 						<< "	Freq =" << mMeas.mFixedInsts[FixedNum].sFrequency 
 						<< "	M: "<< CMean 					
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-
+*/
 				}
 
 				CNumUsed = 0;
@@ -368,20 +384,20 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 					+ FixedAnt.mGain + MobileAnt.mGain;
 
 
-//				cout << "cMeasAnalysisCalc::PerformAnalysis: Setting Prediction parameters to match FixedInstallation" << endl;
+//				cout << "cGPpropModel::CostFunction: Setting Prediction parameters to match FixedInstallation" << endl;
 				mMeas.mPathLoss.setParameters(mMeas.mkFactor,mMeas.mFixedInsts[FixedNum].sFrequency,
 								mMeas.mFixedInsts[FixedNum].sTxHeight,
 								mMeas.mMobiles[MobileNum].sMobileHeight,
 								mMeas.mUseClutter, mMeas.mClutterClassGroup);
 				
-				freq = mMeas.mFixedInsts[FixedNum].sFrequency;
-				htx = mMeas.mFixedInsts[FixedNum].sTxHeight;
+//				freq = mMeas.mFixedInsts[FixedNum].sFrequency;
+//				htx = mMeas.mFixedInsts[FixedNum].sTxHeight;
 			}
 			
-//			cout << "cMeasAnalysisCalc::PerformAnalysis:  Before mDEM.GetForLink" << endl;
+//			cout << "cGPpropModel::CostFunction:  Before mDEM.GetForLink" << endl;
 			mMeas.mDEM.GetForLink(mMeas.mFixedInsts[FixedNum].sSitePos, mMeas.mMeasPoints[i].sPoint, 
 							mMeas.mPlotResolution, DEM);
-//			cout << "cMeasAnalysisCalc::PerformAnalysis: After mDEM.GetForLink" << endl;
+//			cout << "cGPpropModel::CostFunction: After mDEM.GetForLink" << endl;
 			mMeas.mMeasPoints[i].sDistance = mMeas.mFixedInsts[FixedNum].sSitePos.Distance(mMeas.mMeasPoints[i].sPoint);
 			Length = DEM.GetSize();
 			
@@ -393,7 +409,7 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 				if (mMeas.mUseClutter)
 				{
 					
-//					cout << "cMeasAnalysisCalc::PerformAnalysis:  Before mClutter.GetForLink" << endl;
+//					cout << "cGPpropModel::CostFunction:  Before mClutter.GetForLink" << endl;
 					mMeas.mClutterRaster.GetForLink(mMeas.mFixedInsts[FixedNum].sSitePos,
 									mMeas.mMeasPoints[i].sPoint,
 									mMeas.mPlotResolution,Clutter);
@@ -404,11 +420,19 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 									mMeas.mMeasPoints[i].sDiffLoss, 
 									mMeas.mMeasPoints[i].sClutterDistance);
 				mMeas.mMeasPoints[i].sClutter = mMeas.mPathLoss.get_Clutter();
+//				cout << " RawLoss = " << mMeas.mMeasPoints[i].sPathLoss
+//					<< "	O_L = " << mMeas.mMeasPoints[i].sDiffLoss;
 				mMeas.mMeasPoints[i].sClutterHeight = mCandidate[CIndex].sClutterHeight[mMeas.mMeasPoints[i].sClutter]; 
-
-				mCandidate[CIndex].sTree->eval(mMeas.mMeasPoints[i]);
+				mMeas.mMeasPoints[i] = mCandidate[CIndex].sTree->eval(mMeas.mMeasPoints[i]);
 
 				mMeas.mMeasPoints[i].sPathLoss = mMeas.mMeasPoints[i].sReturn;
+			
+				if ((isnan(mMeas.mMeasPoints[i].sPathLoss))||(isinf(mMeas.mMeasPoints[i].sPathLoss)))
+				{
+					mMeas.mMeasPoints[i].sReturn = -9999;
+					mMeas.mMeasPoints[i].sPathLoss = -9999;
+				}	
+//				cout << "	TreeLoss = " << mMeas.mMeasPoints[i].sPathLoss << endl;
 
 				if (DiffLoss>0)
 					NLOS[mMeas.mMeasPoints[i].sClutter]++;
@@ -420,10 +444,11 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 
 				AntValue = FixedAnt.GetPatternValue(mMeas.mMeasPoints[i].sAzimuth, 
 									mMeas.mMeasPoints[i].sTilt)
-									+ MobileAnt.GetPatternValue(0, -mMeas.mMeasPoints[i].sTilt);
+									+ MobileAnt.GetPatternValue(0, 
+									- mMeas.mMeasPoints[i].sTilt);
 
 				mMeas.mMeasPoints[i].sPredValue = -mMeas.mMeasPoints[i].sPathLoss + EIRP - AntValue;
-//				cout << "cMeasAnalysisCalc::PerformAnalysis pathloss=" << mMeasPoints[i].sPathLoss;
+//				cout << "cGPpropModel::CostFunction pathloss=" << mMeasPoints[i].sPathLoss;
 //				cout << "	AntValue=" << AntValue << endl;
 
 				Error = - mMeas.mMeasPoints[i].sMeasValue + mMeas.mMeasPoints[i].sPredValue;
@@ -462,11 +487,11 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 		double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
 		double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 		CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
-  		cout << "Inst: " << currentInst << "	#: " << CNumUsed <<"	M: " << CMean 
+/*  		cout << "Inst: " << currentInst << "	#: " << CNumUsed <<"	M: " << CMean 
 			<< "	MSE: " << CMeanSquareError 
 			<< "	StDev: " << CStDev
 			<< "	Corr: " << CCorrC << endl;
-
+*/
 	}
 
 	if (NumUsed>0)
@@ -489,7 +514,7 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 	}
 */
 
-	cout << " Leaving cMeasAnalysisCalc::PerformAnalysis   NumUsed = " << NumUsed << endl;
+//	cout << " Leaving cGPpropModel::CostFunction   NumUsed = " << NumUsed << endl;
 	delete [] LOS;
 	delete [] NLOS;
 	delete [] ClutterOccur;
@@ -497,9 +522,43 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 	return NumUsed;
 }
 
+//********************************************************************************
+void cGPpropModel::mutateCandidate(unsigned Index)
+{
+	unsigned j;
+	for (j=0; j<mClutter.mNumber; j++)
+	{
+		mCandidate[Index].sClutterHeight[j] *= (1.0+(1.0-mCandidate[Index].sCorrC)*gGauss(gRandomGen));
+		if (mCandidate[Index].sClutterHeight[j]<0.0)
+			mCandidate[Index].sClutterHeight[j]=0.0;
+	}
+	unsigned depth=0;
+	unsigned TreeDepth=mCandidate[Index].sTree->getTreeDepth(depth);
+	depth = max(0, (int)TreeDepth); 
+//	cout << "Tree depth = " << TreeDepth << endl;
+	unsigned mutateDepth = min(depth, (unsigned)(depth*(1-fabs(gGauss(gRandomGen))*mCandidate[Index].sMSE/2000)));
+	double mutateProp = min(0.5, fabs(gGauss(gRandomGen))*mCandidate[Index].sMSE/2000);
+	cout << "mutateProp = " << mutateProp << "	mutateDepth = " << mutateDepth << endl;	
+	mutateTree(&mCandidate[Index].sTree, mutateDepth, mutateProp); 
+}
+
+//********************************************************************************
+void cGPpropModel::crossOverCandidate(unsigned Index, unsigned donatorIndex)
+{
+}
+
+//********************************************************************************
+void cGPpropModel::replaceTree(unsigned Index)
+{
+}
+
+//********************************************************************************	
+void cGPpropModel::deleteCandidate(unsigned Index)
+{
+}
 
 //*************************************************************************
-void cGPpropModel::crossOver(GOftn* treeToAlter, GOftn* donatingTree)
+void cGPpropModel::crossOverTree(GOftn* treeToAlter, GOftn* donatingTree)
 {
 	if ((treeToAlter->mNumChildren > 0) && (donatingTree->mNumChildren > 0)) 
 	{
@@ -518,12 +577,12 @@ void cGPpropModel::crossOver(GOftn* treeToAlter, GOftn* donatingTree)
 }
 
 //*************************************************************************
-void cGPpropModel::mutateTree(GOftn** inTree, int depth)
+void cGPpropModel::mutateTree(GOftn** inTree, int depth, double PropMutate)
 {
 	double randNum0t1 = rand()/(double)RAND_MAX;
-	if (randNum0t1 < MUTATION_THRESH) 
+	if (randNum0t1 < PropMutate) 
 	{
-		cout << "SHOULD MUTATE" << endl;
+//		cout << "SHOULD MUTATE" << endl;
 		//create new node
 		//create a random node to replace current node
 		GOftn* newNode = createRandomNode(depth + 1);
@@ -656,21 +715,21 @@ void cGPpropModel::deleteTree(GOftn* inTree)
 //***************************************************************************
 bool cGPpropModel::SortCriteriaOnCorrC(SCandidate c1, SCandidate c2)
 {
-	return (c1.sCorrC < c2.sCorrC);
+	return (c1.sCorrC > c2.sCorrC);
 }
 //***************************************************************************
 bool cGPpropModel::SortCriteriaOnMSE(SCandidate c1, SCandidate c2)
 {
-	return (c1.sMSE > c2.sMSE);
+	return (c1.sMSE < c2.sMSE);
 }
 //***************************************************************************
 bool cGPpropModel::SortCriteriaOnRank(SCandidate c1, SCandidate c2)
 {
-	return (c1.sRank>c2.sRank);
+	return (c1.sRank < c2.sRank);
 }
 //******************************************************
 int cGPpropModel::getRandSurvivor(unsigned popSize)
 {
 	int randn = rand() % (popSize - mNumToDie);
-	return (mNumToDie + randn);
+	return (randn);
 }

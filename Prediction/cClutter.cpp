@@ -37,7 +37,7 @@ cClutter::cClutter()
 //	cout << "In cClutter Default constructor" << endl;
 	mNumber = 0;
 	mClutterTypes = NULL;
-	mClassificationGroup = 0;
+	mClassificationGroup = 1;
 	string setting = gDb.GetSetting("UseClutter");
 	if (setting=="true")
 		GetFromDatabase();
@@ -326,7 +326,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 	}
 */
 	mNumber = MaxLandCoverID+1;
-//	cout << "mNumber=" << mNumber << endl;
+	cout << "mNumber=" << mNumber << endl;
 	delete [] type;
 	delete [] temp;
 	delete [] idnr; 

@@ -39,6 +39,7 @@ int main (int argc, char * const argv[])
 	{
 		cout << "Error updating qrap_config" << endl;
 	}
+
 	cGPpropModel GP;
 	GP.mainTuning();
     	return 0;

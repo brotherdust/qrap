@@ -108,11 +108,11 @@ cRaster::cRaster(string Directory,
 //	cout << "In CRaster Non-default constructor ... Geotype = " << mProjType << endl;
 //	cout << "mCentMer = " << mCentMer << endl;
 	if (nullptr!=mProj4) Proj4String = pj_get_def(mProj4, 0);
-	cout << "Proj4string = " << Proj4String << endl;
+//	cout << "Proj4string = " << Proj4String << endl;
 //	if (mSouth) cout << " South" << endl;
 //	else cout << " North" << endl;
 
-	cout << "Leaving cRaster non-default Constructer: mFilename = " << mFilename << endl;
+//	cout << "Leaving cRaster non-default Constructer: mFilename = " << mFilename << endl;
 }
 
 //************************************************************************

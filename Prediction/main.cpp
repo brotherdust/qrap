@@ -151,7 +151,7 @@ int main (int argc, char **argv)
 
 	cGeoP *Hoek;
 	unsigned NumHoek=4;
-/*
+
 //Gauteng 20m DEM
 	NumHoek=19;
 	Hoek = new cGeoP[NumHoek];
@@ -175,7 +175,7 @@ int main (int argc, char **argv)
 	Hoek[16].Set(-25.26, 29.24);
 	Hoek[17].Set(-26.26, 28.99);
 	Hoek[18].Set(-25.01, 28.99);
-*/
+
 	
 //	Country
 //	NumHoek=4;
@@ -186,13 +186,13 @@ int main (int argc, char **argv)
 //	Hoek[3].Set(-24.01, 23.00);
 
 //	Bryanston
-	NumHoek=4;
+/*	NumHoek=4;
 	Hoek = new cGeoP[NumHoek];
 	Hoek[0].Set(-26.035, 27.975);
 	Hoek[1].Set(-26.109, 27.975);
 	Hoek[2].Set(-26.109, 28.075);
 	Hoek[3].Set(-26.035, 28.075);
-
+*/
 //	Tembisa
 /*	NumHoek=6;
 	Hoek = new cGeoP[NumHoek];
@@ -223,7 +223,8 @@ int main (int argc, char **argv)
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
-*/	double Mean, MSE, StDev, CorrC;
+*/	
+	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 	int Num;
 
@@ -239,6 +240,7 @@ int main (int argc, char **argv)
 
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
+	Meas.OptimiseHeights(0);
 	Meas.SaveResults();
 
 

@@ -31,6 +31,7 @@
 #include "../DataBase/Config.h"
 #include "cProfile.h"
 #include "cMemmngr.h"
+#define MAX_NUM_RASTERS 5
 
 #define MAX_NUM_RASTERS 5
 

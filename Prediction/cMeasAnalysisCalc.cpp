@@ -685,15 +685,15 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
 					double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
-/*
-					cout << "Inst: " << currentInst << "	#: " << CNumUsed  
+
+/*					cout << "Inst: " << currentInst << "	#: " << CNumUsed  
 						<< "	Freq =" << mFixedInsts[FixedNum].sFrequency 
 						<< "	M: "<< CMean 					
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
 */
-			}
+				}
 
 				CNumUsed = 0;
 				CError=0;
@@ -868,8 +868,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			<< "	MSE: " << CMeanSquareError 
 			<< "	StDev: " << CStDev
 			<< "	Corr: " << CCorrC << endl;
-
-*/	}
+*/
+	}
 
 	if (NumUsed>0)
 	{
@@ -891,7 +891,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	}
 */
 
-	cout << " Leaving cMeasAnalysisCalc::PerformAnalysis   NumUsed = " << NumUsed << endl;
+//	cout << " Leaving cMeasAnalysisCalc::PerformAnalysis   NumUsed = " << NumUsed << endl;
 	delete [] LOS;
 	delete [] NLOS;
 	delete [] ClutterOccur;
@@ -1504,9 +1504,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	{
 		Change[i] = true;
 		Up[i] = true;
-		CHeightDiff[i] = -0.5;
+		CHeightDiff[i] = 0.5;
 		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
-		DeltaH[i] = -0.5;
+		DeltaH[i] = 0.5;
 		NumClut[i] = 0;
 		Passed[i] = false;
 		changed[i]=false;

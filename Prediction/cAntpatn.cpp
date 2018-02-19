@@ -109,7 +109,7 @@ cAntennaPattern::~cAntennaPattern()
 // ********************************************************************
 // Set antenna pattern file
 bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type, 
-																					double Bearing, double MechTilt)
+				double Bearing, double MechTilt)
 {	
 
 	if (Type ==Mobile)
@@ -245,7 +245,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 //	cout << "After got basic info. RadKey := " << Key << endl;
 	
 	string CmdStr;
-//   cout << "After declaring CmdStr"  << endl;
+//   	cout << "After declaring CmdStr"  << endl;
 
 	CmdStr = "SELECT numazipoints, azimuthangles, azimuthpattern,";
 	CmdStr+=" numelevpoints, elevationangles, elevationpattern ";
@@ -731,8 +731,8 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 
 //	cout << "cAntennaPattern::SetAntennaPattern:	"<< mNEA << "	" << TempRef_mElev[k] << "	" <<TempAziAngles[k]<< endl;
 //	cout << "cAntennaPattern::SetAntennaPattern:	" << mNAA << "	" << TempRef_mAzi[k]<< "	" <<TempAziAngles[k] << endl;
-	
-/*	for (k=0;k<mNEA+3;k++)
+/*	
+	for (k=0;k<mNEA+3;k++)
 		cout << k << "  " << TempRef_mElev[k] << endl;
 	cout << "Azi " << mNAA << "  Elev " << mNEA << endl;
 */	
@@ -1032,6 +1032,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	}	
 */
 	delete [] Temp;
+//	cout << " Leaving cAntennaPattern::SetAntennaPattern " << endl;
 	return 1;
 } // End SetAntennaPattern
 

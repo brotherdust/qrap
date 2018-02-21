@@ -153,7 +153,7 @@ int main (int argc, char **argv)
 	unsigned NumHoek=4;
 
 //Gauteng 20m DEM
-	NumHoek=19;
+/*	NumHoek=19;
 	Hoek = new cGeoP[NumHoek];
 
 	Hoek[0].Set(-25.01, 28.99);
@@ -175,7 +175,7 @@ int main (int argc, char **argv)
 	Hoek[16].Set(-25.26, 29.24);
 	Hoek[17].Set(-26.26, 28.99);
 	Hoek[18].Set(-25.01, 28.99);
-
+*/
 	
 //	Country
 //	NumHoek=4;
@@ -186,13 +186,13 @@ int main (int argc, char **argv)
 //	Hoek[3].Set(-24.01, 23.00);
 
 //	Bryanston
-/*	NumHoek=4;
+	NumHoek=4;
 	Hoek = new cGeoP[NumHoek];
-	Hoek[0].Set(-26.035, 27.975);
-	Hoek[1].Set(-26.109, 27.975);
-	Hoek[2].Set(-26.109, 28.075);
-	Hoek[3].Set(-26.035, 28.075);
-*/
+	Hoek[0].Set(-26.036, 27.976);
+	Hoek[1].Set(-26.108, 27.976);
+	Hoek[2].Set(-26.108, 28.074);
+	Hoek[3].Set(-26.036, 28.074);
+
 //	Tembisa
 /*	NumHoek=6;
 	Hoek = new cGeoP[NumHoek];
@@ -219,11 +219,11 @@ int main (int argc, char **argv)
 	
 	delete [] Hoek;
 
-/*	if (!gDb.PerformRawSql(queryC))
+	if (!gDb.PerformRawSql(queryC))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
-*/	
+	
 	double Mean, MSE, StDev, CorrC;
 	cMeasAnalysisCalc Meas;
 	int Num;
@@ -234,21 +234,25 @@ int main (int argc, char **argv)
 
 	cout << "Loading measurements ... in main()" << endl;
 
-	Meas.SetPlotResolution(30);
+	Meas.SetPlotResolution(5);
 	Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-	Meas.OptimiseHeights(0);
-	Meas.SaveResults();
-
+//	Meas.OptimiseHeights(0);
+	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 //	Meas.SetSeekWidthBest(1);
 //	Meas.SetSmoothWidthBest(1);
 //	Meas.OptimiseSeekWidth();
-//	Meas.OptimiseModelCoefAllTotal(3);
-//	Meas.OptimiseModelCoefD(3);
+	Meas.OptimiseModelCoefAllTotal(0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas.OptimiseModelCoefD(0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas.SaveResults();
 //      Meas.OptimiseHeights(3);
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 

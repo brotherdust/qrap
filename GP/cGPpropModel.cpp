@@ -39,6 +39,9 @@ cGPpropModel::cGPpropModel()
 	cout << "Entering cGPpropModel::cGPpropModel()" << endl;
 	mNumCandidates = NUM_INIT_CANDIDATES; 
 	mNumToDie = (unsigned)(mNumCandidates*DEATH_RATE/100);
+	bool UseClutter = true;
+	unsigned ClassGroup=1;
+	mMeas.mPathLoss.set_Clutter(UseClutter, ClassGroup); 
 	cout << "Leaving cGPpropModel::cGPpropModel()" << endl;
 }
 
@@ -63,10 +66,10 @@ int cGPpropModel:: mainTuning()
 	unsigned i=0, j=0, k=0;
 
 	cGeoP *Hoek;
-	unsigned NumHoek=19;
+	unsigned NumHoek=4;
 
 //Gauteng 20m DEM
-	NumHoek=19;
+/*	NumHoek=19;
 	Hoek = new cGeoP[NumHoek];
 
 	Hoek[0].Set(-25.01, 28.99);
@@ -88,6 +91,14 @@ int cGPpropModel:: mainTuning()
 	Hoek[16].Set(-25.26, 29.24);
 	Hoek[17].Set(-26.26, 28.99);
 	Hoek[18].Set(-25.01, 28.99);
+*/
+//	Bryanston
+	NumHoek=4;
+	Hoek = new cGeoP[NumHoek];
+	Hoek[0].Set(-26.036, 27.976);
+	Hoek[1].Set(-26.108, 27.976);
+	Hoek[2].Set(-26.108, 28.074);
+	Hoek[3].Set(-26.036, 28.074);
 
 	vPoints Punte;
 	for (i=0; i<NumHoek; i++)
@@ -97,11 +108,11 @@ int cGPpropModel:: mainTuning()
 
 	mMeas.SetUseAntANN(false);
 
-	mMeas.mPathLoss.mClutter.Reset(1);
+//	mMeas.mPathLoss.mClutter.Reset(1);
 
 	cout << "Loading measurements ... in main()" << endl;
 
-	mMeas.SetPlotResolution(30);
+	mMeas.SetPlotResolution(5);
 	mMeas.LoadMeasurements(Punte,0,0,0);
 
 	double Mean, MSE, StDev, CorrC;
@@ -117,47 +128,123 @@ int cGPpropModel:: mainTuning()
 	// Initialise candidates of known models
 
 	// Basic free space plus obstruction loss (Q-Rap basic model)
-	newTree = new Add();
-	newTree->mChild[0] = new Add();
-	newTree->mChild[1] = new Add();
-	newTree->mChild[0]->mChild[0] = new Multiply();
-	newTree->mChild[0]->mChild[0]->mChild[0] = new ConstNode(20.0);
-	newTree->mChild[0]->mChild[0]->mChild[1] = new Log10Node();
-	newTree->mChild[0]->mChild[0]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[0]->mChild[1] = new Multiply();
-	newTree->mChild[0]->mChild[1]->mChild[0] = new ConstNode(20.0);
-	newTree->mChild[0]->mChild[1]->mChild[1] = new Log10Node();
-	newTree->mChild[0]->mChild[1]->mChild[1]->mChild[0] = new DistanceNode();
-	newTree->mChild[1]->mChild[0] = new ConstNode(32.45);
-	newTree->mChild[1]->mChild[1] = new Multiply();
-	newTree->mChild[1]->mChild[1]->mChild[0] = new ConstNode(1.0);
-	newTree->mChild[1]->mChild[1]->mChild[1] = new ObstructionNode();
+	newTree = new Add(4);
+	newTree->mChild[0] = new ConstNode(32.45);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(20.0);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(20.0);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
 
+	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 3;
+	mCandidate.push_back(newCandidate);
+
+	newTree = new Add(4);
+	newTree->mChild[0] = new ConstNode(39.40);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(27.74);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(23.3);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(0.0);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
+
+	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 3;
+	mCandidate.push_back(newCandidate);
+
+
+	// Tuned Q-Rap model ... classic tuning
+	newTree = new Add(7);
+	newTree->mChild[0] = new ConstNode(0);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(14.14);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(18.50);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(0.34);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
+	newTree->mChild[4] = new Multiply(3);
+	newTree->mChild[4]->mChild[0] = new ConstNode(-14.16);
+	newTree->mChild[4]->mChild[1] = new Log10Node();
+	newTree->mChild[4]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[4]->mChild[2] = new Log10Node();
+	newTree->mChild[4]->mChild[2]->mChild[0] = new TxHeightNode();
+	newTree->mChild[5] = new Multiply();
+	newTree->mChild[5]->mChild[0] = new ConstNode(-4.75);
+	newTree->mChild[5]->mChild[1] = new Log10Node();
+	newTree->mChild[5]->mChild[1]->mChild[0] = new TxHeightNode();
+	newTree->mChild[6] = new Multiply();
+	newTree->mChild[6]->mChild[0] = new ConstNode(-0.48);
+	newTree->mChild[6]->mChild[1] = new Power();
+	newTree->mChild[6]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.5);
+
+	
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
 	mCandidate.push_back(newCandidate);
 
 	// Hata - Suburban
-/*	newTree = new Add();
-	newTree->mChild[0] = new Add();
-	newTree->mChild[1] = new Add();
-	newTree->mChild[0]->mChild[0] = new Multiply();
-	newTree->mChild[0]->mChild[0]->mChild[0] = new ConstNode(20.0);
-	newTree->mChild[0]->mChild[0]->mChild[1] = new Log10Node();
-	newTree->mChild[0]->mChild[0]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[0]->mChild[1] = new Multiply();
-	newTree->mChild[0]->mChild[1]->mChild[0] = new ConstNode(20.0);
-	newTree->mChild[0]->mChild[1]->mChild[1] = new Log10Node();
-	newTree->mChild[0]->mChild[1]->mChild[1]->mChild[0] = new DistanceNode();
-	newTree->mChild[1]->mChild[0] = new ConstNode(32.45);
-	newTree->mChild[1]->mChild[1] = new Multiply();
-	newTree->mChild[1]->mChild[1]->mChild[0] = new ConstNode(1.0);
-	newTree->mChild[1]->mChild[1]->mChild[1] = new ObstructionNode();
+	newTree = new Add(9);
+	newTree->mChild[0] = new ConstNode(63.35);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(27.72);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(44.9);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(0.0);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
+	newTree->mChild[4] = new Multiply(3);
+	newTree->mChild[4]->mChild[0] = new ConstNode(-6.55);
+	newTree->mChild[4]->mChild[1] = new Log10Node();
+	newTree->mChild[4]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[4]->mChild[2] = new Log10Node();
+	newTree->mChild[4]->mChild[2]->mChild[0] = new TxHeightNode();
+	newTree->mChild[5] = new Multiply();
+	newTree->mChild[5]->mChild[0] = new ConstNode(-13.82);
+	newTree->mChild[5]->mChild[1] = new Log10Node();
+	newTree->mChild[5]->mChild[1]->mChild[0] = new TxHeightNode();
+	newTree->mChild[6] = new Multiply(3);
+	newTree->mChild[6]->mChild[0] = new ConstNode(-1.1);
+	newTree->mChild[6]->mChild[1] = new RxHeightNode();
+	newTree->mChild[6]->mChild[2] = new Log10Node();
+	newTree->mChild[6]->mChild[2]->mChild[0] = new FrequencyNode();
+	newTree->mChild[7] = new Multiply();
+	newTree->mChild[7]->mChild[0] = new ConstNode(-2.0);
+	newTree->mChild[7]->mChild[1] = new Square();
+	newTree->mChild[7]->mChild[1]->mChild[0] = new Log10Node();
+	newTree->mChild[7]->mChild[1]->mChild[0]->mChild[0] = new Divide();
+	newTree->mChild[7]->mChild[1]->mChild[0]->mChild[0]->mChild[0] = new FrequencyNode();
+	newTree->mChild[7]->mChild[1]->mChild[0]->mChild[0]->mChild[1] = new ConstNode(28);
+	newTree->mChild[8] = new Multiply();
+	newTree->mChild[8]->mChild[0] = new ConstNode(0.7);
+	newTree->mChild[8]->mChild[1] = new RxHeightNode();
 
 	newCandidate.sTree = newTree;
-	newCandidate.sDepth = 4;
+	newCandidate.sDepth = 6;
 	mCandidate.push_back(newCandidate);
-*/
+
+
 	mNumCandidates = mCandidate.size();
 
 	srand(time(NULL));
@@ -174,7 +261,7 @@ int cGPpropModel:: mainTuning()
 	for (i=0; i<mNumCandidates; i++)
 	{
 		mCandidate[i].sCorrC = -1.0;
-		mCandidate[i].sMSE = 9999999;
+		mCandidate[i].sStdDev = 999;
 		mCandidate[i].sRank = 2*(mNumCandidates-1);
 		mCandidate[i].sNumClutter = mClutter.mNumber;
 		mCandidate[i].sClutterType  = new unsigned[mClutter.mNumber];
@@ -196,10 +283,11 @@ int cGPpropModel:: mainTuning()
 		// this should be problem-dependent, and implemented in another file
 		for (i=0; i<mNumCandidates; i++)
 		{
-			Nsamples = CostFunction(i, Mean,mCandidate[i].sMSE,
-					StDev, mCandidate[i].sCorrC);
-			cout << "i = " << i <<"		CorrC=" << mCandidate[i].sCorrC << "	MSE=" << mCandidate[i].sMSE  
-				<< "	Mean=" << Mean  << "	StDev=" << StDev <<"	N=" << Nsamples << endl ;
+			Nsamples = CostFunction(i, Mean,MSE,
+					 mCandidate[i].sStdDev, mCandidate[i].sCorrC);
+			cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
+				<<"		CorrC=" << mCandidate[i].sCorrC << "	StDev=" << mCandidate[i].sStdDev
+				<< "	MSE=" << MSE << "	Mean=" << Mean  <<"	N=" << Nsamples << endl ;
 			
 		}
 		
@@ -210,10 +298,10 @@ int cGPpropModel:: mainTuning()
 //			cout << i << "	CorrC = " << mCandidate[i].sCorrC << endl;
 			mCandidate[i].sRank = i;
 		}
-		sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnMSE);
+		sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnStdDev);
 		for (i=0; i<mNumCandidates; i++)
 		{
-//			cout << i << "	MSE = " << mCandidate[i].sMSE << endl;
+//			cout << i << "	StdDev = " << mCandidate[i].sStdDev << endl;
 			mCandidate[i].sRank += i;
 		}
 		sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnRank);
@@ -228,11 +316,13 @@ int cGPpropModel:: mainTuning()
 			//replace worst of population with mutations of best
 			mCandidate[mNumCandidates-1-i] = mCandidate[i];
 			mutateCandidate(mNumCandidates-1-i);
-			IndexForCrossOver = (unsigned)(gGauss(gRandomGen)*(mNumCandidates-mNumToDie));		
+			IndexForCrossOver = mNumCandidates -1;
+			while (IndexForCrossOver>(mNumCandidates-mNumToDie))
+				IndexForCrossOver = (unsigned)(fabs(gGauss(gRandomGen)*(mNumCandidates-mNumToDie)));	
 			crossOverTree(mCandidate[mNumCandidates-1-i].sTree, mCandidate[IndexForCrossOver].sTree);  
 		}
 		cout << "Best candidate:	CorrC = " << mCandidate[0].sCorrC 
-			<< "	MSE = " << mCandidate[0].sMSE << endl;
+			<< "	StdDev = " << mCandidate[0].sStdDev << endl;
 	}
 	printTree(mCandidate[0].sTree);
     	return 0;
@@ -291,8 +381,8 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 
 //	cout <<"cGPpropModel::CostFunction: mNumMeas = " << mNumMeas << endl;
 
-//	unsigned SkipNumber = (unsigned)(mMeas.mNumMeas/NUM_POINT_PER_EVAL);
-	unsigned SkipNumber = (mCandidate[CIndex].sRank+1)*10;
+	unsigned SkipNumber = min((mMeas.mNumMeas/NUM_POINT_PER_EVAL),5*mCandidate[CIndex].sRank/mNumCandidates);
+	if (SkipNumber<1) SkipNumber = 1;
 	unsigned FirstMeas = rand() % SkipNumber;
 	for (i=FirstMeas; i<mMeas.mNumMeas; i=i+SkipNumber)
 	{
@@ -321,7 +411,8 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 				mMeas.mPathLoss.setParameters(mMeas.mkFactor,mMeas.mFixedInsts[FixedNum].sFrequency,
 								mMeas.mFixedInsts[FixedNum].sTxHeight,
 								mMeas.mMobiles[MobileNum].sMobileHeight,
-								mMeas.mUseClutter, mMeas.mClutterClassGroup);
+								mMeas.mUseClutter, mMeas.mClutterClassGroup); 
+//				cout << "TxHeight=" << mMeas.mFixedInsts[FixedNum].sTxHeight << endl;
 			}
 
 			//Change settings if the Fixed Installation changed
@@ -419,9 +510,11 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 									mMeas.mMeasPoints[i].sTilt,Clutter,
 									mMeas.mMeasPoints[i].sDiffLoss, 
 									mMeas.mMeasPoints[i].sClutterDistance);
+				DiffLoss=mMeas.mMeasPoints[i].sDiffLoss;
 				mMeas.mMeasPoints[i].sClutter = mMeas.mPathLoss.get_Clutter();
 //				cout << " RawLoss = " << mMeas.mMeasPoints[i].sPathLoss
 //					<< "	O_L = " << mMeas.mMeasPoints[i].sDiffLoss;
+//				cout << endl;
 				mMeas.mMeasPoints[i].sClutterHeight = mCandidate[CIndex].sClutterHeight[mMeas.mMeasPoints[i].sClutter]; 
 				mMeas.mMeasPoints[i] = mCandidate[CIndex].sTree->eval(mMeas.mMeasPoints[i]);
 
@@ -431,7 +524,8 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 				{
 					mMeas.mMeasPoints[i].sReturn = -9999;
 					mMeas.mMeasPoints[i].sPathLoss = -9999;
-				}	
+				}
+//				cout <<endl;	
 //				cout << "	TreeLoss = " << mMeas.mMeasPoints[i].sPathLoss << endl;
 
 				if (DiffLoss>0)
@@ -536,10 +630,10 @@ void cGPpropModel::mutateCandidate(unsigned Index)
 	unsigned TreeDepth=mCandidate[Index].sTree->getTreeDepth(depth);
 	depth = max(0, (int)TreeDepth); 
 //	cout << "Tree depth = " << TreeDepth << endl;
-	unsigned mutateDepth = min(depth, (unsigned)(depth*(1-fabs(gGauss(gRandomGen))*mCandidate[Index].sMSE/2000)));
-	double mutateProp = min(0.5, fabs(gGauss(gRandomGen))*mCandidate[Index].sMSE/2000);
-	cout << "mutateProp = " << mutateProp << "	mutateDepth = " << mutateDepth << endl;	
-	mutateTree(&mCandidate[Index].sTree, mutateDepth, mutateProp); 
+	unsigned mutateDepth = min(depth, (unsigned)max(0,(int)(depth*(1-fabs(gGauss(gRandomGen))*mCandidate[Index].sStdDev/3))));
+	double mutateProp = min(0.5, fabs(gGauss(gRandomGen))*mCandidate[Index].sStdDev/3);
+//	cout << "mutateProp = " << mutateProp << "	mutateDepth = " << mutateDepth << endl;	
+	mutateTree(mCandidate[Index].sTree, mutateDepth, mutateProp); 
 }
 
 //********************************************************************************
@@ -577,8 +671,13 @@ void cGPpropModel::crossOverTree(GOftn* treeToAlter, GOftn* donatingTree)
 }
 
 //*************************************************************************
-void cGPpropModel::mutateTree(GOftn** inTree, int depth, double PropMutate)
+void cGPpropModel::mutateTree(GOftn* &inTree, int depth, double PropMutate)
 {
+	if (inTree->mIsConstant)
+	{
+		inTree->mutate(PropMutate);
+		return;
+	}
 	double randNum0t1 = rand()/(double)RAND_MAX;
 	if (randNum0t1 < PropMutate) 
 	{
@@ -586,22 +685,22 @@ void cGPpropModel::mutateTree(GOftn** inTree, int depth, double PropMutate)
 		//create new node
 		//create a random node to replace current node
 		GOftn* newNode = createRandomNode(depth + 1);
-		int childrenToMove = min(newNode->mNumChildren, (*inTree)->mNumChildren);
-		for (int i=0; i<childrenToMove; i++)
+		unsigned childrenToMove = min(newNode->mNumChildren, inTree->mNumChildren);
+		for (unsigned i=0; i<childrenToMove; i++)
 		{
-			newNode->mChild[i] = (*inTree)->mChild[i];
+			newNode->mChild[i] = inTree->mChild[i];
 		}
-		int numNewChildren = newNode->mNumChildren - childrenToMove;
-		for (int i=childrenToMove; i<(childrenToMove + numNewChildren); i++)
+		unsigned numNewChildren = max(0,(int)newNode->mNumChildren - (int)childrenToMove);
+		for (unsigned i=childrenToMove; i<(childrenToMove + numNewChildren); i++)
 		{
-			newNode->mChild[i] = createRandomTree(depth + 1);
+			newNode->mChild[i] = createRandomTree(depth + 2);
 		}
-		free(*inTree);		//free memory held by old node
-		*inTree = newNode;	//replace old ptr with ptr to new
+		if (inTree!=nullptr) deleteTree(inTree); //free memory held by old node
+		inTree = newNode;	//replace old ptr with ptr to new
 	}
-	for (int i=0; i<(*inTree)->mNumChildren; i++) 
+	for (unsigned i=0; i<inTree->mNumChildren; i++) 
 	{
-		mutateTree(&(*inTree)->mChild[i], depth + 1);
+		mutateTree(inTree->mChild[i], depth + 2);
 	}
 }
 
@@ -610,11 +709,10 @@ void cGPpropModel::printTree(GOftn* inTree, int depth)
 {
 	for (int j=0; j<depth; j++) 
 	{
-		printf("..");
+		printf(" . ");
 	}
-	//printf("%s\n", inTree->label.c_str());
 	cout << inTree->mLabel.c_str() <<endl;
-	for (int i=0; i<inTree->mNumChildren; i++) 
+	for (unsigned i=0; i<inTree->mNumChildren; i++) 
 	{
 		printTree(inTree->mChild[i], depth+1);
 	}
@@ -625,22 +723,35 @@ GOftn* cGPpropModel::createRandomTree(int depth)
 {
 	GOftn* retFtn = createRandomNode(depth);
 	
-	for (int i=0; i < retFtn->mNumChildren; i++) 
+	for (unsigned i=0; i < retFtn->mNumChildren; i++) 
 	{
 		retFtn->mChild[i] = createRandomTree(depth+1);
 	}
 	return retFtn;
 }
 
+//***********************************************************************
+void cGPpropModel::deleteTree(GOftn* inTree)
+{
+	 //free any children first
+//	cout << "delete" << endl;
+//	printTree(inTree);
+	for (unsigned i=0; i<inTree->mNumChildren; i++) 
+	{ 
+		if (inTree->mChild[i]!=nullptr) deleteTree(inTree->mChild[i]);
+	}
+//	if ((inTree!=nullptr)/*&&(inTree->mNumChildren>0)*/) free(inTree);
+}
+
 //******************************************************************************
 GOftn* cGPpropModel::createRandomNode(int depth)
 {
 	int randn = 0;
-	int numFtnChoices = 2;
+	int numFtnChoices = 9;
 	GOftn* retFtn;
 
 	//if the depth is greater than 3 only allow const or inputs
-	if (depth < MAX_TREE_DEPTH) numFtnChoices = 16;
+	if (depth < MAX_TREE_DEPTH) numFtnChoices = 15;
 	//generate random int
 	randn = rand() % numFtnChoices;		
 	
@@ -653,47 +764,45 @@ GOftn* cGPpropModel::createRandomNode(int depth)
 			retFtn = new ObstructionNode();
 			break;
 		case 2:
-			retFtn = new Add();
-			break;
-		case 3:
-			retFtn = new Log10Node();
-			break;
-		case 4:
-			retFtn = new Multiply();
-			break;
-		case 5:
-			retFtn = new Divide();
-			break;
-		case 6:
-			retFtn = new Square();
-			break;
-		case 7:
-			retFtn = new Log10Node();
-			break;
-		case 8:
-			retFtn = new Power();
-			break;
-		case 9:
 			retFtn = new DistanceNode();
 			break;
-		case 10:
+		case 3:
 			retFtn = new FrequencyNode();
 			break;
-		case 11:
+		case 4:
 			retFtn = new TxHeightNode();
 			break;
-		case 12:
+		case 5:
 			retFtn = new RxHeightNode();
 			break;
-		case 13:
+		case 6:
 			retFtn = new ClutterTypeNode();
 			break;
-		case 14:
+		case 7:
 			retFtn = new ClutterHeightNode();
 			break;
-		case 15:
+		case 8:
 			retFtn = new ClutterDepthNode();
 			break;
+		case 9:
+			retFtn = new Add();
+			break;
+		case 10:
+			retFtn = new Multiply();
+			break;
+		case 11:
+			retFtn = new Divide();
+			break;
+		case 12:
+			retFtn = new Square();
+			break;
+		case 13:
+			retFtn = new Log10Node();
+			break;
+		case 14:
+			retFtn = new Power();
+			break;
+
 		default:
 			cerr<<"invalid random number, bad news\n\n\n";
 			break;
@@ -701,32 +810,24 @@ GOftn* cGPpropModel::createRandomNode(int depth)
 	return retFtn;
 }
 
-//***********************************************************************
-void cGPpropModel::deleteTree(GOftn* inTree)
-{
-	 //free any children first
-	for (int i=0; i<inTree->mNumChildren; i++) 
-	{ 
-		deleteTree(inTree->mChild[i]);
-	}
-	free(inTree);
-}
-
 //***************************************************************************
 bool cGPpropModel::SortCriteriaOnCorrC(SCandidate c1, SCandidate c2)
 {
 	return (c1.sCorrC > c2.sCorrC);
 }
+
 //***************************************************************************
-bool cGPpropModel::SortCriteriaOnMSE(SCandidate c1, SCandidate c2)
+bool cGPpropModel::SortCriteriaOnStdDev(SCandidate c1, SCandidate c2)
 {
-	return (c1.sMSE < c2.sMSE);
+	return (c1.sStdDev < c2.sStdDev);
 }
+
 //***************************************************************************
 bool cGPpropModel::SortCriteriaOnRank(SCandidate c1, SCandidate c2)
 {
 	return (c1.sRank < c2.sRank);
 }
+
 //******************************************************
 int cGPpropModel::getRandSurvivor(unsigned popSize)
 {

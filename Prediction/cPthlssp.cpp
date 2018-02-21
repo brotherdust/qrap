@@ -578,7 +578,11 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 		delete [] mClutterProfile;
 		mClutterProfile = new int[m_size];
 		for (i=0; i<m_size; i++)
+		{
 			mClutterProfile[i] = (int)m_TempProfile[i];
+//			cout << " " << mClutterProfile[i];
+		}
+//		cout << endl;
 	}
 
 //	m_SeekWidth = (int) 36.9*pow((5/m_interPixelDist),(m_freq/1900));

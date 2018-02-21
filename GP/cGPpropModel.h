@@ -39,13 +39,13 @@
 #include "cGPFunctions.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 6
-#define NUM_GENERATIONS 200
-#define NUM_POINT_PER_EVAL 2000
+#define NUM_INIT_CANDIDATES 30
+#define NUM_GENERATIONS 100
+#define NUM_POINT_PER_EVAL 1500
 //how much of the population we loose per generation
 #define DEATH_RATE 40 
 
-#define MAX_TREE_DEPTH 5 
+#define MAX_TREE_DEPTH 8 
 
 struct SCandidate
 { 
@@ -54,7 +54,7 @@ struct SCandidate
 	double * 	sClutterHeight;
 	GOftn * 	sTree;
 	double		sCorrC;
-	double		sMSE;
+	double		sStdDev;
 	unsigned	sRank;
 	unsigned	sDepth;
 
@@ -71,7 +71,7 @@ struct SCandidate
 		}
 		sTree		= Right.sTree->clone();
 		sCorrC		= Right.sCorrC;
-		sMSE		= Right.sMSE;
+		sStdDev		= Right.sStdDev;
 		sRank		= Right.sRank;
 		sDepth		= Right.sDepth;
 		return *this;
@@ -106,7 +106,7 @@ namespace Qrap
 
 			void printTree(GOftn* inTree, int depth=0);
 
-			void mutateTree(GOftn** inTree, int depth=0, double PropMutate=0.3);
+			void mutateTree(GOftn* &inTree, int depth=0, double PropMutate=0.3);
 
 			void crossOverTree(GOftn* treeToAlter, GOftn* donatingTree);
 	
@@ -121,7 +121,7 @@ namespace Qrap
 			void deleteCandidate(unsigned Index);
 	
 			static bool SortCriteriaOnCorrC(SCandidate c1, SCandidate c2);
-			static bool SortCriteriaOnMSE(SCandidate c1, SCandidate c2);
+			static bool SortCriteriaOnStdDev(SCandidate c1, SCandidate c2);
 			static bool SortCriteriaOnRank(SCandidate c1, SCandidate c2);
 		
 			GOftn* createRandomNode(int depth);

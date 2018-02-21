@@ -11,8 +11,12 @@
 #define BASIC_FTNS_H 1
 
 #include <string>
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
 #include <iostream>
+#include <algorithm> 
+#include <cmath>
+#include <time.h>
 #include "../Prediction/cMeasAnalysisCalc.h"
 
 using namespace std;
@@ -26,7 +30,9 @@ class GOftn
 {	
 public:
 	string mLabel;
-	int mNumChildren;
+	unsigned mNumChildren;
+	bool mIsConstant;
+	void mutate(double Scale);
 	GOftn** mChild;
 	GOftn();
 	~GOftn();
@@ -34,6 +40,7 @@ public:
 	virtual GOftn* clone() = 0; //make a deep copy of the current tree
 	string getLabel();
 	unsigned getTreeDepth(unsigned &CurrentDepth);
+
 };
 
 //*************************************************************************************
@@ -44,6 +51,7 @@ class ConstNode : public GOftn
 public:
 	ConstNode();
 	ConstNode(double preSetVal);
+	void mutate(double Scale);
 	tMeasPoint eval(tMeasPoint inPoint);
 	ConstNode* clone();
 };
@@ -133,7 +141,7 @@ public:
 class Add : public GOftn 
 {
 public:
-	Add();
+	Add(unsigned NumChildren=2);
 	tMeasPoint eval(tMeasPoint inPoint);
 	Add* clone();
 };
@@ -153,7 +161,7 @@ public:
 class Multiply : public GOftn 
 {
 public:
-	Multiply();
+	Multiply(unsigned NumChildren=2);
 	tMeasPoint eval(tMeasPoint inPoint);
 	Multiply* clone();
 };

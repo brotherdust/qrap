@@ -420,8 +420,8 @@ bool cLoadFile::CutCurrentSet(	unsigned OriginalFileSet,
 		Cols = (unsigned)(SizeEW*100000 / OrigRes);
 		Size = Rows*Cols;	
 	}
-
-*/	unsigned NumMapRows, NumMapCols;
+*/
+	unsigned NumMapRows, NumMapCols;
 	NumMapRows = (unsigned)((maxN-minS)/SizeNS +1.0);
 	NumMapCols = (unsigned)((maxE-minW)/SizeEW +1.0);
 

@@ -208,7 +208,8 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 		query += text;
 	}
 //	Where testpoint is in area
-//	query += " and testpoint.location ";
+	query += " and testpoint.location ";
+	query += areaQuery;
 //	Where site is in area
 	query += " and site.location";
 	query += areaQuery;
@@ -501,7 +502,7 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 						} // if rMobile.size()
 					} // else !gDb->PerformRawSq
 					mMobiles.push_back(tempMobile);	
-				}
+				} //end if new mobile installation
 				
 				if (mMeasPoints[i].sCell==currentCI)
 					mMeasPoints[i].sInstKeyFixed = currentFixedInst;
@@ -527,7 +528,7 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 						err+=query; 
 						QRAP_ERROR(err.c_str());
 						return false;
-					} // if
+					} // end if query failed
 					else
 					{
 						gDb.GetLastResult(rFixed);
@@ -748,6 +749,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			
 //			cout << "cMeasAnalysisCalc::PerformAnalysis:  Before mDEM.GetForLink" << endl;
 			mDEM.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution, DEM);
+//			DEM.Display();
 //			cout << "cMeasAnalysisCalc::PerformAnalysis: After mDEM.GetForLink" << endl;
 			mMeasPoints[i].sDistance = mFixedInsts[FixedNum].sSitePos.Distance(mMeasPoints[i].sPoint);
 			Length = DEM.GetSize();
@@ -761,6 +763,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				{
 //					cout << "cMeasAnalysisCalc::PerformAnalysis:  Before mClutter.GetForLink" << endl;
 					mClutterRaster.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution,Clutter);
+//					Clutter.Display();
 					Clutter.GetProfile(ClutterLength,TempClutter);
 
 					for (k=0; k<ClutterLength; k++)
@@ -769,6 +772,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 
 				mMeasPoints[i].sPathLoss = mPathLoss.TotPathLoss(DEM,mMeasPoints[i].sTilt,Clutter,
 								mMeasPoints[i].sDiffLoss, mMeasPoints[i].sClutterDistance);
+				DiffLoss=mMeasPoints[i].sDiffLoss;
 				if ((NUMTERMS>6)&&(mUseClutter)) terms[6]=DiffLoss;
  
 				mMeasPoints[i].sClutter = mPathLoss.get_Clutter();

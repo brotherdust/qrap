@@ -39,8 +39,8 @@
 #include "cGPFunctions.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 30
-#define NUM_GENERATIONS 200
+#define NUM_INIT_CANDIDATES 50
+#define NUM_GENERATIONS 300
 #define NUM_POINT_PER_EVAL 1000
 //how much of the population we loose per generation
 #define DEATH_RATE 33 // As percentage.

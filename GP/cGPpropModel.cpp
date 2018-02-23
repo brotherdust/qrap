@@ -794,9 +794,37 @@ void cGPpropModel::printTree(GOftn* inTree, int depth)
 //********************************************************************************
 GOftn* cGPpropModel::createRandomTree(int depth)
 {
-	GOftn* retFtn = createRandomNode(depth);
-	
-	for (unsigned i=0; i < retFtn->mNumChildren; i++) 
+	unsigned i=0, begin =0;
+	double random;
+	int randn;
+	GOftn* retFtn;
+	if (0==depth)
+	{
+		randn = rand()%6+4;
+		retFtn = new Add(randn);
+		random = rand()%70 + 30;
+		retFtn->mChild[0]= new ConstNode(random);
+		retFtn->mChild[1]= new Multiply();
+		random = (rand()%101)/100;
+		retFtn->mChild[1]->mChild[0] = new ConstNode(random);
+		retFtn->mChild[1]->mChild[1] = new ObstructionNode();
+		for (i=2; i<4; i++)
+		{
+			retFtn->mChild[i]= new Multiply();
+			random = rand()%16 + 20;
+			retFtn->mChild[i]->mChild[0] = new ConstNode(random);
+			retFtn->mChild[i]->mChild[1] = new Log10Node();
+		}
+		retFtn->mChild[2]->mChild[1]->mChild[0] = new FrequencyNode();
+		retFtn->mChild[3]->mChild[1]->mChild[0] = new DistanceNode();
+ 		begin = 4;
+	}
+	else
+	{
+		retFtn = createRandomNode(depth);
+		begin=0;
+	}
+	for (i=begin; i < retFtn->mNumChildren; i++) 
 	{
 		retFtn->mChild[i] = createRandomTree(depth+1);
 	}
@@ -863,7 +891,7 @@ GOftn* cGPpropModel::createRandomNode(int depth)
 	}
 
 
-	//if the depth is greater than 3 only allow const or inputs
+	//if the depth reached max depth only allow constants and nputs
 	if (depth < MAX_TREE_DEPTH) numFtnChoices = 15;
 	else numFtnChoices = 9;
 	//generate random int
@@ -945,6 +973,6 @@ bool cGPpropModel::SortCriteriaOnRank(SCandidate c1, SCandidate c2)
 //******************************************************
 int cGPpropModel::getRandSurvivor(unsigned popSize)
 {
-	int randn = rand() % (popSize - mNumToDie);
+	int randn = rand() % (popSize - 2*mNumToDie);
 	return (randn);
 }

@@ -75,7 +75,7 @@ ConstNode::ConstNode()
 	mChild = nullptr;
 //	mConstVal = fGauss(fRandomGen)*30;
 	mConstVal = 30*(rand()%100)/100;
-	double sign = rand()%2 -1;
+	double sign = 2*(rand()%2 -0.5);
 	mConstVal*=sign;
 	char* str;
 	str = new char[20];

@@ -40,12 +40,12 @@
 
 // local defines
 #define NUM_INIT_CANDIDATES 30
-#define NUM_GENERATIONS 100
-#define NUM_POINT_PER_EVAL 1500
+#define NUM_GENERATIONS 200
+#define NUM_POINT_PER_EVAL 1000
 //how much of the population we loose per generation
-#define DEATH_RATE 40 
+#define DEATH_RATE 33 // As percentage.
 
-#define MAX_TREE_DEPTH 8 
+#define MAX_TREE_DEPTH 20 
 
 struct SCandidate
 { 
@@ -55,8 +55,10 @@ struct SCandidate
 	GOftn * 	sTree;
 	double		sCorrC;
 	double		sStdDev;
+	double		sMean;
 	unsigned	sRank;
 	unsigned	sDepth;
+	bool		sPareto;
 
 	SCandidate operator=(SCandidate Right)
 	{
@@ -74,6 +76,7 @@ struct SCandidate
 		sStdDev		= Right.sStdDev;
 		sRank		= Right.sRank;
 		sDepth		= Right.sDepth;
+		sPareto		= Right.sPareto;
 		return *this;
 	}
 };

@@ -49,7 +49,7 @@ string GOftn::getLabel()
 }
 
 //************************************************************************
-unsigned GOftn::getTreeDepth(unsigned &CurrentDepth)
+unsigned GOftn::getTreeDepth(unsigned CurrentDepth)
 {
 	unsigned i, MaxDepth=0, childDepth;
 	for (i=0; i < mNumChildren; i++)
@@ -73,7 +73,10 @@ ConstNode::ConstNode()
 {
 	mNumChildren = 0;
 	mChild = nullptr;
-	mConstVal = fGauss(fRandomGen)*30;
+//	mConstVal = fGauss(fRandomGen)*30;
+	mConstVal = 30*(rand()%100)/100;
+	double sign = rand()%2 -1;
+	mConstVal*=sign;
 	char* str;
 	str = new char[20];
 	sprintf(str, " C: %f", mConstVal);

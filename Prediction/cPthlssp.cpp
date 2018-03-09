@@ -254,6 +254,8 @@ int cPathLossPredictor::setParameters(double k, double f,
 		UseClutter = mUseClutter;
 		mClutter.mClassificationGroup = ClutterClassGroup;
 	}
+//	cout << " In cPathLossPredictor::setParameters: mClutter.mClassificationGroup = "
+//		<< mClutter.mClassificationGroup << endl;
 
 	for (unsigned i=0; i<NUMTERMS; i++)
 		mCterms[i]=0;
@@ -309,6 +311,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //	InputProfile.Display();
 	
 	mLinkLength = CalcDist(InputProfile);
+//	cout << " In cPathLossPredictor::TotPathLoss: mLinkLength = " << mLinkLength << endl;
 	if (mLinkLength<10)
 		return 0.0;
 	
@@ -411,6 +414,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		ClutterDepth = (mClutter.mClutterTypes[mClutterIndex].sHeight - m_hrx)/sqrt(2.0);
 	}
 
+	if (DiffLoss<0) DiffLoss = 0;
 	//Incorporate the Obstruction loss
 	if ((NUMTERMS>6)&&(mUseClutter)&&(mClutterIndex>=0)&&(mClutterIndex<200))
 	{
@@ -464,7 +468,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 
 //cout << "Na clutter in TotPathloss" << endl;
 
-	m_Loss = max(m_Loss,FreeSpace);
+//	m_Loss = max(m_Loss,FreeSpace);
 //	m_Loss = max(m_Loss,max(FreeSpace,PlaneEarth));
 /*
 #ifndef NO_DEBUG

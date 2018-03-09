@@ -19,8 +19,11 @@
 #include <time.h>
 #include "../Prediction/cMeasAnalysisCalc.h"
 
-using namespace std;
 
+
+using namespace std;
+using namespace Qrap;
+	
 namespace Qrap
 {
 
@@ -28,11 +31,16 @@ namespace Qrap
 //Master abstract class: GOftn: Genetic Optimize Function
 class GOftn
 {	
+
+typedef vector<GOftn *> vConstants;
 public:
+	double mConstVal;
 	string mLabel;
 	unsigned mNumChildren;
 	bool mIsConstant;
 	void mutate(double Scale);
+	void setValue(double newValue);
+	double getValue();
 	GOftn** mChild;
 	GOftn();
 	~GOftn();
@@ -40,18 +48,22 @@ public:
 	virtual GOftn* clone() = 0; //make a deep copy of the current tree
 	string getLabel();
 	unsigned getTreeDepth(unsigned CurrentDepth=0);
+	unsigned getConstants(vConstants &Constants);
 
 };
+
+
 
 //*************************************************************************************
 //class for storing constant values
 class ConstNode : public GOftn 
 {
-	double mConstVal;
 public:
 	ConstNode();
 	ConstNode(double preSetVal);
 	void mutate(double Scale);
+	void setValue(double newValue);
+	double getValue();
 	tMeasPoint eval(tMeasPoint inPoint);
 	ConstNode* clone();
 };

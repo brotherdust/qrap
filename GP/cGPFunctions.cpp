@@ -25,14 +25,10 @@ std::normal_distribution<double> 	fGauss;
 //*************************************************************************
 GOftn::GOftn()
 {
+	mConstVal = 0.0;
 	mNumChildren=0;
 	mIsConstant = false;
 	mChild=nullptr;
-}
-
-//************************************************************************
-void GOftn::mutate(double Scale)
-{
 }
 
 //************************************************************************
@@ -63,6 +59,51 @@ unsigned GOftn::getTreeDepth(unsigned CurrentDepth)
 	return CurrentDepth;
 }
 
+//************************************************************************
+unsigned GOftn::getConstants(vConstants &Constants)
+{
+	unsigned i, number;
+	for (i=0; i < mNumChildren; i++)
+	{
+		number = mChild[i]->getConstants(Constants);
+	}
+	if (mIsConstant)
+	{
+		Constants.push_back(&*this);
+	}
+	number = Constants.size();
+	return number;
+}
+
+//****************************************************************************
+void GOftn::setValue(double newValue) 
+{
+	mConstVal = newValue;
+	char* str;
+	str = new char[20];
+	sprintf(str, " C: %f", mConstVal);
+	mLabel = str;
+	delete [] str;
+	mIsConstant = true;
+}
+
+//*****************************************************************************
+double GOftn::getValue() 
+{
+	return mConstVal;
+}
+
+//****************************************************************************
+void GOftn::mutate(double Scale)
+{
+	mConstVal *=( 1.0 + fGauss(fRandomGen)*Scale);
+	char* str;
+	str = new char[20];
+	sprintf(str, " C: %f", mConstVal);
+	mLabel = str;
+	delete [] str;
+	mIsConstant = true;
+}
 //**************************************************************************
 //**************************************************************************
 //
@@ -73,15 +114,16 @@ ConstNode::ConstNode()
 {
 	mNumChildren = 0;
 	mChild = nullptr;
-//	mConstVal = fGauss(fRandomGen)*30;
-	mConstVal = 30*(rand()%100)/100;
-	double sign = 2*(rand()%2 -0.5);
-	mConstVal*=sign;
+	mConstVal = fGauss(fRandomGen)*30;
+//	mConstVal = 30*(rand()%100)/100;
+//	double sign = 2*(rand()%2 -0.5);
+//	mConstVal*=sign;
 	char* str;
 	str = new char[20];
 	sprintf(str, " C: %f", mConstVal);
 	mLabel = str;
 	delete [] str;
+//	cout << mLabel << endl;
 	mIsConstant = true;
 }
 
@@ -110,6 +152,23 @@ void ConstNode::mutate(double Scale)
 	delete [] str;
 }
 
+//***************************************************************************
+void ConstNode::setValue(double newValue)
+{
+	mConstVal = newValue;
+	char* str;
+	str = new char[20];
+	sprintf(str, " C: %f", mConstVal);
+	mLabel = str;
+	delete [] str;
+	mIsConstant = true;
+}
+
+//***************************************************************************
+double ConstNode::getValue() 
+{
+	return mConstVal;
+}
 
 //***************************************************************************
 tMeasPoint ConstNode::eval(tMeasPoint InPoint)
@@ -446,7 +505,7 @@ tMeasPoint Subtract::eval(tMeasPoint inPoint)
 	else 
 	{
 		cerr << "left and right not defined in Subtract"<<endl;
-		outPoint.sReturn = -1000.0;
+		outPoint.sReturn = -200.0;
 	}
 	return outPoint;
 }
@@ -496,7 +555,7 @@ tMeasPoint Multiply::eval(tMeasPoint inPoint)
 		{
 			cerr << "not all inputs define in Multiply"<<endl;
 			mNumChildren=NumChildren;
-			outPoint.sReturn = -1000.0;
+			outPoint.sReturn = -200.0;
 			return outPoint;
 		}
 	}
@@ -540,20 +599,20 @@ tMeasPoint Divide::eval(tMeasPoint inPoint)
 	{
 		c1 = mChild[0]->eval(inPoint);
 		c2 = mChild[1]->eval(inPoint);
-		if (fabs(c2.sReturn)>0)
+		if (fabs(c2.sReturn)>0.0000000001)
 		{
 			outPoint.sReturn = c1.sReturn/c2.sReturn;
 		}
 		else
 		{
 //			cerr << "almost divide by zero "<<endl;
-			outPoint.sReturn = -1000.0;
+			outPoint.sReturn = c1.sReturn/0.0000000001;
 		}
 	}
 	else 
 	{
 		cout << "left and right not defined in divide "<<endl;
-		outPoint.sReturn = -1000.0;
+		outPoint.sReturn = -500.0;
 	}
 	return outPoint;
 }
@@ -592,18 +651,18 @@ tMeasPoint Log10Node::eval(tMeasPoint inPoint)
 	if (mChild[0])
 	{
 		c1 = mChild[0]->eval(inPoint);
-		if (c1.sReturn>0)
+		if (c1.sReturn>1e-10)
 			outPoint.sReturn = log10(c1.sReturn);
 		else
 		{
 //			cerr << "input to log10 not positive"<<endl;
-			outPoint.sReturn = -1000.0;
+			outPoint.sReturn = -200.0;
 		}
 	}
 	else 
 	{
 		cerr << "input not defined in log10"<<endl;
-		outPoint.sReturn = -1000.0;
+		outPoint.sReturn = -200.0;
 	}
 //	cout <<"	"<< mLabel << outPoint.sReturn << endl;
 	return outPoint;
@@ -647,7 +706,7 @@ tMeasPoint Square::eval(tMeasPoint inPoint)
 	else 
 	{
 		cerr << "input not defined in square"<<endl;
-		outPoint.sReturn = -1000.0;
+		outPoint.sReturn = -200.0;
 	}
 	return outPoint;
 }
@@ -686,12 +745,32 @@ tMeasPoint Power::eval(tMeasPoint inPoint)
 	{
 		c1 = mChild[0]->eval(inPoint);
 		c2 = mChild[1]->eval(inPoint);
-		outPoint.sReturn = pow(c1.sReturn, c2.sReturn);
+		if (c1.sReturn>0)
+			outPoint.sReturn = pow(c1.sReturn, c2.sReturn);
+		else if ((c2.sReturn>1.0)&&(c2.sReturn==(double)(int)(c2.sReturn)))
+			outPoint.sReturn = pow(c1.sReturn, c2.sReturn);
+		else if (fabs(c1.sReturn)<0.000000000001)
+		{
+			if (c2.sReturn>=0)
+				outPoint.sReturn = 0.0;
+			else
+				outPoint.sReturn = -200; 
+		}
+		else
+		{
+//			cout << "power not defined" << endl;
+			outPoint.sReturn = -200;
+		} 
+		if ((isnan(outPoint.sReturn))||(isinf(outPoint.sReturn)))
+		{
+//			cout << "power not defined" << endl;
+			outPoint.sReturn = -200;
+		}
 	}
 	else 
 	{
 		cerr << "left and right not defined in Power"<<endl;
-		outPoint.sReturn = -1000.0;
+		outPoint.sReturn = -200.0;
 	}
 //	cout <<"	"<< mLabel << outPoint.sReturn << endl;	
 	return outPoint;

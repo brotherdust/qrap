@@ -104,7 +104,15 @@ namespace Qrap
 						cProfile &ClutterProfile,
 						double &DiffLoss,
 						double &ClutterDepth);
-			
+
+			/**
+			 * Description of set_kFactor
+			 * 
+			 * @param value Description
+			 */
+
+			double getLinkLength() {return mLinkLength;}			
+		
 			/**
 			 * Find the elevation angle in which the main ray is directed.
 			 * 
@@ -196,6 +204,7 @@ namespace Qrap
 			void set_Clutter(bool &UseClutter, unsigned ClutterClassGroup=9999); 
 
 			void set_Tuning( bool Tuning) { mTuning=Tuning;}
+			bool get_Tuning() { return mTuning;}
 
 			/**
 			 * Overloaded operator

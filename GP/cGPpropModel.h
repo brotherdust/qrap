@@ -39,13 +39,23 @@
 #include "cGPFunctions.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 50
-#define NUM_GENERATIONS 300
+#define NUM_INIT_CANDIDATES 20
+//#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
+#define NUM_GENERATIONS 10 // GP field guide suggest between 10 and 50
 #define NUM_POINT_PER_EVAL 1000
 //how much of the population we loose per generation
 #define DEATH_RATE 33 // As percentage.
+#define UNFIT_LIMIT 1000
 
-#define MAX_TREE_DEPTH 20 
+#define MAX_TREE_DEPTH 10 
+#define PROP_MUTATE 0.5
+#define PROP_CROSSOVER 0.5
+
+using namespace std;
+using namespace Qrap;
+
+
+typedef vector<GOftn *> vConstants;
 
 struct SCandidate
 { 
@@ -56,9 +66,12 @@ struct SCandidate
 	double		sCorrC;
 	double		sStdDev;
 	double		sMean;
+	double		sFitness;
 	unsigned	sRank;
 	unsigned	sDepth;
 	bool		sPareto;
+	vConstants	sConstants;
+	bool		sOptimised;
 
 	SCandidate operator=(SCandidate Right)
 	{
@@ -72,20 +85,20 @@ struct SCandidate
 			sClutterHeight[i] = Right.sClutterHeight[i];
 		}
 		sTree		= Right.sTree->clone();
+		sTree->getConstants(sConstants);
 		sCorrC		= Right.sCorrC;
 		sStdDev		= Right.sStdDev;
+		sMean		= Right.sMean;
+		sFitness	= Right.sFitness;
 		sRank		= Right.sRank;
 		sDepth		= Right.sDepth;
 		sPareto		= Right.sPareto;
+		sOptimised	= Right.sOptimised;
 		return *this;
 	}
 };
 
 typedef vector<SCandidate> vCandidates;
-
-
-using namespace std;
-using namespace Qrap;
 
 namespace Qrap
 {
@@ -103,43 +116,50 @@ namespace Qrap
 
 		private:
 
-			int CostFunction(unsigned CanIndex, double &Mean, double &MeanSquareError,
-				double &StDev, double &CorrC, unsigned Clutterfilter=0);
+			int CostFunction(unsigned CandidateIndex, double &Mean, double &MeanSquareError,
+				double &StDev, double &CorrC, 
+				bool CalcNewObstruction=true, unsigned Clutterfilter=0);
 
 
 			void printTree(GOftn* inTree, int depth=0);
 
-			void mutateTree(GOftn* &inTree, int depth=0, double PropMutate=0.3);
+			void mutateTree(GOftn* &inTree, int depth=0, 
+							bool grow = false, 
+							double PropMutate=0.3);
 
 			void crossOverTree(GOftn* treeToAlter, GOftn* donatingTree);
 	
 			void deleteTree(GOftn* inTree);
 
-			void mutateCandidate(unsigned Index);
+			void mutateCandidate(unsigned CandidateIndex, bool grow=false);
 
-			void crossOverCandidate(unsigned Index, unsigned donatorIndex);
+			void crossOverCandidate(unsigned CandidateIndex, unsigned donatorIndex);
 
-			void replaceTree(unsigned Index);
+			void replaceTree(unsigned CandidateIndex);
 	
-			void deleteCandidate(unsigned Index);
+			void deleteCandidate(unsigned CandidateIndex);
 	
 			static bool SortCriteriaOnCorrC(SCandidate c1, SCandidate c2);
 			static bool SortCriteriaOnStdDev(SCandidate c1, SCandidate c2);
 			static bool SortCriteriaOnRank(SCandidate c1, SCandidate c2);
+			static bool SortCriteriaOnFitness(SCandidate c1, SCandidate c2);
 		
-			GOftn* createRandomNode(int depth);
-	
-			GOftn* createRandomTree(int depth=0);
+			GOftn* createRandomNode(int depth, bool grow=false);
+
+			GOftn* createRandomTree(int depth=0, bool grow=false);
 
 			int getRandSurvivor(unsigned popSize);
+
+			bool optimiseConstants(unsigned Index);
 
 		private:
 
 			double 		mMutationThreshold;
 			unsigned	mNumToDie;
 			unsigned	mNumCandidates;
-			cClutter	mClutter;
+			double		mMinFitness;
 			vCandidates 	mCandidate;
+			vCandidates 	mStars;
 			cMeasAnalysisCalc mMeas;
 
 	};

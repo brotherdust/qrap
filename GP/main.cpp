@@ -7,6 +7,7 @@
 *********************************************************/
 			
 #include "cGPpropModel.h"
+#include <thread>
 
 using namespace Qrap;
 using namespace std;
@@ -39,6 +40,9 @@ int main (int argc, char * const argv[])
 	{
 		cout << "Error updating qrap_config" << endl;
 	}
+
+    	std::cout << "Number of threads = " 
+              <<  std::thread::hardware_concurrency() << std::endl;
 
 	cGPpropModel GP;
 	GP.mainTuning();

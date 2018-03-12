@@ -5,7 +5,7 @@ OBJECTS =  cMemmngr.o cGeoP.o cAntpatn.o cClutter.o cPthlssp.o cProfile.o cRaste
 all: GP makefile
 
 GP: $(OBJECTS) makefile
-	c++ -g -o GP $(OBJECTS) -L/usr/local/pgsql/lib  -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal -lproj  -lssl -lPocoXML  -lPocoFoundation -lQtCore -ldoublefann -lfann
+	c++ -g -o GP $(OBJECTS) -L/usr/local/pgsql/lib  -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal -lproj  -lssl -lQtCore -ldoublefann -lfann -lPocoXML  -lPocoFoundation -lpthread
 
 main.o: main.cpp makefile
 	$(CC) main.cpp

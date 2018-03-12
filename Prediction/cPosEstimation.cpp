@@ -50,6 +50,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	mDEM = new cRasterFileHandler();
 	mClutter = new cRasterFileHandler();
 	mPathLoss= new cPathLossPredictor();
+
 	mLTEsim = false;
 	mOriginal = true;
 	mUMTSsim = false;
@@ -101,6 +102,8 @@ cPosEstimation::cPosEstimation() // default constructor
 		cout << "cPosEstimation constructor3:  Using Clutter " <<  endl;
 	else cout << "cPosEstimation constructor3:  NOT Using Clutter " <<  endl;
 	mUseClutter = (mUseClutter)&&(mClutterClassGroup>0)&&(mClutterClassGroup<9000);
+	if (mUseClutter)
+		mPathLoss->mClutter.GetFromDatabase(mClutterClassGroup);
 	if (mUseClutter) mClutterCount = new unsigned[mPathLoss->mClutter.mNumber];
 	else mClutterCount = new unsigned[2];
 	if (mUseClutter) mClutter->SetSampleMethod(1);

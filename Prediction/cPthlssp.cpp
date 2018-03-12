@@ -105,7 +105,7 @@ cPathLossPredictor::cPathLossPredictor(const cPathLossPredictor &right)
 
 	mClutterIndex = right.mClutterIndex;
 	mUseClutter = right.mUseClutter ;
-	if (mUseClutter) mClutter = right.mClutter;
+	mClutter = right.mClutter;
 
 	m_kFactor = right.m_kFactor;
 	m_freq = right.m_freq;
@@ -228,7 +228,6 @@ const cPathLossPredictor & cPathLossPredictor::operator=
 	for (i=0;i<NUMTERMS;i++)
 		mCterms[i] = right.mCterms[i];
 
-return (*this);
 }/* end CPathLossPredictor assignment */
 
 
@@ -254,8 +253,6 @@ int cPathLossPredictor::setParameters(double k, double f,
 		UseClutter = mUseClutter;
 		mClutter.mClassificationGroup = ClutterClassGroup;
 	}
-//	cout << " In cPathLossPredictor::setParameters: mClutter.mClassificationGroup = "
-//		<< mClutter.mClassificationGroup << endl;
 
 	for (unsigned i=0; i<NUMTERMS; i++)
 		mCterms[i]=0;

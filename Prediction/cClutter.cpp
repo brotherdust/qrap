@@ -36,13 +36,36 @@ cClutter::cClutter()
 {
 //	cout << "In cClutter Default constructor" << endl;
 	mNumber = 0;
-	mClutterTypes = NULL;
+	mClutterTypes = nullptr;
 	mClassificationGroup = 1;
-	string setting = gDb.GetSetting("UseClutter");
-	if (setting=="true")
-		GetFromDatabase();
+//	string setting = gDb.GetSetting("UseClutter");
+//	if (setting=="true")
+//		GetFromDatabase();
 }/*end cClutter Default Constructor */
 
+//*************************************************************************
+cClutter::cClutter (const cClutter &right)
+{
+	unsigned i, j;
+	mNumber = right.mNumber;
+	mClassificationGroup = right.mClassificationGroup;
+	mClutterTypes = new sClutter[mNumber];
+	for (i=0; i<mNumber; i++)
+	{
+		mClutterTypes[i].sLandCoverID = right.mClutterTypes[i].sLandCoverID;
+		mClutterTypes[i].sRho = right.mClutterTypes[i].sRho;
+		mClutterTypes[i].sHeight = right.mClutterTypes[i].sHeight;
+		mClutterTypes[i].sCoefficients = new double[NUMTERMS];
+		mClutterTypes[i].sAllowCchange = new bool[NUMTERMS];
+		for (j=0; j<NUMTERMS; j++)
+		{
+			mClutterTypes[i].sCoefficients[j] = right.mClutterTypes[i].sCoefficients[j];
+			mClutterTypes[i].sAllowCchange[j] = right.mClutterTypes[i].sAllowCchange[j];
+		}
+				
+	}
+		
+}
 
 //*************************************************************************
 // Overloaded constructor, where a specific Clutter Classification Group 
@@ -51,7 +74,7 @@ cClutter::cClutter(unsigned ClassGroup)
 {
 //	cout << "In cClutter Overlaod constructor" << endl;
 	mNumber = 0;
-	mClutterTypes = NULL;
+	mClutterTypes = nullptr;
 	mClassificationGroup = ClassGroup;
 	string setting = gDb.GetSetting("UseClutter");
 	if (setting=="true")
@@ -326,7 +349,7 @@ bool cClutter::GetFromDatabase(unsigned ClassGroup)
 	}
 */
 	mNumber = MaxLandCoverID+1;
-	cout << "mNumber=" << mNumber << endl;
+//	cout << "mNumber=" << mNumber << endl;
 	delete [] type;
 	delete [] temp;
 	delete [] idnr; 

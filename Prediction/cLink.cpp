@@ -57,7 +57,7 @@ cLink::cLink()
 	mFrequency = 2400;
 	mkFactor = 1;
 	mDEMsource = 1;
-	mClutterSource = 1;
+	mClutterSource = 2;
 	mUseClutter = false;
 	mPlotResolution = 90;
 	mTxInst.sInstKey=1;
@@ -150,16 +150,16 @@ const cLink & cLink::operator=(const cLink &right)
 	mClutterset		= right.mClutterset;
 	mLength			= right.mLength;
 	mSlope 			= right.mSlope;
-	mPlotResolution	= right.mPlotResolution;
+	mPlotResolution		= right.mPlotResolution;
 	mEffRadius 		= right.mEffRadius;
-    	mMinClearance  	= right.mMinClearance;
+    	mMinClearance  		= right.mMinClearance;
 	mFrequency		= right.mFrequency;
 	mTxTilt			= right.mTxTilt;
 	mRxTilt			= right.mRxTilt;
 	mTxBearing		= right.mTxBearing;
 	mRxBearing		= right.mRxBearing;
-	mTxElevation	= right.mTxElevation;
-	mRxElevation	= right.mRxElevation;
+	mTxElevation		= right.mTxElevation;
+	mRxElevation		= right.mRxElevation;
 	mUnits			= right.mUnits;				///< Description
 	mDownlink		= right.mDownlink;			///< Description
 	mkFactor		= right.mkFactor;			///< Description
@@ -171,6 +171,7 @@ const cLink & cLink::operator=(const cLink &right)
 	mUseClutter		= right.mUseClutter;		///< Description
 	mClutter		= right.mClutter;			///< Description
 	mClutterClassGroup 	= right.mClutterClassGroup;
+	mPathLoss 		= right.mPathLoss;
 	CopyFixed(mTxInst,right.mTxInst);
 	CopyFixed(mRxInst,right.mRxInst);		///< Description
     	mRxLev	 = new float[mLength];
@@ -208,6 +209,7 @@ const cLink & cLink::operator=(const cLink &right)
 	return (*this);
 }/* cLink Assignment */
 
+
 //******************************************************/
 void cLink::SetLink(eOutputUnits	Units,
 			bool		Downlink,
@@ -234,10 +236,15 @@ void cLink::SetLink(eOutputUnits	Units,
 	if (mUseClutter)
 		mUseClutter = mClutter.SetRasterFileRules(mClutterSource);
 	else
-		mClutterSource = 1;
+		mClutterSource = 2;
 	if (mUseClutter) 
 		mClutterClassGroup = mClutter.GetClutterClassGroup();
-	if (mUseClutter) mClutterset.Reset(mClutterClassGroup);
+	mUseClutter = mUseClutter&&(mClutterClassGroup>0);
+	if (mUseClutter) 
+	{	
+		mPathLoss.mClutter.GetFromDatabase(mClutterClassGroup);
+		mClutterset.Reset(mClutterClassGroup);
+	}
 	UseClutter = mUseClutter;
 
 	if (mTrial)
@@ -377,10 +384,10 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 	SetLineOfSight();
 	SetFresnelClear();
 	
-//	cout << "cLink::DoLink( ... ) before PathLoss.setParameters" << endl; 	
-	PathLoss.setParameters(mkFactor,mFrequency,mTxInst.sTxHeight,mRxInst.sRxHeight,
+//	cout << "cLink::DoLink( ... ) before mPathLoss.setParameters" << endl; 	
+	mPathLoss.setParameters(mkFactor,mFrequency,mTxInst.sTxHeight,mRxInst.sRxHeight,
 				mUseClutter,mClutterClassGroup);
-//	cout << "cLink::DoLink( ... ) After PathLoss.setParameters" << endl;
+//	cout << "cLink::DoLink( ... ) After mPathLoss.setParameters" << endl;
 	if (Length>0)	
 		j=(Length-1);
 	else
@@ -388,17 +395,17 @@ bool cLink::DoLink(bool Trial, double MaxDist)
 		cout << "In cLink::DoLink Link has 0 lenght" << endl;
 		return false;
 	}
-	mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss, ClutterDepth);
+	mPropLoss[j] = mPathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss, ClutterDepth);
 	mTxBearing = mTxInst.sSitePos.Bearing(mRxInst.sSitePos);
 	if (mTxBearing < 180.0)
 		mRxBearing = mTxBearing + 180.0;
 	else	
 		mRxBearing = mTxBearing - 180.0;
-	PathLoss.FindElevAngles(mTxTilt,mRxTilt);
+	mPathLoss.FindElevAngles(mTxTilt,mRxTilt);
 //	cout << "cLink::DoLink( ... ) before mPropLoss loop" << endl;
 	for (j=(Length-1); j>0 ; j--)
 	{
-		mPropLoss[j] = PathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss, ClutterDepth);
+		mPropLoss[j] = mPathLoss.TotPathLoss(DEM,Tilt[j],Clutter,DiffLoss, ClutterDepth);
 		if (!Trial)
 		{
 			TxAntValue = mTxAnt.GetPatternValue(mTxBearing, Tilt[j])

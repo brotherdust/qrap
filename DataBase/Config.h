@@ -37,6 +37,7 @@
 #include <string.h>
 #include <map>
 #include <vector>
+#include <mutex>
 
 #include <pqxx/pqxx>
 #include <pqxx/transaction>

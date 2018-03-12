@@ -88,28 +88,20 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 		mClutterClassGroup = mClutterRaster.GetClutterClassGroup();
 	cout << "cMeasAnalysisCalc::contructor: 2) mClutterClassGroup=" << mClutterClassGroup << endl;
 	mUseClutter = (mUseClutter)&&(mClutterClassGroup>=0);
-	
 	cout << "cMeasAnalysisCalc::contructor: 2) mUseClutter=";
 	if (mUseClutter)
-	{
-		mClutterCount = new unsigned[mPathLoss.mClutter.mNumber];
-		mClutterRaster.SetSampleMethod(1);
-		mPathLoss.mClutter.Reset(mClutterClassGroup);
-		cout << "true" << endl;
-	}
-	else
-	{
-		cout << "False" << endl;
-		mClutterCount = new unsigned[2];
-	}
+		mPathLoss.mClutter.GetFromDatabase(mClutterClassGroup);
+	if (mUseClutter) cout << "true" << endl;
+		else cout << "False" << endl;
+	if (mUseClutter) mClutterCount = new unsigned[mPathLoss.mClutter.mNumber];
+	else mClutterCount = new unsigned[2];
+	if (mUseClutter) mClutterRaster.SetSampleMethod(1);
 
 	mDEMsource = atoi(gDb.GetSetting("DEMsource").c_str());
 	cout << "mDEMsource = " << mDEMsource << endl;
 	mDEM.SetRasterFileRules(mDEMsource);
 	mDEM.SetSampleMethod(2);
 	cout << "Existing cMeasAnalysisCalc::contructor" << endl;
-	mPathLoss.set_Tuning(false);
-
 }
 
 //*********************************************************************
@@ -631,31 +623,9 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		if (mUseClutter)	mClutterCount[j]=0;
 		LOS[j]=0;
 		NLOS[j]=0;
-//		cout << "Cj = " <<  mPathLoss.mClutter.mClutterTypes[j].sLandCoverID  
+//		cout << "Cj = " <<  mPathLoss.mClutter.mNumber 
 //			<< "	Height= " << mPathLoss.mClutter.mClutterTypes[j].sHeight << endl;
 	}
-
-/*	if (mUseClutter)
-		cout << "UseClutter = TRUE" << endl;
-	else	cout << "UseClutter = FALSE" << endl;
-
-	if (mPathLoss.get_Tuning())
-		cout << "PathLoss Tuning = TRUE" << endl;
-	else	cout << "PathLoss Tuning = FALSE" << endl;
-
-	if (mUseAntANN)
-		cout << "mUseAntANN = TRUE" << endl;
-	else	cout << "mUseAntANN = FALSE" << endl;
-
-	cout << "mDEMsource = " << mDEMsource << endl;
-	cout << "mClutterSource = " << mClutterSource << endl;
-	cout << " mClutterClassGroup = " << mClutterClassGroup << endl;
-	cout << "mPathLoss.mClutter.mClassificationGroup = " 
-		<< mPathLoss.mClutter.mClassificationGroup << endl;
-	cout << "mClutterFilter = " << mClutterFilter << endl;
-	cout << "mPlotResolution = " << mPlotResolution << endl;
-	cout << "mkFactor = " << mkFactor << endl;
-*/
 
 	if (mUseClutter)
 	{
@@ -672,6 +642,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		}
 
 	}
+
 
 	NumUsed = 0;
 
@@ -738,12 +709,12 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-//						cout	<< "	AntVal: " << CsumOfAntValue 
-//							<< " /N: "<< CsumOfAntValue/CNumUsed
-//							<< "	PathLoss: " << CsumOfPathLoss 
-//							<< " /N: " << CsumOfPathLoss/CNumUsed << endl;
-*/
-				}
+						cout	<< "	AntVal: " << CsumOfAntValue 
+							<< " /N: "<< CsumOfAntValue/CNumUsed
+							<< "	PathLoss: " << CsumOfPathLoss 
+							<< " /N: " << CsumOfPathLoss/CNumUsed << endl;
+
+*/				}
 
 				CNumUsed = 0;
 				CError=0;
@@ -796,7 +767,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				if (mUseClutter)
 					cout << "	Using Clutter" << endl;
 				else cout << "	NOT using Clutter" << endl;
-*/			
+*/				
 				if (mUseClutter)
 				{
 					m_freq = mFixedInsts[FixedNum].sFrequency;
@@ -951,8 +922,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			<< "	MSE: " << CMeanSquareError 
 			<< "	StDev: " << CStDev
 			<< "	Corr: " << CCorrC << endl;
-//		cout	<< "	AntVal: " << CsumOfAntValue << " /N: "<< CsumOfAntValue/CNumUsed
-//			<< "	PathLoss: " << CsumOfPathLoss << " /N: " << CsumOfPathLoss/CNumUsed << endl;
+		cout	<< "	AntVal: " << CsumOfAntValue << " /N: "<< CsumOfAntValue/CNumUsed
+			<< "	PathLoss: " << CsumOfPathLoss << " /N: " << CsumOfPathLoss/CNumUsed << endl;
 */	}
 
 	if (NumUsed>0)
@@ -1607,8 +1578,6 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	costMin = cost;
 	costMinTemp = cost;
 	StepResult[NumStop] = cost;
-
-	return false;
 
 	for(int ii=0;ii<NumUsed;ii++)
 		NumClut[mMeasPoints[ii].sClutter]++; 

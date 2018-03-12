@@ -411,6 +411,8 @@ int cBTLPredict::PredictBTL(unsigned NumAngles, unsigned NumDistance,
 	unsigned i;
 	int j;
 	cPathLossPredictor PathLoss;
+	if ((UseClutter)&&(ClutterClassGroup>0))
+		PathLoss.mClutter.GetFromDatabase(ClutterClassGroup);
 	mNumAngles=NumAngles;
 	mAngleRes=360.0/(double)mNumAngles;
 	mDistanceRes=DistanceRes;

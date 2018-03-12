@@ -77,15 +77,25 @@ namespace Qrap
 		
 		public:
 			/**
-			 * Constructor
+			 * Constructor. Needs calling GetFromDatabase seperately.
 			 */
 			cClutter ();
+
+			/**
+			 * Overloaded constructor
+			 * 
+			 * @param right Description
+			 */
+			cClutter (const cClutter &right);
 
 			/**
 			 * Overload Constructor with the Clutter Classification Group as input 
 			 */
 			cClutter (unsigned ClassGroup);
  
+
+			bool GetFromDatabase(unsigned ClassGroup=9999);
+
 			/**
 			 * Destructor
 			 */
@@ -120,7 +130,7 @@ namespace Qrap
 			/**
 			 * Query the database for the stored data
 			 */
-			bool GetFromDatabase(unsigned ClassGroup=9999);
+
 
 			/**
 			 * Destroy content: called by destructor and reset

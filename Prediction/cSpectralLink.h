@@ -78,7 +78,7 @@ private:
 	short int		mDEMsource;		///< Description
 	short int		mClutterSource;	///< Description
 	unsigned 		mClutterClassGroup;
-	cClutter		mClutterset;
+//	cClutter		mClutterset;
 	cRasterFileHandler 	*mDEM;		///< Description
 	bool			mUseClutter;	///< Description
 	bool mUseAntennaANN; ///< 

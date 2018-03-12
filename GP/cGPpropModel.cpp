@@ -122,7 +122,7 @@ int cGPpropModel:: mainTuning()
 
 	cout << "Loading measurements ... in main()" << endl;
 
-	mMeas.SetPlotResolution(5);
+	mMeas.SetPlotResolution(30);
 	mMeas.LoadMeasurements(Punte,0,0,0);
 
 	double Mean, MSE, StDev, CorrC;

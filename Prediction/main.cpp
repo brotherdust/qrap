@@ -234,7 +234,7 @@ int main (int argc, char **argv)
 
 	cout << "Loading measurements ... in main()" << endl;
 
-	Meas.SetPlotResolution(5);
+	Meas.SetPlotResolution(30);
 	Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 

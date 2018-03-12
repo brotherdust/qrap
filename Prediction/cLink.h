@@ -168,7 +168,7 @@ namespace Qrap
 
 			static double reR;			///< real earth Radius in m
 			static double c;			///< Speed of Light in m/s
-			cPathLossPredictor 	PathLoss;			
+			cPathLossPredictor 	mPathLoss;			
 			eOutputUnits		mUnits;		///< Requested output units of link
 			bool			mDownlink;	///< Is the TxInst transmitting? 
 			double			mFrequency;	///< Operating frequency of Link

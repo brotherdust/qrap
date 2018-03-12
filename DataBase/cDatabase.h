@@ -32,8 +32,11 @@
 
 using std::string;
 
+
+
 namespace Qrap
 {
+	
 	const int         cCsvLineBufferSize  = 32768;   ///< The maximum number of bytes in a single line from a CSV file.
 	const std::string cPostGisDefaultSrid = "4326";  ///< The default PostGIS SRID if one is not specified in the settings file.
 	
@@ -60,6 +63,7 @@ namespace Qrap
 		friend class cTransactor;
 		friend class cClient;
 	public:
+		std::mutex mgDBlock;
 		short int globalMachineID;
 		
 		/**

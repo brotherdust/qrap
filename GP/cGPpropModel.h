@@ -32,11 +32,15 @@
 #include <algorithm> 
 #include <cmath>
 #include <time.h>
+#include <thread>
+#include <chrono> 
+#include <mutex>
 
 // Include local headers
 #include "../Prediction/cMeasAnalysisCalc.h"
 #include "../Prediction/cClutter.h"
 #include "cGPFunctions.h"
+#include "../DataBase/Config.h"
 
 // local defines
 #define NUM_INIT_CANDIDATES 20
@@ -52,6 +56,7 @@
 #define PROP_CROSSOVER 0.5
 
 using namespace std;
+
 using namespace Qrap;
 
 
@@ -109,6 +114,8 @@ namespace Qrap
 		public:
 
 			cGPpropModel();
+			
+			cGPpropModel (const cGPpropModel &right);
 
 			~cGPpropModel();
 		
@@ -116,10 +123,13 @@ namespace Qrap
 
 		private:
 
+			void ComputeCandidates(unsigned Begin, unsigned Skip);
+
 			int CostFunction(unsigned CandidateIndex, double &Mean, double &MeanSquareError,
 				double &StDev, double &CorrC, 
 				bool CalcNewObstruction=true, unsigned Clutterfilter=0);
 
+			bool optimiseConstants(unsigned Index);
 
 			void printTree(GOftn* inTree, int depth=0);
 
@@ -150,7 +160,6 @@ namespace Qrap
 
 			int getRandSurvivor(unsigned popSize);
 
-			bool optimiseConstants(unsigned Index);
 
 		private:
 

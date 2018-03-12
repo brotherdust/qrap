@@ -83,7 +83,7 @@ namespace Qrap
 			 * @param right Description
 			 */
 			cPathLossPredictor (const cPathLossPredictor &right);
-			
+	
 			/**
 			 * Destructor
 			 */
@@ -204,7 +204,6 @@ namespace Qrap
 			void set_Clutter(bool &UseClutter, unsigned ClutterClassGroup=9999); 
 
 			void set_Tuning( bool Tuning) { mTuning=Tuning;}
-			bool get_Tuning() { return mTuning;}
 
 			/**
 			 * Overloaded operator

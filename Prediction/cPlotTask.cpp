@@ -44,7 +44,7 @@ cPlotTask::cPlotTask()
 	mkFactorInt = 2.5;
 	mDEMsource = 1;
 	mDownlink = true;
-	mClutterSource = 1;
+	mClutterSource = 2;
 	mUseClutter = false;
 	mPlotResolution = 90;
 	mMinAngleRes = 1;
@@ -214,6 +214,7 @@ bool cPlotTask::SetPlotTask(	ePlotType PlotType,
 	if (mUseClutter)
 		mClutterClassGroup = mClutter.GetClutterClassGroup();
 	mUseClutter = (mUseClutter) && (mClutterClassGroup>0);
+	
 
 	cout << "North West corner: " << endl;
 	NorthWestCorner.Display();

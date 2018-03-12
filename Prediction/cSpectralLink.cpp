@@ -70,6 +70,7 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey,
 				unsigned int &TxKey, double &Resol, double &kFactor)
 {
 	mUseAntennaANN=false;
+	mClutterClassGroup = 0;
 	string setting = gDb.GetSetting("UseAntennaANN");
 	if (setting=="true")
 		mUseAntennaANN=true;
@@ -77,7 +78,7 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey,
 	mUseClutter = mClutter.SetRasterFileRules(mClutterSource);
 	if (mUseClutter) 
 		mClutterClassGroup = mClutter.GetClutterClassGroup();
-	if (mUseClutter) mClutterset.Reset(mClutterClassGroup);
+	mUseClutter = mUseClutter&&(mClutterClassGroup>0);
 
 	bool FoundRasterSet=FALSE;
 	mFrequencySpacing=Resol;
@@ -200,6 +201,8 @@ bool cSpectralLink::DoLink()
 	cProfile Clutter;
 	cProfile DEM;
 	cPathLossPredictor PathLoss;
+	if (mUseClutter)
+		PathLoss.mClutter.GetFromDatabase(mClutterClassGroup);
 	bool AfterReceiver = (mUnits!=dBWm2Hz) && (mUnits!=dBWm2);
 
 	mTxBearing = mTxInst.sSitePos.Bearing(mRxInst.sSitePos);

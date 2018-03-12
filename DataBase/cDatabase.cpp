@@ -276,6 +276,7 @@ bool cDatabase::PerformRawSql (const string& command)
 bool cDatabase::Select (const string& columns, const string& tableName, const string& where,
 	const string& orderBy, bool ascending, bool hideDefault)
 {
+
 	StringArray cols;
 	StringArray newCols;
 	string      fixedCols, actTable, whereStr;
@@ -1534,44 +1535,61 @@ bool cDatabase::RemoveView (const string& viewName)
 //**********************************************************************
 string cDatabase::GetSetting (const string& name)
 {
+	mgDBlock.lock();
 	if (!PerformRawSql("select value from qrap_config where name='"+name+"' and type='local' and username='"+mUsername+"';"))
+	{
+		mgDBlock.unlock();
 		return string("");
+	}
 	
 	if (mLastResult.size() == 0)
+	{
+		mgDBlock.unlock();
 		return string("");
-	
+	}
+
+	mgDBlock.unlock();
 	return string(mLastResult[0]["value"].c_str());
 	
 //	if (mSettings.count(name) > 0)
 //		return mSettings[name];
-	
-	return string("");
+
 }
 
 //****************************************************************************
 bool cDatabase::SetSetting (const string& name, const string& value)
 {
+	mgDBlock.lock();
 	// check if the setting exists for this user
 	if (!PerformRawSql("select id from qrap_config where name='"+name+"' and type='local' and username='"+mUsername+"';"))
+	{
+		mgDBlock.unlock();
 		return false;
+	}
 	
 	// if the entry should be inserted
 	if (mLastResult.size() == 0)
 	{
 		if (!PerformRawSql("insert into qrap_config (lastmodified,type,username,name,value) values (now(),'local','"+
 			mUsername+"','"+name+"',"+StrQuote(value)+");"))
+		{
+			mgDBlock.unlock();
 			return false;
+		}
 	} else
 	// if the entry should be updated
 	{
 		if (!PerformRawSql("update qrap_config set lastmodified=now(),value="+StrQuote(value)+
 			" where type='local' and username='"+mUsername+"' and name='"+name+"';"))
+		{
+			mgDBlock.unlock();
 			return false;
+		}
 	}
 	
 	// set the setting in memory
 	mSettings[name] = value;
-	
+	mgDBlock.unlock();	
 	return true;
 }
 

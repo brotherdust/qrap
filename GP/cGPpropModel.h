@@ -41,11 +41,13 @@
 #include "../Prediction/cClutter.h"
 #include "cGPFunctions.h"
 #include "../DataBase/Config.h"
+#include "ThreadPool.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 20
-//#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
-#define NUM_GENERATIONS 10 // GP field guide suggest between 10 and 50
+//#define NUM_INIT_CANDIDATES 100
+#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
+#define MAX_NUM_IN_CACHE 15
+#define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50
 #define NUM_POINT_PER_EVAL 1000
 //how much of the population we loose per generation
 #define DEATH_RATE 33 // As percentage.
@@ -71,6 +73,7 @@ struct SCandidate
 	double		sCorrC;
 	double		sStdDev;
 	double		sMean;
+	double		sMSE;
 	double		sFitness;
 	unsigned	sRank;
 	unsigned	sDepth;
@@ -94,6 +97,7 @@ struct SCandidate
 		sCorrC		= Right.sCorrC;
 		sStdDev		= Right.sStdDev;
 		sMean		= Right.sMean;
+		sMSE		= Right.sMSE;
 		sFitness	= Right.sFitness;
 		sRank		= Right.sRank;
 		sDepth		= Right.sDepth;
@@ -125,11 +129,16 @@ namespace Qrap
 
 			void ComputeCandidates(unsigned Begin, unsigned Skip);
 
+			void ComputeCandidate(unsigned CandidateIndex);
+
 			int CostFunction(unsigned CandidateIndex, double &Mean, double &MeanSquareError,
 				double &StDev, double &CorrC, 
 				bool CalcNewObstruction=true, unsigned Clutterfilter=0);
 
-			bool optimiseConstants(unsigned Index);
+			int CostFunctionTreeOnly(unsigned CIndex, double &Mean, double &MeanSquareError,
+					double &StDev, double &CorrC, unsigned Clutterfilter=0);
+
+			void optimiseConstants(unsigned Index);
 
 			void printTree(GOftn* inTree, int depth=0);
 

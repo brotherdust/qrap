@@ -77,8 +77,7 @@ private:
 	double			mPlotResolution;///< Hz
 	short int		mDEMsource;		///< Description
 	short int		mClutterSource;	///< Description
-//	unsigned 		mClutterClassGroup;
-//	cClutter		mClutterset;
+	unsigned 		mClutterClassGroup;
 	cRasterFileHandler 	*mDEM;		///< Description
 	bool			mUseClutter;	///< Description
 	bool mUseAntennaANN; ///< 

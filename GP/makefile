@@ -58,7 +58,7 @@ cBIN.o: ../Prediction/cBIN.h ../Prediction/cBIN.cpp makefile
 cMeasAnalysisCalc.o: ../Prediction/cMeasAnalysisCalc.h ../Prediction/cMeasAnalysisCalc.cpp makefile
 	$(CC) ../Prediction/cMeasAnalysisCalc.cpp
 
-cGPpropModel.o: cGPpropModel.h cGPpropModel.cpp makefile
+cGPpropModel.o: SafeQueue.h ThreadPool.h cGPpropModel.h cGPpropModel.cpp makefile
 	$(CC) cGPpropModel.cpp	
 
 cGPFunctions.o:  cGPFunctions.h cGPFunctions.cpp makefile

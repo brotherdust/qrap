@@ -266,7 +266,7 @@ tMeasPoint TxHeightNode::eval(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	outPoint.sReturn = inPoint.sTxHeight;
-//	cout << mLabel << outPoint.sReturn<<endl;
+//	cout << "	" << mLabel << outPoint.sReturn<<endl;
 	return outPoint;
 }
 
@@ -296,6 +296,7 @@ tMeasPoint RxHeightNode::eval(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	outPoint.sReturn = inPoint.sRxHeight;
+//	cout <<"	"<< mLabel << outPoint.sReturn<<endl;
 	return outPoint;
 }
 
@@ -355,6 +356,7 @@ tMeasPoint ClutterTypeNode::eval(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	outPoint.sReturn = inPoint.sClutter;
+//	cout <<"	"<< mLabel << outPoint.sReturn<<endl;
 	return outPoint;
 }
 
@@ -384,6 +386,7 @@ tMeasPoint ClutterHeightNode::eval(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	outPoint.sReturn = inPoint.sClutterHeight;
+//	cout <<"	"<< mLabel << outPoint.sReturn<<endl;
 	return outPoint;
 }
 
@@ -405,7 +408,7 @@ ClutterDepthNode::ClutterDepthNode()
 {
 	mNumChildren = 0;
 	mChild = nullptr;
-	mLabel = " h_c ";
+	mLabel = " d_c ";
 	mIsConstant = false;
 }
 
@@ -414,6 +417,7 @@ tMeasPoint ClutterDepthNode::eval(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	outPoint.sReturn = inPoint.sClutterDistance;
+//	cout <<"	"<< mLabel << outPoint.sReturn<<endl;
 	return outPoint;
 }
 
@@ -457,7 +461,7 @@ tMeasPoint Add::eval(tMeasPoint inPoint)
 		{
 			cerr << "not all inputs define in Add"<<endl;
 			mNumChildren=NumChildren;
-			outPoint.sReturn = -1000.0;
+			outPoint.sReturn = 200.0;
 			return outPoint;
 		}
 	}
@@ -505,7 +509,7 @@ tMeasPoint Subtract::eval(tMeasPoint inPoint)
 	else 
 	{
 		cerr << "left and right not defined in Subtract"<<endl;
-		outPoint.sReturn = -200.0;
+		outPoint.sReturn = 200.0;
 	}
 	return outPoint;
 }
@@ -555,7 +559,7 @@ tMeasPoint Multiply::eval(tMeasPoint inPoint)
 		{
 			cerr << "not all inputs define in Multiply"<<endl;
 			mNumChildren=NumChildren;
-			outPoint.sReturn = -200.0;
+			outPoint.sReturn = 200.0;
 			return outPoint;
 		}
 	}
@@ -612,7 +616,7 @@ tMeasPoint Divide::eval(tMeasPoint inPoint)
 	else 
 	{
 		cout << "left and right not defined in divide "<<endl;
-		outPoint.sReturn = -500.0;
+		outPoint.sReturn = 200.0;
 	}
 	return outPoint;
 }
@@ -656,13 +660,13 @@ tMeasPoint Log10Node::eval(tMeasPoint inPoint)
 		else
 		{
 //			cerr << "input to log10 not positive"<<endl;
-			outPoint.sReturn = -200.0;
+			outPoint.sReturn = 200.0;
 		}
 	}
 	else 
 	{
 		cerr << "input not defined in log10"<<endl;
-		outPoint.sReturn = -200.0;
+		outPoint.sReturn = 200.0;
 	}
 //	cout <<"	"<< mLabel << outPoint.sReturn << endl;
 	return outPoint;
@@ -706,7 +710,7 @@ tMeasPoint Square::eval(tMeasPoint inPoint)
 	else 
 	{
 		cerr << "input not defined in square"<<endl;
-		outPoint.sReturn = -200.0;
+		outPoint.sReturn = 200.0;
 	}
 	return outPoint;
 }
@@ -754,23 +758,23 @@ tMeasPoint Power::eval(tMeasPoint inPoint)
 			if (c2.sReturn>=0)
 				outPoint.sReturn = 0.0;
 			else
-				outPoint.sReturn = -200; 
+				outPoint.sReturn = 200; 
 		}
 		else
 		{
 //			cout << "power not defined" << endl;
-			outPoint.sReturn = -200;
+			outPoint.sReturn = 200;
 		} 
 		if ((isnan(outPoint.sReturn))||(isinf(outPoint.sReturn)))
 		{
-//			cout << "power not defined" << endl;
-			outPoint.sReturn = -200;
+//			cout << "power not defined nan" << endl;
+			outPoint.sReturn = 200;
 		}
 	}
 	else 
 	{
 		cerr << "left and right not defined in Power"<<endl;
-		outPoint.sReturn = -200.0;
+		outPoint.sReturn = 200.0;
 	}
 //	cout <<"	"<< mLabel << outPoint.sReturn << endl;	
 	return outPoint;

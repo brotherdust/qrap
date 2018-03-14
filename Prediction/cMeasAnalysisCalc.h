@@ -68,6 +68,7 @@ struct tMeasPoint
 	unsigned 	sClutter;
 	double		sClutterHeight;
 	double		sClutterDistance;
+	double		sEIRPAntValue;
 	double		sReturn;
 
 	tMeasPoint operator=(tMeasPoint Right)
@@ -90,6 +91,7 @@ struct tMeasPoint
 		sClutter	= Right.sClutter;
 		sClutterHeight	= Right.sClutterHeight;
 		sClutterDistance= Right.sClutterDistance;
+		sEIRPAntValue	= Right.sEIRPAntValue;
 		sReturn		= Right.sReturn;
 		return *this;
 	}

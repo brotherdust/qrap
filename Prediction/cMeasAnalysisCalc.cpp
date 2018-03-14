@@ -830,6 +830,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				AntValue = FixedAnt.GetPatternValue(mMeasPoints[i].sAzimuth, mMeasPoints[i].sTilt)
 								+ MobileAnt.GetPatternValue(0, -mMeasPoints[i].sTilt);
 
+				mMeasPoints[i].sEIRPAntValue = EIRP - AntValue;
 				mMeasPoints[i].sPredValue = -mMeasPoints[i].sPathLoss + EIRP - AntValue;
 //				cout << "cMeasAnalysisCalc::PerformAnalysis pathloss=" << mMeasPoints[i].sPathLoss;
 //				cout << "	AntValue=" << AntValue << endl;

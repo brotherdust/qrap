@@ -91,8 +91,7 @@ cPathLossPredictor::cPathLossPredictor(	double k, double f,
 	if (NUMTERMS>2) mCterms[2] = TERM2;
 	if (NUMTERMS>4) mCterms[4] = TERM4;
 
-	mUseClutter = true;
-	if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
+//	if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
 
 }/* end CPathLossPredictor:: Default Constructor */
 

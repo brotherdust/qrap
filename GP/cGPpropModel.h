@@ -41,21 +41,23 @@
 #include "../Prediction/cClutter.h"
 #include "cGPFunctions.h"
 #include "../DataBase/Config.h"
-#include "ThreadPool.h"
+//#include "ThreadPool.h"
 
 // local defines
-//#define NUM_INIT_CANDIDATES 100
-#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
-#define MAX_NUM_IN_CACHE 15
-#define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50
+#define NUM_INIT_CANDIDATES 50
+//#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
+#define MAX_NUM_IN_CACHE 10
+#define NUM_GENERATIONS 2 // GP field guide suggest between 10 and 50
 #define NUM_POINT_PER_EVAL 1000
 //how much of the population we loose per generation
-#define DEATH_RATE 33 // As percentage.
-#define UNFIT_LIMIT 1000
+#define UNFIT_LIMIT 10000
 
 #define MAX_TREE_DEPTH 10 
 #define PROP_MUTATE 0.5
 #define PROP_CROSSOVER 0.5
+
+#define MAXOPTLOOPS 500
+#define MAXOPTCALC 1500
 
 using namespace std;
 
@@ -81,7 +83,7 @@ struct SCandidate
 	vConstants	sConstants;
 	bool		sOptimised;
 
-	SCandidate operator=(SCandidate Right)
+	SCandidate & operator=(SCandidate Right)
 	{
 		unsigned i;
 		sNumClutter	= Right.sNumClutter;
@@ -118,8 +120,6 @@ namespace Qrap
 		public:
 
 			cGPpropModel();
-			
-			cGPpropModel (const cGPpropModel &right);
 
 			~cGPpropModel();
 		
@@ -139,6 +139,14 @@ namespace Qrap
 					double &StDev, double &CorrC, unsigned Clutterfilter=0);
 
 			void optimiseConstants(unsigned Index);
+
+			void optimiseConstantsSTDev(unsigned Index);
+
+			void optimiseConstantsSTDevMO(unsigned Index);
+
+			void optimiseConstantsCorrC(unsigned Index);
+
+			void optimiseConstantsCorrCMO(unsigned Index);
 
 			void printTree(GOftn* inTree, int depth=0);
 

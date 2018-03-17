@@ -97,8 +97,8 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem, unsigned int &RxKey,
 	mFrequency = 60000;
 	mkFactor = kFactor;
 	mDEMsource = 1;
-	mClutterSource = 2;
-	mUseClutter = false;
+	mClutterSource = 1;
+//	mUseClutter = false;
 	mPlotResolution = 90;
 	
 	FoundRasterSet = mDEM->SetRasterFileRules(mDEMsource);
@@ -135,7 +135,7 @@ cSpectralLink::cSpectralLink(cRasterFileHandler *Dem)
 	mFrequency = 60000;
 	mkFactor = 1.33;
 	mDEMsource = 1;
-	mClutterSource = 2;
+	mClutterSource = 1;
 	mUseClutter = false;
 	mPlotResolution = 10;
 	mTxInst.sInstKey=491;

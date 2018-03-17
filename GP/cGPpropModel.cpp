@@ -28,6 +28,7 @@
 #define GLOBALS 1
 std::default_random_engine 		gRandomGen;
 std::normal_distribution<double> 	gGauss;
+std::uniform_real_distribution<double> 	gUni(0.0, 1.0);
 #endif
 
 using namespace Qrap;
@@ -38,13 +39,7 @@ cGPpropModel::cGPpropModel()
 {
 	cout << "Entering cGPpropModel::cGPpropModel()" << endl;
 	mNumCandidates = NUM_INIT_CANDIDATES; 
-	mNumToDie = (unsigned)(mNumCandidates*DEATH_RATE/100);
 	cout << "Leaving cGPpropModel::cGPpropModel()" << endl;
-}
-
-//*************************************************************************
-cGPpropModel::cGPpropModel(const cGPpropModel &right)
-{
 }
 
 //*************************************************************************
@@ -77,6 +72,7 @@ int cGPpropModel:: mainTuning()
 
 	cGeoP *Hoek;
 	unsigned NumHoek=4;
+	unsigned NumSeeds = 0;
 
 //Gauteng 20m DEM
 /*	NumHoek=19;
@@ -111,7 +107,7 @@ int cGPpropModel:: mainTuning()
 	Hoek[2].Set(-26.999, 28.999);
 	Hoek[3].Set(-26.999, 27.001);
 
-	
+
 //	Bryanston
 /*	NumHoek=4;
 	Hoek = new cGeoP[NumHoek];
@@ -138,24 +134,21 @@ int cGPpropModel:: mainTuning()
 	double Mean, MSE, StDev, CorrC;
 	mMeas.PerformAnalysis(Mean, MSE, StDev, CorrC);
 
-	cout << "Initial calculation done" << endl;
+	cout << endl<< "Initial calculation done" << endl;
 	cout << "Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl << endl << endl;
 
 	mMeas.PerformAnalysis(Mean, MSE, StDev, CorrC);
-
 	cout << "Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl << endl << endl;
+	
 	GOftn* newTree = nullptr;
 	SCandidate newCandidate;
-
-//	double PathLoss,Tilt,DiffLoss,sClutterDistance;
-	
 
 	// ***********************************************************************
 	// Initialise candidates of known models
 
 	// Basic free space plus obstruction loss (Q-Rap basic model)
 	// # 0
-	newTree = new Add(4);
+/*	newTree = new Add(4);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
 	newTree->mChild[1]->mChild[0] = new ConstNode(20.0);
@@ -172,7 +165,7 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 3;
 	mCandidate.push_back(newCandidate);
-
+*/
 	// 'Tuned' with 3 terms 
 	// # 1
 	newTree = new Add(4);
@@ -193,9 +186,129 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 3;
 	mCandidate.push_back(newCandidate);
 
-	//Basic model with some vegetation loss term
-	// #2
+	// basic terms with clutterheight dependancy
+	// # 2
 	newTree = new Add(5);
+	newTree->mChild[0] = new ConstNode(39.40);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(27.74);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(23.3);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
+	newTree->mChild[4] = new Multiply();
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[4]->mChild[1] = new Power();
+	newTree->mChild[4]->mChild[1]->mChild[0] = new ClutterHeightNode();
+	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.5);
+
+	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 3;
+	mCandidate.push_back(newCandidate);
+
+	// basic terms with clutterheight dependancy
+	// # 2
+	newTree = new Add(6);
+	newTree->mChild[0] = new ConstNode(39.40);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(27.74);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(23.3);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
+	newTree->mChild[4] = new Multiply();
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[4]->mChild[1] = new Power();
+	newTree->mChild[4]->mChild[1]->mChild[0] = new ClutterHeightNode();
+	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[5] = new Multiply();
+	newTree->mChild[5]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[5]->mChild[1] = new Power();
+	newTree->mChild[5]->mChild[1]->mChild[0] = new ClutterDepthNode();
+	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.5);
+
+	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 3;
+	mCandidate.push_back(newCandidate);
+
+	// basic terms with clutterheight dependancy
+	// # 2
+	newTree = new Add(6);
+	newTree->mChild[0] = new ConstNode(39.40);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(27.74);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(23.3);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
+	newTree->mChild[4] = new Multiply();
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[4]->mChild[1] = new Power();
+	newTree->mChild[4]->mChild[1]->mChild[0] = new ClutterHeightNode();
+	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[5] = new Multiply();
+	newTree->mChild[5]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[5]->mChild[1] = new Power();
+	newTree->mChild[5]->mChild[1]->mChild[0] = new TxHeightNode();
+	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.5);
+
+	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 3;
+	mCandidate.push_back(newCandidate);
+
+
+	// basic terms with good guess ekstra terms
+	// # 3
+	newTree = new Add(7);
+	newTree->mChild[0] = new ConstNode(39.40);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(20.74);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(20.3);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
+	newTree->mChild[4] = new Multiply();
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[4]->mChild[1] = new Power();
+	newTree->mChild[4]->mChild[1]->mChild[0] = new ClutterHeightNode();
+	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[5] = new Multiply();
+	newTree->mChild[5]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[5]->mChild[1] = new Power();
+	newTree->mChild[5]->mChild[1]->mChild[0] = new ClutterDepthNode();
+	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[6] = new Multiply();
+	newTree->mChild[6]->mChild[0] = new ConstNode(1);
+	newTree->mChild[6]->mChild[1] = new Log10Node();
+	newTree->mChild[6]->mChild[1]->mChild[0] = new TxHeightNode();
+
+	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 3;
+	mCandidate.push_back(newCandidate);
+
+	//Basic model with some vegetation loss term
+	// # 4
+	newTree = new Add(6);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
 	newTree->mChild[1]->mChild[0] = new ConstNode(20.0);
@@ -209,21 +322,28 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
 	newTree->mChild[3]->mChild[1] = new ObstructionNode();
 	newTree->mChild[4] = new Multiply(3);
-	newTree->mChild[4]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[4]->mChild[1] = new Power();
 	newTree->mChild[4]->mChild[1]->mChild[0] = new FrequencyNode();
 	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.5);
 	newTree->mChild[4]->mChild[2] = new Power();
 	newTree->mChild[4]->mChild[2]->mChild[0] = new ClutterDepthNode();
 	newTree->mChild[4]->mChild[2]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[5] = new Multiply(3);
+	newTree->mChild[5]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[5]->mChild[1] = new Power();
+	newTree->mChild[5]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[5]->mChild[2] = new Power();
+	newTree->mChild[5]->mChild[2]->mChild[0] = new ClutterHeightNode();
+	newTree->mChild[5]->mChild[2]->mChild[1] = new ConstNode(0.5);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
 	mCandidate.push_back(newCandidate);
 
-
 	// Tuned Q-Rap model ... classic tuning
-	// #3
+	// # 5
 	newTree = new Add(7);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -259,7 +379,7 @@ int cGPpropModel:: mainTuning()
 	mCandidate.push_back(newCandidate);
 
 	// Tuned Q-Rap model ... with clutterdepth
-	// #4
+	// # 6
 	newTree = new Add(7);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -284,22 +404,55 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[5]->mChild[1] = new Log10Node();
 	newTree->mChild[5]->mChild[1]->mChild[0] = new TxHeightNode();
 	newTree->mChild[6] = new Multiply(3);
-	newTree->mChild[6]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[6]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[6]->mChild[1] = new Power();
 	newTree->mChild[6]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[6]->mChild[2] = new Power();
 	newTree->mChild[6]->mChild[2]->mChild[0] = new ClutterDepthNode();
-	newTree->mChild[6]->mChild[2]->mChild[1] = new ConstNode(0.5);
-
+	newTree->mChild[6]->mChild[2]->mChild[1] = new ConstNode(0.3);
 	
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
 	mCandidate.push_back(newCandidate);
 
+	// Tuned Q-Rap model ... with clutterheight
+	// # 7
+	newTree = new Add(7);
+	newTree->mChild[0] = new ConstNode(32.45);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(34.1453);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(38.5005);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(0.340187);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
+	newTree->mChild[4] = new Multiply(3);
+	newTree->mChild[4]->mChild[0] = new ConstNode(-14.1625);
+	newTree->mChild[4]->mChild[1] = new Log10Node();
+	newTree->mChild[4]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[4]->mChild[2] = new Log10Node();
+	newTree->mChild[4]->mChild[2]->mChild[0] = new TxHeightNode();
+	newTree->mChild[5] = new Multiply();
+	newTree->mChild[5]->mChild[0] = new ConstNode(-4.74767);
+	newTree->mChild[5]->mChild[1] = new Log10Node();
+	newTree->mChild[5]->mChild[1]->mChild[0] = new TxHeightNode();
+	newTree->mChild[6] = new Multiply(2);
+	newTree->mChild[6]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[6]->mChild[1] = new Power();
+	newTree->mChild[6]->mChild[1]->mChild[0] = new ClutterHeightNode();
+	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	
+	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 4;
+	mCandidate.push_back(newCandidate);
 
 	// Hata - Suburban
-	// #5
+	// # 8
 	newTree = new Add(9);
 	newTree->mChild[0] = new ConstNode(63.35);
 	newTree->mChild[1] = new Multiply();
@@ -345,8 +498,8 @@ int cGPpropModel:: mainTuning()
 	mCandidate.push_back(newCandidate);
 
 	// Hata - Suburban altered with vegetation loss term
-	// #6
-	newTree = new Add(10);
+	// # 9
+	newTree = new Add(11);
 	newTree->mChild[0] = new ConstNode(63.35);
 	newTree->mChild[1] = new Multiply();
 	newTree->mChild[1]->mChild[0] = new ConstNode(27.72);
@@ -385,20 +538,78 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[8]->mChild[0] = new ConstNode(0.7);
 	newTree->mChild[8]->mChild[1] = new RxHeightNode();
 	newTree->mChild[9] = new Multiply(3);
-	newTree->mChild[9]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[9]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[9]->mChild[1] = new Power();
 	newTree->mChild[9]->mChild[1]->mChild[0] = new FrequencyNode();
 	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.5);
 	newTree->mChild[9]->mChild[2] = new Power();
 	newTree->mChild[9]->mChild[2]->mChild[0] = new ClutterDepthNode();
 	newTree->mChild[9]->mChild[2]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[10] = new Multiply(3);
+	newTree->mChild[10]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[10]->mChild[1] = new Power();
+	newTree->mChild[10]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[10]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[10]->mChild[2] = new Power();
+	newTree->mChild[10]->mChild[2]->mChild[0] = new ClutterHeightNode();
+	newTree->mChild[10]->mChild[2]->mChild[1] = new ConstNode(0.5);
+
+	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 6;
+	mCandidate.push_back(newCandidate);
+
+	// Hata - Suburban altered with clutterheight
+	// #10
+	newTree = new Add(10);
+	newTree->mChild[0] = new ConstNode(63.35);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(27.72);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(44.9);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
+	newTree->mChild[4] = new Multiply(3);
+	newTree->mChild[4]->mChild[0] = new ConstNode(-6.55);
+	newTree->mChild[4]->mChild[1] = new Log10Node();
+	newTree->mChild[4]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[4]->mChild[2] = new Log10Node();
+	newTree->mChild[4]->mChild[2]->mChild[0] = new TxHeightNode();
+	newTree->mChild[5] = new Multiply();
+	newTree->mChild[5]->mChild[0] = new ConstNode(-13.82);
+	newTree->mChild[5]->mChild[1] = new Log10Node();
+	newTree->mChild[5]->mChild[1]->mChild[0] = new TxHeightNode();
+	newTree->mChild[6] = new Multiply(3);
+	newTree->mChild[6]->mChild[0] = new ConstNode(-1.1);
+	newTree->mChild[6]->mChild[1] = new RxHeightNode();
+	newTree->mChild[6]->mChild[2] = new Log10Node();
+	newTree->mChild[6]->mChild[2]->mChild[0] = new FrequencyNode();
+	newTree->mChild[7] = new Multiply();
+	newTree->mChild[7]->mChild[0] = new ConstNode(-2.0);
+	newTree->mChild[7]->mChild[1] = new Square();
+	newTree->mChild[7]->mChild[1]->mChild[0] = new Log10Node();
+	newTree->mChild[7]->mChild[1]->mChild[0]->mChild[0] = new Divide();
+	newTree->mChild[7]->mChild[1]->mChild[0]->mChild[0]->mChild[0] = new FrequencyNode();
+	newTree->mChild[7]->mChild[1]->mChild[0]->mChild[0]->mChild[1] = new ConstNode(28);
+	newTree->mChild[8] = new Multiply();
+	newTree->mChild[8]->mChild[0] = new ConstNode(0.7);
+	newTree->mChild[8]->mChild[1] = new RxHeightNode();
+	newTree->mChild[9] = new Multiply(2);
+	newTree->mChild[9]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[9]->mChild[1] = new Power();
+	newTree->mChild[9]->mChild[1]->mChild[0] = new ClutterHeightNode();
+	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.3);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 6;
 	mCandidate.push_back(newCandidate);
 
 	// Hata - Suburban altered with terms of each kind
-	// # 7
+	// # 11
 	newTree = new Add(14);
 	newTree->mChild[0] = new ConstNode(63.35);
 	newTree->mChild[1] = new Multiply();
@@ -438,37 +649,37 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[8]->mChild[0] = new ConstNode(0.7);
 	newTree->mChild[8]->mChild[1] = new RxHeightNode();
 	newTree->mChild[9] = new Multiply();
-	newTree->mChild[9]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[9]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[9]->mChild[1] = new Power();
 	newTree->mChild[9]->mChild[1]->mChild[0] = new DistanceNode();
-	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[10] = new Multiply();
-	newTree->mChild[10]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[10]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[10]->mChild[1] = new Power();
 	newTree->mChild[10]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[10]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[10]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[11] = new Multiply();
-	newTree->mChild[11]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[11]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[11]->mChild[1] = new Power();
 	newTree->mChild[11]->mChild[1]->mChild[0] = new TxHeightNode();
-	newTree->mChild[11]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[11]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[12] = new Multiply();
-	newTree->mChild[12]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[12]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[12]->mChild[1] = new Power();
 	newTree->mChild[12]->mChild[1]->mChild[0] = new ClutterDepthNode();
-	newTree->mChild[12]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[12]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[13] = new Multiply();
-	newTree->mChild[13]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[13]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[13]->mChild[1] = new Power();
 	newTree->mChild[13]->mChild[1]->mChild[0] = new ClutterHeightNode();
-	newTree->mChild[13]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[13]->mChild[1]->mChild[1] = new ConstNode(0.3);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 6;
 	mCandidate.push_back(newCandidate);
 
 	// basic model with 'vegetation-loss' term
-	// # 8
+	// # 12
 	newTree = new Add(5);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -495,8 +706,8 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 4;
 	mCandidate.push_back(newCandidate);
 
-	//Basic with ekstra terms of each parameter with vergloss term)
-	// # 9
+	//Basic with extra terms of each parameter with vegloss term)
+	// # 13
 	newTree = new Add(10);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -511,7 +722,7 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
 	newTree->mChild[3]->mChild[1] = new ObstructionNode();
 	newTree->mChild[4] = new Multiply(3);
-	newTree->mChild[4]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[4]->mChild[1] = new Power();
 	newTree->mChild[4]->mChild[1]->mChild[0] = new FrequencyNode();
 	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.5);
@@ -519,37 +730,36 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[4]->mChild[2]->mChild[0] = new ClutterDepthNode();
 	newTree->mChild[4]->mChild[2]->mChild[1] = new ConstNode(0.5);
 	newTree->mChild[5] = new Multiply();
-	newTree->mChild[5]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[5]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[5]->mChild[1] = new Power();
 	newTree->mChild[5]->mChild[1]->mChild[0] = new DistanceNode();
-	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[6] = new Multiply();
-	newTree->mChild[6]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[6]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[6]->mChild[1] = new Power();
 	newTree->mChild[6]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[7] = new Multiply();
-	newTree->mChild[7]->mChild[0] = new ConstNode(0.2);
-	newTree->mChild[7]->mChild[1] = new Power();
+	newTree->mChild[7]->mChild[0] = new ConstNode(1);
+	newTree->mChild[7]->mChild[1] = new Log10Node();
 	newTree->mChild[7]->mChild[1]->mChild[0] = new TxHeightNode();
-	newTree->mChild[7]->mChild[1]->mChild[1] = new ConstNode(0.5);
 	newTree->mChild[8] = new Multiply();
-	newTree->mChild[8]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[8]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[8]->mChild[1] = new Power();
 	newTree->mChild[8]->mChild[1]->mChild[0] = new ClutterDepthNode();
-	newTree->mChild[8]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[8]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[9] = new Multiply();
-	newTree->mChild[9]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[9]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[9]->mChild[1] = new Power();
 	newTree->mChild[9]->mChild[1]->mChild[0] = new ClutterHeightNode();
-	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.3);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
 	mCandidate.push_back(newCandidate);
 
-	//Basic with ekstra terms of each parameter sans vergloss term)
-	// # 10
+	//Basic with extra terms of each parameter sans vegloss term)
+	// # 14
 	newTree = new Add(9);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -564,37 +774,37 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
 	newTree->mChild[3]->mChild[1] = new ObstructionNode();
 	newTree->mChild[4] = new Multiply();
-	newTree->mChild[4]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[4]->mChild[1] = new Power();
 	newTree->mChild[4]->mChild[1]->mChild[0] = new DistanceNode();
-	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[5] = new Multiply();
-	newTree->mChild[5]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[5]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[5]->mChild[1] = new Power();
 	newTree->mChild[5]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[6] = new Multiply();
-	newTree->mChild[6]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[6]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[6]->mChild[1] = new Power();
 	newTree->mChild[6]->mChild[1]->mChild[0] = new TxHeightNode();
-	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[7] = new Multiply();
-	newTree->mChild[7]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[7]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[7]->mChild[1] = new Power();
 	newTree->mChild[7]->mChild[1]->mChild[0] = new ClutterDepthNode();
-	newTree->mChild[7]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[7]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[8] = new Multiply();
-	newTree->mChild[8]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[8]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[8]->mChild[1] = new Power();
 	newTree->mChild[8]->mChild[1]->mChild[0] = new ClutterHeightNode();
-	newTree->mChild[8]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[8]->mChild[1]->mChild[1] = new ConstNode(0.3);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
 	mCandidate.push_back(newCandidate);
 
-	//Basic with ekstra terms of each parameter sans vergloss term)
-	// # 11
+	//Basic with clutterheight term)
+	// # 15
 	newTree = new Add(7);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -609,31 +819,184 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
 	newTree->mChild[3]->mChild[1] = new ObstructionNode();
 	newTree->mChild[4] = new Multiply();
-	newTree->mChild[4]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[4]->mChild[1] = new Power();
 	newTree->mChild[4]->mChild[1]->mChild[0] = new TxHeightNode();
-	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[5] = new Multiply();
-	newTree->mChild[5]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[5]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[5]->mChild[1] = new Power();
 	newTree->mChild[5]->mChild[1]->mChild[0] = new ClutterDepthNode();
-	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.3);
 	newTree->mChild[6] = new Multiply();
-	newTree->mChild[6]->mChild[0] = new ConstNode(0.2);
+	newTree->mChild[6]->mChild[0] = new ConstNode(0.1);
 	newTree->mChild[6]->mChild[1] = new Power();
 	newTree->mChild[6]->mChild[1]->mChild[0] = new ClutterHeightNode();
-	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.5);
+	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.3);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
 	mCandidate.push_back(newCandidate);
+
+	NumSeeds = mCandidate.size();
+	mNumCandidates = mCandidate.size();
+
+	for (i=0; i<NumSeeds; i++)
+	{
+		mCandidate[i].sCorrC = -1.0;
+		mCandidate[i].sStdDev = 9999;
+		mCandidate[i].sMean = 9999;
+		mCandidate[i].sFitness = 10200;
+		mCandidate[i].sRank = 2*(mNumCandidates-1);
+		mCandidate[i].sPareto = true;
+		mCandidate[i].sOptimised =false;
+		mCandidate[i].sNumClutter = mMeas.mPathLoss.mClutter.mNumber;
+		mCandidate[i].sClutterType  = new unsigned[mMeas.mPathLoss.mClutter.mNumber];
+		mCandidate[i].sClutterHeight = new double[mMeas.mPathLoss.mClutter.mNumber];
+		mCandidate[i].sDepth=mCandidate[i].sTree->getTreeDepth();
+		numConst = mCandidate[i].sTree->getConstants(mCandidate[i].sConstants);
+		for (j=0; j<mMeas.mPathLoss.mClutter.mNumber; j++)
+		{
+			mCandidate[i].sClutterType[j] = mMeas.mPathLoss.mClutter.mClutterTypes[j].sLandCoverID;	
+			mCandidate[i].sClutterHeight[j] = mMeas.mPathLoss.mClutter.mClutterTypes[j].sHeight;
+//			cout << "Cj = " <<  mMeas.mPathLoss.mClutter.mNumber 
+//			<< "	Height= " << mCandidate[i].sClutterHeight[j] << endl;
+		}
+		newCandidate = mCandidate[i];
+		mCandidate.push_back(newCandidate);
+	}
+	for (i=0; i<NumSeeds; i++)
+	{
+		newCandidate = mCandidate[i];
+		mCandidate.push_back(newCandidate);
+	}
+
+	unsigned NumThread = 8;
+    	NumThread = min(NumThread,std::thread::hardware_concurrency());
+	if (NumThread<1) NumThread=1;
+	
+	std::thread calcThread[NumThread];
+	unsigned Skip = NumThread;
+
+/*
+	for (j = 0; j < NumSeeds; j+=Skip)
+	{	
+		for (i=j; (i < (NumThread+j))&&(i<NumSeeds); i++) 
+		{
+			cout << "generating thread for: " << i << endl;
+        		calcThread[i-j] = std::thread(&cGPpropModel::ComputeCandidate, this, i+NumSeeds,4);
+       		}
+ 
+      		for (i = 0; i < NumThread; i++) 
+		{
+			cout << "joining thread: " << i << endl;
+			if (calcThread[i].joinable())
+        			calcThread[i].join();	
+		}
+	}
+	for (i=0; i<NumSeeds; i++)
+		mCandidate[i+NumSeeds].sOptimised = false;
+
+	for (j = 0; j < NumSeeds; j+=Skip)
+	{	
+		for (i=j; (i < (NumThread+j))&&(i<NumSeeds); i++) 
+		{
+			cout << "generating thread for: " << i << endl;
+        		calcThread[i-j] = std::thread(&cGPpropModel::ComputeCandidate, this, i+NumSeeds,1);
+       		}
+ 
+      		for (i = 0; i < NumThread; i++) 
+		{
+			cout << "joining thread: " << i << endl;
+			if (calcThread[i].joinable())
+        			calcThread[i].join();	
+		}
+	}
+	for (i=0; i<NumSeeds; i++)
+		mCandidate[i+NumSeeds].sOptimised = false;
+	for (j = 0; j < NumSeeds; j+=Skip)
+	{	
+		for (i=j; (i < (NumThread+j))&&(i<NumSeeds); i++) 
+		{
+			cout << "generating thread for: " << i << endl;
+        		calcThread[i-j] = std::thread(&cGPpropModel::ComputeCandidate, this, i+NumSeeds,2);
+       		}
+ 
+      		for (i = 0; i < NumThread; i++) 
+		{
+			cout << "joining thread: " << i << endl;
+			if (calcThread[i].joinable())
+        			calcThread[i].join();	
+		}
+	}
+
+	for (j = 0; j < NumSeeds; j+=Skip)
+	{	
+		for (i=j; (i < (NumThread+j))&&(i<NumSeeds); i++) 
+		{
+			cout << "generating thread for: " << i << endl;
+        		calcThread[i-j] = std::thread(&cGPpropModel::ComputeCandidate, this, i+2*NumSeeds,0);
+       		}
+ 
+      		for (i = 0; i < NumThread; i++) 
+		{
+			cout << "joining thread for: " << i << endl;
+			if (calcThread[i].joinable())
+        			calcThread[i].join();	
+		}
+	}
+	for (i=0; i<NumSeeds; i++)
+		mCandidate[i+2*NumSeeds].sOptimised = false;
+	for (j = 0; j < NumSeeds; j+=Skip)
+	{	
+		for (i=j; (i < (NumThread+j))&&(i<NumSeeds); i++) 
+		{
+			cout << "generating thread for: " << i << endl;
+        		calcThread[i-j] = std::thread(&cGPpropModel::ComputeCandidate, this, i+2*NumSeeds,3);
+       		}
+ 
+      		for (i = 0; i < NumThread; i++) 
+		{
+			cout << "joining thread for: " << i << endl;
+			if (calcThread[i].joinable())
+        			calcThread[i].join();	
+		}
+	}	
+	for (i=0; i<NumSeeds; i++)
+		mCandidate[i+2*NumSeeds].sOptimised = false;
+		for (j = 0; j < NumSeeds; j+=Skip)
+	{	
+		for (i=j; (i < (NumThread+j))&&(i<NumSeeds); i++) 
+		{
+			cout << "generating thread for: " << i << endl;
+        		calcThread[i-j] = std::thread(&cGPpropModel::ComputeCandidate, this, i+2*NumSeeds,2);
+       		}
+ 
+      		for (i = 0; i < NumThread; i++) 
+		{
+			cout << "joining thread for: " << i << endl;
+			if (calcThread[i].joinable())
+        			calcThread[i].join();	
+		}
+	}
+*/
+	for (i=0; i<NumSeeds; i++)
+	{	
+		optimiseConstantsSTDevMO(i+NumSeeds);
+		optimiseConstantsSTDev(i+NumSeeds);
+		optimiseConstants(i+NumSeeds);
+		mCandidate[i+NumSeeds].sOptimised = false;
+		optimiseConstantsSTDev(i+NumSeeds);
+		optimiseConstantsCorrC(i+2*NumSeeds);
+		optimiseConstantsCorrCMO(i+2*NumSeeds);
+	}
 
 	mNumCandidates = mCandidate.size();
 
 	srand(time(NULL));
 	
 	// create the initial tree population 
-	for (i=mNumCandidates; i<NUM_INIT_CANDIDATES/2; i++)
+	for (i=mNumCandidates; i<2*NUM_INIT_CANDIDATES/3; i++)
 	{
 		newTree = createRandomTree();
 		newCandidate.sTree = newTree;
@@ -653,9 +1016,9 @@ int cGPpropModel:: mainTuning()
 	for (i=0; i<mNumCandidates; i++)
 	{
 		mCandidate[i].sCorrC = -1.0;
-		mCandidate[i].sStdDev = 999;
-		mCandidate[i].sMean = 999;
-		mCandidate[i].sFitness = 999;
+		mCandidate[i].sStdDev = 9999;
+		mCandidate[i].sMean = 9999;
+		mCandidate[i].sFitness = 10200;
 		mCandidate[i].sRank = 2*(mNumCandidates-1);
 		mCandidate[i].sPareto = true;
 		mCandidate[i].sOptimised =false;
@@ -676,26 +1039,15 @@ int cGPpropModel:: mainTuning()
 	unsigned IndexForCrossOver = 0;
 	unsigned IndexForClone = 0;
 	double growProp;
+
 //	unsigned Nsamples=0;
 	double MaxFitness=0;
-	mMinFitness = 2000;
-
-	unsigned NumThread = 8;
-    	NumThread = min(NumThread,std::thread::hardware_concurrency());
-	if (NumThread<1) NumThread=1;
-	
-	std::thread calcThread[NumThread];
-	unsigned Skip = NumThread;
+	mMinFitness = 10200;
 
 	for (k=0; k<NUM_GENERATIONS; k++) 
 	{
-		mMinFitness=999; MaxFitness=0;
+		MaxFitness=0;
 		mNumCandidates = mCandidate.size();
-		for (i=0; i<mNumCandidates; i++)
-		{
-			if ((k<4)&&(i<12)) mCandidate[i].sOptimised = false;
-
-		}
 
 /*		ThreadPool pool(NumThread);
 		pool.init();
@@ -709,22 +1061,23 @@ int cGPpropModel:: mainTuning()
 		
 //		ComputeCandidates(0,1);
 
-		for (int i = 0; i < NumThread; ++i) 
+		for (i = 0; i < NumThread; i++) 
 		{
 			cout << "generating thread: " << i << endl;
              		calcThread[i] = std::thread(&cGPpropModel::ComputeCandidates, this, i, Skip);
 			// Wait for cPathLossPredictor and cMeasAnalysis constructors to complete
 			// To avoid database clashes
-//			 std::this_thread::sleep_for (std::chrono::milliseconds(100));
+			 std::this_thread::sleep_for (std::chrono::milliseconds(100));
          	}
  
-         	for (int i = 0; i < NumThread; ++i) 
+         	for (i = 0; i < NumThread; i++) 
 		{
 			cout << "joining thread: " << i << endl;
 			if (calcThread[i].joinable())
              			calcThread[i].join();	
 		}
 
+		cout << "SORTING and Preparing" << endl;
 		//sort by performance (sort in increasing order so we work on first N)
 		sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnCorrC);
 		for (i=0; i<mNumCandidates; i++)
@@ -779,7 +1132,15 @@ int cGPpropModel:: mainTuning()
 						(mStars[j].sStdDev<=mCandidate[i].sStdDev)));
 				if (mCandidate[i].sPareto)
 				{
+					cout << endl << "Inserting new Star" << endl;
 					optimiseConstants(i);
+					cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
+						<< "	Fitness=" << mCandidate[i].sFitness 
+						<< "	CorrC=" << mCandidate[i].sCorrC 
+						<< "	StDev=" << mCandidate[i].sStdDev
+						<< "	Mean=" << mCandidate[i].sMean  
+						<< "	Depth=" << mCandidate[i].sDepth <<endl;
+					printTree(mCandidate[i].sTree);
 					mStars.push_back(mCandidate[i]);
 				}
 							
@@ -831,34 +1192,29 @@ int cGPpropModel:: mainTuning()
 		NumStars = mStars.size();
 		for (i=0; i<mNumToDie; i++)
 		{
-			IndexForClone = mNumCandidates -1;
-			while (IndexForClone>(mNumCandidates-mNumToDie))
-				IndexForClone = (unsigned)(fabs(gGauss(gRandomGen)*(mNumCandidates-mNumToDie)));
-			mCandidate[mNumCandidates-1-i] = mCandidate[IndexForClone];
-			mCandidate[mNumCandidates-1-i].sPareto=false;
-			mCandidate[mNumCandidates-1-i].sOptimised = false;
-			mutateCandidate(mNumCandidates-1-i,true);
-/*			if (NumStars>1)
-			{ 
-				IndexForCrossOver = NumStars;
-				while (IndexForCrossOver>NumStars-1)
-					IndexForCrossOver = (unsigned)(fabs(gGauss(gRandomGen))*NumStars);
-				crossOverTree(mCandidate[mNumCandidates-1-i].sTree, 
-						mStars[IndexForCrossOver].sTree);  
+			if (NumStars>1)
+			{
+				IndexForClone = NumStars;
+				while (IndexForClone>(NumStars-1))
+					IndexForClone = (unsigned)(fabs(gGauss(gRandomGen)*2*(NumStars)));
+				mCandidate[mNumCandidates-1-i] = mStars[IndexForClone];
 			}
-*/			mCandidate[mNumCandidates-1-i].sRank=2*mNumCandidates;
-			mCandidate[mNumCandidates-1-i].sFitness = MaxFitness;
+			else if (mNumCandidates-mNumToDie>1)
+			{ 
+				IndexForClone = mNumCandidates-mNumToDie;
+				while (IndexForClone>(mNumCandidates-mNumToDie-1))
+					IndexForClone = (unsigned)(fabs(gGauss(gRandomGen)*(mNumCandidates-mNumToDie)));
+				mCandidate[mNumCandidates-1-i] = mCandidate[IndexForClone];
+			}
 		}
+
 		//...................................................................................
-//
-		for (i=0; i<mNumCandidates-mNumToDie; i++)
+		// Mutate all
+		for (i=0; i<mNumCandidates; i++)
 		{
 			growProp = fabs(gGauss(gRandomGen))*(1-mMinFitness/mCandidate[i].sFitness);
-			mutateCandidate(i,(growProp>1));
-			mCandidate[i].sRank=2*mNumCandidates;
-			mCandidate[i].sFitness = MaxFitness;
-			mCandidate[i].sPareto=false;
-			mCandidate[i].sOptimised = false;
+			mutateCandidate(i,(growProp>0.5));
+
 /*			CrossOverProp = fabs(gGauss(gRandomGen))*(1-mMinFitness/mCandidate[i].sFitness);
 			if ((NumStars>1)&&(CrossOverProp>1))
 			{
@@ -890,6 +1246,16 @@ int cGPpropModel:: mainTuning()
 		cout << endl << endl;
 		i++;
 	}
+
+	for (i=0; i<mStars.size(); i++)
+	{
+		mCandidate[mNumCandidates-1]=mStars[i];
+		ComputeCandidate(mNumCandidates-1);
+		mStars[i]=mCandidate[mNumCandidates-1];
+	}
+
+	if (mStars.size()>0)	
+		sort(mStars.begin(), mStars.end(), SortCriteriaOnFitness);
 
 //	clearout all non-pareto candidates
 	i=mStars.size()-1;
@@ -938,42 +1304,12 @@ int cGPpropModel:: mainTuning()
 //******************************************************************************
 void cGPpropModel::ComputeCandidates(unsigned Begin, unsigned Skip)
 {
-	double MSE;
-	int Nsamples;
 	unsigned Index;
 	cout << "In cGPpropModel::ComputeCandidates: Begin = " 
 		<< Begin << "	Skip = " << Skip << endl;
 	for (Index = Begin; Index < mNumCandidates; Index+=Skip)
 	{ 
-		Nsamples = CostFunctionTreeOnly(Index, mCandidate[Index].sMean ,MSE,
-			 mCandidate[Index].sStdDev, mCandidate[Index].sCorrC);
-
-		if ((isnan(mCandidate[Index].sStdDev))||(isinf(mCandidate[Index].sStdDev))
-			||(mCandidate[Index].sStdDev<0)||(isinf(MSE))||(isnan(MSE)))
-		{
-			mCandidate[Index].sStdDev = 999;
-		}
-		if ((isnan(mCandidate[Index].sCorrC))||(isinf(mCandidate[Index].sCorrC))
-			||(mCandidate[Index].sCorrC<-1.0)||(isinf(MSE))||(isnan(MSE)))
-		{
-			mCandidate[Index].sCorrC = -0.999;
-		}
-
-		mCandidate[Index].sFitness = 100*(1-mCandidate[Index].sCorrC)
-						+ mCandidate[Index].sStdDev;
-	
-		if (
-			(mCandidate[Index].sCorrC>0.3)
-			&&(mCandidate[Index].sStdDev<900)
-			&&(mCandidate[Index].sFitness<900)
-			&&(!mCandidate[Index].sOptimised)
-		   )
-		{
-			optimiseConstants(Index);
-		}
-
-		mCandidate[Index].sFitness = 100*(1-mCandidate[Index].sCorrC) 
-						+ mCandidate[Index].sStdDev;
+		ComputeCandidate(Index);
 	}
 }
 
@@ -990,24 +1326,36 @@ void cGPpropModel::ComputeCandidate(unsigned Index)
 	if ((isnan(mCandidate[Index].sStdDev))||(isinf(mCandidate[Index].sStdDev))
 		||(mCandidate[Index].sStdDev<0)||(isinf(MSE))||(isnan(MSE)))
 	{
-		mCandidate[Index].sStdDev = 999;
+		mCandidate[Index].sStdDev = 9999;
 	}
 	if ((isnan(mCandidate[Index].sCorrC))||(isinf(mCandidate[Index].sCorrC))
 		||(mCandidate[Index].sCorrC<-1.0)||(isinf(MSE))||(isnan(MSE)))
 	{
-		mCandidate[Index].sCorrC = -0.999;
+		mCandidate[Index].sCorrC = -0.9999;
 	}
 	mCandidate[Index].sFitness = 100*(1-mCandidate[Index].sCorrC)
 				+ mCandidate[Index].sStdDev;
 	
 	if (
-		((mCandidate[Index].sCorrC>0.3)
-		||(mCandidate[Index].sStdDev<900)
-		||(mCandidate[Index].sFitness<900))
+		(mCandidate[Index].sCorrC>0.0)
+		&&(mCandidate[Index].sStdDev<900)
+		&&(mCandidate[Index].sFitness<2100)
 		&&(!mCandidate[Index].sOptimised)
 	   )
 	{
 		optimiseConstants(Index);
+	}
+	else
+	{
+		cout << "Not Tuning "<< endl;
+		cout << "Index = " << Index 
+			<< "	Fitness=" << mCandidate[Index].sFitness				
+			<< "	CorrC=" << mCandidate[Index].sCorrC 
+			<< "	StDev=" << mCandidate[Index].sStdDev
+			<< "	Mean=" << mCandidate[Index].sMean;
+		if (mCandidate[Index].sOptimised) cout << "	Optimised";
+		else cout << "	NOT optimised";
+		cout << endl;
 	}
 
 	mCandidate[Index].sFitness = 100*(1-mCandidate[Index].sCorrC) 
@@ -1081,12 +1429,13 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 
 //	cout <<"cGPpropModel::CostFunction: mNumMeas = " << mNumMeas << endl;
 
-	unsigned SkipNumber = min((mMeas.mNumMeas/NUM_POINT_PER_EVAL),1+(unsigned)(mCandidate[CIndex].sFitness/25));
+	unsigned SkipNumber = min((mMeas.mNumMeas/NUM_POINT_PER_EVAL),
+					1+(unsigned)(mCandidate[CIndex].sFitness/mMinFitness));
 	if (SkipNumber<1) SkipNumber = 1;
-	if ((mCandidate[CIndex].sPareto)&&(k>0)) SkipNumber = 1;
+	if (mCandidate[CIndex].sPareto) SkipNumber = 1;
 	if (!CalcNewObstruction) SkipNumber = 1;
 
-	unsigned FirstMeas = SkipNumber * ((double) rand() / (RAND_MAX));
+	unsigned FirstMeas = SkipNumber * gUni(gRandomGen);
 //	cout << "SkipNumber=" << SkipNumber <<"	FirstMeas = " << FirstMeas << endl;
 	for (i=FirstMeas; i<mMeas.mNumMeas; i=i+SkipNumber)
 	{
@@ -1394,9 +1743,10 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 int cGPpropModel::CostFunctionTreeOnly(unsigned CIndex, double &Mean, double &MeanSquareError,
 					double &StDev, double &CorrC, unsigned Clutterfilter)
 {
+	Mean = 0; MeanSquareError = 0; StDev= 0; CorrC=0;
 	double CsumOfPathLoss =0;
 	mMeas.mClutterFilter = Clutterfilter;
-	unsigned i=0, k=0, NumUsed = 0, CNumUsed =0;
+	unsigned i=0, NumUsed = 0, CNumUsed =0;
 	unsigned FixedNum=0;
 	double Error=0, TotalError=0, TotalSError=0, TotalMeas=0;
 	double TotalPred=0, TotalSMeas=0, TotalSPred=0, TotalMeasPred=0;
@@ -1407,11 +1757,6 @@ int cGPpropModel::CostFunctionTreeOnly(unsigned CIndex, double &Mean, double &Me
 	tMeasPoint tempMeas;
 	double PathLoss;
 	double CMean = 0, CMeanSquareError=0, CCorrC=0.0, CStDev=0.0;
-	Mean = 0; 
-	MeanSquareError=0;
-	StDev = 0;
-	CorrC = 0;
-
 
 	unsigned Length;
 
@@ -1421,13 +1766,15 @@ int cGPpropModel::CostFunctionTreeOnly(unsigned CIndex, double &Mean, double &Me
 
 //	cout <<"cGPpropModel::CostFunction: mNumMeas = " << mNumMeas << endl;
 
-	unsigned SkipNumber = min((mMeas.mNumMeas/NUM_POINT_PER_EVAL),1+(unsigned)(mCandidate[CIndex].sFitness/50));
+	unsigned SkipNumber = min((unsigned)(mMeas.mNumMeas/NUM_POINT_PER_EVAL),
+					(unsigned)(1+mCandidate[CIndex].sFitness/mMinFitness));
 	if (SkipNumber<1) SkipNumber = 1;
-	if ((mCandidate[CIndex].sPareto)&&(k>0)) SkipNumber = 1;
+	if (mCandidate[CIndex].sPareto) SkipNumber = 1;
 
-	unsigned FirstMeas = SkipNumber * ((double) rand() / (RAND_MAX));
+	unsigned FirstMeas = SkipNumber * gUni(gRandomGen);
 //	cout << "SkipNumber=" << SkipNumber <<"	FirstMeas = " << FirstMeas << endl;
-	for (i=FirstMeas; i<mMeas.mNumMeas; i=i+SkipNumber)
+
+	for (i=FirstMeas; i<mMeas.mNumMeas; i+=SkipNumber)
 	{
 		tempMeas = mMeas.mMeasPoints[i];
 		if ((0==Clutterfilter)||(0==tempMeas.sClutter)
@@ -1582,8 +1929,10 @@ void cGPpropModel::optimiseConstants(unsigned Index)
 	double ACorrC, AStdDev;
 	double alphaC, alphaS;
 	double Mean, MSE;
+	unsigned LoopCount = 0;
+	unsigned CalcCount = 0;
 
-	double TempDelta=0, DeltaA = 5.0/0.8;
+	double TempDelta=0, DeltaA = 5.0/0.75;
 	double OmegaSize =0.0, OmegaI;
 	unsigned i=0, numConsts=0;
 	bool Continue = true;
@@ -1602,17 +1951,802 @@ void cGPpropModel::optimiseConstants(unsigned Index)
 	double ProductCS = 0.0;
 	double SizeDelta = 0.0;
 
-	cout << endl;
-	cout << "Optimising Constants for Candidate Tree. INDEX = " << Index << endl;
+	cout << "Optimising Constants for Candidate Tree MO. INDEX = " << Index << endl;
 	for (i=0; i<numConsts; i++)
 	{
 		OldValue[i] = mCandidate[Index].sConstants[i]->getValue();
 //		cout << "	" << OldValue[i];
-		if (fabs(OldValue[i])>0.0001)
-			Delta[i] = -0.01*fabs(OldValue[i])/0.75;
-		else Delta[i] = -0.01/0.75;
-		DiffC[i] = 0.0;
-		DiffS[i] = 0.0;
+		if (fabs(OldValue[i])>1)
+			Delta[i] = -0.01*fabs(OldValue[i])/0.7;
+		else Delta[i] = -0.01/0.7;
+		DiffC[i] = 1.0;
+		DiffS[i] = 1.0;
+	}
+//	cout << endl;
+
+	CostFunctionTreeOnly(Index, oldMean ,oldMSE, oldStdDev, oldCorrC);
+	cout << "OldCost:  Index = " << Index << "		CorrC=" << oldCorrC 
+		<< "	StDev=" << oldStdDev << "	Mean=" << oldMean  <<  "	MSE=" << oldMSE << endl;
+
+	Continue = true;
+	while (Continue)
+	{
+		NotDecreasing = true;
+		ModOfDiffC = 0.0;
+		ModOfDiffS = 0.0;
+		ProductCS = 0.0;
+		if (DeltaA>1000) DeltaA = 5/0.7;
+		else DeltaA*=2;
+		if (DeltaA<1e-3) DeltaA=1e-3;
+		for (i=0; i<numConsts; i++)
+		{
+			newStdDev = 9999;
+			newCorrC = -0.9999;
+			newMSE = 200000;
+			OldValue[i] = mCandidate[Index].sConstants[i]->getValue();
+			if (DeltaA<1)
+			{
+				if (fabs(OldValue[i])>1)
+					Delta[i] = -0.1*DeltaA*fabs(OldValue[i])/0.7;
+				else Delta[i] = -0.01*DeltaA/0.7;
+			}
+			else
+			{
+				if (fabs(OldValue[i])>1)
+					Delta[i] = -0.001*fabs(OldValue[i])/0.7;
+				else Delta[i] = -0.001/0.7;
+			}
+			while ( (fabs(Delta[i])>1e-6)
+				&&((fabs(DiffC[i])>1e-10)||(fabs(DiffS[i])>1e-10))
+				&&( (fabs(newStdDev)>900)||(newCorrC<0.0)
+				||(isnan(newStdDev))||(isinf(newStdDev))
+				||(isnan(newMSE))||(isinf(newMSE))
+				||(isnan(newCorrC))||(isinf(newCorrC)) ) )
+			{
+				Delta[i] *=-0.7;
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + Delta[i]);
+				CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
+				DiffC[i] = (100.0*(oldCorrC -newCorrC))*Delta[i]/fabs(Delta[i]); 
+				DiffS[i] = (newStdDev - oldStdDev)*Delta[i]/fabs(Delta[i]);
+				CalcCount ++;
+			}
+
+			if ((newStdDev<900)&&(newCorrC>0.0)&&(fabs(Delta[i])>1e-6)
+				&&((fabs(DiffC[i])>1e-10)||(fabs(DiffS[i])>1e-10)))
+			{
+				ModOfDiffC += DiffC[i]*DiffC[i]/(Delta[i]*Delta[i]);
+				ModOfDiffS += DiffS[i]*DiffS[i]/(Delta[i]*Delta[i]);
+				ProductCS +=  DiffC[i]*DiffS[i]/(Delta[i]*Delta[i]);
+			}
+			else
+			{
+//				cout << "Make zero" << endl;
+				DiffC[i] = 0.0;
+				DiffS[i] = 0.0;
+				Delta[i] = 1e-10;
+			}
+			//return value to original value
+			mCandidate[Index].sConstants[i]->setValue(OldValue[i]);
+		} // for mNumConst
+
+		if ((ModOfDiffC>1e-15)||(ModOfDiffS>1e-15))
+		{
+			if ((ProductCS<ModOfDiffC)&&(ProductCS<ModOfDiffS))
+				alphaC = (ModOfDiffS - ProductCS)/(ModOfDiffS + ModOfDiffC - 2*ProductCS);
+			else if (ModOfDiffS<ModOfDiffC) alphaC = 0.0;
+			else alphaC = 1.0;
+			alphaS = 1 - alphaC;
+		}
+		else
+		{
+			NotDecreasing=false;
+			Continue = false;
+		}	
+
+		while (NotDecreasing)
+		{
+			DeltaA*=0.7;
+			SizeDelta = 0.0;
+			for (i=0; i<numConsts; i++)
+			{
+				TempDelta = -(alphaC*DiffC[i]/fabs(Delta[i]) + alphaS*DiffS[i]/fabs(Delta[i]))*DeltaA;
+				SizeDelta += TempDelta*TempDelta;
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+			}
+			CostFunctionTreeOnly(Index, Mean, MSE, AStdDev, ACorrC);
+//			cout << "DeltaA = " << DeltaA << "		CorrC=" << ACorrC 
+//				<< "	StDev=" << AStdDev << "	Mean=" << Mean  <<  "	MSE=" << MSE << endl;
+			NotDecreasing = ((AStdDev>oldStdDev)||(ACorrC<oldCorrC))
+					||(isnan(AStdDev))||(isinf(AStdDev))
+					||(isnan(MSE))||(isinf(MSE))
+					||(isnan(ACorrC))||(isinf(ACorrC));
+			NotDecreasing = NotDecreasing && (SizeDelta>1e-3);
+			CalcCount ++ ;
+		}
+		Continue = Continue&&(AStdDev<=oldStdDev)&&(ACorrC>=oldCorrC)&&(!isnan(AStdDev))&&(!isinf(AStdDev))
+				&&(!isnan(MSE))&&(!isinf(MSE))&&(!isnan(ACorrC))&&(!isinf(ACorrC))
+				&&(SizeDelta>1e-3);
+		if (Continue)
+		{
+
+			OmegaSize = 0;
+			for (i=0; i<numConsts; i++)
+			{
+				OmegaI = alphaC*DiffC[i]/fabs(Delta[i]) + alphaS*DiffS[i]/fabs(Delta[i]);
+				OmegaSize+= OmegaI*OmegaI;
+				Delta[i] = -OmegaI*DeltaA;
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + Delta[i]);
+			}
+			CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
+			cout << Index << "	MulOb	DeltaA = " << DeltaA 
+					<< "		CorrC=" << newCorrC 
+					<< "	StDev=" << newStdDev 
+					<< "	Mean=" << newMean  
+					<< "	MSE=" << newMSE << "	CalcCount="<< CalcCount << endl;
+		
+			Continue = (OmegaSize>1e-3)&&((((oldStdDev-newStdDev)/newStdDev)>1e-6)
+					||(((newCorrC-oldCorrC)/newCorrC)>1e-6));
+			oldCorrC = newCorrC; oldStdDev=newStdDev; oldMean=newMean; oldMSE=newMSE;
+		}
+		Continue = Continue&&(LoopCount<3*MAXOPTLOOPS)&&(CalcCount<3*MAXOPTCALC);
+	}
+	CostFunctionTreeOnly(Index, oldMean, oldMSE, oldStdDev, oldCorrC);
+	mCandidate[Index].sOptimised = true;
+	mCandidate[Index].sMean = oldMean;
+	mCandidate[Index].sMSE = oldMSE;
+	mCandidate[Index].sStdDev = oldStdDev;
+	mCandidate[Index].sCorrC = oldCorrC;
+}
+
+//**************************************************************************
+void cGPpropModel::optimiseConstantsSTDevMO(unsigned Index)
+{
+	double oldCorrC, oldStdDev, oldMean, oldMSE;
+	double newCorrC, newStdDev, newMean, newMSE;
+	double ACorrC, AStdDev;
+	double alphaC, alphaS;
+	double Mean, MSE;
+	unsigned LoopCount = 0;
+	unsigned CalcCount = 0;
+
+	double TempDelta=0, DeltaA = 5.0/0.75;
+	double OmegaSize =0.0, OmegaI;
+	unsigned i=0, numConsts=0;
+	bool Continue = true;
+	bool NotDecreasing = true;
+	numConsts = mCandidate[Index].sConstants.size();
+	double * Delta;
+	double * DiffC;
+	double * DiffS;
+	double * OldValue;
+	Delta = new double[numConsts];
+	DiffC = new double[numConsts];
+	DiffS = new double[numConsts];
+	OldValue = new double[numConsts];
+	double ModOfDiffC = 0.0;
+	double ModOfDiffS = 0.0;
+	double ProductCS = 0.0;
+	double SizeDelta = 0.0;
+
+	cout << "Optimising Constants for Candidate Tree STDevMO. INDEX = " << Index << endl;
+	for (i=0; i<numConsts; i++)
+	{
+		OldValue[i] = mCandidate[Index].sConstants[i]->getValue();
+//		cout << "	" << OldValue[i];
+		if (fabs(OldValue[i])>1)
+			Delta[i] = -0.01*fabs(OldValue[i])/0.7;
+		else Delta[i] = -0.01/0.7;
+		DiffC[i] = 1.0;
+		DiffS[i] = 1.0;
+	}
+//	cout << endl;
+
+	CostFunctionTreeOnly(Index, oldMean ,oldMSE, oldStdDev, oldCorrC);
+	cout << "OldCost:  Index = " << Index << "		CorrC=" << oldCorrC 
+		<< "	StDev=" << oldStdDev << "	Mean=" << oldMean  <<  "	MSE=" << oldMSE << endl;
+
+	Continue = true;
+	while (Continue)
+	{
+		NotDecreasing = true;
+		ModOfDiffC = 0.0;
+		ModOfDiffS = 0.0;
+		ProductCS = 0.0;
+		if (DeltaA>1000) DeltaA = 5/0.7;
+		else DeltaA*=2;
+		if (DeltaA<1e-3) DeltaA=1e-3;
+		for (i=0; i<numConsts; i++)
+		{
+			newStdDev = 9999;
+			newCorrC = -0.9999;
+			newMSE = 200000;
+			OldValue[i] = mCandidate[Index].sConstants[i]->getValue();
+			if (DeltaA<1)
+			{
+				if (fabs(OldValue[i])>1)
+					Delta[i] = -0.1*DeltaA*fabs(OldValue[i])/0.7;
+				else Delta[i] = -0.01*DeltaA/0.7;
+			}
+			else
+			{
+				if (fabs(OldValue[i])>1)
+					Delta[i] = -0.001*fabs(OldValue[i])/0.7;
+				else Delta[i] = -0.001/0.7;
+			}
+			while ( (fabs(Delta[i])>1e-6)
+				&&((fabs(DiffC[i])>1e-10)||(fabs(DiffS[i])>1e-10))
+				&&( (fabs(newStdDev)>900)||(newCorrC<0.0)
+				||(isnan(newStdDev))||(isinf(newStdDev))
+				||(isnan(newMSE))||(isinf(newMSE))
+				||(isnan(newCorrC))||(isinf(newCorrC)) ) )
+			{
+				Delta[i] *=-0.7;
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + Delta[i]);
+				CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
+				DiffC[i] = (newMSE - oldMSE)*Delta[i]/fabs(Delta[i]); 
+				DiffS[i] = (newStdDev - oldStdDev)*Delta[i]/fabs(Delta[i]);
+				CalcCount ++;
+			}
+
+
+			if ((newStdDev<900)&&(newCorrC>0.0)&&(fabs(Delta[i])>1e-6)
+				&&((fabs(DiffC[i])>1e-10)||(fabs(DiffS[i])>1e-10)))
+			{
+				ModOfDiffC += DiffC[i]*DiffC[i]/(Delta[i]*Delta[i]);
+				ModOfDiffS += DiffS[i]*DiffS[i]/(Delta[i]*Delta[i]);
+				ProductCS +=  DiffC[i]*DiffS[i]/(Delta[i]*Delta[i]);
+			}
+			else
+			{
+//				cout << "Make zero" << endl;
+				DiffC[i] = 0.0;
+				DiffS[i] = 0.0;
+				Delta[i] = 1e-10;
+			}
+			//return value to original value
+			mCandidate[Index].sConstants[i]->setValue(OldValue[i]);
+		} // for mNumConst
+
+		if ((ModOfDiffC>1e-12)||(ModOfDiffS>1e-12))
+		{
+			if ((ProductCS<ModOfDiffC)&&(ProductCS<ModOfDiffS))
+				alphaC = (ModOfDiffS - ProductCS)/(ModOfDiffS + ModOfDiffC - 2*ProductCS);
+			else if (ModOfDiffS<ModOfDiffC) alphaC = 0.0;
+			else alphaC = 1.0;
+			alphaS = 1 - alphaC;
+		}
+		else
+		{
+			NotDecreasing=false;
+			Continue = false;
+		}	
+
+		while (NotDecreasing)
+		{
+			DeltaA*=0.7;
+			SizeDelta = 0.0;
+			for (i=0; i<numConsts; i++)
+			{
+				OmegaI = alphaC*DiffC[i]/fabs(Delta[i]) + alphaS*DiffS[i]/fabs(Delta[i]);
+				TempDelta = -OmegaI*DeltaA;
+				SizeDelta += OmegaI*OmegaI;
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+//				cout << "Ci=" << i <<"	OldValue[i]=" << OldValue[i] 
+//					<< "	TempDelta=" << TempDelta << endl;
+			}
+			CostFunctionTreeOnly(Index, Mean, MSE, AStdDev, ACorrC);
+//			cout << "DeltaA = " << DeltaA 
+//				<< "		CorrC=" << ACorrC 
+//				<< "	StDev=" << AStdDev 
+//				<< "	Mean=" << Mean  
+//				<< "	MSE=" << MSE 
+//				<< "	SizeDelta=" << SizeDelta<< endl;
+			NotDecreasing = ((AStdDev>oldStdDev)||(MSE>oldMSE))
+					||(isnan(AStdDev))||(isinf(AStdDev))
+					||(isnan(MSE))||(isinf(MSE))
+					||(isnan(ACorrC))||(isinf(ACorrC));
+			NotDecreasing = NotDecreasing && (SizeDelta>1e-3);
+			CalcCount ++ ;
+		}
+		Continue = Continue&&(AStdDev<=oldStdDev)&&(MSE<=oldMSE)&&(SizeDelta>1e-3);
+		if (Continue)
+		{
+			OmegaSize = 0;
+			for (i=0; i<numConsts; i++)
+			{
+				OmegaI = alphaC*DiffC[i]/fabs(Delta[i]) + alphaS*DiffS[i]/fabs(Delta[i]);
+				Delta[i] = -OmegaI*DeltaA;
+				OmegaSize+= OmegaI*OmegaI;
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + Delta[i]);
+//				cout << "Ci=" << i <<"	OldValue[i]=" << OldValue[i] 
+//					<< "	Delta[i]=" << Delta[i] << endl;
+			}
+			CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
+			cout << Index << "	STDevMO	DeltaA = " << DeltaA 
+					<< "		CorrC=" << newCorrC 
+					<< "	StDev=" << newStdDev 
+					<< "	Mean=" << newMean  
+					<< "	MSE=" << newMSE << "	CalcCount="<< CalcCount << endl;
+		
+			Continue = (OmegaSize>1e-3)&&(((oldStdDev-newStdDev)/newStdDev)>1e-6);
+			oldCorrC = newCorrC; oldStdDev=newStdDev; oldMean=newMean; oldMSE=newMSE;
+		}
+		Continue = Continue&&(LoopCount<MAXOPTLOOPS)&&(CalcCount<MAXOPTCALC);
+	}
+	CostFunctionTreeOnly(Index, oldMean, oldMSE, oldStdDev, oldCorrC);
+	mCandidate[Index].sMean = oldMean;
+	mCandidate[Index].sMSE = oldMSE;
+	mCandidate[Index].sStdDev = oldStdDev;
+	mCandidate[Index].sCorrC = oldCorrC;
+}
+
+//**************************************************************************
+void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
+{
+	double oldCorrC, oldStdDev, oldMean, oldMSE;
+	double newCorrC, newStdDev, newMean, newMSE;
+	double AStdDev, BStdDev, AMSE, BMSE;
+	double AMean, ACorrC, BMean, BCorrC;
+	double DFl, DDFl;
+	unsigned LoopCount = 0;
+	unsigned CalcCount = 0;
+
+	double TempDelta=0, DeltaA = 5/0.8, DeltaB, DeltaC;
+	double OmegaSize =0.0, OmegaI;
+	unsigned i=0, numConsts=0;
+	bool Continue = true;
+	numConsts = mCandidate[Index].sConstants.size();
+	double * Delta;
+	double * DiffS;
+	double * OldValue;
+	Delta = new double[numConsts];
+	DiffS = new double[numConsts];
+	OldValue = new double[numConsts];
+	double ModOfDiffS = 0.0;
+
+	cout << "Optimising Constants for Candidate Tree StDev. INDEX = " << Index << endl;
+	for (i=0; i<numConsts; i++)
+	{
+		OldValue[i] = mCandidate[Index].sConstants[i]->getValue();
+		if (fabs(OldValue[i])>1)
+			Delta[i] = -0.01*fabs(OldValue[i])/0.7;
+		else Delta[i] = -0.01/0.7;
+		DiffS[i] = 1.0;
+	}
+
+	CostFunctionTreeOnly(Index, oldMean ,oldMSE, oldStdDev, oldCorrC);
+
+	Continue = true;
+	while (Continue)
+	{
+		ModOfDiffS = 0.0;
+		if (DeltaA>1000) DeltaA = 5/0.7;
+		else DeltaA*=2;
+		for (i=0; i<numConsts; i++)
+		{
+			newStdDev = 9999;
+			newCorrC = -0.9999;
+			newMSE = 200000;
+			newMean = 9999;
+			OldValue[i] = mCandidate[Index].sConstants[i]->getValue();
+			if (DeltaA<1)
+			{
+				if (fabs(OldValue[i])>1)
+					Delta[i] = -0.1*DeltaA*fabs(OldValue[i])/0.7;
+				else Delta[i] = -0.01*DeltaA/0.7;
+			}
+			else
+			{
+				if (fabs(OldValue[i])>1)
+					Delta[i] = -0.001*fabs(OldValue[i])/0.7;
+				else Delta[i] = -0.001/0.7;
+			}
+			while ( (fabs(Delta[i])>1e-6)&&(fabs(DiffS[i])>1e-10)
+				&&( (fabs(newStdDev)>900)||(newCorrC<0.0)
+				||(newStdDev>oldStdDev)
+				||(isnan(newStdDev))||(isinf(newStdDev))
+				||(isnan(newMSE))||(isinf(newMSE))
+				||(isnan(newCorrC))||(isinf(newCorrC)) ) )
+			{
+				Delta[i] *=-0.7;
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + Delta[i]);
+				CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
+				DiffS[i] = (newStdDev - oldStdDev)*Delta[i]/fabs(Delta[i]);
+				CalcCount++;
+			}
+			
+			if ((newStdDev<900)&&(newCorrC>0.0)&&(fabs(Delta[i])>1e-6)&&(fabs(DiffS[i])>1e-10))
+			{
+				ModOfDiffS += DiffS[i]*DiffS[i]/(Delta[i]*Delta[i]);
+			}
+			else
+			{
+//				cout << "Make zero" << endl;
+				DiffS[i] = 0.0;
+				Delta[i] = 1e-10;
+			}
+			//return value to original value
+			mCandidate[Index].sConstants[i]->setValue(OldValue[i]);
+		} // for mNumConst
+		
+		if (ModOfDiffS<1e-10)
+		{ 
+			cout << Index <<"	StDev	Gradient is zero" << endl;
+			Continue=false;
+		}
+
+		if (Continue) 
+		{
+			ModOfDiffS = sqrt(ModOfDiffS);
+			AStdDev = oldStdDev+1;
+			while ((DeltaA>1e-4)&&(AStdDev>oldStdDev))
+			{
+				DeltaA*=0.7;
+				for (i=0; i<numConsts; i++)
+				{
+					TempDelta = -DiffS[i]*DeltaA/ModOfDiffS/fabs(Delta[i]);
+					mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+				}
+				CostFunctionTreeOnly(Index, AMean, AMSE, AStdDev, ACorrC);
+				CalcCount ++ ;
+			}
+//			cout << Index << "	STDEV	DeltaA = " << DeltaA 
+//					<< "		CorrC=" << ACorrC 
+//					<< "	StDev=" << AStdDev 
+//					<< "	Mean=" << AMean  
+//					<< "	MSE=" << AMSE << endl;
+
+			if(AStdDev<oldStdDev)
+				DeltaB=2*DeltaA;
+			else DeltaB = -DeltaA;
+			for (i=0; i<numConsts; i++)
+			{
+				TempDelta = -DiffS[i]*DeltaB/ModOfDiffS/fabs(Delta[i]);
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+			}
+			CostFunctionTreeOnly(Index, BMean, BMSE, BStdDev, BCorrC);
+
+//			cout << Index << "	STDEV	DeltaB = " << DeltaB 
+//					<< "		CorrC=" << BCorrC 
+//					<< "	StDev=" << BStdDev 
+//					<< "	Mean=" << BMean  
+//					<< "	MSE=" << BMSE << endl;
+
+			DFl = (AStdDev - oldStdDev)/DeltaA;
+			DDFl = (((BStdDev-AStdDev)/(DeltaB-DeltaA)) - DFl)/DeltaA;
+			DeltaC = (DeltaA*DDFl - DFl)/DDFl;
+
+			OmegaSize = 0;
+			for (i=0; i<numConsts; i++)
+			{
+				OmegaI = DiffS[i]/ModOfDiffS/fabs(Delta[i]);
+				OmegaSize+= OmegaI*OmegaI;
+				TempDelta = -OmegaI*DeltaC;
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+			}
+			CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
+//			cout << Index << "	STDEV	DeltaC = " << DeltaC 
+//					<< "		CorrC=" << newCorrC 
+//					<< "	StDev=" << newStdDev 
+//					<< "	Mean=" << newMean  
+//					<< "	MSE=" << newMSE << endl;
+
+			if ((newStdDev>AStdDev)&&(BStdDev>AStdDev)&&(AStdDev<oldStdDev))
+			{
+				OmegaSize = 0;
+				for (i=0; i<numConsts; i++)
+				{
+					OmegaI = DiffS[i]/ModOfDiffS/fabs(Delta[i]);
+					OmegaSize+= OmegaI*OmegaI;
+					TempDelta = -OmegaI*DeltaA;
+					mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+				}
+				Continue = (OmegaSize>1e-3)&&(fabs((AStdDev-oldStdDev)/AStdDev)>1e-6);
+				oldCorrC = ACorrC; oldStdDev=AStdDev; oldMean=AMean; oldMSE=AMSE;
+			}
+			else if ((newStdDev>BStdDev)&&(BStdDev<AStdDev)&&(BStdDev<oldStdDev))
+			{
+				DeltaA = DeltaB;
+				OmegaSize = 0;
+				for (i=0; i<numConsts; i++)
+				{
+					OmegaI = DiffS[i]/ModOfDiffS/fabs(Delta[i]);
+					OmegaSize+= OmegaI*OmegaI;
+					TempDelta = -OmegaI*DeltaA;
+					mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+				}
+				Continue = (OmegaSize>1e-3)&&(fabs((BStdDev-oldStdDev)/BStdDev)>1e-6);
+				oldCorrC = BCorrC; oldStdDev=BStdDev; oldMean=BMean; oldMSE=BMSE;
+			}
+			else if ((newStdDev<BStdDev)&&(newStdDev<AStdDev)&&(newStdDev<oldStdDev))
+			{	
+				DeltaA = DeltaC;	
+				Continue = (OmegaSize>1e-3)&&(fabs((newStdDev-oldStdDev)/newStdDev)>1e-6);
+				oldCorrC = newCorrC; oldStdDev=newStdDev; oldMean=newMean; oldMSE=newMSE;
+			}
+			else 
+			{
+				DeltaA=0;
+				Continue = false;
+			}			
+
+			cout << Index << "	STDEV	Delta = " << DeltaA 
+					<< "		CorrC=" << oldCorrC 
+					<< "	StDev=" << oldStdDev 
+					<< "	Mean=" << oldMean  
+					<< "	MSE=" << oldMSE << "	CalcCount="<< CalcCount <<endl;
+				
+		}
+		LoopCount ++;
+		Continue = Continue&&(LoopCount<MAXOPTLOOPS)&&(CalcCount<MAXOPTCALC);	
+	}
+	CostFunctionTreeOnly(Index, oldMean, oldMSE, oldStdDev, oldCorrC);
+	mCandidate[Index].sMean = oldMean;
+	mCandidate[Index].sMSE = oldMSE;
+	mCandidate[Index].sStdDev = oldStdDev;
+	mCandidate[Index].sCorrC = oldCorrC;
+}
+
+//**************************************************************************
+void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
+{
+	double origCorrC, origStdDev, origMean, origMSE;
+	double minStdDev;
+	double oldCorrC, oldStdDev, oldMean, oldMSE;
+	double newCorrC, newStdDev, newMean, newMSE;
+	double ACorrC, BCorrC, AMean, BMean;
+	double AStdDev, BStdDev, AMSE, BMSE;
+	double DFl, DDFl;
+	unsigned LoopCount = 0;
+	unsigned CalcCount = 0;
+
+	double TempDelta=0, DeltaA = 3.0/0.7, DeltaB, DeltaC;
+	double OmegaSize =0.0, OmegaI;
+	unsigned i=0, numConsts=0;
+	bool Continue = true;
+	numConsts = mCandidate[Index].sConstants.size();
+	double * Delta;
+	double * DiffC;
+	double * OldValue;
+	Delta = new double[numConsts];
+	DiffC = new double[numConsts];
+	OldValue = new double[numConsts];
+	double ModOfDiffC = 0.0;
+
+	cout << "Optimising Constants for Candidate Tree CorrC. INDEX = " << Index << endl;
+	for (i=0; i<numConsts; i++)
+	{
+		OldValue[i] = mCandidate[Index].sConstants[i]->getValue();
+		if (fabs(OldValue[i])>1)
+			Delta[i] = -0.01*fabs(OldValue[i])/0.7;
+		else Delta[i] = -0.01/0.7;
+		DiffC[i] = 1.0;
+	}
+
+	CostFunctionTreeOnly(Index, origMean ,origMSE, origStdDev, origCorrC);
+	oldCorrC = origCorrC; oldStdDev=origStdDev; oldMean=origMean; oldMSE=origMSE;
+	minStdDev = origStdDev;
+	cout << Index << "	CorrC	Original: " 
+					<< "		CorrC=" << oldCorrC 
+					<< "	StDev=" << oldStdDev 
+					<< "	Mean=" << oldMean  
+					<< "	MSE=" << oldMSE << endl;
+	Continue = true;
+	while (Continue)
+	{
+		ModOfDiffC = 0.0;
+		if (DeltaA>1000) DeltaA = 5/0.7;
+		else DeltaA*=2;
+		if (DeltaA<1e-3) DeltaA=1e-3;
+		for (i=0; i<numConsts; i++)
+		{
+			newStdDev = 9999;
+			newCorrC = -0.9999;
+			newMSE = 200000;
+			newMean = 9999;
+			OldValue[i] = mCandidate[Index].sConstants[i]->getValue();
+			if (DeltaA<1)
+			{
+				if (fabs(OldValue[i])>1)
+					Delta[i] = -0.1*DeltaA*fabs(OldValue[i])/0.7;
+				else Delta[i] = -0.01*DeltaA/0.7;
+			}
+			else
+			{
+				if (fabs(OldValue[i])>1)
+					Delta[i] = -0.001*fabs(OldValue[i])/0.7;
+				else Delta[i] = -0.001/0.7;
+			}
+			while ( (fabs(Delta[i])>1e-6)&&(fabs(DiffC[i])>1e-10)
+				&&( (fabs(newStdDev)>900)||(newCorrC<0.0)
+				||(newCorrC<oldCorrC)
+				||(isnan(newStdDev))||(isinf(newStdDev))
+				||(isnan(newMSE))||(isinf(newMSE))
+				||(isnan(newCorrC))||(isinf(newCorrC)) ) )
+			{
+				Delta[i] *=-0.7;
+//				cout << "OldValue = " << OldValue[i] << "	Delta[i] = " << Delta[i] << endl;
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + Delta[i]);
+				CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
+				DiffC[i] = (100.0*(oldCorrC -newCorrC))*Delta[i]/fabs(Delta[i]); 
+				CalcCount ++;
+			}
+
+			if ((newStdDev<900)&&(newCorrC>0.0)&&(fabs(Delta[i])>1e-6)&&(fabs(DiffC[i])>1e-10))
+			{
+				ModOfDiffC += DiffC[i]*DiffC[i]/(Delta[i]*Delta[i]);
+			}
+			else
+			{
+//				cout << "Make zero" << endl;
+				DiffC[i] = 0.0;
+				Delta[i] = 1e-6;
+			}
+			//return value to original value
+			mCandidate[Index].sConstants[i]->setValue(OldValue[i]);
+		} // for mNumConst
+
+		if (ModOfDiffC <1e-12) 
+		{ 
+			cout << Index <<"	CorrC	Gradient is zero" << endl;
+			Continue=false;
+		}
+
+		if (Continue)
+		{
+			ModOfDiffC = sqrt(ModOfDiffC);
+			ACorrC = oldCorrC -0.05;
+			while ((fabs(DeltaA)>1e-5)&&(ACorrC<oldCorrC))
+			{
+				DeltaA*=0.7;
+				for (i=0; i<numConsts; i++)
+				{
+					TempDelta = -DiffC[i]*DeltaA/ModOfDiffC/fabs(Delta[i]);
+					mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+				}
+				CostFunctionTreeOnly(Index, AMean, AMSE, AStdDev, ACorrC);
+				CalcCount ++;
+			}
+//			cout << Index << "	CorrC	DeltaA = " << DeltaA 
+//					<< "		CorrC=" << ACorrC 
+//					<< "	StDev=" << AStdDev 
+//					<< "	Mean=" << AMean  
+//					<< "	MSE=" << AMSE << endl;
+
+			if (ACorrC>oldCorrC)
+				DeltaB = 2*DeltaA;
+			else DeltaB = -DeltaA/2;
+			for (i=0; i<numConsts; i++)
+			{
+				TempDelta = -DiffC[i]*DeltaB/ModOfDiffC/fabs(Delta[i]);
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+			}
+			CostFunctionTreeOnly(Index, BMean, BMSE, BStdDev, BCorrC);
+//			cout << Index << "	CorrC	DeltaB = " << DeltaB 
+//					<< "		CorrC=" << BCorrC 
+//					<< "	StDev=" << BStdDev 
+//					<< "	Mean=" << BMean  
+//					<< "	MSE=" << BMSE << endl;
+
+			DFl = 100*(oldCorrC - ACorrC)/DeltaA;
+			DDFl = ((100*(ACorrC-BCorrC)/(DeltaB-DeltaA)) - DFl)/DeltaA;
+			DeltaC = (DeltaA*DDFl - DFl)/DDFl;
+
+			OmegaSize = 0;
+			for (i=0; i<numConsts; i++)
+			{
+				OmegaI = DiffC[i]/ModOfDiffC/fabs(Delta[i]);
+				OmegaSize+= OmegaI*OmegaI;
+				TempDelta = -OmegaI*DeltaC;
+				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+			}
+			CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
+//			cout << Index << "	CorrC	DeltaC = " << DeltaC 
+//					<< "		CorrC=" << newCorrC 
+//					<< "	StDev=" << newStdDev 
+//					<< "	Mean=" << newMean  
+//					<< "	MSE=" << newMSE << endl;
+
+			if ((newCorrC<ACorrC)&&(BCorrC<ACorrC)&&(ACorrC>oldCorrC))
+			{
+				OmegaSize = 0;
+				for (i=0; i<numConsts; i++)
+				{
+					OmegaI = DiffC[i]/ModOfDiffC/fabs(Delta[i]);
+					OmegaSize+= OmegaI*OmegaI;
+					TempDelta = -OmegaI*DeltaA;
+					mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+				}
+				Continue = (OmegaSize>1e-3)&&(fabs((ACorrC-oldCorrC)/oldCorrC)>1e-7);
+				oldCorrC = ACorrC; oldStdDev=AStdDev; oldMean=AMean; oldMSE=AMSE;
+			}
+			else if ((newCorrC<BCorrC)&&(BCorrC>ACorrC)&&(BCorrC>oldCorrC))
+			{
+				DeltaA = DeltaB;
+				OmegaSize = 0;
+				for (i=0; i<numConsts; i++)
+				{
+					OmegaI = DiffC[i]/ModOfDiffC/fabs(Delta[i]);
+					OmegaSize+= OmegaI*OmegaI;
+					TempDelta = -OmegaI*DeltaA;
+					mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
+				}
+				Continue = (OmegaSize>1e-3)&&(fabs((BCorrC-oldCorrC)/oldCorrC)>1e-7);
+				oldCorrC = BCorrC; oldStdDev=BStdDev; oldMean=BMean; oldMSE=BMSE;
+			}
+			else if ((newCorrC>ACorrC)&&(BCorrC<newCorrC)&&(newCorrC>oldCorrC))
+			{	
+				DeltaA = DeltaC;	
+				Continue = (OmegaSize>1e-3)&&(fabs((newCorrC-oldCorrC)/newCorrC)>1e-7);
+				oldCorrC = newCorrC; oldStdDev=newStdDev; oldMean=newMean; oldMSE=newMSE;
+			}
+			else 
+			{
+				DeltaA=0;
+				Continue = false;
+			}
+						
+			if (oldStdDev<minStdDev)
+				minStdDev = oldStdDev;
+			cout << Index << "	CorrC	Delta = " << DeltaA 
+					<< "		CorrC=" << oldCorrC 
+					<< "	StDev=" << oldStdDev 
+					<< "	Mean=" << oldMean  
+					<< "	MSE=" << oldMSE << "	CalcCount="<< CalcCount << endl;
+
+			Continue = Continue&&((oldStdDev<1.5*minStdDev)||(oldCorrC<(origCorrC+0.03)));
+			
+		}
+		LoopCount ++;
+		Continue = Continue&&(LoopCount<MAXOPTLOOPS)&&(CalcCount<MAXOPTCALC);
+	}
+	CostFunctionTreeOnly(Index, oldMean, oldMSE, oldStdDev, oldCorrC);
+	mCandidate[Index].sMean = oldMean;
+	mCandidate[Index].sMSE = oldMSE;
+	mCandidate[Index].sStdDev = oldStdDev;
+	mCandidate[Index].sCorrC = oldCorrC;
+}
+
+
+
+//**************************************************************************
+void cGPpropModel::optimiseConstantsCorrCMO(unsigned Index)
+{
+	double oldCorrC, oldStdDev, oldMean, oldMSE;
+	double newCorrC, newStdDev, newMean, newMSE;
+	double ACorrC, AStdDev, AMean, AMSE;
+	double alphaC, alphaS;
+	unsigned LoopCount = 0;
+	unsigned CalcCount = 0;
+
+	double TempDelta=0, DeltaA = 5.0/0.75;
+	double OmegaSize =0.0, OmegaI;
+	unsigned i=0, numConsts=0;
+	bool Continue = true;
+	bool NotDecreasing = true;
+	numConsts = mCandidate[Index].sConstants.size();
+	double * Delta;
+	double * DiffC;
+	double * DiffS;
+	double * OldValue;
+	Delta = new double[numConsts];
+	DiffC = new double[numConsts];
+	DiffS = new double[numConsts];
+	OldValue = new double[numConsts];
+	double ModOfDiffC = 0.0;
+	double ModOfDiffS = 0.0;
+	double ProductCS = 0.0;
+	double SizeDelta = 0.0;
+
+	cout << "Optimising Constants for Candidate Tree CorrC MO. INDEX = " << Index << endl;
+	for (i=0; i<numConsts; i++)
+	{
+		OldValue[i] = mCandidate[Index].sConstants[i]->getValue();
+		if (fabs(OldValue[i])>1)
+			Delta[i] = -0.01*fabs(OldValue[i])/0.7;
+		else Delta[i] = -0.01/0.7;
+		DiffC[i] = 1.0;
+		DiffS[i] = 1.0;
 	}
 //	cout << endl;
 
@@ -1627,44 +2761,43 @@ void cGPpropModel::optimiseConstants(unsigned Index)
 		ModOfDiffC = 0.0;
 		ModOfDiffS = 0.0;
 		ProductCS = 0.0;
-		DeltaA *=2 ;
+		if (DeltaA>1000) DeltaA = 5/0.7;
+		else DeltaA*=2;
 		for (i=0; i<numConsts; i++)
 		{
-			newStdDev = 1000;
-			newCorrC = 0.0;
+			newStdDev = 9999;
+			newCorrC = -0.9999;
 			newMSE = 200000;
-			DiffC[i] = 0.0;
-			DiffS[i] = 0.0;
 			OldValue[i] = mCandidate[Index].sConstants[i]->getValue();
-			if (fabs(OldValue[i])>0.0001)
-				Delta[i] = -0.01*fabs(OldValue[i])/0.75;
-			else Delta[i] = -0.01/0.75;
-//			cout << "Delta[i]= "<< Delta[i];
-			while ( (fabs(Delta[i])>1e-6)
-				&&( (fabs(newStdDev)>900)||(newCorrC<0.0)
-				||(isnan(newStdDev))||(isinf(newStdDev))||(newStdDev<0)
+			if (DeltaA<1)
+			{
+				if (fabs(OldValue[i])>1)
+					Delta[i] = -0.1*DeltaA*fabs(OldValue[i])/0.7;
+				else Delta[i] = -0.01*DeltaA/0.7;
+			}
+			else
+			{
+				if (fabs(OldValue[i])>1)
+					Delta[i] = -0.001*fabs(OldValue[i])/0.7;
+				else Delta[i] = -0.001/0.7;
+			}
+			while ( (fabs(Delta[i])>1e-8)
+				&&((fabs(DiffC[i])>1e-12)||(fabs(DiffS[i])>1e-12))
+				&&( (fabs(newMSE)>10200)||(newCorrC<0.0)
+				||(isnan(newStdDev))||(isinf(newStdDev))
 				||(isnan(newMSE))||(isinf(newMSE))
 				||(isnan(newCorrC))||(isinf(newCorrC)) ) )
 			{
-				Delta[i] *=-0.75;
+				Delta[i] *=-0.7;
 				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + Delta[i]);
 				CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
+				DiffC[i] = (100.0*(oldCorrC -newCorrC))*Delta[i]/fabs(Delta[i]); 
+				DiffS[i] = (fabs(newMean) - fabs(oldMean))*Delta[i]/fabs(Delta[i]);
+				CalcCount ++ ;
 			}
-/*			cout << "	OldValue[i]="<< OldValue[i] << " 	Ci = " << i 
-				<< "		CorrC=" << oldCorrC 
-				<< "	StDev=" << oldStdDev << "	Mean=" << oldMean  
-				<< "	MSE=" << oldMSE << endl;
-			cout << "Delta[i]= "<< Delta[i] << "	Ci = " << i 
-				<< "		CorrC=" << newCorrC 
-				<< "	StDev=" << newStdDev << "	Mean=" << newMean  
-				<< "	MSE=" << newMSE << endl;
-*/
-			DiffC[i] = (100.0*(oldCorrC -newCorrC))*Delta[i]/fabs(Delta[i]); //
-			DiffS[i] = (newStdDev - oldStdDev)*Delta[i]/fabs(Delta[i]);
-			
-//			cout<<"DiffC[i]:"<<DiffC[i]<<"	DiffS[i]:"<<DiffS[i] <<"	Delta[i]:"<<Delta[i] << endl; 
 
-			if ((newStdDev<900)&&(newCorrC>0.0)&&(fabs(Delta[i])>1e-6))
+			if ((newStdDev<900)&&(newCorrC>0.0)&&(fabs(Delta[i])>1e-2)
+				&&((fabs(DiffC[i])>1e-12)||(fabs(DiffS[i])>1e-12)))
 			{
 				ModOfDiffC += DiffC[i]*DiffC[i]/(Delta[i]*Delta[i]);
 				ModOfDiffS += DiffS[i]*DiffS[i]/(Delta[i]*Delta[i]);
@@ -1676,48 +2809,54 @@ void cGPpropModel::optimiseConstants(unsigned Index)
 				DiffC[i] = 0.0;
 				DiffS[i] = 0.0;
 				Delta[i] = 1e-10;
-				NotDecreasing = false;
-				Continue = false;
-				mCandidate[Index].sOptimised=true;
 			}
 			//return value to original value
 			mCandidate[Index].sConstants[i]->setValue(OldValue[i]);
 		} // for mNumConst
 
-//		cout << "MC:" << ModOfDiffC << "	MS:" << ModOfDiffS << "	PCS:" << ProductCS << endl; 
-		if ((ProductCS<ModOfDiffC)&&(ProductCS<ModOfDiffS))
-			alphaC = (ModOfDiffS - ProductCS)/(ModOfDiffS + ModOfDiffC - 2*ProductCS);
-		else if (ModOfDiffS<ModOfDiffC) alphaC = 0.0;
-		else alphaC = 1.0;
-		alphaS = 1 - alphaC;
-//		cout << "alphaC=" << alphaC << "	alphaS=" << alphaS << endl;		
+		if ((ModOfDiffC>1e-15)||(ModOfDiffS>1e-15))
+		{
+			if ((ProductCS<ModOfDiffC)&&(ProductCS<ModOfDiffS))
+				alphaC = (ModOfDiffS - ProductCS)/(ModOfDiffS + ModOfDiffC - 2*ProductCS);
+			else if (ModOfDiffS<ModOfDiffC) alphaC = 0.0;
+			else alphaC = 1.0;
+			alphaS = 1 - alphaC;
+		}
+		else
+		{
+			NotDecreasing=false;
+			Continue = false;
+		}
 
 		while (NotDecreasing)
 		{
-			DeltaA*=0.8;
+			DeltaA*=0.7;
 			SizeDelta = 0.0;
 			for (i=0; i<numConsts; i++)
 			{
 				TempDelta = -(alphaC*DiffC[i]/fabs(Delta[i]) + alphaS*DiffS[i]/fabs(Delta[i]))*DeltaA;
-//				cout << TempDelta << "	";
 				SizeDelta += TempDelta*TempDelta;
 				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + TempDelta);
 			}
-//			cout << endl;
-			CostFunctionTreeOnly(Index, Mean, MSE, AStdDev, ACorrC);
-//			cout << "DeltaA = " << DeltaA << "		CorrC=" << ACorrC 
-//				<< "	StDev=" << AStdDev << "	Mean=" << Mean  <<  "	MSE=" << MSE << endl;
-			NotDecreasing = (AStdDev>=oldStdDev)||(ACorrC<=oldCorrC)
-					||(isnan(AStdDev))||(isinf(AStdDev))||(AStdDev<0)
-					||(isnan(MSE))||(isinf(MSE))
+			CostFunctionTreeOnly(Index, AMean, AMSE, AStdDev, ACorrC);
+			CalcCount ++ ;
+/*			cout << "DeltaA = " << DeltaA 
+				<< "		CorrC=" << ACorrC 
+				<< "	StDev=" << AStdDev 
+				<< "	Mean=" << AMean  
+				<< "	MSE=" << AMSE 
+				<< "	SizeDelta=" << SizeDelta<< endl;
+*/			NotDecreasing = (ACorrC<oldCorrC)
+					||(isnan(AStdDev))||(isinf(AStdDev))
+					||(isnan(AMSE))||(isinf(AMSE))
 					||(isnan(ACorrC))||(isinf(ACorrC));
-			NotDecreasing = NotDecreasing && (SizeDelta>1e-10);
+			NotDecreasing = NotDecreasing && (SizeDelta>1e-8);
 		}
+		Continue = Continue&&(ACorrC>=oldCorrC)&&(!isnan(AStdDev))&&(!isinf(AStdDev))
+				&&(!isnan(AMSE))&&(!isinf(AMSE))&&(!isnan(ACorrC))&&(!isinf(ACorrC))
+				&&(SizeDelta>1e-8);
 		if (Continue)
 		{
-			cout << Index << "	DeltaA = " << DeltaA << "		CorrC=" << ACorrC 
-					<< "	StDev=" << AStdDev << "	Mean=" << Mean  <<  "	MSE=" << MSE << endl;
-//			cout << endl;
 			OmegaSize = 0;
 			for (i=0; i<numConsts; i++)
 			{
@@ -1727,17 +2866,19 @@ void cGPpropModel::optimiseConstants(unsigned Index)
 				mCandidate[Index].sConstants[i]->setValue(OldValue[i] + Delta[i]);
 			}
 			CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
-//				cout << "NewCost:  Index = " << Index << "		CorrC=" << newCorrC 
-//					<< "	StDev=" << newStdDev << "	Mean=" << newMean  
-//					<<  "	MSE=" << newMSE << endl;
+			cout << Index << "	CorrCMO	DeltaA = " << DeltaA 
+					<< "		CorrC=" << newCorrC 
+					<< "	StDev=" << newStdDev 
+					<< "	Mean=" << newMean  
+					<< "	MSE=" << newMSE << "	CalcCount="<< CalcCount << endl;
 		
-			Continue = (OmegaSize>1e-6)&&(fabs((newStdDev-oldStdDev)/newStdDev)>1e-5)
-					&&(fabs((newCorrC-oldCorrC)/newCorrC)>1e-5);
+			Continue = (OmegaSize>1e-8)&&(((newCorrC-oldCorrC)/newCorrC)>1e-6);
 			oldCorrC = newCorrC; oldStdDev=newStdDev; oldMean=newMean; oldMSE=newMSE;
 		}
+		LoopCount ++;
+		Continue = Continue&&(LoopCount<MAXOPTLOOPS)&&(CalcCount<MAXOPTCALC);
 	}
 	CostFunctionTreeOnly(Index, oldMean, oldMSE, oldStdDev, oldCorrC);
-	mCandidate[Index].sOptimised = true;
 	mCandidate[Index].sMean = oldMean;
 	mCandidate[Index].sMSE = oldMSE;
 	mCandidate[Index].sStdDev = oldStdDev;
@@ -1748,27 +2889,52 @@ void cGPpropModel::optimiseConstants(unsigned Index)
 //********************************************************************************
 void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 {
-	unsigned j;
-	mCandidate[Index].sOptimised =false;
-/*	for (j=0; j<mMeas.mPathLoss.mClutter.mNumber; j++)
+	unsigned coin, dice;
+	mCandidate[Index].sPareto = false;
+	mCandidate[Index].sOptimised = false;
+	coin = rand() % 2;
+	dice = rand() % 4;
+	if ((coin<1)&&(dice<3)&&(!grow)&&(mCandidate[Index].sCorrC>0.5)&&(mCandidate[Index].sStdDev<500))
 	{
-		mCandidate[Index].sClutterHeight[j] *= (1.0 
-			+ gGauss(gRandomGen)*(1-mMinFitness/mCandidate[Index].sFitness);
-		if (mCandidate[Index].sClutterHeight[j]<0.0)
-			mCandidate[Index].sClutterHeight[j]=0.0;
+		switch (dice)
+		{	
+			case 0:	optimiseConstantsCorrC(Index);
+				break;
+			case 1:	optimiseConstantsSTDev(Index);
+				break;
+			case 2:	optimiseConstantsCorrCMO(Index);
+				break;
+			case 3:	optimiseConstantsSTDevMO(Index);
+				break;
+		}
 	}
-*/	unsigned depth=0;
-	mCandidate[Index].sDepth=mCandidate[Index].sTree->getTreeDepth(depth);
-	depth = max(0, (int)mCandidate[Index].sDepth); 
-//	cout << "Tree depth = " << TreeDepth << endl;
-	double random = gGauss(gRandomGen);
-//	cout << "	random=" << random;
-	unsigned mutateDepth = min(depth, (unsigned)max(0,(int)(depth*(1-fabs(random)*mCandidate[Index].sFitness/mMinFitness))));
-	random = gGauss(gRandomGen);
-//	cout << "	random=" << random;
-	double mutateProp = min(0.5, fabs(random)*(1-mMinFitness/mCandidate[Index].sFitness));
-//	cout << "mutateProp = " << mutateProp << "	mutateDepth = " << mutateDepth << endl;	
-	mutateTree(mCandidate[Index].sTree, mutateDepth, mutateProp, grow); 
+	else
+	{
+
+/*		for (j=0; j<mMeas.mPathLoss.mClutter.mNumber; j++)
+		{
+			mCandidate[Index].sClutterHeight[j] *= (1.0 
+				+ gGauss(gRandomGen)*(1-mMinFitness/mCandidate[Index].sFitness);
+			if (mCandidate[Index].sClutterHeight[j]<0.0)
+				mCandidate[Index].sClutterHeight[j]=0.0;
+		}
+*/
+		unsigned depth=0;
+		mCandidate[Index].sDepth=mCandidate[Index].sTree->getTreeDepth(depth);
+		depth = max(0, (int)mCandidate[Index].sDepth); 
+//		cout << "Tree depth = " << TreeDepth << endl;
+		double random = gGauss(gRandomGen);
+//		cout << "	random=" << random;
+		unsigned mutateDepth = min(depth, (unsigned)max(0,
+				(int)(depth*fabs(random)*mCandidate[Index].sFitness/mMinFitness)));
+		random = gGauss(gRandomGen);
+//		cout << "	random=" << random;
+		double mutateProp = min(0.5, fabs(random)*(1-mMinFitness/mCandidate[Index].sFitness));
+//		cout << "mutateProp = " << mutateProp << "	mutateDepth = " << mutateDepth << endl;	
+		mutateTree(mCandidate[Index].sTree, mutateDepth, grow, mutateProp); 
+		mCandidate[Index].sRank=2*mNumCandidates;
+		mCandidate[Index].sFitness *= 2;
+	}
 }
 
 //********************************************************************************
@@ -1813,7 +2979,7 @@ void cGPpropModel::mutateTree(GOftn* &inTree, int depth, bool grow, double PropM
 		inTree->mutate(PropMutate);
 		return;
 	}
-	double randNum0t1 = rand()/(double)RAND_MAX;
+	double randNum0t1 = gUni(gRandomGen);
 	if (randNum0t1 < PropMutate) 
 	{
 //		cout << "SHOULD MUTATE" << endl;
@@ -1863,7 +3029,7 @@ void cGPpropModel::printTree(GOftn* inTree, int depth)
 //********************************************************************************
 GOftn* cGPpropModel::createRandomTree(int depth, bool grow)
 {
-	unsigned i=0, begin =0;
+	unsigned i=0, j=0;
 	double random;
 	int randn;
 	GOftn* retFtn;
@@ -1886,16 +3052,25 @@ GOftn* cGPpropModel::createRandomTree(int depth, bool grow)
 		}
 		retFtn->mChild[2]->mChild[1]->mChild[0] = new FrequencyNode();
 		retFtn->mChild[3]->mChild[1]->mChild[0] = new DistanceNode();
- 		begin = 4;
+		for (i=4;retFtn->mNumChildren; i++)
+		{
+			randn = rand()%2+2;
+			retFtn->mChild[i]= new Multiply(randn);	
+			random = gUni(gRandomGen);
+			retFtn->mChild[i]->mChild[0] = new ConstNode(random);
+			for (j=1; j< retFtn->mChild[i]->mNumChildren; j++)
+			{
+				retFtn->mChild[i]->mChild[j] = createRandomTree(depth+2,grow);
+			}
+		}
 	}
 	else
 	{
 		retFtn = createRandomNode(depth,grow);
-		begin=0;
-	}
-	for (i=begin; i < retFtn->mNumChildren; i++) 
-	{
-		retFtn->mChild[i] = createRandomTree(depth+1,grow);
+		for (i=0; i < retFtn->mNumChildren; i++) 
+		{
+			retFtn->mChild[i] = createRandomTree(depth+1,grow);
+		}
 	}
 	return retFtn;
 }
@@ -1964,9 +3139,9 @@ GOftn* cGPpropModel::createRandomNode(int depth, bool grow)
 	//if the depth reached max depth only allow constants and inputs
 	if (depth < MAX_TREE_DEPTH) numFtnChoices = 15;
 	else numFtnChoices = 9;
-	randn = rand() % numFtnChoices;	
+	randn = numFtnChoices * gUni(gRandomGen);	
 	if ((grow)&&(depth < MAX_TREE_DEPTH))
-		randn = rand() % 6 + 9;
+		randn = 6*gUni(gRandomGen) + 9;
 
 	//generate random int
 	
@@ -2059,14 +3234,4 @@ bool cGPpropModel::SortCriteriaOnFitness(SCandidate c1, SCandidate c2)
 		return (c1.sFitness < c2.sFitness);
 	else return (c2.sPareto);
 }
-
-
-//******************************************************
-int cGPpropModel::getRandSurvivor(unsigned popSize)
-{
-	int randn = rand() % (popSize - 2*mNumToDie);
-	return (randn);
-}
-
-
 

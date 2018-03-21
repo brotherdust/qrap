@@ -50,14 +50,15 @@
 #define NUM_GENERATIONS 2 // GP field guide suggest between 10 and 50
 #define NUM_POINT_PER_EVAL 1000
 //how much of the population we loose per generation
-#define UNFIT_LIMIT 10000
+#define UNFIT_LIMIT 100195
 
 #define MAX_TREE_DEPTH 10 
 #define PROP_MUTATE 0.5
 #define PROP_CROSSOVER 0.5
 
 #define MAXOPTLOOPS 500
-#define MAXOPTCALC 1500
+#define MAXOPTCALC 2500
+#define MAXMINAGE 30
 
 using namespace std;
 
@@ -86,6 +87,7 @@ struct SCandidate
 	SCandidate & operator=(SCandidate Right)
 	{
 		unsigned i;
+		GOftn * constantP;
 		sNumClutter	= Right.sNumClutter;
 		sClutterType = new unsigned[sNumClutter];
 		sClutterHeight = new double[sNumClutter];
@@ -94,6 +96,7 @@ struct SCandidate
 			sClutterType[i] = Right.sClutterType[i];
 			sClutterHeight[i] = Right.sClutterHeight[i];
 		}
+		sConstants.clear();
 		sTree		= Right.sTree->clone();
 		sTree->getConstants(sConstants);
 		sCorrC		= Right.sCorrC;
@@ -160,6 +163,8 @@ namespace Qrap
 
 			void mutateCandidate(unsigned CandidateIndex, bool grow=false);
 
+			void mutateThread(unsigned Begin, unsigned Skip);
+
 			void crossOverCandidate(unsigned CandidateIndex, unsigned donatorIndex);
 
 			void replaceTree(unsigned CandidateIndex);
@@ -175,14 +180,12 @@ namespace Qrap
 
 			GOftn* createRandomTree(int depth=0, bool grow=false);
 
-			int getRandSurvivor(unsigned popSize);
-
-
 		private:
 
 			double 		mMutationThreshold;
 			unsigned	mNumToDie;
 			unsigned	mNumCandidates;
+			unsigned	mNumStars;
 			double		mMinFitness;
 			vCandidates 	mCandidate;
 			vCandidates 	mStars;

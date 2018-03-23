@@ -1138,6 +1138,9 @@ int cGPpropModel:: mainTuning()
 			if (!mStars[i].sPareto)
 			{
 				cout << "erasing mStar " << i << endl;
+				mStars[i].sConstants.clear();
+				delete [] mStars[i].sClutterHeight;
+				delete [] mStars[i].sClutterType;
 				mStars.erase (mStars.begin()+i);
 				i--;
 			}
@@ -2605,6 +2608,22 @@ void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
 	mCandidate[Index].sMSE = oldMSE;
 	mCandidate[Index].sStdDev = oldStdDev;
 	mCandidate[Index].sCorrC = oldCorrC;
+
+	thisCandidate.sConstants.clear();
+	delete [] thisCandidate.sClutterHeight;
+	delete [] thisCandidate.sClutterType;
+	oldCandidate.sConstants.clear();
+	delete [] oldCandidate.sClutterHeight;
+	delete [] oldCandidate.sClutterType;
+	newCandidate.sConstants.clear();
+	delete [] newCandidate.sClutterHeight;
+	delete [] newCandidate.sClutterType;
+	yCandidate.sConstants.clear();
+	delete [] yCandidate.sClutterHeight;
+	delete [] yCandidate.sClutterType;
+	minCandidate.sConstants.clear();
+	delete [] minCandidate.sClutterHeight;
+	delete [] minCandidate.sClutterType;
 }
 
 
@@ -3175,6 +3194,21 @@ void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
 	mCandidate[Index].sMSE = oldMSE;
 	mCandidate[Index].sStdDev = oldStdDev;
 	mCandidate[Index].sCorrC = oldCorrC;
+	thisCandidate.sConstants.clear();
+	delete [] thisCandidate.sClutterHeight;
+	delete [] thisCandidate.sClutterType;
+	oldCandidate.sConstants.clear();
+	delete [] oldCandidate.sClutterHeight;
+	delete [] oldCandidate.sClutterType;
+	newCandidate.sConstants.clear();
+	delete [] newCandidate.sClutterHeight;
+	delete [] newCandidate.sClutterType;
+	yCandidate.sConstants.clear();
+	delete [] yCandidate.sClutterHeight;
+	delete [] yCandidate.sClutterType;
+	minCandidate.sConstants.clear();
+	delete [] minCandidate.sClutterHeight;
+	delete [] minCandidate.sClutterType;
 }
 
 

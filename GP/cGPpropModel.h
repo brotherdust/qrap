@@ -44,10 +44,10 @@
 //#include "ThreadPool.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 50
+#define NUM_INIT_CANDIDATES 100
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 10
-#define NUM_GENERATIONS 2 // GP field guide suggest between 10 and 50
+#define NUM_GENERATIONS 10 // GP field guide suggest between 10 and 50
 #define NUM_POINT_PER_EVAL 1000
 //how much of the population we loose per generation
 #define UNFIT_LIMIT 100195
@@ -56,8 +56,8 @@
 #define PROP_MUTATE 0.5
 #define PROP_CROSSOVER 0.5
 
-#define MAXOPTLOOPS 500
-#define MAXOPTCALC 2500
+#define MAXOPTLOOPS 100
+#define MAXOPTCALC 500
 #define MAXMINAGE 30
 
 using namespace std;
@@ -69,10 +69,10 @@ typedef vector<GOftn *> vConstants;
 
 struct SCandidate
 { 
-	unsigned	sNumClutter;
-	unsigned * 	sClutterType;
-	double * 	sClutterHeight;
-	GOftn * 	sTree;
+	unsigned	sNumClutter=0;
+	unsigned * 	sClutterType=nullptr;
+	double * 	sClutterHeight=nullptr;
+	GOftn * 	sTree=nullptr;
 	double		sCorrC;
 	double		sStdDev;
 	double		sMean;
@@ -87,8 +87,13 @@ struct SCandidate
 	SCandidate & operator=(SCandidate Right)
 	{
 		unsigned i;
-		GOftn * constantP;
-		sNumClutter	= Right.sNumClutter;
+/*		if ((sClutterType!=nullptr)&&(sClutterHeight!=nullptr)
+			&&(sNumClutter>5)&&(sNumClutter<101))
+		{
+			delete [] sClutterType;
+			delete [] sClutterHeight;
+		}
+*/		sNumClutter	= Right.sNumClutter;
 		sClutterType = new unsigned[sNumClutter];
 		sClutterHeight = new double[sNumClutter];
 		for (i=0; i<sNumClutter; i++)

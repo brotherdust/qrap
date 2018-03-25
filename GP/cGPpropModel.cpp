@@ -845,7 +845,7 @@ int cGPpropModel:: mainTuning()
 		mCandidate.push_back(newCandidate);
 	}
 
-	unsigned NumThread = 8;
+	unsigned NumThread = 7;
     	NumThread = min(NumThread,std::thread::hardware_concurrency());
 	if (NumThread<1) NumThread=1;
 	
@@ -3803,7 +3803,7 @@ GOftn* cGPpropModel::createRandomTree(int depth, bool grow)
 		}
 		retFtn->mChild[2]->mChild[1]->mChild[0] = new FrequencyNode();
 		retFtn->mChild[3]->mChild[1]->mChild[0] = new DistanceNode();
-		for (i=4;retFtn->mNumChildren; i++)
+		for (i=4;i < retFtn->mNumChildren; i++)
 		{
 			randn = rand()%2+2;
 			retFtn->mChild[i]= new Multiply(randn);	

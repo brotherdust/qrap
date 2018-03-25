@@ -56,8 +56,8 @@
 #define PROP_MUTATE 0.5
 #define PROP_CROSSOVER 0.5
 
-#define MAXOPTLOOPS 100
-#define MAXOPTCALC 500
+#define MAXOPTLOOPS 500
+#define MAXOPTCALC 2500
 #define MAXMINAGE 30
 
 using namespace std;

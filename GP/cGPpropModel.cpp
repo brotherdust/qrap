@@ -1015,7 +1015,7 @@ int cGPpropModel:: mainTuning()
 
 	for (i; i<NUM_INIT_CANDIDATES; i++)
 	{
-		newTree = createRandomTree(0,true);
+		newTree = createRandomTree(0,false);
 		newCandidate.sTree = newTree;
 		mCandidate.push_back(newCandidate);
 	}
@@ -1156,11 +1156,11 @@ int cGPpropModel:: mainTuning()
 		} 
 		
 		if (mStars.size()>0)	
-			sort(mStars.begin(), mStars.end(), SortCriteriaOnFitness);
+			sort(mStars.begin(), mStars.end(), SortCriteriaOnFitnessInverse);
 
 //		if too many stars, clearout (some) non-pareto candidates
-		i=mStars.size()-1;
-		while ((mStars.size()>MAX_NUM_IN_CACHE)&&(i>0))
+		i=0;
+		while ((mStars.size()>MAX_NUM_IN_CACHE)&&(i<mStars.size()))
 		{
 			cout << "Checking Stars " << endl;
 			mStars[i].sPareto = true;
@@ -1180,10 +1180,13 @@ int cGPpropModel:: mainTuning()
 				delete [] mStars[i].sClutterHeight;
 				delete [] mStars[i].sClutterType;
 				mStars.erase (mStars.begin()+i);
-				i--;
+				
 			}
-			i--;
+			else i++;
 		}
+
+		if (mStars.size()>0)	
+			sort(mStars.begin(), mStars.end(), SortCriteriaOnFitness);
 	
 		if (mCandidate.size()>0)
 			sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnFitness);
@@ -1269,11 +1272,11 @@ int cGPpropModel:: mainTuning()
 	}
 
 	if (mStars.size()>0)	
-		sort(mStars.begin(), mStars.end(), SortCriteriaOnFitness);
+		sort(mStars.begin(), mStars.end(), SortCriteriaOnFitnessInverse);
 
 //	clearout all non-pareto candidates
-	i=mStars.size()-1;
-	while ((i>0))
+	i=0;
+	while ((i<mStars.size()))
 	{
 		cout << "Checking Stars " << endl;
 		mStars[i].sPareto = true;
@@ -1289,10 +1292,12 @@ int cGPpropModel:: mainTuning()
 		if (!mStars[i].sPareto)
 		{
 			cout << "erasing mStar " << i << endl;
+			mStars[i].sConstants.clear();
+			delete [] mStars[i].sClutterHeight;
+			delete [] mStars[i].sClutterType;
 			mStars.erase (mStars.begin()+i);
-			i--;
 		}
-		i--;
+		else i++;
 	}
 	
 	for (i=0; i<mStars.size(); i++)
@@ -1310,6 +1315,17 @@ int cGPpropModel:: mainTuning()
 			cout << "	[" << j<< "] " << mStars[i].sClutterHeight[j];
 		}
 		cout << endl << endl;
+	}
+
+	sort(mStars.begin(), mStars.end(), SortCriteriaOnStdDev);
+	for (i=0; i<mStars.size(); i++)
+	{
+		cout << " Star.	i = " << i << "	Rank=" << mStars[i].sRank
+			<< "	Fitness=" << mStars[i].sFitness 
+			<< "	CorrC=" << mStars[i].sCorrC 
+			<< "	StDev=" << mStars[i].sStdDev
+			<< "	Mean=" << mStars[i].sMean  
+			<< "	Depth=" << mStars[i].sDepth <<endl;
 	}
 
     	return 0;
@@ -3667,8 +3683,9 @@ void cGPpropModel::mutateThread(unsigned Begin, unsigned Skip)
 
 	for (i=Begin; i<mNumCandidates; i+=Skip)
 	{
-		growProp = fabs(gGauss(gRandomGen))*(1-mMinFitness/mCandidate[i].sFitness);
-		mutateCandidate(i,(growProp>0.5));
+		mutateCandidate(i,false);
+//		growProp = fabs(gGauss(gRandomGen))*(1-mMinFitness/mCandidate[i].sFitness);
+//		mutateCandidate(i,(growProp>0.5));
 /*		CrossOverProp = fabs(gGauss(gRandomGen))*(1-mMinFitness/mCandidate[i].sFitness);
 		if ((mNumStars>1)&&(CrossOverProp>1))
 		{
@@ -4013,7 +4030,7 @@ bool cGPpropModel::SortCriteriaOnRank(SCandidate c1, SCandidate c2)
 		return (c1.sRank < c2.sRank);
 	else if ((!c1.sPareto)&&(!c2.sPareto))
 		return (c1.sRank < c2.sRank);
-	else return (c2.sPareto);
+	else return (c1.sPareto);
 }
 
 //***************************************************************************
@@ -4023,6 +4040,16 @@ bool cGPpropModel::SortCriteriaOnFitness(SCandidate c1, SCandidate c2)
 		return (c1.sFitness < c2.sFitness);
 	else if ((!c1.sPareto)&&(!c2.sPareto))
 		return (c1.sFitness < c2.sFitness);
+	else return (c1.sPareto);
+}
+
+//***************************************************************************
+bool cGPpropModel::SortCriteriaOnFitnessInverse(SCandidate c1, SCandidate c2)
+{
+	if ((c1.sPareto)&&(c2.sPareto))
+		return (c1.sFitness > c2.sFitness);
+	else if ((!c1.sPareto)&&(!c2.sPareto))
+		return (c1.sFitness > c2.sFitness);
 	else return (c2.sPareto);
 }
 

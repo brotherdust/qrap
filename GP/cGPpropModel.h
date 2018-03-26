@@ -46,7 +46,7 @@
 // local defines
 #define NUM_INIT_CANDIDATES 200
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
-#define MAX_NUM_IN_CACHE 10
+#define MAX_NUM_IN_CACHE 5
 #define NUM_GENERATIONS 10 // GP field guide suggest between 10 and 50
 #define NUM_POINT_PER_EVAL 1000
 //how much of the population we loose per generation
@@ -180,6 +180,7 @@ namespace Qrap
 			static bool SortCriteriaOnStdDev(SCandidate c1, SCandidate c2);
 			static bool SortCriteriaOnRank(SCandidate c1, SCandidate c2);
 			static bool SortCriteriaOnFitness(SCandidate c1, SCandidate c2);
+			static bool SortCriteriaOnFitnessInverse(SCandidate c1, SCandidate c2);
 		
 			GOftn* createRandomNode(int depth, bool grow=false);
 

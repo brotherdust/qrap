@@ -44,7 +44,7 @@
 //#include "ThreadPool.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 100
+#define NUM_INIT_CANDIDATES 200
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 10
 #define NUM_GENERATIONS 10 // GP field guide suggest between 10 and 50

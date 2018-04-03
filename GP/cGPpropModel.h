@@ -44,7 +44,7 @@
 //#include "ThreadPool.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 150
+#define NUM_INIT_CANDIDATES 100
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 5
 #define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50
@@ -56,14 +56,13 @@
 #define PROP_MUTATE 0.5
 #define PROP_CROSSOVER 0.5
 
-#define MAXOPTLOOPS 500
-#define MAXOPTCALC 2500
+#define MAXOPTLOOPS 100
+#define MAXOPTCALC 500
 #define MAXMINAGE 30
 
 using namespace std;
 
 using namespace Qrap;
-
 
 typedef vector<GOftn *> vConstants;
 
@@ -80,6 +79,7 @@ struct SCandidate
 	double		sFitness;
 	unsigned	sRank;
 	unsigned	sDepth;
+	unsigned	sForm;
 	bool		sPareto;
 	vConstants	sConstants;
 	bool		sOptimised;

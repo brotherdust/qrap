@@ -165,6 +165,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 3;
+	newCandidate.sForm = 0;
 	mCandidate.push_back(newCandidate);
 */
 	// 'Tuned' with 3 terms 
@@ -185,6 +186,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 3;
+	newCandidate.sForm = 1;
 	mCandidate.push_back(newCandidate);
 
 /*	// basic terms with clutterheight dependancy
@@ -210,6 +212,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 3;
+	newCandidate.sForm = 2;
 	mCandidate.push_back(newCandidate);
 */
 	// basic terms with good guess ekstra terms
@@ -244,6 +247,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 3;
+	newCandidate.sForm = 3;
 	mCandidate.push_back(newCandidate);
 
 	//Engineerd equation
@@ -278,6 +282,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 5;
+	newCandidate.sForm = 4;
 	mCandidate.push_back(newCandidate);
 
 	//Basic model with some vegetation loss term
@@ -318,6 +323,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
+	newCandidate.sForm = 5;
 	mCandidate.push_back(newCandidate);
 
 	// Tuned Q-Rap model ... classic tuning
@@ -354,6 +360,7 @@ int cGPpropModel:: mainTuning()
 	
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
+	newCandidate.sForm = 6;
 	mCandidate.push_back(newCandidate);
 
 	// Tuned Q-Rap model ... with clutterdepth
@@ -392,6 +399,7 @@ int cGPpropModel:: mainTuning()
 	
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
+	newCandidate.sForm = 7;
 	mCandidate.push_back(newCandidate);
 
 /*	// Tuned Q-Rap model ... with clutterheight
@@ -427,6 +435,7 @@ int cGPpropModel:: mainTuning()
 	
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
+	newCandidate.sForm = 8;
 	mCandidate.push_back(newCandidate);
 */
 	// Hata - Suburban
@@ -473,6 +482,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 6;
+	newCandidate.sForm = 9;
 	mCandidate.push_back(newCandidate);
 
 	// Hata - Suburban altered with vegetation loss term
@@ -534,6 +544,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 6;
+	newCandidate.sForm = 10;
 	mCandidate.push_back(newCandidate);
 
 /*	// Hata - Suburban altered with clutterheight
@@ -584,6 +595,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 6;
+	newCandidate.sForm = 11;
 	mCandidate.push_back(newCandidate);
 */
 	// Hata - Suburban altered with terms of each kind
@@ -654,6 +666,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 6;
+	newCandidate.sForm = 12;
 	mCandidate.push_back(newCandidate);
 
 	// basic model with 'vegetation-loss' term
@@ -682,6 +695,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
+	newCandidate.sForm = 13;
 	mCandidate.push_back(newCandidate);
 
 	//Basic with extra terms of each parameter with vegloss term)
@@ -734,6 +748,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
+	newCandidate.sForm = 14;
 	mCandidate.push_back(newCandidate);
 
 	//Basic with extra terms of each parameter sans vegloss term)
@@ -779,6 +794,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
+	newCandidate.sForm = 15;
 	mCandidate.push_back(newCandidate);
 
 	//Basic with clutterheight term)
@@ -814,6 +830,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
+	newCandidate.sForm = 16;
 	mCandidate.push_back(newCandidate);
 
 	//Basic with clutterheight term)
@@ -849,6 +866,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
+	newCandidate.sForm = 17;
 	mCandidate.push_back(newCandidate);
 
 	NumSeeds = mCandidate.size();
@@ -1010,15 +1028,18 @@ int cGPpropModel:: mainTuning()
 	{
 		newTree = createRandomTree();
 		newCandidate.sTree = newTree;
+		newCandidate.sForm = 99;
 		mCandidate.push_back(newCandidate);
 		CostFunctionTreeOnly(i, mCandidate[i].sMean, MSE,
 			 mCandidate[i].sStdDev, mCandidate[i].sCorrC);
+		
 	}
 
 	for (i; i<NUM_INIT_CANDIDATES; i++)
 	{
 		newTree = createRandomTree(0,false);
 		newCandidate.sTree = newTree;
+		newCandidate.sForm = 99;
 		mCandidate.push_back(newCandidate);
 		CostFunctionTreeOnly(i, mCandidate[i].sMean, MSE,
 			 mCandidate[i].sStdDev, mCandidate[i].sCorrC);
@@ -3734,6 +3755,7 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 */
 		double MSE;
 		unsigned depth=0;
+		mCandidate[Index].sForm = 88;
 		mCandidate[Index].sDepth=mCandidate[Index].sTree->getTreeDepth(depth);
 		depth = max(0, (int)mCandidate[Index].sDepth); 
 //		cout << "Tree depth = " << TreeDepth << endl;

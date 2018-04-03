@@ -1011,6 +1011,8 @@ int cGPpropModel:: mainTuning()
 		newTree = createRandomTree();
 		newCandidate.sTree = newTree;
 		mCandidate.push_back(newCandidate);
+		CostFunctionTreeOnly(i, mCandidate[i].sMean, MSE,
+			 mCandidate[i].sStdDev, mCandidate[i].sCorrC);
 	}
 
 	for (i; i<NUM_INIT_CANDIDATES; i++)
@@ -1018,6 +1020,8 @@ int cGPpropModel:: mainTuning()
 		newTree = createRandomTree(0,false);
 		newCandidate.sTree = newTree;
 		mCandidate.push_back(newCandidate);
+		CostFunctionTreeOnly(i, mCandidate[i].sMean, MSE,
+			 mCandidate[i].sStdDev, mCandidate[i].sCorrC);
 	}
 
 	mNumCandidates = mCandidate.size();
@@ -1299,7 +1303,8 @@ int cGPpropModel:: mainTuning()
 		}
 		else i++;
 	}
-	
+
+	sort(mStars.begin(), mStars.end(), SortCriteriaOnStdDev);	
 	for (i=0; i<mStars.size(); i++)
 	{
 		cout << " Star.	i = " << i << "	Rank=" << mStars[i].sRank
@@ -3727,6 +3732,7 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 				mCandidate[Index].sClutterHeight[j]=0.0;
 		}
 */
+		double MSE;
 		unsigned depth=0;
 		mCandidate[Index].sDepth=mCandidate[Index].sTree->getTreeDepth(depth);
 		depth = max(0, (int)mCandidate[Index].sDepth); 
@@ -3740,8 +3746,11 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 		double mutateProp = min(0.5, fabs(random)*(1-mMinFitness/mCandidate[Index].sFitness));
 //		cout << "mutateProp = " << mutateProp << "	mutateDepth = " << mutateDepth << endl;	
 		mutateTree(mCandidate[Index].sTree, mutateDepth, grow, mutateProp); 
+		CostFunctionTreeOnly(Index, mCandidate[Index].sMean, MSE,
+			 mCandidate[Index].sStdDev, mCandidate[Index].sCorrC);
 		mCandidate[Index].sRank=2*mNumCandidates;
-		mCandidate[Index].sFitness *= 2;
+		mCandidate[Index].sFitness *=  100*(1-mCandidate[Index].sCorrC) 
+					+ mCandidate[Index].sStdDev;;
 	}
 }
 
@@ -3880,6 +3889,7 @@ GOftn* cGPpropModel::createRandomTree(int depth, bool grow)
 			retFtn->mChild[i] = createRandomTree(depth+1,grow);
 		}
 	}
+
 	return retFtn;
 }
 
@@ -4021,6 +4031,12 @@ bool cGPpropModel::SortCriteriaOnCorrC(SCandidate c1, SCandidate c2)
 bool cGPpropModel::SortCriteriaOnStdDev(SCandidate c1, SCandidate c2)
 {
 	return (c1.sStdDev < c2.sStdDev);
+}
+
+//***************************************************************************
+bool cGPpropModel::SortCriteriaOnStdDevInverse(SCandidate c1, SCandidate c2)
+{
+	return (c1.sStdDev > c2.sStdDev);
 }
 
 //***************************************************************************

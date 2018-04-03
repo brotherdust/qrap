@@ -104,6 +104,42 @@ void GOftn::mutate(double Scale)
 	delete [] str;
 	mIsConstant = true;
 }
+
+//******************************************************************************
+GOftn* GOftn::getNewNode()
+{
+	int randn = rand() % 6;
+	double ConstP;
+	GOftn* retFtn;
+	
+	switch (randn) 
+	{	//move random 
+		case 0:
+			ConstP = (double)(rand() % 40) + 0.5;
+			retFtn = new ConstNode(ConstP);
+			break;
+		case 1:
+			retFtn = new ObstructionNode();
+			break;
+		case 2:
+			retFtn = new DistanceNode();
+			break;
+		case 3:
+			retFtn = new FrequencyNode();
+			break;
+		case 4:
+			retFtn = new TxHeightNode();
+			break;
+		case 5:
+			retFtn = new RxHeightNode();
+			break;
+		default:
+			cerr<<"invalid random number, bad news\n\n\n";
+			break;
+	}
+	return retFtn;
+}
+
 //**************************************************************************
 //**************************************************************************
 //
@@ -150,6 +186,7 @@ void ConstNode::mutate(double Scale)
 	sprintf(str, " C: %f", mConstVal);
 	mLabel = str;
 	delete [] str;
+	mIsConstant = true;
 }
 
 //***************************************************************************
@@ -603,15 +640,12 @@ tMeasPoint Divide::eval(tMeasPoint inPoint)
 	{
 		c1 = mChild[0]->eval(inPoint);
 		c2 = mChild[1]->eval(inPoint);
-		if (fabs(c2.sReturn)>0.0000000001)
+		while (fabs(c2.sReturn)<0.0000000001)
 		{
-			outPoint.sReturn = c1.sReturn/c2.sReturn;
+			mChild[1] = getNewNode();
+			c2 = mChild[1]->eval(inPoint);
 		}
-		else
-		{
-//			cerr << "almost divide by zero "<<endl;
-			outPoint.sReturn = c1.sReturn/0.0000000001;
-		}
+		outPoint.sReturn = c1.sReturn/c2.sReturn;
 	}
 	else 
 	{
@@ -655,13 +689,12 @@ tMeasPoint Log10Node::eval(tMeasPoint inPoint)
 	if (mChild[0])
 	{
 		c1 = mChild[0]->eval(inPoint);
-		if (c1.sReturn>1e-10)
-			outPoint.sReturn = log10(c1.sReturn);
-		else
+		while (c1.sReturn<0.0000000001)
 		{
-//			cerr << "input to log10 not positive"<<endl;
-			outPoint.sReturn = 200.0;
+			mChild[0] = getNewNode();
+			c1 = mChild[0]->eval(inPoint);
 		}
+		outPoint.sReturn = log10(c1.sReturn);
 	}
 	else 
 	{
@@ -743,6 +776,7 @@ Power::Power()
 //**********************************************************************
 tMeasPoint Power::eval(tMeasPoint inPoint)
 {
+	double returnval = 1;
 	tMeasPoint outPoint = inPoint;
 	tMeasPoint c1, c2;
 	if (mChild[0] && mChild[1])
@@ -751,25 +785,32 @@ tMeasPoint Power::eval(tMeasPoint inPoint)
 		c2 = mChild[1]->eval(inPoint);
 		if (c1.sReturn>0)
 			outPoint.sReturn = pow(c1.sReturn, c2.sReturn);
-		else if ((c2.sReturn>1.0)&&(c2.sReturn==(double)(int)(c2.sReturn)))
-			outPoint.sReturn = pow(c1.sReturn, c2.sReturn);
-		else if (fabs(c1.sReturn)<0.000000000001)
+		else if ((c2.sReturn>=0.0)&&(c2.sReturn==(double)(int)(c2.sReturn)))
+//		exponent is positive whole number
 		{
-			if (c2.sReturn>=0)
-				outPoint.sReturn = 0.0;
-			else
-				outPoint.sReturn = 200; 
+			returnval = 1;
+			unsigned Exp = (unsigned)c2.sReturn;
+			for (unsigned i = 0; i<Exp; i++)
+				returnval *= c1.sReturn;
+		}
+		else if ((fabs(c1.sReturn)<0.000000000001)&&(c2.sReturn>=0))
+		{
+			outPoint.sReturn = 0.0;
 		}
 		else
 		{
-//			cout << "power not defined" << endl;
-			outPoint.sReturn = 200;
+			while (c1.sReturn<0.0000000001)
+			{
+				mChild[0] = getNewNode();
+				c1 = mChild[0]->eval(inPoint);
+			}
+			while (fabs(c2.sReturn)>100)
+			{
+				mChild[1] = getNewNode();
+				c2 = mChild[1]->eval(inPoint);
+			}
+			outPoint.sReturn = pow(c1.sReturn, c2.sReturn);
 		} 
-		if ((isnan(outPoint.sReturn))||(isinf(outPoint.sReturn)))
-		{
-//			cout << "power not defined nan" << endl;
-			outPoint.sReturn = 200;
-		}
 	}
 	else 
 	{

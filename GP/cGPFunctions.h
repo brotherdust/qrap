@@ -39,6 +39,7 @@ public:
 	unsigned mNumChildren;
 	bool mIsConstant;
 	void mutate(double Scale);
+	GOftn* getNewNode();
 	void setValue(double newValue);
 	double getValue();
 	GOftn** mChild;

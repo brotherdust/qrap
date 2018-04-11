@@ -61,13 +61,13 @@ using namespace std;
 #include <qgisplugin.h>
 #include <qgisinterface.h>
 #include <qgisgui.h>
-#include <qgsproject.h>
 #include <qgspoint.h>
 #include <qgsmapcanvas.h>
 #include <qgsmaptool.h>
 #include <qgsmaptopixel.h> 
 #include <qgsmaptoolemitpoint.h> 
 #include <qgscolorrampshader.h>
+#include <qgsproject.h>
 
 #include <QCursor>
 #include <QString>
@@ -86,7 +86,7 @@ using namespace std;
 #include "Prediction/cSpectralPlot.h"
 #include "Prediction/cPlotTask.h"
 #include "Prediction/cLink.h"
-#include <cMouseEvents.h>
+#include "cMouseEvents.h"
 #include "Interface/cPlaceSite.h"
 #include "Interface/cDeleteObject.h"
 #include "Interface/cConfirmLink.h"

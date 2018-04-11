@@ -1,11 +1,11 @@
-CC = g++ -g -std=c++11 -std=gnu++11 -Wall -W -D_REENTRANT -c -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I../DataBase  -I/usr/include/eigen3 -I/usr/local/ -I/usr/include/c++/5.4.0/
+CC = g++ -g -std=c++11 -std=gnu++11 -Wall -W -D_REENTRANT -c -I/include -I/usr/include/qt4 -I/usr/include/qt4/Qt -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -I/usr/include -I/usr/include/postgresql -I/usr/include/gdal -I../Prediction -I../DataBase  -I/usr/include/eigen3 -I/usr/local/ -I/usr/include/c++/7/ /usr/include/x86_64-linux-gnu/sys/
 
-OBJECTS =  cMemmngr.o cGeoP.o cAntpatn.o cClutter.o cPthlssp.o cProfile.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cDatabase.o cSiteEditTools.o cMeasAnalysisCalc.o cGPpropModel.o cGPFunctions.o main.o
+OBJECTS =  cDatabase.o cGPpropModel.o cMemmngr.o cGeoP.o cAntpatn.o cClutter.o cPthlssp.o cProfile.o cRasterFileHandler.o cGDAL.o cBIN.o cRaster.o cSettings.o cAlert.o cBase.o cSiteEditTools.o cMeasAnalysisCalc.o cGPFunctions.o main.o
 
 all: GP makefile
 
 GP: $(OBJECTS) makefile
-	c++ -g -o GP $(OBJECTS) -L/usr/local/pgsql/lib  -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal -lproj  -lssl -lQtCore -ldoublefann -lfann -lPocoXML  -lPocoFoundation -lpthread
+	c++ -g -o GP $(OBJECTS) -L/usr/local/pgsql/lib  -L/lib/x86_64-linux-gnu/ -L/usr/lib/ -L/lib/-lpq -lpqxx -lgdal -lproj  -lssl -lQtCore -ldoublefann -lfann -lPocoXML  -lPocoFoundation  -lpthread
 
 main.o: main.cpp makefile
 	$(CC) main.cpp
@@ -58,7 +58,7 @@ cBIN.o: ../Prediction/cBIN.h ../Prediction/cBIN.cpp makefile
 cMeasAnalysisCalc.o: ../Prediction/cMeasAnalysisCalc.h ../Prediction/cMeasAnalysisCalc.cpp makefile
 	$(CC) ../Prediction/cMeasAnalysisCalc.cpp
 
-cGPpropModel.o: SafeQueue.h ThreadPool.h cGPpropModel.h cGPpropModel.cpp makefile
+cGPpropModel.o: cGPpropModel.h cGPpropModel.cpp makefile
 	$(CC) cGPpropModel.cpp	
 
 cGPFunctions.o:  cGPFunctions.h cGPFunctions.cpp makefile

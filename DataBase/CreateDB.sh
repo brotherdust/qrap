@@ -17,7 +17,7 @@ echo "activiting postgis"
 # find the following *.sql files on your machine and change PostGISDir accordingly.
 # Hint: Look under the "installed files" in Synaptic properties
 # for postgres-$.$-postgis to see where the files are stored
-PostGISDir=/usr/share/postgresql/9.5/contrib/postgis-2.2/
+PostGISDir=/usr/share/postgresql/10/contrib/postgis-2.4/
 createlang plpgsql -d qrap
 echo "running postgis.sql"
 psql qrap -f ${PostGISDir}postgis.sql

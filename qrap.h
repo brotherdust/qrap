@@ -67,16 +67,15 @@ using namespace std;
 #include <qgsmaptopixel.h> 
 #include <qgsmaptoolemitpoint.h> 
 #include <qgscolorrampshader.h>
+#include <qgsrubberband.h>
+#include <qgsmaplayer.h>
+#include <qgsrasterlayer.h>
 #include <qgsproject.h>
 
 #include <QCursor>
 #include <QString>
 #include <QObject>
 #include <QMouseEvent>
-#include <qgisinterface.h>
-#include <qgsrubberband.h>
-#include <qgsmaplayer.h>
-#include <qgsrasterlayer.h>
 #undef CPL_SUPRESS_CPLUSPLUS
 
 // Radio Planning Tool Includes

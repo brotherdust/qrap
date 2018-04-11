@@ -560,7 +560,6 @@ SET (qrap_SRCS
      
 	Interface/cPlaceSite.cpp
 	Interface/cConfirmLink.cpp
-	Interface/cConfirmPrediction.cpp
 	Interface/cConfirmSpectral.cpp
 	Interface/cConfirmMultiLink.cpp
 	Interface/cSpectralAnalysis.cpp
@@ -577,6 +576,7 @@ SET (qrap_SRCS
 	Interface/cImportUpdateFile.cpp   
 	Interface/cMeasurementAnalysis.cpp
 	Interface/cLoadMeasurements.cpp
+	Interface/cConfirmPrediction.cpp
 
 	Interface/LoadRasterFiles/cLoadRasterFiles.cpp
 	Interface/LoadRasterFiles/cLoadThread.cpp
@@ -602,7 +602,6 @@ SET (qrap_UIS
    	Interface/Site.ui
    	Interface/ConfirmLink.ui
    	Interface/LinkAnalysis.ui
-   	Interface/ConfirmPrediction.ui
 	Interface/LoadMeasurements.ui
 	Interface/MeasurementAnalysis.ui
 	Interface/LoadRasterFiles/CreateDataSet.ui
@@ -616,6 +615,7 @@ SET (qrap_UIS
    	Interface/ColourManager.ui
 	Interface/DeleteObject.ui
 	Interface/FilterDialog.ui
+   	Interface/ConfirmPrediction.ui
 	DataBase/Filter.ui
 )
 
@@ -681,7 +681,6 @@ SET (qrap_MOC_HDRS
 
 	Interface/cPlaceSite.h
 	Interface/cConfirmLink.h
-	Interface/cConfirmPrediction.h
 	Interface/cConfirmSpectral.h
 	Interface/cConfirmMultiLink.h
 	Interface/cSpectralAnalysis.h
@@ -698,6 +697,7 @@ SET (qrap_MOC_HDRS
 	Interface/Optimisation.h
 	Interface/cMeasurementAnalysis.h
 	Interface/cLoadMeasurements.h
+	Interface/cConfirmPrediction.h
 	Interface/LoadRasterFiles/cLoadRasterFiles.h
 	Interface/LoadRasterFiles/cLoadThread.h
 	Interface/LoadRasterFiles/cLoadFiles.h

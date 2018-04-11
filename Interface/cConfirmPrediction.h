@@ -52,7 +52,6 @@
 
 
 //QGIS includes
-#include <qgsmaprenderer.h>
 #include <qgsrasterrenderer.h>
 #include <qgsmapcanvas.h>
 #include <qgspoint.h>
@@ -67,6 +66,7 @@
 #include <qgscolorrampshader.h>
 #include <qgssinglebandpseudocolorrenderer.h>
 #include <qgsrasterlayer.h>
+#include <qgsmaprenderer.h>
 
 //using namespace std;
 namespace Qrap

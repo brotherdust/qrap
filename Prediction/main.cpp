@@ -148,9 +148,12 @@ int main (int argc, char **argv)
 		cout << "Error updating qrap_config" << endl;
 	}
 
+	bool Continue;
+	cMeasAnalysisCalc Meas;
 
-	cGeoP *Hoek;
-	unsigned NumHoek=4;
+
+//	cGeoP *Hoek;
+//	unsigned NumHoek=4;
 
 //Gauteng 20m DEM
 /*	NumHoek=19;
@@ -185,6 +188,7 @@ int main (int argc, char **argv)
 //	Hoek[2].Set(-30.01, 23.00);
 //	Hoek[3].Set(-24.01, 23.00);
 
+/*
 //	Bryanston
 	NumHoek=4;
 	Hoek = new cGeoP[NumHoek];
@@ -192,7 +196,7 @@ int main (int argc, char **argv)
 	Hoek[1].Set(-26.108, 27.976);
 	Hoek[2].Set(-26.108, 28.074);
 	Hoek[3].Set(-26.036, 28.074);
-
+*/
 //	Tembisa
 /*	NumHoek=6;
 	Hoek = new cGeoP[NumHoek];
@@ -213,11 +217,23 @@ int main (int argc, char **argv)
 	Hoek[3].Set(-26.06, 28.113);
 	Hoek[4].Set(-26.06, 28.26);
 */
-	vPoints Punte;
+
+/*	vPoints Punte;
 	for (unsigned i=0; i<NumHoek; i++)
 		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek;
+	cout << "Loading measurements ... in main()" << endl;
+	Continue = Meas.LoadMeasurements(Punte,0,0,0);
+*/
+	cout << "Loading measurements ... in main()" << endl;
+	char * CustomAreaName;
+	CustomAreaName= new char[23];
+	strcpy(CustomAreaName,"GautengClutterOutline");
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,0);
+
+	if (!Continue)
+		return 0;
 
 	if (!gDb.PerformRawSql(queryC))
 	{
@@ -225,17 +241,14 @@ int main (int argc, char **argv)
 	}
 	
 	double Mean, MSE, StDev, CorrC;
-	cMeasAnalysisCalc Meas;
 	int Num;
 
 	Meas.SetUseAntANN(false);
 
 	Meas.mPathLoss.mClutter.Reset(1);
 
-	cout << "Loading measurements ... in main()" << endl;
+	Meas.SetPlotResolution(10);
 
-	Meas.SetPlotResolution(5);
-	Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;

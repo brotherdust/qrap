@@ -44,7 +44,7 @@
 #include "../DataBase/Config.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 500
+#define NUM_INIT_CANDIDATES 300
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 10
 #define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50
@@ -57,7 +57,7 @@
 #define PROP_CROSSOVER 0.5
 
 #define MAXOPTLOOPS 500
-#define MAXOPTCALC 3500
+#define MAXOPTCALC 2500
 #define MAXMINAGE 30
 
 using namespace std;
@@ -158,7 +158,7 @@ namespace Qrap
 
 			void printTree(GOftn* inTree, int depth=0);
 
-			void mutateTree(GOftn* &inTree, int depth=0, 
+			bool mutateTree(GOftn* &inTree, int depth=0, 
 							bool grow = false, 
 							double PropMutate=0.3);
 

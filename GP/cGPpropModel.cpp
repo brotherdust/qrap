@@ -74,6 +74,7 @@ int cGPpropModel:: mainTuning()
 	cGeoP *Hoek;
 	unsigned NumHoek=4;
 	unsigned NumSeeds = 0;
+	bool Continue;
 
 //Gauteng 20m DEM
 /*	NumHoek=19;
@@ -101,12 +102,13 @@ int cGPpropModel:: mainTuning()
 */
 
 //Gauteng 30m 4 DEM blokke
-	NumHoek=4;
+/*	NumHoek=4;
 	Hoek = new cGeoP[NumHoek];
 	Hoek[0].Set(-25.001, 27.001);
 	Hoek[1].Set(-25.001, 28.999);
 	Hoek[2].Set(-26.999, 28.999);
 	Hoek[3].Set(-26.999, 27.001);
+*/
 
 /*
 //	Bryanston
@@ -116,21 +118,29 @@ int cGPpropModel:: mainTuning()
 	Hoek[1].Set(-26.108, 27.976);
 	Hoek[2].Set(-26.108, 28.074);
 	Hoek[3].Set(-26.036, 28.074);
-*/
+
 	vPoints Punte;
 	for (i=0; i<NumHoek; i++)
 		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek;
-
-	mMeas.SetUseAntANN(false);
+	cout << "Loading measurements ... in main()" << endl;
+	Continue = mMeas.LoadMeasurements(Punte,0,0,0);
+*/
 
 //	mMeas.mPathLoss.mClutter.Reset(1);
 
 	cout << "Loading measurements ... in main()" << endl;
+	char * CustomAreaName;
+	CustomAreaName= new char[23];
+	strcpy(CustomAreaName,"GautengClutterOutline");
+	Continue = mMeas.LoadMeasurements(CustomAreaName,0,0,0);
 
-	mMeas.SetPlotResolution(5);
-	mMeas.LoadMeasurements(Punte,0,0,0);
+	if (!Continue)
+		return 0;
+
+	mMeas.SetUseAntANN(false);
+	mMeas.SetPlotResolution(20);
 
 	double Mean, MSE, StDev, CorrC;
 	mMeas.PerformAnalysis(Mean, MSE, StDev, CorrC);
@@ -2334,7 +2344,7 @@ void cGPpropModel::optimiseConstantsSTDevMO(unsigned Index)
 	double ProductCS = 0.0;
 	double SizeDelta = 0.0;
 
-//	cout << "Optimising Constants for Candidate Tree STDevMO. INDEX = " << Index << endl;
+	cout << "Optimising Constants for Candidate Tree STDevMO. INDEX = " << Index << endl;
 	for (i=0; i<numConsts; i++)
 	{
 		OldValue[i] = mCandidate[Index].sConstants[i]->getValue();
@@ -3901,7 +3911,7 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 */
 		double MSE;
 		unsigned depth=0;
-		mCandidate[Index].sForm = 88;
+
 		mCandidate[Index].sDepth=mCandidate[Index].sTree->getTreeDepth(depth);
 		depth = max(0, (int)mCandidate[Index].sDepth); 
 //		cout << "Tree depth = " << TreeDepth << endl;
@@ -3913,12 +3923,15 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 //		cout << "	random=" << random;
 		double mutateProp = min(0.5, fabs(random)*(1-mMinFitness/mCandidate[Index].sFitness));
 //		cout << "mutateProp = " << mutateProp << "	mutateDepth = " << mutateDepth << endl;	
-		mutateTree(mCandidate[Index].sTree, mutateDepth, grow, mutateProp); 
-		CostFunctionTreeOnly(Index, mCandidate[Index].sMean, MSE,
-			 mCandidate[Index].sStdDev, mCandidate[Index].sCorrC);
-		mCandidate[Index].sRank=2*mNumCandidates;
-		mCandidate[Index].sFitness *=  100*(1-mCandidate[Index].sCorrC) 
-					+ mCandidate[Index].sStdDev;;
+		if (mutateTree(mCandidate[Index].sTree, mutateDepth, grow, mutateProp))
+		{ 
+			CostFunctionTreeOnly(Index, mCandidate[Index].sMean, MSE,
+				 mCandidate[Index].sStdDev, mCandidate[Index].sCorrC);
+			mCandidate[Index].sRank=2*mNumCandidates;
+			mCandidate[Index].sFitness *=  100*(1-mCandidate[Index].sCorrC) 
+					+ mCandidate[Index].sStdDev;
+			mCandidate[Index].sForm = 88;
+		}
 	}
 }
 
@@ -3957,16 +3970,18 @@ void cGPpropModel::crossOverTree(GOftn* treeToAlter, GOftn* donatingTree)
 }
 
 //*************************************************************************
-void cGPpropModel::mutateTree(GOftn* &inTree, int depth, bool grow, double PropMutate)
+bool cGPpropModel::mutateTree(GOftn* &inTree, int depth, bool grow, double PropMutate)
 {
+	bool Mutated = false;
 	if (inTree->mIsConstant)
 	{
 		inTree->mutate(PropMutate);
-		return;
+		return false;
 	}
 	double randNum0t1 = gUni(gRandomGen);
 	if (randNum0t1 < PropMutate) 
 	{
+		Mutated= true;
 //		cout << "SHOULD MUTATE" << endl;
 		//create new node
 		//create a random node to replace current node
@@ -3995,6 +4010,7 @@ void cGPpropModel::mutateTree(GOftn* &inTree, int depth, bool grow, double PropM
 	{
 		mutateTree(inTree->mChild[i], depth + 2, grow);
 	}
+	return Mutated;
 }
 
 //***************************************************************************

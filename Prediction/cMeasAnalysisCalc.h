@@ -117,6 +117,12 @@ class cMeasAnalysisCalc
 			unsigned MeasSource=0, 
 			unsigned Cell=0);
 
+	bool LoadMeasurements(char*  CustomAreaName, 
+				unsigned MeasType=0, 
+				unsigned PosSource=0, 
+				unsigned MeasSource=0, 
+				unsigned CI=0);
+
 	bool LoadMeasurements(	unsigned MeasType=0, 
 				unsigned PosSource=0, 
 				unsigned MeasSource=0, 

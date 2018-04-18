@@ -370,6 +370,225 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 	return true;
 }
 
+
+//*********************************************************************
+bool cMeasAnalysisCalc::LoadMeasurements(char*  CustomAreaName, 
+					unsigned MeasType, 
+					unsigned PosSource, 
+					unsigned MeasSource, 
+					unsigned CI)
+{
+	unsigned i;
+	char *text= new char[10];
+	string PointString;
+
+	cout << " In cMeasAnalysisCalc::LoadMeasurements " << endl;
+	pqxx::result r, rMobile, rFixed;
+
+//	Where testpoint is in area
+/*	string query ="SELECT mobile, ci, frequency, ST_AsText(location) as location, ";
+	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth ";
+
+	query += "from measurement cross join testpoint cross join measdatasource ";
+	query += "where tp=testpoint.id and measdatasource=measdatasource.id";
+*/
+//	Where site is in area
+	string query ="SELECT mobile, ci, frequency, ST_AsText(testpoint.location) as location, ";
+	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth, ";
+	query += "mobileheight, txantennaheight ";
+	query += "from measurement cross join testpoint cross join measdatasource ";
+	query += "cross join mobile ";
+	query += "cross join cell cross join radioinstallation cross join site ";
+	query += "cross join customareafilter ";
+	query += "where ci=cell.id and risector= radioinstallation.id and siteid=site.id "; 
+	query += "and mobile=mobile.id ";
+	query += "and tp=testpoint.id and measdatasource=measdatasource.id ";	
+	query += "and areaname = '";
+ 	query += CustomAreaName;
+	query += "' ";
+	if (MeasType>0)
+	{
+		query += " and meastype=";
+		gcvt(MeasType,9,text);
+		query += text;
+	}
+	if (MeasSource>0)
+	{
+		query += " and measdatasource=";
+		gcvt(MeasSource,9,text);
+		query += text;
+	}
+	if (PosSource>0)
+	{
+		query += " and positionsource=";
+		gcvt(PosSource,9,text);
+		query += text;
+	}
+	if (CI>0)
+	{
+		query += " and ci=";
+		gcvt(CI,9,text);
+		query += text;
+	}
+//	Where testpoint is in area
+	query += " and testpoint.location @ the_geom ";
+	query += " and site.location @ the_geom";
+	query+=" order by mobile, ci, id;";
+
+	double longitude, latitude; 
+	unsigned spacePos;
+	unsigned currentCI=0;
+	int currentFixedInst=0;
+	int currentMobile=0;
+	tFixed tempInst;
+	tMobile tempMobile;
+
+//	cout << "In cMeasAnalysisCalc::LoadMeasurements; QUERY:" << endl;
+	cout << query << endl; 
+	// Perform a Raw SQL query
+	if(!gDb.PerformRawSql(query))
+	{
+		string err = "Error in Database Select on Measurement Table. Query:";
+		err+=query; 
+		QRAP_ERROR(err.c_str());
+		return false;
+	} // if
+	else
+	{
+		gDb.GetLastResult(r);
+			
+		mNumMeas = r.size();
+	
+		if(mNumMeas!=0)
+		{
+			delete [] mMeasPoints;
+			mMeasPoints = new tMeasPoint[mNumMeas];
+			unsigned i;
+			for (i=0;i<mNumMeas;i++)
+			{		
+				mMeasPoints[i].sCell = atoi(r[i]["ci"].c_str());	
+				mMeasPoints[i].sID = atoi(r[i]["id"].c_str());
+				mMeasPoints[i].sInstKeyMobile = atoi(r[i]["mobile"].c_str());
+				PointString = r[i]["location"].c_str();
+				spacePos = PointString.find_first_of(' ');
+				longitude = atof((PointString.substr(6,spacePos).c_str())); 
+				latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
+				mMeasPoints[i].sPoint.Set(latitude,longitude,DEG);
+				mMeasPoints[i].sMeasValue = atof(r[i]["measvalue"].c_str());
+				mMeasPoints[i].sPredValue = atof(r[i]["predictvalue"].c_str());
+				mMeasPoints[i].sPathLoss = atof(r[i]["pathloss"].c_str());
+				mMeasPoints[i].sDistance = atof(r[i]["distance"].c_str());
+				mMeasPoints[i].sAzimuth = atof(r[i]["azimuth"].c_str());
+				mMeasPoints[i].sTilt = atof(r[i]["tilt"].c_str());
+				mMeasPoints[i].sFrequency = atof(r[i]["frequency"].c_str());
+				mMeasPoints[i].sTxHeight = atof(r[i]["txantennaheight"].c_str());
+				mMeasPoints[i].sRxHeight = atof(r[i]["mobileheight"].c_str());
+				mMeasPoints[i].sClutter = 0;
+				
+				if (mMeasPoints[i].sInstKeyMobile != currentMobile)
+				{
+					tempMobile.sInstKey =mMeasPoints[i].sInstKeyMobile;
+					currentMobile = mMeasPoints[i].sInstKeyMobile;
+					query = "SELECT eirp,txpower,txlosses,rxlosses,rxsensitivity,";
+					query += " antpatternkey,mobileheight ";
+					query += "FROM mobile CROSS JOIN technology ";
+					query += "WHERE mobile.techkey=technology.id AND mobile.id=";
+					gcvt(mMeasPoints[i].sInstKeyMobile,8,text);
+					query += text;
+					query += ";";
+	
+					if(!gDb.PerformRawSql(query))
+					{
+						string err = "Error in Database Select on tables mobile and technology. Query:";
+						err+=query; 
+						QRAP_ERROR(err.c_str());
+						return false;
+					}
+					else
+					{
+						gDb.GetLastResult(rMobile);
+		
+						if(rMobile.size()!=0)
+						{
+							tempMobile.sEIRP = atof(rMobile[0]["eirp"].c_str());
+							tempMobile.sTxPower = atof(rMobile[0]["txpower"].c_str());
+							tempMobile.sTxSysLoss = atof(rMobile[0]["txlosses"].c_str());
+							tempMobile.sRxSysLoss = atof(rMobile[0]["rxlosses"].c_str());
+							tempMobile.sRxSens = atof(rMobile[0]["rxsensitivity"].c_str());
+							tempMobile.sPatternKey = atoi(rMobile[0]["antpatternkey"].c_str());
+							tempMobile.sMobileHeight = atof(rMobile[0]["mobileheight"].c_str());
+						} // if rMobile.size()
+					} // else !gDb->PerformRawSq
+					mMobiles.push_back(tempMobile);	
+				}
+				
+				if (mMeasPoints[i].sCell==currentCI)
+					mMeasPoints[i].sInstKeyFixed = currentFixedInst;
+				else
+				{
+//					cout << "New Cell = " << mMeasPoints[i].sCell << endl;
+					gcvt(mMeasPoints[i].sCell,8,text);
+					query = "SELECT risector, siteid, ST_AsText(location) as location, eirp,";
+					query += "radioinstallation.txpower as txpower,txlosses,rxlosses";
+					query +=",rxsensitivity,txantpatternkey,txbearing,txmechtilt,rxantpatternkey,";
+					query += "rxbearing,rxmechtilt,txantennaheight,rxantennaheight ";
+					query += "FROM cell CROSS JOIN radioinstallation CROSS JOIN site ";
+					query += "WHERE risector=radioinstallation.id and siteid=site.id ";
+					query += "and cell.id="; 
+					query += text;
+					query += ";";
+				
+					// Perform a Raw SQL query
+					if(!gDb.PerformRawSql(query))
+					{
+						string err = "Error in Database Select on tables radioinstallation ";
+						err += "and technology failed. Query:";
+						err+=query; 
+						QRAP_ERROR(err.c_str());
+						return false;
+					} // if
+					else
+					{
+						gDb.GetLastResult(rFixed);
+						if(rFixed.size()!=0)
+						{
+							currentCI = mMeasPoints[i].sCell;
+							currentFixedInst = atoi(rFixed[0]["risector"].c_str());
+							mMeasPoints[i].sInstKeyFixed = currentFixedInst;
+							tempInst.sFrequency = atof(r[i]["frequency"].c_str());
+
+							tempInst.sInstKey = currentFixedInst;
+							tempInst.sSiteID = atoi(rFixed[0]["siteid"].c_str());
+							PointString = rFixed[0]["location"].c_str();
+							spacePos = PointString.find_first_of(' ');
+							longitude = atof((PointString.substr(6,spacePos).c_str())); 
+							latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
+							tempInst.sSitePos.Set(latitude,longitude,DEG);
+							tempInst.sEIRP = atof(rFixed[0]["eirp"].c_str());
+							tempInst.sTxPower = atof(rFixed[0]["txpower"].c_str());
+							tempInst.sTxSysLoss = atof(rFixed[0]["txlosses"].c_str());
+							tempInst.sRxSysLoss = atof(rFixed[0]["rxlosses"].c_str());
+							tempInst.sRxSens = atof(rFixed[0]["rxsensitivity"].c_str());
+							tempInst.sTxPatternKey = atoi(rFixed[0]["txantpatternkey"].c_str());
+							tempInst.sTxAzimuth = atof(rFixed[0]["txbearing"].c_str());
+							tempInst.sTxMechTilt = atof(rFixed[0]["txmechtilt"].c_str());
+							tempInst.sRxPatternKey = atoi(rFixed[0]["rxantpatternkey"].c_str());
+							tempInst.sRxAzimuth = atof(rFixed[0]["rxbearing"].c_str());
+							tempInst.sRxMechTilt = atof(rFixed[0]["rxmechtilt"].c_str());
+							tempInst.sTxHeight = atof(rFixed[0]["txantennaheight"].c_str());
+							tempInst.sRxHeight = atof(rFixed[0]["rxantennaheight"].c_str());
+							mFixedInsts.push_back(tempInst);
+						} // if the query was not empty	
+					}// else ... hence the query was successful
+				}// else ... hence new installation that must be loaded.
+			}//for all measurements
+		}// if there are measurements
+	} // else ... hence the query was successful
+	
+	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
+	return true;
+}
+
 //*********************************************************************
 bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType, 
 					unsigned PosSource, 

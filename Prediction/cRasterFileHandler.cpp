@@ -90,7 +90,8 @@ bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
 	else
 	{
 		gDb.GetLastResult(r);
-		if(r.size()!=0)
+		cout << "Number of filesets in fileset order: " << r.size() << endl;
+		if(r.size()>0)
 		{
  			// \TODO: I am sure there are more elegant ways, but for now it will do
 			QueryResult=r[0]["orderarray"].c_str();

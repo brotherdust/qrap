@@ -76,7 +76,7 @@ cDatabase::~cDatabase ()
 bool cDatabase::Connect (const string& username, const string& password, bool Create,
 			const string& database, const string& host, const int Iport)
 {
-/*	cout << "In cDatabase::Connect: " << username << endl;
+	cout << "In cDatabase::Connect: " << username << endl;
 	cout << "In cDatabase::Connect: " << password << endl;
 	cout << "In cDatabase::Connect: " << host << endl;
 	cout << "In cDatabase::Connect: " << database << endl;
@@ -85,7 +85,7 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 	mHostAddr = host;
 	mName = database;
 	mPort = Iport;
-*/
+
 	mHostAddr = gSettings.GetValue("database.host");
 	mName = gSettings.GetValue("database.name");
 	string port = gSettings.GetValue("database.port");
@@ -171,7 +171,7 @@ bool cDatabase::Connect (const string& username, const string& password, bool Cr
 	//create any tables that might be new.
 //	cout << "Implementing any possible table additions to the database structure" << endl;
 //	gDb.Create (username, password);
-	mConnected=true;	
+//	mConnected=true;	
 	return true;
 }
 
@@ -1811,6 +1811,7 @@ short int cDatabase::getsetMachineID()
 	string query = "select id from machine where qrapinst='";
 	query += HostID;
 	query += "';"; 
+	cout << query << endl;
 	
 //	query = "select max(machineid) from sourcefiles;";
 

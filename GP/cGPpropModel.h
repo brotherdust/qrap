@@ -31,6 +31,7 @@
 #include <iostream>
 #include <algorithm> 
 #include <cmath>
+#include <ctime>
 #include <random>
 #include <time.h>
 #include <thread>

@@ -366,7 +366,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 		}// if there are measurements
 	} // else ... hence the query was successful
 	
-	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
+	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving #Meas = " << mNumMeas << endl << endl;
 	return true;
 }
 
@@ -585,7 +585,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(char*  CustomAreaName,
 		}// if there are measurements
 	} // else ... hence the query was successful
 	
-	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
+	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving #Meas = " << mNumMeas << endl << endl;
 	return true;
 }
 
@@ -787,7 +787,7 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 		}// if there are measurements
 	} // else ... hence the query was successful
 	
-	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving " << endl << endl;
+	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving #Meas = " << mNumMeas << endl << endl;
 	return true;
 }
 

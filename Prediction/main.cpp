@@ -253,7 +253,7 @@ int main (int argc, char **argv)
 
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-	Meas.OptimiseHeights(0);
+//	Meas.OptimiseHeights(0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 //	Meas.SetSeekWidthBest(1);

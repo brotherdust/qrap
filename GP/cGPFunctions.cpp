@@ -783,7 +783,7 @@ tMeasPoint Power::eval(tMeasPoint inPoint)
 	{
 		c1 = mChild[0]->eval(inPoint);
 		c2 = mChild[1]->eval(inPoint);
-		if (c1.sReturn>0)
+		if ((c1.sReturn>0)||((c1.sReturn>=0)&&(c2.sReturn>=0)))
 			outPoint.sReturn = pow(c1.sReturn, c2.sReturn);
 		else if ((c2.sReturn>=0.0)&&(c2.sReturn==(double)(int)(c2.sReturn)))
 //		exponent is positive whole number
@@ -799,7 +799,7 @@ tMeasPoint Power::eval(tMeasPoint inPoint)
 		}
 		else
 		{
-			while (c1.sReturn<0.0000000001)
+			while (c1.sReturn<0.0)
 			{
 				mChild[0] = getNewNode();
 				c1 = mChild[0]->eval(inPoint);

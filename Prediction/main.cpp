@@ -247,7 +247,7 @@ int main (int argc, char **argv)
 
 	Meas.mPathLoss.mClutter.Reset(1);
 
-	Meas.SetPlotResolution(10);
+	Meas.SetPlotResolution(30);
 
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 

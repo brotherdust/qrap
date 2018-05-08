@@ -111,6 +111,7 @@ struct SCandidate
 		sMSE		= Right.sMSE;
 		sFitness	= Right.sFitness;
 		sRank		= Right.sRank;
+		sForm		= Right.sForm;
 		sDepth		= Right.sDepth;
 		sPareto		= Right.sPareto;
 		sOptimised	= Right.sOptimised;

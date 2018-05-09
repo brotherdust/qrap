@@ -45,7 +45,7 @@
 #include "../DataBase/Config.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 6
+#define NUM_INIT_CANDIDATES 250
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 10
 #define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50

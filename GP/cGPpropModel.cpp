@@ -159,7 +159,7 @@ int cGPpropModel:: mainTuning()
 	// ***********************************************************************
 	// Initialise candidates of known models
 
-/*	// Basic free space plus obstruction loss (Q-Rap basic model)
+	// Basic free space plus obstruction loss (Q-Rap basic model)
 	// # 0
 	newTree = new Add(4);
 	newTree->mChild[0] = new ConstNode(32.45);
@@ -179,10 +179,10 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 3;
 	newCandidate.sForm = 0;
 	mCandidate.push_back(newCandidate);
-*/
+
 	// Emperically 'Tuned' with 3 terms 
 	// # 1
-/*	newTree = new Add(4);
+	newTree = new Add(4);
 	newTree->mChild[0] = new ConstNode(26.5636);
 	newTree->mChild[1] = new Multiply();
 	newTree->mChild[1]->mChild[0] = new ConstNode(28.1101);
@@ -262,8 +262,8 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 3;
 	newCandidate.sForm = 7;
 	mCandidate.push_back(newCandidate);
-*/
-/*
+
+
 	// basic terms with good guess ekstra terms
 	// # 3
 	newTree = new Add(7);
@@ -298,8 +298,8 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 3;
 	newCandidate.sForm = 3;
 	mCandidate.push_back(newCandidate);
-*/
-/*	//Engineered equation
+
+	//Engineered equation
 	// # 4
 	newTree = new Add(6);
 	newTree->mChild[0] = new ConstNode(32.45);
@@ -333,8 +333,8 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 5;
 	newCandidate.sForm = 4;
 	mCandidate.push_back(newCandidate);
-*/
-/*	//Engineered equation 2
+
+	//Engineered equation 2
 	// # 4
 	newTree = new Add(6);
 	newTree->mChild[0] = new ConstNode(32.45);
@@ -365,8 +365,7 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 5;
 	newCandidate.sForm = 5;
 	mCandidate.push_back(newCandidate);
-*/
-/*
+
 	//Basic model with some vegetation loss term
 	// # 4
 	newTree = new Add(7);
@@ -564,9 +563,9 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 4;
 	newCandidate.sForm = 11;
 	mCandidate.push_back(newCandidate);
-*/
 
-/*	// Hata - COST231
+
+	// Hata - COST231
 	// # 8
 	newTree = new Add(11);
 	newTree->mChild[0] = new ConstNode(45.5);
@@ -630,10 +629,10 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 6;
 	newCandidate.sForm = 12;
 	mCandidate.push_back(newCandidate);
-*/
+
 	// Hata - Suburban
 	// # 8
-/*	newTree = new Add(11);
+	newTree = new Add(11);
 	newTree->mChild[0] = new ConstNode(74.52);
 	newTree->mChild[1] = new Multiply();
 	newTree->mChild[1]->mChild[0] = new ConstNode(44.9);
@@ -695,8 +694,8 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 6;
 	newCandidate.sForm = 20;
 	mCandidate.push_back(newCandidate);
-*/
-/*	// Hata - Suburban altered with vegetation loss term
+
+	// Hata - Suburban altered with vegetation loss term
 	// # 9
 	newTree = new Add(11);
 	newTree->mChild[0] = new ConstNode(63.35);
@@ -758,8 +757,8 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 6;
 	newCandidate.sForm = 13;
 	mCandidate.push_back(newCandidate);
-*/
-/*	// Hata - Suburban altered with clutterheight
+
+	// Hata - Suburban altered with clutterheight
 	// #10
 	newTree = new Add(10);
 	newTree->mChild[0] = new ConstNode(63.35);
@@ -810,8 +809,8 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 6;
 	newCandidate.sForm = 11;
 	mCandidate.push_back(newCandidate);
-*/
-/*
+
+
 	// Hata - Suburban altered with terms of each kind
 	// # 11
 	newTree = new Add(14);
@@ -1081,7 +1080,7 @@ int cGPpropModel:: mainTuning()
 	newCandidate.sDepth = 4;
 	newCandidate.sForm = 19;
 	mCandidate.push_back(newCandidate);
-*/
+
 	//Walfish Ikagami terms
 	// # 4
 	newTree = new Add(8);
@@ -1133,8 +1132,7 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[7]->mChild[2]->mChild[0] = new FrequencyNode();
 
 	newCandidate.sTree = newTree;
-	newCandidate.sDepth = 7;
-	cout << "Calculated tree depth: " << newCandidate.sTree->getTreeDepth() << endl;
+	newCandidate.sDepth = 6;
 	newCandidate.sForm = 21;
 	mCandidate.push_back(newCandidate);
 

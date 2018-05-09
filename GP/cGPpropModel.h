@@ -45,7 +45,7 @@
 #include "../DataBase/Config.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 300
+#define NUM_INIT_CANDIDATES 6
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 10
 #define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50
@@ -88,13 +88,7 @@ struct SCandidate
 	SCandidate & operator=(SCandidate Right)
 	{
 		unsigned i;
-/*		if ((sClutterType!=nullptr)&&(sClutterHeight!=nullptr)
-			&&(sNumClutter>5)&&(sNumClutter<101))
-		{
-			delete [] sClutterType;
-			delete [] sClutterHeight;
-		}
-*/		sNumClutter	= Right.sNumClutter;
+		sNumClutter	= Right.sNumClutter;
 		sClutterType = new unsigned[sNumClutter];
 		sClutterHeight = new double[sNumClutter];
 		for (i=0; i<sNumClutter; i++)
@@ -160,7 +154,11 @@ namespace Qrap
 
 			void printTree(GOftn* inTree, int depth=0);
 
-			bool mutateTree(GOftn* &inTree, int depth=0, 
+			bool mutateTreeManyNode(GOftn* &inTree, int depth=0, 
+							bool grow = false, 
+							double PropMutate=0.3);
+
+			bool mutateTreeSingleBranch(GOftn* &inTree, int depth=0, 
 							bool grow = false, 
 							double PropMutate=0.3);
 

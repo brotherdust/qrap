@@ -45,12 +45,12 @@ string GOftn::getLabel()
 }
 
 //************************************************************************
-unsigned GOftn::getTreeDepth(unsigned CurrentDepth)
+unsigned GOftn::getTreeDepth()
 {
-	unsigned i, MaxDepth=0, childDepth;
+	unsigned i, MaxDepth=0, childDepth, CurrentDepth;
 	for (i=0; i < mNumChildren; i++)
 	{
-		childDepth = mChild[i]->getTreeDepth(CurrentDepth);
+		childDepth = mChild[i]->getTreeDepth();
 		if ( childDepth > MaxDepth)
 			MaxDepth = childDepth;
 	}

@@ -49,7 +49,7 @@ public:
 	virtual tMeasPoint eval(tMeasPoint inPoint) = 0;  //setting the 0 makes it a PURE
 	virtual GOftn* clone() = 0; //make a deep copy of the current tree
 	string getLabel();
-	unsigned getTreeDepth(unsigned CurrentDepth=0);
+	unsigned getTreeDepth();
 	unsigned getConstants(vConstants &Constants);
 
 };

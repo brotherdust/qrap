@@ -115,7 +115,7 @@ int cGPpropModel:: mainTuning()
 	Hoek[3].Set(-26.999, 27.001);
 */
 
-
+/*
 //	Bryanston
 	NumHoek=4;
 	Hoek = new cGeoP[NumHoek];
@@ -131,15 +131,15 @@ int cGPpropModel:: mainTuning()
 	delete [] Hoek;
 	cout << "Loading measurements ... in main()" << endl;
 	Continue = mMeas.LoadMeasurements(Punte,0,0,0);
-
+*/
 
 //	mMeas.mPathLoss.mClutter.Reset(1);
 
-//	cout << "Loading measurements ... in main()" << endl;
-//	char * CustomAreaName;
-//	CustomAreaName= new char[23];
-//	strcpy(CustomAreaName,"GautengClutterOutline");
-//	Continue = mMeas.LoadMeasurements(CustomAreaName,0,0,0);
+	cout << "Loading measurements ... in main()" << endl;
+	char * CustomAreaName;
+	CustomAreaName= new char[23];
+	strcpy(CustomAreaName,"GautengClutterOutline");
+	Continue = mMeas.LoadMeasurements(CustomAreaName,0,0,0);
 
 	if (!Continue)
 		return 0;
@@ -260,12 +260,12 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 3;
-	newCandidate.sForm = 7;
+	newCandidate.sForm = 3;
 	mCandidate.push_back(newCandidate);
 
 
 	// basic terms with good guess ekstra terms
-	// # 3
+	// # 4
 	newTree = new Add(7);
 	newTree->mChild[0] = new ConstNode(39.40);
 	newTree->mChild[1] = new Multiply();
@@ -296,11 +296,11 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 3;
-	newCandidate.sForm = 3;
+	newCandidate.sForm = 4;
 	mCandidate.push_back(newCandidate);
 
 	//Engineered equation
-	// # 4
+	// # 5
 	newTree = new Add(6);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -331,11 +331,11 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 5;
-	newCandidate.sForm = 4;
+	newCandidate.sForm = 5;
 	mCandidate.push_back(newCandidate);
 
 	//Engineered equation 2
-	// # 4
+	// # 6
 	newTree = new Add(6);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -363,11 +363,11 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 5;
-	newCandidate.sForm = 5;
+	newCandidate.sForm = 6;
 	mCandidate.push_back(newCandidate);
 
 	//Basic model with some vegetation loss term
-	// # 4
+	// # 7
 	newTree = new Add(7);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -404,13 +404,12 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
-	newCandidate.sForm = 6;
+	newCandidate.sForm = 7;
 	mCandidate.push_back(newCandidate);
 
 
-
 	// Tuned Q-Rap model ... with clutterdepth
-	// # 6
+	// # 8
 	newTree = new Add(7);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -449,7 +448,7 @@ int cGPpropModel:: mainTuning()
 	mCandidate.push_back(newCandidate);
 
 	// Tuned Q-Rap model ... with clutterdepth
-	// # 6
+	// # 9
 	newTree = new Add(7);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -490,7 +489,7 @@ int cGPpropModel:: mainTuning()
 	mCandidate.push_back(newCandidate);
 
 	// Tuned Q-Rap model ... with clutterdepth
-	// # 6
+	// # 10
 	newTree = new Add(7);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -529,7 +528,7 @@ int cGPpropModel:: mainTuning()
 
 
 	// Tuned Q-Rap model ... with clutterheight
-	// # 7
+	// # 11
 	newTree = new Add(7);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -566,7 +565,7 @@ int cGPpropModel:: mainTuning()
 
 
 	// Hata - COST231
-	// # 8
+	// # 12
 	newTree = new Add(11);
 	newTree->mChild[0] = new ConstNode(45.5);
 	newTree->mChild[1] = new Multiply();
@@ -609,7 +608,7 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[8]->mChild[2] = new Log10Node();
 	newTree->mChild[8]->mChild[2]->mChild[0] = new FrequencyNode();
 	newTree->mChild[9] = new Multiply();
-	newTree->mChild[9]->mChild[0] = new ConstNode(0.0);
+	newTree->mChild[9]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[9]->mChild[1] = new Power();
 	newTree->mChild[9]->mChild[1]->mChild[0] = new Log10Node();
 	newTree->mChild[9]->mChild[1]->mChild[0]->mChild[0] = new Multiply();
@@ -617,21 +616,21 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[9]->mChild[1]->mChild[0]->mChild[0]->mChild[1] = new ConstNode(11.75);
 	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(2.0);
 	newTree->mChild[10] = new Multiply();
-	newTree->mChild[10]->mChild[0] = new ConstNode(0.0);
+	newTree->mChild[10]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[10]->mChild[1] = new Power();
 	newTree->mChild[10]->mChild[1]->mChild[0] = new Log10Node();
 	newTree->mChild[10]->mChild[1]->mChild[0]->mChild[0] = new Divide();
 	newTree->mChild[10]->mChild[1]->mChild[0]->mChild[0]->mChild[0] = new FrequencyNode();
-	newTree->mChild[10]->mChild[1]->mChild[0]->mChild[0]->mChild[1] = new ConstNode(28);
+	newTree->mChild[10]->mChild[1]->mChild[0]->mChild[0]->mChild[1] = new ConstNode(28.0);
 	newTree->mChild[10]->mChild[1]->mChild[1] = new ConstNode(2.0);
 
 	newCandidate.sTree = newTree;
-	newCandidate.sDepth = 6;
+	newCandidate.sDepth = 7;
 	newCandidate.sForm = 12;
 	mCandidate.push_back(newCandidate);
 
 	// Hata - Suburban
-	// # 8
+	// # 13
 	newTree = new Add(11);
 	newTree->mChild[0] = new ConstNode(74.52);
 	newTree->mChild[1] = new Multiply();
@@ -682,7 +681,7 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[9]->mChild[1]->mChild[0]->mChild[0]->mChild[1] = new ConstNode(11.75);
 	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(2.0);
 	newTree->mChild[10] = new Multiply();
-	newTree->mChild[10]->mChild[0] = new ConstNode(0.0);
+	newTree->mChild[10]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[10]->mChild[1] = new Power();
 	newTree->mChild[10]->mChild[1]->mChild[0] = new Log10Node();
 	newTree->mChild[10]->mChild[1]->mChild[0]->mChild[0] = new Divide();
@@ -692,11 +691,11 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 6;
-	newCandidate.sForm = 20;
+	newCandidate.sForm = 13;
 	mCandidate.push_back(newCandidate);
 
 	// Hata - Suburban altered with vegetation loss term
-	// # 9
+	// # 14
 	newTree = new Add(11);
 	newTree->mChild[0] = new ConstNode(63.35);
 	newTree->mChild[1] = new Multiply();
@@ -737,29 +736,29 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[8]->mChild[0] = new ConstNode(0.7);
 	newTree->mChild[8]->mChild[1] = new RxHeightNode();
 	newTree->mChild[9] = new Multiply(3);
-	newTree->mChild[9]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[9]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[9]->mChild[1] = new Power();
 	newTree->mChild[9]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[9]->mChild[2] = new Power();
 	newTree->mChild[9]->mChild[2]->mChild[0] = new ClutterDepthNode();
-	newTree->mChild[9]->mChild[2]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[9]->mChild[2]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[10] = new Multiply(3);
-	newTree->mChild[10]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[10]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[10]->mChild[1] = new Power();
 	newTree->mChild[10]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[10]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[10]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[10]->mChild[2] = new Power();
 	newTree->mChild[10]->mChild[2]->mChild[0] = new ClutterHeightNode();
-	newTree->mChild[10]->mChild[2]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[10]->mChild[2]->mChild[1] = new ConstNode(0.4);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 6;
-	newCandidate.sForm = 13;
+	newCandidate.sForm = 14;
 	mCandidate.push_back(newCandidate);
 
 	// Hata - Suburban altered with clutterheight
-	// #10
+	// # 15
 	newTree = new Add(10);
 	newTree->mChild[0] = new ConstNode(63.35);
 	newTree->mChild[1] = new Multiply();
@@ -800,19 +799,19 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[8]->mChild[0] = new ConstNode(0.7);
 	newTree->mChild[8]->mChild[1] = new RxHeightNode();
 	newTree->mChild[9] = new Multiply(2);
-	newTree->mChild[9]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[9]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[9]->mChild[1] = new Power();
 	newTree->mChild[9]->mChild[1]->mChild[0] = new ClutterHeightNode();
-	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.4);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 6;
-	newCandidate.sForm = 11;
+	newCandidate.sForm = 15;
 	mCandidate.push_back(newCandidate);
 
 
 	// Hata - Suburban altered with terms of each kind
-	// # 11
+	// # 16
 	newTree = new Add(14);
 	newTree->mChild[0] = new ConstNode(63.35);
 	newTree->mChild[1] = new Multiply();
@@ -853,38 +852,38 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[8]->mChild[0] = new ConstNode(0.7);
 	newTree->mChild[8]->mChild[1] = new RxHeightNode();
 	newTree->mChild[9] = new Multiply();
-	newTree->mChild[9]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[9]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[9]->mChild[1] = new Power();
 	newTree->mChild[9]->mChild[1]->mChild[0] = new DistanceNode();
-	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[9]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[10] = new Multiply();
-	newTree->mChild[10]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[10]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[10]->mChild[1] = new Power();
 	newTree->mChild[10]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[10]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[10]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[11] = new Multiply();
-	newTree->mChild[11]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[11]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[11]->mChild[1] = new Power();
 	newTree->mChild[11]->mChild[1]->mChild[0] = new TxHeightNode();
-	newTree->mChild[11]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[11]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[12] = new Multiply();
-	newTree->mChild[12]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[12]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[12]->mChild[1] = new Power();
 	newTree->mChild[12]->mChild[1]->mChild[0] = new ClutterDepthNode();
-	newTree->mChild[12]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[12]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[13] = new Multiply();
-	newTree->mChild[13]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[13]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[13]->mChild[1] = new Power();
 	newTree->mChild[13]->mChild[1]->mChild[0] = new ClutterHeightNode();
-	newTree->mChild[13]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[13]->mChild[1]->mChild[1] = new ConstNode(0.4);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 6;
-	newCandidate.sForm = 14;
+	newCandidate.sForm = 16;
 	mCandidate.push_back(newCandidate);
 
 	// basic model with 'vegetation-loss' term
-	// # 12
+	// # 17
 	newTree = new Add(5);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -896,24 +895,24 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[2]->mChild[1] = new Log10Node();
 	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
 	newTree->mChild[3] = new Multiply();
-	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
+	newTree->mChild[3]->mChild[0] = new ConstNode(0.5);
 	newTree->mChild[3]->mChild[1] = new ObstructionNode();
 	newTree->mChild[4] = new Multiply(3);
-	newTree->mChild[4]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[4]->mChild[1] = new Power();
 	newTree->mChild[4]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[4]->mChild[2] = new Power();
 	newTree->mChild[4]->mChild[2]->mChild[0] = new ClutterDepthNode();
-	newTree->mChild[4]->mChild[2]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[4]->mChild[2]->mChild[1] = new ConstNode(0.4);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
-	newCandidate.sForm = 15;
+	newCandidate.sForm = 17;
 	mCandidate.push_back(newCandidate);
 
 	//Basic with extra terms of each parameter with vegloss term)
-	// # 13
+	// # 18
 	newTree = new Add(9);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -925,10 +924,10 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[2]->mChild[1] = new Log10Node();
 	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
 	newTree->mChild[3] = new Multiply();
-	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
+	newTree->mChild[3]->mChild[0] = new ConstNode(0.5);
 	newTree->mChild[3]->mChild[1] = new ObstructionNode();
 	newTree->mChild[4] = new Multiply(3);
-	newTree->mChild[4]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[4]->mChild[1] = new Power();
 	newTree->mChild[4]->mChild[1]->mChild[0] = new FrequencyNode();
 	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.2);
@@ -936,7 +935,7 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[4]->mChild[2]->mChild[0] = new ClutterDepthNode();
 	newTree->mChild[4]->mChild[2]->mChild[1] = new ConstNode(0.2);
 	newTree->mChild[5] = new Multiply(3);
-	newTree->mChild[5]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[5]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[5]->mChild[1] = new Power();
 	newTree->mChild[5]->mChild[1]->mChild[0] = new FrequencyNode();
 	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.2);
@@ -948,23 +947,23 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[6]->mChild[1] = new Log10Node();
 	newTree->mChild[6]->mChild[1]->mChild[0] = new TxHeightNode();
 	newTree->mChild[7] = new Multiply();
-	newTree->mChild[7]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[7]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[7]->mChild[1] = new Power();
 	newTree->mChild[7]->mChild[1]->mChild[0] = new ClutterDepthNode();
 	newTree->mChild[7]->mChild[1]->mChild[1] = new ConstNode(0.2);
 	newTree->mChild[8] = new Multiply();
-	newTree->mChild[8]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[8]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[8]->mChild[1] = new Power();
 	newTree->mChild[8]->mChild[1]->mChild[0] = new ClutterHeightNode();
 	newTree->mChild[8]->mChild[1]->mChild[1] = new ConstNode(0.2);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
-	newCandidate.sForm = 16;
+	newCandidate.sForm = 18;
 	mCandidate.push_back(newCandidate);
 
 	//Basic with extra terms of each parameter sans vegloss term)
-	// # 14
+	// # 19
 	newTree = new Add(9);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
@@ -976,113 +975,113 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[2]->mChild[1] = new Log10Node();
 	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
 	newTree->mChild[3] = new Multiply();
-	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
+	newTree->mChild[3]->mChild[0] = new ConstNode(0.5);
 	newTree->mChild[3]->mChild[1] = new ObstructionNode();
 	newTree->mChild[4] = new Multiply();
-	newTree->mChild[4]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[4]->mChild[1] = new Power();
 	newTree->mChild[4]->mChild[1]->mChild[0] = new DistanceNode();
-	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[5] = new Multiply();
-	newTree->mChild[5]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[5]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[5]->mChild[1] = new Power();
 	newTree->mChild[5]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[6] = new Multiply();
-	newTree->mChild[6]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[6]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[6]->mChild[1] = new Power();
 	newTree->mChild[6]->mChild[1]->mChild[0] = new TxHeightNode();
-	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[7] = new Multiply();
-	newTree->mChild[7]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[7]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[7]->mChild[1] = new Power();
 	newTree->mChild[7]->mChild[1]->mChild[0] = new ClutterDepthNode();
-	newTree->mChild[7]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[7]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[8] = new Multiply();
-	newTree->mChild[8]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[8]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[8]->mChild[1] = new Power();
 	newTree->mChild[8]->mChild[1]->mChild[0] = new ClutterHeightNode();
-	newTree->mChild[8]->mChild[1]->mChild[1] = new ConstNode(0.3);
-
-	newCandidate.sTree = newTree;
-	newCandidate.sDepth = 4;
-	newCandidate.sForm = 17;
-	mCandidate.push_back(newCandidate);
-
-	//Basic with clutterheight term)
-	// # 15
-	newTree = new Add(7);
-	newTree->mChild[0] = new ConstNode(32.45);
-	newTree->mChild[1] = new Multiply();
-	newTree->mChild[1]->mChild[0] = new ConstNode(20.0);
-	newTree->mChild[1]->mChild[1] = new Log10Node();
-	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[2] = new Multiply();
-	newTree->mChild[2]->mChild[0] = new ConstNode(20.0);
-	newTree->mChild[2]->mChild[1] = new Log10Node();
-	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
-	newTree->mChild[3] = new Multiply();
-	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
-	newTree->mChild[3]->mChild[1] = new ObstructionNode();
-	newTree->mChild[4] = new Multiply();
-	newTree->mChild[4]->mChild[0] = new ConstNode(0.1);
-	newTree->mChild[4]->mChild[1] = new Power();
-	newTree->mChild[4]->mChild[1]->mChild[0] = new TxHeightNode();
-	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.3);
-	newTree->mChild[5] = new Multiply();
-	newTree->mChild[5]->mChild[0] = new ConstNode(0.1);
-	newTree->mChild[5]->mChild[1] = new Power();
-	newTree->mChild[5]->mChild[1]->mChild[0] = new ClutterDepthNode();
-	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.3);
-	newTree->mChild[6] = new Multiply();
-	newTree->mChild[6]->mChild[0] = new ConstNode(0.1);
-	newTree->mChild[6]->mChild[1] = new Power();
-	newTree->mChild[6]->mChild[1]->mChild[0] = new ClutterHeightNode();
-	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.3);
-
-	newCandidate.sTree = newTree;
-	newCandidate.sDepth = 4;
-	newCandidate.sForm = 18;
-	mCandidate.push_back(newCandidate);
-
-	//Basic with clutterheight term)
-	// # 15
-	newTree = new Add(7);
-	newTree->mChild[0] = new ConstNode(32.45);
-	newTree->mChild[1] = new Multiply();
-	newTree->mChild[1]->mChild[0] = new ConstNode(20.0);
-	newTree->mChild[1]->mChild[1] = new Log10Node();
-	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[2] = new Multiply();
-	newTree->mChild[2]->mChild[0] = new ConstNode(20.0);
-	newTree->mChild[2]->mChild[1] = new Log10Node();
-	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
-	newTree->mChild[3] = new Multiply();
-	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
-	newTree->mChild[3]->mChild[1] = new ObstructionNode();
-	newTree->mChild[4] = new Multiply();
-	newTree->mChild[4]->mChild[0] = new ConstNode(0.1);
-	newTree->mChild[4]->mChild[1] = new Power();
-	newTree->mChild[4]->mChild[1]->mChild[0] = new TxHeightNode();
-	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.3);
-	newTree->mChild[5] = new Multiply();
-	newTree->mChild[5]->mChild[0] = new ConstNode(0.1);
-	newTree->mChild[5]->mChild[1] = new Power();
-	newTree->mChild[5]->mChild[1]->mChild[0] = new ClutterDepthNode();
-	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.3);
-	newTree->mChild[6] = new Multiply();
-	newTree->mChild[6]->mChild[0] = new ConstNode(0.1);
-	newTree->mChild[6]->mChild[1] = new Power();
-	newTree->mChild[6]->mChild[1]->mChild[0] = new ClutterHeightNode();
-	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.3);
+	newTree->mChild[8]->mChild[1]->mChild[1] = new ConstNode(0.4);
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 4;
 	newCandidate.sForm = 19;
 	mCandidate.push_back(newCandidate);
 
+	//Basic with clutterheight term)
+	// # 20
+	newTree = new Add(7);
+	newTree->mChild[0] = new ConstNode(32.45);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(20.0);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(20.0);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
+	newTree->mChild[4] = new Multiply();
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.01);
+	newTree->mChild[4]->mChild[1] = new Power();
+	newTree->mChild[4]->mChild[1]->mChild[0] = new TxHeightNode();
+	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.4);
+	newTree->mChild[5] = new Multiply();
+	newTree->mChild[5]->mChild[0] = new ConstNode(0.01);
+	newTree->mChild[5]->mChild[1] = new Power();
+	newTree->mChild[5]->mChild[1]->mChild[0] = new ClutterDepthNode();
+	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.4);
+	newTree->mChild[6] = new Multiply();
+	newTree->mChild[6]->mChild[0] = new ConstNode(0.01);
+	newTree->mChild[6]->mChild[1] = new Power();
+	newTree->mChild[6]->mChild[1]->mChild[0] = new ClutterHeightNode();
+	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.4);
+
+	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 4;
+	newCandidate.sForm = 20;
+	mCandidate.push_back(newCandidate);
+
+	//Basic with clutterheight term)
+	// # 21
+	newTree = new Add(7);
+	newTree->mChild[0] = new ConstNode(32.45);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(20.0);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(20.0);
+	newTree->mChild[2]->mChild[1] = new Log10Node();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(0.5);
+	newTree->mChild[3]->mChild[1] = new ObstructionNode();
+	newTree->mChild[4] = new Multiply();
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.01);
+	newTree->mChild[4]->mChild[1] = new Power();
+	newTree->mChild[4]->mChild[1]->mChild[0] = new TxHeightNode();
+	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.4);
+	newTree->mChild[5] = new Multiply();
+	newTree->mChild[5]->mChild[0] = new ConstNode(0.01);
+	newTree->mChild[5]->mChild[1] = new Power();
+	newTree->mChild[5]->mChild[1]->mChild[0] = new ClutterDepthNode();
+	newTree->mChild[5]->mChild[1]->mChild[1] = new ConstNode(0.4);
+	newTree->mChild[6] = new Multiply();
+	newTree->mChild[6]->mChild[0] = new ConstNode(0.01);
+	newTree->mChild[6]->mChild[1] = new Power();
+	newTree->mChild[6]->mChild[1]->mChild[0] = new ClutterHeightNode();
+	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.4);
+
+	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 4;
+	newCandidate.sForm = 21;
+	mCandidate.push_back(newCandidate);
+
 	//Walfish Ikagami terms
-	// # 4
+	// # 22
 	newTree = new Add(8);
 	newTree->mChild[0] = new ConstNode(69.5);
 	newTree->mChild[1] = new Multiply();
@@ -1094,10 +1093,10 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[2]->mChild[1] = new Log10Node();
 	newTree->mChild[2]->mChild[1]->mChild[0] = new FrequencyNode();
 	newTree->mChild[3] = new Multiply();
-	newTree->mChild[3]->mChild[0] = new ConstNode(0.0);
+	newTree->mChild[3]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[3]->mChild[1] = new ObstructionNode();
 	newTree->mChild[4] = new Multiply(3);
-	newTree->mChild[4]->mChild[0] = new ConstNode(0.0);
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.01);
 	newTree->mChild[4]->mChild[1] = new Power();
 	newTree->mChild[4]->mChild[1]->mChild[0] = new FrequencyNode();
 	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.4);
@@ -1133,7 +1132,7 @@ int cGPpropModel:: mainTuning()
 
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 6;
-	newCandidate.sForm = 21;
+	newCandidate.sForm = 22;
 	mCandidate.push_back(newCandidate);
 
 	NumSeeds = mCandidate.size();
@@ -3712,14 +3711,14 @@ void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
 		mCandidate[Index]= newCandidate;
 		CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
 		CalcCount++;
-		cout << Index << "	CorrC	DeltaA = " << DeltaA 
+/*		cout << Index << "	CorrC	DeltaA = " << DeltaA 
 				<< "		CorrC=" << newCorrC 
 				<< "	StDev=" << newStdDev 
 				<< "	Mean=" << newMean  
 				<< "	MSE=" << newMSE 
 				<< "	minStdDev="<< minStdDev << "	minAge=" << minAge
 				<< "	CalcCount="<< CalcCount <<endl;
-		if (newStdDev< minStdDev) minStdDev = newStdDev;
+*/		if (newStdDev< minStdDev) minStdDev = newStdDev;
 		if (newCorrC>=maxCorrC)
 		{
 			minAge = 0;

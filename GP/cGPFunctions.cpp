@@ -34,8 +34,8 @@ GOftn::GOftn()
 //************************************************************************
 GOftn::~GOftn()
 {
-	if ((mChild!=nullptr)&&(mNumChildren>0))
-		delete [] mChild;
+//	if ((mChild!=nullptr)&&(mNumChildren>0))
+//		delete [] mChild;
 }
 
 //*************************************************************************
@@ -792,6 +792,7 @@ tMeasPoint Power::eval(tMeasPoint inPoint)
 			unsigned Exp = (unsigned)c2.sReturn;
 			for (unsigned i = 0; i<Exp; i++)
 				returnval *= c1.sReturn;
+			outPoint.sReturn = returnval;
 		}
 //		exponent is a negative whole number
 		else if ((c2.sReturn<0.0)&&(c2.sReturn==(double)(int)(c2.sReturn)))
@@ -800,9 +801,10 @@ tMeasPoint Power::eval(tMeasPoint inPoint)
 			unsigned Exp = (unsigned)(-c2.sReturn);
 			for (unsigned i = 0; i<Exp; i++)
 				returnval *= c1.sReturn;
-			returnval = 1.0/returnval;	
+			returnval = 1.0/returnval;
+			outPoint.sReturn = returnval;	
 		}
-		else if ((fabs(c1.sReturn)<0.000000000001)&&(c2.sReturn>=0))
+		else if ((fabs(c1.sReturn)<0.0000000001)&&(c2.sReturn>0))
 		{
 			outPoint.sReturn = 0.0;
 		}

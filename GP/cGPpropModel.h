@@ -45,7 +45,7 @@
 #include "../DataBase/Config.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 30
+#define NUM_INIT_CANDIDATES 100
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 10
 #define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50
@@ -69,9 +69,9 @@ typedef vector<GOftn *> vConstants;
 
 struct SCandidate
 { 
-	unsigned	sNumClutter=0;
-	unsigned * 	sClutterType=nullptr;
-	double * 	sClutterHeight=nullptr;
+//	unsigned	sNumClutter=0;
+//	unsigned * 	sClutterType=nullptr;
+//	double * 	sClutterHeight=nullptr;
 	GOftn * 	sTree=nullptr;
 	double		sCorrC;
 	double		sStdDev;
@@ -85,10 +85,46 @@ struct SCandidate
 	vConstants	sConstants;
 	bool		sOptimised;
 
+ 	SCandidate() 
+	{
+		renew();
+	}
+
+	void renew()
+	{
+/*		sNumClutter=2;
+		sClutterType = new unsigned[sNumClutter];
+		sClutterHeight = new double[sNumClutter];
+*/		sTree = new ConstNode(0.0);
+	}
+
+	void deleteTree(GOftn* inTree)	
+	{
+	 //free any children first
+		for (unsigned i=0; i<inTree->mNumChildren; i++) 
+		{ 
+			if (inTree->mChild[i]!=nullptr) deleteTree(inTree->mChild[i]);
+		}
+//		if ((inTree!=nullptr)) delete inTree;
+		inTree = nullptr;
+	}
+
+ 	~SCandidate() 
+	{
+/*		if (sClutterType!=nullptr) delete [] sClutterType;
+		sClutterType = nullptr;
+		if (sClutterHeight!=nullptr) delete [] sClutterHeight;	
+		sClutterHeight = nullptr;
+		sConstants.clear();
+		if (sTree!=nullptr) deleteTree(sTree);
+*/	}
+
 	SCandidate & operator=(SCandidate Right)
 	{
 		unsigned i;
-		sNumClutter	= Right.sNumClutter;
+/*		sNumClutter	= Right.sNumClutter;
+		delete [] sClutterType;
+		delete [] sClutterHeight;
 		sClutterType = new unsigned[sNumClutter];
 		sClutterHeight = new double[sNumClutter];
 		for (i=0; i<sNumClutter; i++)
@@ -96,8 +132,9 @@ struct SCandidate
 			sClutterType[i] = Right.sClutterType[i];
 			sClutterHeight[i] = Right.sClutterHeight[i];
 		}
-		sConstants.clear();
-		sTree		= Right.sTree->clone();
+*/		sConstants.clear();
+		if (sTree!=nullptr) deleteTree(sTree);
+		sTree = Right.sTree->clone();
 		sTree->getConstants(sConstants);
 		sCorrC		= Right.sCorrC;
 		sStdDev		= Right.sStdDev;
@@ -111,6 +148,7 @@ struct SCandidate
 		sOptimised	= Right.sOptimised;
 		return *this;
 	}
+	
 };
 
 typedef vector<SCandidate> vCandidates;
@@ -137,10 +175,10 @@ namespace Qrap
 
 			int CostFunction(unsigned CandidateIndex, double &Mean, double &MeanSquareError,
 				double &StDev, double &CorrC, 
-				bool CalcNewObstruction=true, unsigned Clutterfilter=0);
+				bool CalcNewObstruction=true, unsigned Clutterfilter=21);
 
 			int CostFunctionTreeOnly(unsigned CIndex, double &Mean, double &MeanSquareError,
-					double &StDev, double &CorrC, unsigned Clutterfilter=0);
+					double &StDev, double &CorrC, unsigned Clutterfilter=21);
 
 			void optimiseConstants(unsigned Index);
 

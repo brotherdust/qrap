@@ -105,10 +105,16 @@ void GOftn::mutate(double Scale)
 	mIsConstant = true;
 }
 
+//*****************************************************************************
+tMeasPoint GOftn::evalfix(tMeasPoint inPoint)
+{
+	return eval(inPoint);
+}
+
 //******************************************************************************
 GOftn* GOftn::getNewNode()
 {
-	int randn = rand() % 6;
+	int randn = rand() % 9;
 	double ConstP;
 	GOftn* retFtn;
 	
@@ -133,11 +139,283 @@ GOftn* GOftn::getNewNode()
 		case 5:
 			retFtn = new RxHeightNode();
 			break;
+//		case 6:
+//			retFtn = new ClutterTypeNode();
+//			break;
+		case 6:
+			retFtn = new ClutterHeightNode();
+			break;
+		case 7:
+			retFtn = new ClutterDepthNode();
+			break;
+		case 8:
+			retFtn = new Add();
+			break;
+		case 9:
+			retFtn = new Multiply();
+			break;
+		case 10:
+			retFtn = new Divide();
+			break;
+		case 11:
+			retFtn = new Log10Node();
+			break;
+		case 12:
+			retFtn = new Power();
+			break;
+
 		default:
 			cerr<<"invalid random number, bad news\n\n\n";
 			break;
 	}
+	for (unsigned i=0; i<retFtn->mNumChildren; i++) 
+	{
+		retFtn->mChild[i] = getNewNode();
+	}
 	return retFtn;
+}
+
+
+
+//**************************************************************************
+//**************************************************************************
+//
+//		DistanceNode
+//
+//**************************************************************************
+DistanceNode::DistanceNode()
+{
+	mNumChildren = 0;
+	mChild = nullptr;
+	mLabel = " d ";
+	mIsConstant = false;
+}
+
+//**************************************************************************
+tMeasPoint DistanceNode::eval(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sDistance/1000;
+//	cout << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
+}
+
+//*************************************************************************
+DistanceNode* DistanceNode::clone()
+{
+	DistanceNode* retTree = new DistanceNode();
+	return retTree; 
+}
+
+//**************************************************************************
+//**************************************************************************
+//
+//		FrequencyNode
+//
+//**************************************************************************
+FrequencyNode::FrequencyNode()
+{
+	mNumChildren = 0;
+	mChild = nullptr;
+	mLabel = " f ";
+	mIsConstant = false;
+}
+
+//**************************************************************************
+tMeasPoint FrequencyNode::eval(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sFrequency;
+//	cout << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
+}
+
+//*************************************************************************
+FrequencyNode* FrequencyNode::clone()
+{
+	FrequencyNode* retTree = new FrequencyNode();
+	return retTree; 
+}
+
+//**************************************************************************
+//**************************************************************************
+//
+//		TxHeightNode
+//
+//**************************************************************************
+TxHeightNode::TxHeightNode()
+{
+	mNumChildren = 0;
+	mChild = nullptr;
+	mLabel = " h_tx ";
+	mIsConstant = false;
+}
+
+//**************************************************************************
+tMeasPoint TxHeightNode::eval(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sTxHeight;
+//	cout << mLabel << outPoint.sReturn<<"  "<<endl;
+	return outPoint;
+}
+
+//*************************************************************************
+TxHeightNode* TxHeightNode::clone()
+{
+	TxHeightNode* retTree = new TxHeightNode();
+	return retTree; 
+}
+
+//**************************************************************************
+//**************************************************************************
+//
+//		RxHeightNode
+//
+//**************************************************************************
+RxHeightNode::RxHeightNode()
+{
+	mNumChildren = 0;
+	mChild = nullptr;
+	mLabel = " h_rx ";
+	mIsConstant = false;
+}
+
+//**************************************************************************
+tMeasPoint RxHeightNode::eval(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sRxHeight;
+//	cout << mLabel << outPoint.sReturn<<"  "<<endl;
+	return outPoint;
+}
+
+//*************************************************************************
+RxHeightNode* RxHeightNode::clone()
+{
+	RxHeightNode* retTree = new RxHeightNode();
+	return retTree; 
+}
+
+//**************************************************************************
+//**************************************************************************
+//
+//		ObstructionNode
+//
+//**************************************************************************
+ObstructionNode::ObstructionNode()
+{
+	mNumChildren = 0;
+	mChild = nullptr;
+	mLabel = " L_o ";
+	mIsConstant = false;
+}
+
+//**************************************************************************
+tMeasPoint ObstructionNode::eval(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sDiffLoss;
+//	cout << mLabel << outPoint.sReturn <<"  "<< endl;
+	return outPoint;
+}
+
+//*************************************************************************
+ObstructionNode* ObstructionNode::clone()
+{
+	ObstructionNode* retTree = new ObstructionNode();
+	return retTree; 
+}
+
+//**************************************************************************
+//**************************************************************************
+//
+//		ClutterTypeNode
+//
+//**************************************************************************
+ClutterTypeNode::ClutterTypeNode()
+{
+	mNumChildren = 0;
+	mChild = nullptr;
+	mLabel = " Ic ";
+	mIsConstant = false;
+}
+
+//**************************************************************************
+tMeasPoint ClutterTypeNode::eval(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sClutter;
+//	cout << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
+}
+
+//*************************************************************************
+ClutterTypeNode* ClutterTypeNode::clone()
+{
+	ClutterTypeNode* retTree = new ClutterTypeNode();
+	return retTree; 
+}
+
+//**************************************************************************
+//**************************************************************************
+//
+//		ClutterHeightNode
+//
+//**************************************************************************
+ClutterHeightNode::ClutterHeightNode()
+{
+	mNumChildren = 0;
+	mChild = nullptr;
+	mLabel = " h_c ";
+	mIsConstant = false;
+}
+
+//**************************************************************************
+tMeasPoint ClutterHeightNode::eval(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sClutterHeight;
+//	cout << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
+}
+
+//*************************************************************************
+ClutterHeightNode* ClutterHeightNode::clone()
+{
+	ClutterHeightNode* retTree = new ClutterHeightNode();
+	return retTree; 
+}
+
+
+//**************************************************************************
+//**************************************************************************
+//
+//		ClutterDepthNode
+//
+//**************************************************************************
+ClutterDepthNode::ClutterDepthNode()
+{
+	mNumChildren = 0;
+	mChild = nullptr;
+	mLabel = " d_c ";
+	mIsConstant = false;
+}
+
+//**************************************************************************
+tMeasPoint ClutterDepthNode::eval(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sClutterDistance;
+//	cout << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
+}
+
+//*************************************************************************
+ClutterDepthNode* ClutterDepthNode::clone()
+{
+	ClutterDepthNode* retTree = new ClutterDepthNode();
+	return retTree; 
 }
 
 //**************************************************************************
@@ -208,11 +486,11 @@ double ConstNode::getValue()
 }
 
 //***************************************************************************
-tMeasPoint ConstNode::eval(tMeasPoint InPoint)
+tMeasPoint ConstNode::eval(tMeasPoint inPoint)
 {
-	tMeasPoint outPoint = InPoint;
+	tMeasPoint outPoint = inPoint;
 	outPoint.sReturn = mConstVal;
-//	cout << mLabel << outPoint.sReturn<<endl;
+//	cout << mLabel << "  " << outPoint.sReturn <<endl;
 	return outPoint;
 }
 
@@ -223,247 +501,6 @@ ConstNode* ConstNode::clone()
 	return retTree; 
 }
 
-
-//**************************************************************************
-//**************************************************************************
-//
-//		DistanceNode
-//
-//**************************************************************************
-DistanceNode::DistanceNode()
-{
-	mNumChildren = 0;
-	mChild = nullptr;
-	mLabel = " d ";
-	mIsConstant = false;
-}
-
-//**************************************************************************
-tMeasPoint DistanceNode::eval(tMeasPoint inPoint)
-{
-	tMeasPoint outPoint = inPoint;
-	outPoint.sReturn = inPoint.sDistance/1000;
-//	cout <<"	"<< mLabel << outPoint.sReturn<<endl;
-	return outPoint;
-}
-
-//*************************************************************************
-DistanceNode* DistanceNode::clone()
-{
-	DistanceNode* retTree = new DistanceNode();
-	return retTree; 
-}
-
-//**************************************************************************
-//**************************************************************************
-//
-//		FrequencyNode
-//
-//**************************************************************************
-FrequencyNode::FrequencyNode()
-{
-	mNumChildren = 0;
-	mChild = nullptr;
-	mLabel = " f ";
-	mIsConstant = false;
-}
-
-//**************************************************************************
-tMeasPoint FrequencyNode::eval(tMeasPoint inPoint)
-{
-	tMeasPoint outPoint = inPoint;
-	outPoint.sReturn = inPoint.sFrequency;
-//	cout <<"	"<< mLabel << outPoint.sReturn <<endl;
-	return outPoint;
-}
-
-//*************************************************************************
-FrequencyNode* FrequencyNode::clone()
-{
-	FrequencyNode* retTree = new FrequencyNode();
-	return retTree; 
-}
-
-//**************************************************************************
-//**************************************************************************
-//
-//		TxHeightNode
-//
-//**************************************************************************
-TxHeightNode::TxHeightNode()
-{
-	mNumChildren = 0;
-	mChild = nullptr;
-	mLabel = " h_tx ";
-	mIsConstant = false;
-}
-
-//**************************************************************************
-tMeasPoint TxHeightNode::eval(tMeasPoint inPoint)
-{
-	tMeasPoint outPoint = inPoint;
-	outPoint.sReturn = inPoint.sTxHeight;
-//	cout << "	" << mLabel << outPoint.sReturn<<endl;
-	return outPoint;
-}
-
-//*************************************************************************
-TxHeightNode* TxHeightNode::clone()
-{
-	TxHeightNode* retTree = new TxHeightNode();
-	return retTree; 
-}
-
-//**************************************************************************
-//**************************************************************************
-//
-//		RxHeightNode
-//
-//**************************************************************************
-RxHeightNode::RxHeightNode()
-{
-	mNumChildren = 0;
-	mChild = nullptr;
-	mLabel = " h_rx ";
-	mIsConstant = false;
-}
-
-//**************************************************************************
-tMeasPoint RxHeightNode::eval(tMeasPoint inPoint)
-{
-	tMeasPoint outPoint = inPoint;
-	outPoint.sReturn = inPoint.sRxHeight;
-//	cout <<"	"<< mLabel << outPoint.sReturn<<endl;
-	return outPoint;
-}
-
-//*************************************************************************
-RxHeightNode* RxHeightNode::clone()
-{
-	RxHeightNode* retTree = new RxHeightNode();
-	return retTree; 
-}
-
-//**************************************************************************
-//**************************************************************************
-//
-//		ObstructionNode
-//
-//**************************************************************************
-ObstructionNode::ObstructionNode()
-{
-	mNumChildren = 0;
-	mChild = nullptr;
-	mLabel = " L_o ";
-	mIsConstant = false;
-}
-
-//**************************************************************************
-tMeasPoint ObstructionNode::eval(tMeasPoint inPoint)
-{
-	tMeasPoint outPoint = inPoint;
-	outPoint.sReturn = inPoint.sDiffLoss;
-//	cout <<"	"<< mLabel << outPoint.sReturn << endl;
-	return outPoint;
-}
-
-//*************************************************************************
-ObstructionNode* ObstructionNode::clone()
-{
-	ObstructionNode* retTree = new ObstructionNode();
-	return retTree; 
-}
-
-//**************************************************************************
-//**************************************************************************
-//
-//		ClutterTypeNode
-//
-//**************************************************************************
-ClutterTypeNode::ClutterTypeNode()
-{
-	mNumChildren = 0;
-	mChild = nullptr;
-	mLabel = " Ic ";
-	mIsConstant = false;
-}
-
-//**************************************************************************
-tMeasPoint ClutterTypeNode::eval(tMeasPoint inPoint)
-{
-	tMeasPoint outPoint = inPoint;
-	outPoint.sReturn = inPoint.sClutter;
-//	cout <<"	"<< mLabel << outPoint.sReturn<<endl;
-	return outPoint;
-}
-
-//*************************************************************************
-ClutterTypeNode* ClutterTypeNode::clone()
-{
-	ClutterTypeNode* retTree = new ClutterTypeNode();
-	return retTree; 
-}
-
-//**************************************************************************
-//**************************************************************************
-//
-//		ClutterHeightNode
-//
-//**************************************************************************
-ClutterHeightNode::ClutterHeightNode()
-{
-	mNumChildren = 0;
-	mChild = nullptr;
-	mLabel = " h_c ";
-	mIsConstant = false;
-}
-
-//**************************************************************************
-tMeasPoint ClutterHeightNode::eval(tMeasPoint inPoint)
-{
-	tMeasPoint outPoint = inPoint;
-	outPoint.sReturn = inPoint.sClutterHeight;
-//	cout <<"	"<< mLabel << outPoint.sReturn<<endl;
-	return outPoint;
-}
-
-//*************************************************************************
-ClutterHeightNode* ClutterHeightNode::clone()
-{
-	ClutterHeightNode* retTree = new ClutterHeightNode();
-	return retTree; 
-}
-
-
-//**************************************************************************
-//**************************************************************************
-//
-//		ClutterDepthNode
-//
-//**************************************************************************
-ClutterDepthNode::ClutterDepthNode()
-{
-	mNumChildren = 0;
-	mChild = nullptr;
-	mLabel = " d_c ";
-	mIsConstant = false;
-}
-
-//**************************************************************************
-tMeasPoint ClutterDepthNode::eval(tMeasPoint inPoint)
-{
-	tMeasPoint outPoint = inPoint;
-	outPoint.sReturn = inPoint.sClutterDistance;
-//	cout <<"	"<< mLabel << outPoint.sReturn<<endl;
-	return outPoint;
-}
-
-//*************************************************************************
-ClutterDepthNode* ClutterDepthNode::clone()
-{
-	ClutterDepthNode* retTree = new ClutterDepthNode();
-	return retTree; 
-}
 
 //************************************************************************
 //************************************************************************
@@ -498,12 +535,12 @@ tMeasPoint Add::eval(tMeasPoint inPoint)
 		{
 			cerr << "not all inputs define in Add"<<endl;
 			mNumChildren=NumChildren;
-			outPoint.sReturn = 200.0;
+			outPoint.sReturn = -200.0;
 			return outPoint;
 		}
 	}
 	outPoint.sReturn = Sum;
-//	cout << "	" << mLabel << outPoint.sReturn<<endl;
+//	cout << "	" << mLabel << outPoint.sReturn <<"  "<<endl;
 	return outPoint;
 }
 
@@ -542,12 +579,14 @@ tMeasPoint Subtract::eval(tMeasPoint inPoint)
 		c1 = mChild[0]->eval(inPoint);
 		c2 = mChild[1]->eval(inPoint);
 		outPoint.sReturn = c1.sReturn - c2.sReturn;
+		if (outPoint.sReturn<0) outPoint.sReturn=1e-10;
 	}
 	else 
 	{
 		cerr << "left and right not defined in Subtract"<<endl;
-		outPoint.sReturn = 200.0;
+		outPoint.sReturn = -200.0;
 	}
+//	cout << "	" << mLabel << outPoint.sReturn<<"  "<<endl;
 	return outPoint;
 }
 
@@ -594,9 +633,9 @@ tMeasPoint Multiply::eval(tMeasPoint inPoint)
 		}
 		else 
 		{
-			cerr << "not all inputs define in Multiply"<<endl;
+			cerr << "not all inputs define in Multiply"<<"  "<<endl;
 			mNumChildren=NumChildren;
-			outPoint.sReturn = 200.0;
+			outPoint.sReturn = -200.0;
 			return outPoint;
 		}
 	}
@@ -638,22 +677,51 @@ tMeasPoint Divide::eval(tMeasPoint inPoint)
 	tMeasPoint c1, c2;
 	if (mChild[0] && mChild[1])
 	{
-		c1 = mChild[0]->eval(inPoint);
-		c2 = mChild[1]->eval(inPoint);
-		while (fabs(c2.sReturn)<0.0000000001)
+		c1 = mChild[0]->eval(outPoint);
+		c2 = mChild[1]->eval(outPoint);
+		if (fabs(c2.sReturn)>1e-100)
+			outPoint.sReturn = c1.sReturn/c2.sReturn;
+		else
+		{
+//			cout << "Divide input value too small 	";
+//			cout << mChild[1]->mLabel << " " << c2.sReturn << endl;
+			outPoint.sReturn = 1000000000000.0;			
+		}
+	}
+	else 
+	{
+		cout << "left and right not defined in divide "<<endl;
+		outPoint.sReturn = 100000000000000.0;
+	}
+//	cout << "	" << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
+}
+
+//**********************************************************************
+tMeasPoint Divide::evalfix(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	tMeasPoint c1, c2;
+	if (mChild[0] && mChild[1])
+	{
+		c1 = mChild[0]->evalfix(outPoint);
+		c2 = mChild[1]->evalfix(outPoint);
+		while (fabs(c2.sReturn)<1e-100)
 		{
 			mChild[1] = getNewNode();
-			c2 = mChild[1]->eval(inPoint);
+			c2 = mChild[1]->evalfix(inPoint);
 		}
 		outPoint.sReturn = c1.sReturn/c2.sReturn;
 	}
 	else 
 	{
 		cout << "left and right not defined in divide "<<endl;
-		outPoint.sReturn = 200.0;
+		outPoint.sReturn = 100000000000000.0;
 	}
+//	cout << "	" << mLabel << outPoint.sReturn <<"  "<<endl;
 	return outPoint;
 }
+
 
 //**********************************************************************
 Divide* Divide::clone()
@@ -686,22 +754,55 @@ tMeasPoint Log10Node::eval(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	tMeasPoint c1;
+	double argument;
 	if (mChild[0])
 	{
 		c1 = mChild[0]->eval(inPoint);
-		while (c1.sReturn<0.0000000001)
+		argument = c1.sReturn; 
+		
+		if (c1.sReturn>1e-100)
+			outPoint.sReturn = log10(argument);
+		else 
 		{
-			mChild[0] = getNewNode();
-			c1 = mChild[0]->eval(inPoint);
+//			cerr << "Log10: input value too small	";
+//			cout << mChild[0]->mLabel  << " " << argument << endl;
+			outPoint.sReturn = -200.0;
 		}
-		outPoint.sReturn = log10(c1.sReturn);
+
 	}
 	else 
 	{
 		cerr << "input not defined in log10"<<endl;
-		outPoint.sReturn = 200.0;
+		outPoint.sReturn = -200.0;
 	}
 //	cout <<"	"<< mLabel << outPoint.sReturn << endl;
+	return outPoint;
+}
+
+//**********************************************************************
+tMeasPoint Log10Node::evalfix(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	tMeasPoint c1;
+	double argument;
+	if (mChild[0])
+	{
+		c1 = mChild[0]->evalfix(inPoint);
+		argument = c1.sReturn;
+		while (argument<1e-100)
+		{
+			mChild[0] = getNewNode();
+			c1 = mChild[0]->evalfix(inPoint);
+			argument = c1.sReturn;
+		}
+		outPoint.sReturn = log10(argument);
+	}
+	else 
+	{
+		cerr << "input not defined in log10"<<endl;
+		outPoint.sReturn = -200.0;
+	}
+//	cout <<"	"<< mLabel << outPoint.sReturn <<"  "<< endl;
 	return outPoint;
 }
 
@@ -726,7 +827,7 @@ Square::Square()
 {
 	mNumChildren = 1;
 	mChild = new GOftn*[mNumChildren];
-	mLabel = "Square";
+	mLabel = "Square ";
 	mIsConstant = false;
 }
 
@@ -745,6 +846,7 @@ tMeasPoint Square::eval(tMeasPoint inPoint)
 		cerr << "input not defined in square"<<endl;
 		outPoint.sReturn = 200.0;
 	}
+//	cout <<"	"<< mLabel << outPoint.sReturn <<"  "<< endl;
 	return outPoint;
 }
 
@@ -779,10 +881,66 @@ tMeasPoint Power::eval(tMeasPoint inPoint)
 	double returnval = 1;
 	tMeasPoint outPoint = inPoint;
 	tMeasPoint c1, c2;
+	double base, exp;
 	if (mChild[0] && mChild[1])
 	{
+//		cout << "Power if true" << endl;
 		c1 = mChild[0]->eval(inPoint);
+		base = c1.sReturn;
 		c2 = mChild[1]->eval(inPoint);
+		exp = c2.sReturn; 
+//		cout << mChild[0]->mLabel  << " " << base << endl;
+		if (base>=0.0)
+			outPoint.sReturn = pow(base, exp);
+		else if ((exp>=0.0)&&(exp==(double)(int)(exp)))
+//		exponent is positive whole number
+		{
+			returnval = 1;
+			unsigned Exp = (unsigned)exp;
+			for (unsigned i = 0; i<Exp; i++)
+				returnval *=base;
+			outPoint.sReturn = returnval;
+		}
+//		exponent is a negative whole number
+		else if ((exp<0.0)&&(exp==(double)(int)(exp)))
+		{
+			returnval = 1;
+			unsigned Exp = (unsigned)(-exp);
+			for (unsigned i = 0; i<Exp; i++)
+				returnval *= base;
+			returnval = 1.0/returnval;
+			outPoint.sReturn = returnval;	
+		}
+		else if ((fabs(base)<1e-100)&&(exp>0))
+		{
+			outPoint.sReturn = 0.0;
+		}
+		else
+		{
+//			cerr << "Power function not defined	";
+//			cout << mChild[0]->mLabel  << " " << base << endl;
+			outPoint.sReturn = -200.0;
+		}
+	}
+	else 
+	{
+		cerr << "left and right not defined in Power"<<endl;
+		outPoint.sReturn = 200.0;
+	}
+//	cout <<"	"<< mLabel << outPoint.sReturn <<"	"<< endl;	
+	return outPoint;
+}
+
+//**********************************************************************
+tMeasPoint Power::evalfix(tMeasPoint inPoint)
+{
+	double returnval = 1;
+	tMeasPoint outPoint = inPoint;
+	tMeasPoint c1, c2;
+	if (mChild[0] && mChild[1])
+	{
+		c1 = mChild[0]->evalfix(inPoint);
+		c2 = mChild[1]->evalfix(inPoint);
 		if (c1.sReturn>=0)
 			outPoint.sReturn = pow(c1.sReturn, c2.sReturn);
 		else if ((c2.sReturn>=0.0)&&(c2.sReturn==(double)(int)(c2.sReturn)))
@@ -804,7 +962,7 @@ tMeasPoint Power::eval(tMeasPoint inPoint)
 			returnval = 1.0/returnval;
 			outPoint.sReturn = returnval;	
 		}
-		else if ((fabs(c1.sReturn)<0.0000000001)&&(c2.sReturn>0))
+		else if ((fabs(c1.sReturn)<1e-10)&&(c2.sReturn>0))
 		{
 			outPoint.sReturn = 0.0;
 		}
@@ -813,12 +971,12 @@ tMeasPoint Power::eval(tMeasPoint inPoint)
 			while (c1.sReturn<0.0)
 			{
 				mChild[0] = getNewNode();
-				c1 = mChild[0]->eval(inPoint);
+				c1 = mChild[0]->evalfix(inPoint);
 			}
 			while (fabs(c2.sReturn)>100)
 			{
 				mChild[1] = getNewNode();
-				c2 = mChild[1]->eval(inPoint);
+				c2 = mChild[1]->evalfix(inPoint);
 			}
 			outPoint.sReturn = pow(c1.sReturn, c2.sReturn);
 		} 
@@ -828,7 +986,7 @@ tMeasPoint Power::eval(tMeasPoint inPoint)
 		cerr << "left and right not defined in Power"<<endl;
 		outPoint.sReturn = 200.0;
 	}
-//	cout <<"	"<< mLabel << outPoint.sReturn << endl;	
+//	cout <<"	"<< mLabel << outPoint.sReturn <<"	"<< endl;	
 	return outPoint;
 }
 

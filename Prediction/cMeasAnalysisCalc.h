@@ -95,6 +95,20 @@ struct tMeasPoint
 		sReturn		= Right.sReturn;
 		return *this;
 	}
+
+	void show()
+	{
+		cout 
+		<< "measID:" << sID 
+		<< "	sTxHeight:" << sTxHeight
+		<< "	sRxHeight:" << sRxHeight
+		<< "	sDistance:" << sDistance
+		<< "	sFrequency:" << sFrequency
+		<< "	sReturn:" << sReturn
+		<< endl;
+
+	}
+
 };
 
 typedef vector<cGeoP> vPoints;

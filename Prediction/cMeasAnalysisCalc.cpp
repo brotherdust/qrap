@@ -484,6 +484,8 @@ bool cMeasAnalysisCalc::LoadMeasurements(char*  CustomAreaName,
 				mMeasPoints[i].sTxHeight = atof(r[i]["txantennaheight"].c_str());
 				mMeasPoints[i].sRxHeight = atof(r[i]["mobileheight"].c_str());
 				mMeasPoints[i].sClutter = 0;
+
+//				mMeasPoints[i].show();
 				
 				if (mMeasPoints[i].sInstKeyMobile != currentMobile)
 				{
@@ -1054,11 +1056,14 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 //				cout << "cMeasAnalysisCalc::PerformAnalysis pathloss=" << mMeasPoints[i].sPathLoss;
 //				cout << "	AntValue=" << AntValue << endl;
 
+//				mMeasPoints[i].show();
+
 				Error = - mMeasPoints[i].sMeasValue + mMeasPoints[i].sPredValue;
 /*				cout << "i= " << i << "	err= " << Error 
 					<< "	PL= " <<mMeasPoints[i].sPathLoss
 					<< "	meas= " <<mMeasPoints[i].sMeasValue<<endl;
-*/				TotalError += Error; 
+*/
+				TotalError += Error; 
 				TotalSError += Error*Error;
 				TotalMeas += mMeasPoints[i].sMeasValue; 
 				TotalSMeas += mMeasPoints[i].sMeasValue*mMeasPoints[i].sMeasValue; 

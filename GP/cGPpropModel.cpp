@@ -1426,7 +1426,7 @@ int cGPpropModel:: mainTuning()
 						(mStars[j].sStdDev<=mCandidate[i].sStdDev)));
 				if (mCandidate[i].sPareto)
 				{
-					cout << endl << "Inserting new Star" << endl;
+/*					cout << endl << "Inserting new Star" << endl;
 //					optimiseConstants(i);
 					cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
 						<< "	Fitness=" << mCandidate[i].sFitness 
@@ -1436,7 +1436,7 @@ int cGPpropModel:: mainTuning()
 						<< "	Form=" << mCandidate[i].sForm
 						<< "	Depth=" << mCandidate[i].sDepth <<endl;
 					printTree(mCandidate[i].sTree);
-					mStars.push_back(mCandidate[i]);
+*/					mStars.push_back(mCandidate[i]);
 				}
 	
 			}
@@ -1507,7 +1507,7 @@ int cGPpropModel:: mainTuning()
 //			cout << i << "	Fitness = " << mCandidate[i].sFitness << endl;
 		}
 
-
+		
 		//....................................................................................
 		// Replace completely unfit individuals		
 		mNumToDie = 0;
@@ -1534,6 +1534,39 @@ int cGPpropModel:: mainTuning()
 			}
 		}
 
+		cout << "all good individuals" << endl;
+		sort(mStars.begin(), mStars.end(), SortCriteriaOnStdDev);	
+		for (i=0; i<mStars.size(); i++)
+		{
+			cout << " Star.	i = " << i << "	Rank=" << mStars[i].sRank
+				<< "	Fitness=" << mStars[i].sFitness 
+				<< "	CorrC=" << mStars[i].sCorrC 
+				<< "	StDev=" << mStars[i].sStdDev
+				<< "	Mean=" << mStars[i].sMean  
+				<< "	Form=" << mStars[i].sForm
+				<< "	Depth=" << mStars[i].sDepth <<endl;
+			printTree(mStars[i].sTree);
+
+/*			for (j=0;j<mStars[i].sNumClutter;j++)
+			{
+				cout << "	[" << j<< "] " << mStars[i].sClutterHeight[j];
+			}
+*/			cout << endl << endl;
+		}
+
+		cout << "all good individuals" << endl;
+		sort(mStars.begin(), mStars.end(), SortCriteriaOnStdDev);
+		for (i=0; i<mStars.size(); i++)
+		{
+			cout << " Star.	i = " << i << "	Rank=" << mStars[i].sRank
+				<< "	Fitness=" << mStars[i].sFitness 
+				<< "	CorrC=" << mStars[i].sCorrC 
+				<< "	StDev=" << mStars[i].sStdDev
+				<< "	Mean=" << mStars[i].sMean  
+				<< "	Form=" << mStars[i].sForm
+				<< "	Depth=" << mStars[i].sDepth <<endl;
+		}
+
 		//...................................................................................
 		// Mutate all
 
@@ -1555,7 +1588,10 @@ int cGPpropModel:: mainTuning()
 
 		cout << "Best candidate:	CorrC = " << mCandidate[0].sCorrC 
 			<< "	StdDev = " << mCandidate[0].sStdDev << endl << endl;
-	}
+
+	}//*****End Main tuning loop ************************************************************
+
+
 
 	for (i = 0; i < NumThread; i++) 
 	{
@@ -1634,9 +1670,9 @@ int cGPpropModel:: mainTuning()
 					(mStars[j].sStdDev<=mCandidate[i].sStdDev)));
 			if (mCandidate[i].sPareto)
 			{
-				cout << endl << "Inserting new Star" << endl;
+//				cout << endl << "Inserting new Star" << endl;
 				optimiseConstants(i);
-				cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
+/*				cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
 					<< "	Fitness=" << mCandidate[i].sFitness 
 					<< "	CorrC=" << mCandidate[i].sCorrC 
 					<< "	StDev=" << mCandidate[i].sStdDev
@@ -1644,7 +1680,7 @@ int cGPpropModel:: mainTuning()
 					<< "	Form=" << mCandidate[i].sForm
 					<< "	Depth=" << mCandidate[i].sDepth <<endl;
 				printTree(mCandidate[i].sTree);
-				mStars.push_back(mCandidate[i]);
+*/				mStars.push_back(mCandidate[i]);
 			}
 							
 		}
@@ -4484,14 +4520,18 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 		
 	}
 	double MSE;
+
 	AutoFix(Index, mCandidate[Index].sMean, MSE,
 			 mCandidate[Index].sStdDev, mCandidate[Index].sCorrC);
+	
 	mCandidate[Index].sRank=2*mNumCandidates;
 	mCandidate[Index].sPareto = false;
 	mCandidate[Index].sFitness *=  100*(1-mCandidate[Index].sCorrC) 
 					+ mCandidate[Index].sStdDev;
-	mCandidate[Index].sForm = mCandidate[Index].sForm + NUM_INIT_CANDIDATES;
-
+	if (Mutated)
+		mCandidate[Index].sForm = mCandidate[Index].sForm + NUM_INIT_CANDIDATES;
+	mCandidate[Index].sConstants.clear();
+	mCandidate[Index].sTree->getConstants(mCandidate[Index].sConstants);
 }
 
 //********************************************************************************
@@ -4545,14 +4585,14 @@ bool cGPpropModel::mutateTreeSingleBranch(GOftn* &inTree, int depth, bool grow, 
 	if (subTree->mIsConstant)
 	{
 		subTree->mutate(PropMutate);
-		return true;
+		return false; // The form did not change, only the constant.
 	}
 
 	double randNum0t1 = gUni(gRandomGen);
 	if (randNum0t1 < PropMutate) 
 	{
-		Mutated= true;
 		subTree = createRandomTree(i + 2, grow);
+		Mutated= true;
 	}
 
 	return Mutated;
@@ -4566,7 +4606,7 @@ bool cGPpropModel::mutateTreeManyNode(GOftn* &inTree, int depth, bool grow, doub
 	if (inTree->mIsConstant)
 	{
 		inTree->mutate(PropMutate);
-		return true;
+		return false; // The form did not change, only a constant
 	}
 	double randNum0t1 = gUni(gRandomGen);
 	if (randNum0t1 < PropMutate) 

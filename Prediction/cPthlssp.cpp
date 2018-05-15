@@ -409,6 +409,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	{
 		ClutterDepth = (mClutter.mClutterTypes[mClutterIndex].sHeight - m_hrx)/sqrt(2.0);
 	}
+	if (ClutterDepth<0) ClutterDepth = 0.0;
 
 	if (DiffLoss<0) DiffLoss = 0;
 	//Incorporate the Obstruction loss

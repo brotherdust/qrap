@@ -39,36 +39,21 @@ public:
 	string mLabel;
 	unsigned mNumChildren;
 	bool mIsConstant;
-	void mutate(double Scale);
 	GOftn* getNewNode();
-	void setValue(double newValue);
-	double getValue();
 	GOftn** mChild;
 	GOftn();
 	~GOftn();
 	virtual tMeasPoint eval(tMeasPoint inPoint) = 0;  //setting the 0 makes it a PURE
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	virtual GOftn* clone() = 0; //make a deep copy of the current tree
+	void mutate(double Scale); //used in mutating constants
+	void setValue(double newValue); //used in tuning constants
+	double getValue(); //used in mutating constants
 	string getLabel();
 	unsigned getTreeDepth();
 	unsigned getConstants(vConstants &Constants);
-
 };
 
-
-
-//*************************************************************************************
-//class for storing constant values
-class ConstNode : public GOftn 
-{
-public:
-	ConstNode();
-	ConstNode(double preSetVal);
-	void mutate(double Scale);
-	void setValue(double newValue);
-	double getValue();
-	tMeasPoint eval(tMeasPoint inPoint);
-	ConstNode* clone();
-};
 
 //*****************************************************************************************
 //class for using distance between tx and rx as input
@@ -187,6 +172,7 @@ class Divide : public GOftn
 public:
 	Divide();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	Divide* clone();
 };
 
@@ -198,6 +184,7 @@ class Log10Node : public GOftn
 public:
 	Log10Node();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	Log10Node* clone();
 };
 
@@ -218,8 +205,26 @@ class Power : public GOftn
 public:
 	Power();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	Power* clone();
 };
+
+
+
+//*************************************************************************************
+//class for storing constant values
+class ConstNode : public GOftn 
+{
+public:
+	ConstNode();
+	ConstNode(double preSetVal);
+	void mutate(double Scale);
+	void setValue(double newValue);
+	double getValue();
+	tMeasPoint eval(tMeasPoint inPoint);
+	ConstNode* clone();
+};
+
 
 }
 #endif

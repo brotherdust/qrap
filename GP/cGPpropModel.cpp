@@ -1305,7 +1305,6 @@ int cGPpropModel:: mainTuning()
 		newCandidate.sRank = 2*(mNumCandidates-1);
 		newCandidate.sPareto = false;
 		newCandidate.sOptimised =false;
-		newCandidate.sDepth=newCandidate.sTree->getTreeDepth()+1;
 /*		newCandidate.sNumClutter = mMeas.mPathLoss.mClutter.mNumber;
 		newCandidate.sClutterType  = new unsigned[mMeas.mPathLoss.mClutter.mNumber];
 		newCandidate.sClutterHeight = new double[mMeas.mPathLoss.mClutter.mNumber];
@@ -1317,10 +1316,11 @@ int cGPpropModel:: mainTuning()
 			cout << "Cj = " <<  mMeas.mPathLoss.mClutter.mNumber 
 			<< "	Height= " << newCandidate[i].sClutterHeight[j] << endl;
 		} 
-*/		mCandidate.push_back(newCandidate);
-		CostFunctionTreeOnly(i, mCandidate[i].sMean, MSE,
+*/
+		mCandidate.push_back(newCandidate);
+		AutoFix(i, mCandidate[i].sMean, MSE,
 			 mCandidate[i].sStdDev, mCandidate[i].sCorrC);
-		
+		mCandidate[i].sDepth=Candidate[i].sTree->getTreeDepth()+1;
 	}
 
 

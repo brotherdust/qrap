@@ -175,13 +175,13 @@ namespace Qrap
 
 			int CostFunction(unsigned CandidateIndex, double &Mean, double &MeanSquareError,
 				double &StDev, double &CorrC, 
-				bool CalcNewObstruction=true, unsigned Clutterfilter=21);
+				bool CalcNewObstruction=true, unsigned Clutterfilter=6);
 
 			int CostFunctionTreeOnly(unsigned CIndex, double &Mean, double &MeanSquareError,
-					double &StDev, double &CorrC, unsigned Clutterfilter=21);
+					double &StDev, double &CorrC, unsigned Clutterfilter=6);
 
 			int AutoFix(unsigned CIndex, double &Mean, double &MeanSquareError,
-					double &StDev, double &CorrC, unsigned Clutterfilter=21);
+					double &StDev, double &CorrC, unsigned Clutterfilter=6);
 
 			void optimiseConstants(unsigned Index);
 
@@ -203,7 +203,7 @@ namespace Qrap
 							bool grow = false, 
 							double PropMutate=0.3);
 
-			void crossOverTree(GOftn* treeToAlter, GOftn* donatingTree);
+			bool crossOverTree(GOftn* treeToAlter, GOftn* donatingTree);
 	
 			void deleteTree(GOftn* inTree);
 

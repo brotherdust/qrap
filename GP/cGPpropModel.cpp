@@ -1140,7 +1140,7 @@ int cGPpropModel:: mainTuning()
 
 	//Egineered equation
 	// # 24
-	newTree = new Add(8);
+	newTree = new Add(6);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
 	newTree->mChild[1]->mChild[0] = new ConstNode(20.0);
@@ -1150,7 +1150,7 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[2]->mChild[0] = new ConstNode(0.5);
 	newTree->mChild[2]->mChild[1] = new ObstructionNode();
 	newTree->mChild[3] = new Multiply();
-	newTree->mChild[3]->mChild[0] = new ConstNode(1);
+	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
 	newTree->mChild[3]->mChild[1] = new Power();
 	newTree->mChild[3]->mChild[1]->mChild[0] = new FrequencyNode();
 	newTree->mChild[3]->mChild[1]->mChild[1] = new ConstNode(0.4);
@@ -1160,7 +1160,7 @@ int cGPpropModel:: mainTuning()
 	newTree->mChild[4]->mChild[1]->mChild[0] = new TxHeightNode();
 	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.4);
 	newTree->mChild[5] = new Multiply();
-	newTree->mChild[5]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[5]->mChild[0] = new ConstNode(1.0);
 	newTree->mChild[5]->mChild[1] = new Power();
 	newTree->mChild[5]->mChild[1]->mChild[0] = new Add();
 	newTree->mChild[5]->mChild[1]->mChild[0]->mChild[0] = new ClutterDepthNode();
@@ -1176,20 +1176,20 @@ int cGPpropModel:: mainTuning()
 	// From results
 	// # 25
 	newTree = new Add(4);
-	newTree->mChild[0] = new ConstNode(100);
+	newTree->mChild[0] = new ConstNode(100.0);
 	newTree->mChild[1] = new Multiply();
 	newTree->mChild[1]->mChild[0] = new ConstNode(23.0);
 	newTree->mChild[1]->mChild[1] = new Log10Node();
 	newTree->mChild[1]->mChild[1]->mChild[0] = new DistanceNode();
 	newTree->mChild[2] = new Multiply();
-	newTree->mChild[2]->mChild[0] = new ConstNode(1.0);
+	newTree->mChild[2]->mChild[0] = new ConstNode(0.8);
 	newTree->mChild[2]->mChild[1] = new ObstructionNode();
 	newTree->mChild[3] = new Multiply();
-	newTree->mChild[3]->mChild[0] = new ConstNode(30);
+	newTree->mChild[3]->mChild[0] = new ConstNode(30.0);
 	newTree->mChild[3]->mChild[1] = new RxHeightNode();
 
 	newCandidate.sTree = newTree;
-	newCandidate.sDepth = 3;
+	newCandidate.sDepth = 4;
 	newCandidate.sForm = 25;
 	mCandidate.push_back(newCandidate);
 	newCandidate.renew();

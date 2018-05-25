@@ -230,7 +230,7 @@ int main (int argc, char **argv)
 	char * CustomAreaName;
 	CustomAreaName= new char[23];
 	strcpy(CustomAreaName,"GautengClutterOutline");
-	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,0);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,3);
 
 	if (!Continue)
 		return 0;
@@ -249,23 +249,24 @@ int main (int argc, char **argv)
 
 	Meas.SetPlotResolution(30);
 
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-//	Meas.OptimiseHeights(0);
+	Meas.OptimiseHeights(3);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 //	Meas.SetSeekWidthBest(1);
 //	Meas.SetSmoothWidthBest(1);
 //	Meas.OptimiseSeekWidth();
-	Meas.OptimiseModelCoefAllTotal(0);
+/*	Meas.OptimiseModelCoefAllTotal(0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 	Meas.OptimiseModelCoefD(0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 	Meas.SaveResults();
+*/
 //      Meas.OptimiseHeights(3);
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 

@@ -45,7 +45,7 @@
 #include "../DataBase/Config.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 200
+#define NUM_INIT_CANDIDATES 300
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 10
 #define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50
@@ -175,13 +175,13 @@ namespace Qrap
 
 			int CostFunction(unsigned CandidateIndex, double &Mean, double &MeanSquareError,
 				double &StDev, double &CorrC, 
-				bool CalcNewObstruction=true, unsigned Clutterfilter=21);
+				bool CalcNewObstruction=true, unsigned Clutterfilter=3);
 
 			int CostFunctionTreeOnly(unsigned CIndex, double &Mean, double &MeanSquareError,
-					double &StDev, double &CorrC, unsigned Clutterfilter=21);
+					double &StDev, double &CorrC, unsigned Clutterfilter=3);
 
 			int AutoFix(unsigned CIndex, double &Mean, double &MeanSquareError,
-					double &StDev, double &CorrC, unsigned Clutterfilter=21);
+					double &StDev, double &CorrC, unsigned Clutterfilter=3);
 
 			void optimiseConstants(unsigned Index);
 

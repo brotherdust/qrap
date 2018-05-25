@@ -1739,7 +1739,7 @@ mPathLoss.setSmoothWidth(mSmoothWidthBest);
 }
 
 //*************************************************************************************************
-//*
+/*
 bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 {
 	unsigned i,j,TempMinIndex;
@@ -1899,11 +1899,11 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		SizeOfDiff = sqrt(sumSquareDiff);
 		
 		TempStepSize=StepSize;
-/*		cout << "begin" << endl;
-		for (i=1; i<mPathLoss.mClutter.mNumber; i++)
-			cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
-		cout << endl;
-*/
+//		cout << "begin" << endl;
+//		for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+//			cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
+//		cout << endl;
+
 
 //		if (TempStepSize<0.001) TempStepSize=0.001;
 		if ((fabs(TempStepSize)>0.01) && (smallStepSize<=3) &&(!ExhaustiveSearch))
@@ -1934,9 +1934,10 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				{
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
-								+= CHeightDiff[i]/SizeOfDiff*2*TempStepSize
-//														*mNumMeas/mClutterCount[i];
-													*TotNum/mClutterCount[i];
+						//Going negative
+							+= CHeightDiff[i]/SizeOfDiff*2*TempStepSize
+//									*mNumMeas/mClutterCount[i];
+									*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -1955,9 +1956,10 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				{
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
+							//returning to zero
 								-= CHeightDiff[i]/SizeOfDiff*TempStepSize
-//														*mNumMeas/mClutterCount[i];
-														*TotNum/mClutterCount[i];
+//										*mNumMeas/mClutterCount[i];
+										*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -1968,9 +1970,10 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				{
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
+						//take another step forward
 							-= CHeightDiff[i]/SizeOfDiff*TempStepSize
-//														*mNumMeas/mClutterCount[i];
-													*TotNum/mClutterCount[i];
+//									*mNumMeas/mClutterCount[i];
+									*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -1989,9 +1992,10 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				{
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
+						//take two steps back
 								+= CHeightDiff[i]/SizeOfDiff*2*TempStepSize
-//														*mNumMeas/mClutterCount[i];
-													*TotNum/mClutterCount[i];
+//									*mNumMeas/mClutterCount[i];
+									*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -2018,9 +2022,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			{
 				if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 					mPathLoss.mClutter.mClutterTypes[i].sHeight 
-							-= CHeightDiff[i]/SizeOfDiff*TempStepSize
-//														*mNumMeas/mClutterCount[i];
-													*TotNum/mClutterCount[i];
+						-= CHeightDiff[i]/SizeOfDiff*TempStepSize
+//							*mNumMeas/mClutterCount[i];
+							*TotNum/mClutterCount[i];
 //				cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 			}
 //			cout << endl;
@@ -2203,5 +2207,544 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 
 	return true;
 }
+*/
 
+//*************************************************************************************************
+//*
+bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
+{
+	unsigned i,j,TempMinIndex;
+	double Mean, MeanSq, StDev, CorrC;
+	int NumUsed = 0;
+	bool stop = false, redo=false;
+	bool first = true, ExhaustiveSearch=false;
+
+//	bool StopStepSize=false;
+	double cost, costOld, costMin, costMinTemp, cost1, cost2;
+	double dCost1,dCost2,ddCost;
+	double StepSize=1.0, TempStepSize=1.0, OldStepSize, BestStepSize;
+	double TempHeight;
+	int NumStop = 100;
+	int NumStopStore ;
+	NumStopStore = NumStop;
+	double *StepResult;
+	StepResult = new double[NumStop+1];
+	double SizeOfDiff, sumSquareDiff=0;
+	unsigned stuck=0, giveUP=0, smallStepSize=0;
+	mPathLoss.set_Tuning(false);
+
+	unsigned *NumClut;
+	bool *Up;
+	bool *Passed;
+	bool *Change;
+	double *CHeightDiff;
+	double *DeltaH;
+	double *BestHeight;
+	bool *changed;
+	changed = new bool[mPathLoss.mClutter.mNumber];
+	CHeightDiff = new double[mPathLoss.mClutter.mNumber];
+	BestHeight = new double[mPathLoss.mClutter.mNumber];
+	DeltaH = new double[mPathLoss.mClutter.mNumber];
+	Up = new bool[mPathLoss.mClutter.mNumber];
+	Passed = new bool[mPathLoss.mClutter.mNumber];
+	Change = new bool[mPathLoss.mClutter.mNumber];
+	NumClut = new unsigned[mPathLoss.mClutter.mNumber];
+
+	cout << "cMeasAnalysisCalc::OptimiseHeights for lus" << endl; 
+	for (i=0; i<mPathLoss.mClutter.mNumber; i++)
+	{
+		Change[i] = true;
+		Up[i] = true;
+		CHeightDiff[i] = 1.0;
+		BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
+		DeltaH[i] = 0.2;
+		NumClut[i] = 0;
+		Passed[i] = false;
+		changed[i]=false;
+	}
+
+	mUseClutter = true;
+
+	NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+	cost = 100*(1-CorrC);
+	cout <<   "	Cost=" << cost;
+	cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
+	cout << "	MeanSquare: " << MeanSq << "	StDev: " << StDev;
+	cout << "	CorrC: " << CorrC << endl;
+	costMin = cost;
+	costMinTemp = cost;
+	StepResult[NumStop] = cost;
+
+	for(int ii=0;ii<NumUsed;ii++)
+		NumClut[mMeasPoints[ii].sClutter]++; 
+
+	unsigned TotNum=0;
+	for (i=0; i<mPathLoss.mClutter.mNumber ; i++)
+	{
+		cout  <<mPathLoss.mClutter.mClutterTypes[i].sLandCoverID 
+				<< "	" << NumClut[i] << "	"	<< mClutterCount[i] << endl; 
+		TotNum+=mClutterCount[i];
+		if (0==mClutterCount[i]) Change[i] = false;
+	}
+
+	cout << "Number of Clutter Types: " << mPathLoss.mClutter.mNumber << endl;
+	while ((!stop)&&(NumStop>0))
+	{
+		stuck++;
+		NumStop --;
+		costOld = cost;
+		sumSquareDiff = 0.0;
+		TempMinIndex =0;
+
+		if (smallStepSize>3)  // start exhaustive search.
+		{
+			cout << "Starting Exhaustive search " << endl;
+			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+				DeltaH[i] = -1.0;
+			if (0<mClutterCount[i]) Change[i] = true;
+			smallStepSize = 0;
+			StepSize = 0.5;
+ 			ExhaustiveSearch=true;
+			stop = false;
+		}	
+		
+
+		if (!stop)
+		//Loop to determine partial derivative with respect to each clutter height
+		for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+		{
+			if (Change[i])
+			{
+				if ((mPathLoss.mClutter.mClutterTypes[i].sHeight+DeltaH[i])>0)
+					mPathLoss.mClutter.mClutterTypes[i].sHeight+=DeltaH[i];
+				else
+				{
+					if (mPathLoss.mClutter.mClutterTypes[i].sHeight>0)
+					{
+						DeltaH[i]= -mPathLoss.mClutter.mClutterTypes[i].sHeight;
+						mPathLoss.mClutter.mClutterTypes[i].sHeight =0;
+					}
+					else
+					{
+						DeltaH[i] = - DeltaH[i];
+						mPathLoss.mClutter.mClutterTypes[i].sHeight+=DeltaH[i];
+					}
+				}
+				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+				cost = 100*(1-CorrC);
+				cout << "C=" << mPathLoss.mClutter.mClutterTypes[i].sLandCoverID; 
+				cout << "	H=" << mPathLoss.mClutter.mClutterTypes[i].sHeight;
+				cout << "	dC=" << (costOld - cost);
+				cout << "	dH=" << DeltaH[i];
+				cout << "	CostO=" << costOld << "	Cost=" << cost << "	Min=" << costMin;
+				cout << "	Mean: " << Mean << "	StDev: " << StDev;
+				cout << "	CorrC: " << CorrC << endl;
+		
+				//Store best change for changing only one height. 
+				if( (cost<=costMin)&&(cost<costMinTemp))
+				{
+					if (TempMinIndex>0)
+						TempHeight= BestHeight[TempMinIndex];
+					for (j=0; j<mPathLoss.mClutter.mNumber; j++)
+						BestHeight[j] = mPathLoss.mClutter.mClutterTypes[j].sHeight;
+					if (TempMinIndex>0)
+						BestHeight[TempMinIndex]=TempHeight;					
+					costMinTemp=cost;
+					TempMinIndex=i;
+				}	
+
+				if ((fabs(CHeightDiff[i])<0.0000005)&&(first))
+					Change[i] = false;
+				//Change height back. 
+				mPathLoss.mClutter.mClutterTypes[i].sHeight-=DeltaH[i];
+
+				//Do gradient calculations
+				CHeightDiff[i] = ((cost-costOld)/DeltaH[i]);
+				sumSquareDiff += CHeightDiff[i]*CHeightDiff[i];
+			}
+		}
+		SizeOfDiff = sqrt(sumSquareDiff);
+		
+		TempStepSize=StepSize;
+//		cout << "begin" << endl;
+//		for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+//			cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
+//		cout << endl;
+
+
+		if ((fabs(TempStepSize)>0.009) && (smallStepSize<=3) &&(!ExhaustiveSearch))
+		{
+			OldStepSize=0;
+			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+			{
+				if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
+					mPathLoss.mClutter.mClutterTypes[i].sHeight 
+						-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize)
+//						The below to factors are for the 'altered' gradient search method 
+//						which makes it more sensitive to ill presented cluttertypes. 				
+//							*mNumMeas/mClutterCount[i];
+							*sqrt(TotNum/mClutterCount[i]);
+//					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
+			}
+			OldStepSize = TempStepSize;
+//			cout << endl;
+			NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+			cost1 = 100*(1-CorrC);
+			cout << "S=" << TempStepSize; 
+			cout << "	dC=" << (cost1 - costOld);
+			cout << "	CostO=" << costOld << "	Cost1=" << cost1 << "	Min=" << costMin;
+			cout << "	Mean: " << Mean << "	StDev: " << StDev;
+			cout << "	CorrC: " << CorrC << endl;
+	
+			dCost1=(cost1-costOld)/TempStepSize;	
+
+/*			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+			{
+				if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
+					mPathLoss.mClutter.mClutterTypes[i].sHeight 
+						+= CHeightDiff[i]/SizeOfDiff*OldStepSize
+//						The below to factors are for the 'altered' gradient search method 
+//						which makes it more sensitive to ill presented cluttertypes. 				
+//							*mNumMeas/mClutterCount[i];
+							*sqrt(TotNum/mClutterCount[i]);
+//					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
+			}
+//			cout << endl;
+			NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+			cost1 = 100*(1-CorrC);
+			cout << "S=" << -OldStepSize; 
+			cout << "	dC=" << (cost1 - costOld);
+			cout << "	CostO=" << costOld << "	Cost1=" << cost1 << "	Min=" << costMin;
+			cout << "	Mean: " << Mean << "	StDev: " << StDev;
+			cout << "	CorrC: " << CorrC << endl;
+			OldStepSize = 0;
+*/
+			if (costOld<cost1)
+//			This means that the new set of clutterheights does not give a better answer for the given TempStepSize.
+//			So take half the step size.
+			{
+				TempStepSize/=2;
+				for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+				{
+					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
+						mPathLoss.mClutter.mClutterTypes[i].sHeight 
+							-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize)
+//									The below to factors are for the 'altered' gradient search method 
+//									which makes it more sensitive to ill presented cluttertypes. 
+//									*mNumMeas/mClutterCount[i];
+									*TotNum/mClutterCount[i];
+//					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
+				}
+//				cout << endl;
+				OldStepSize = TempStepSize;
+				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+				cost2 = 100*(1-CorrC);
+				cout << "S=" << TempStepSize; 
+				cout << "	dC=" << (cost2 - costOld);
+				cout << "	CostO=" << costOld << "	Cost2="<< cost2 << "	Min=" << costMin;
+				cout << "	Mean: " << Mean << "	StDev: " << StDev;
+				cout << "	CorrC: " << CorrC << endl;
+				dCost2 = 2*(cost2-costOld)/TempStepSize;
+				ddCost = 4*(dCost1-dCost2)/TempStepSize;
+//				cout << "dCost1=" << dCost1 << "	dCost2=" << dCost2 << "	ddCost=" << ddCost << endl;
+				if (cost2<costOld) BestStepSize = TempStepSize;
+//				cout << "return to zero"<< endl;
+
+
+/*				for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+				{
+					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
+						mPathLoss.mClutter.mClutterTypes[i].sHeight 
+					//Now back at origin
+								+= CHeightDiff[i]/SizeOfDiff*OldStepSize
+//									*mNumMeas/mClutterCount[i];
+									*TotNum/mClutterCount[i];
+//					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
+				}
+
+//				cout << endl;
+				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+				cost2 = 100*(1-CorrC);
+				cout << "S=" << -OldStepSize; 
+				cout << "	dC=" << (cost2-costOld);
+				cout << "	CostO=" << costOld << "	Cost2="<< cost2 << "	Min=" << costMin;
+				cout << "	Mean: " << Mean << "	StDev: " << StDev;
+				cout << "	CorrC: " << CorrC << endl;
+				OldStepSize=0;
+*/
+			}
+			else
+			{
+				//if positive then try double the distance.
+				BestStepSize = TempStepSize;
+				TempStepSize*=2;
+				for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+				{
+					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
+						mPathLoss.mClutter.mClutterTypes[i].sHeight 
+						//Take another TempStepSize forward
+							-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize)
+//								*mNumMeas/mClutterCount[i];
+								*TotNum/mClutterCount[i];
+//					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
+				}
+				OldStepSize=TempStepSize;
+//				cout << endl;
+				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+				cost2 = 100*(1-CorrC);
+				cout << "S=" << TempStepSize; 
+				cout << "	dC=" << (cost2-costOld);
+				cout << "	CostO=" << costOld << "	Cost2="<< cost2 << "	Min=" << costMin;
+				cout << "	Mean: " << Mean << "	StDev: " << StDev;
+				cout << "	CorrC: " << CorrC << endl;
+				dCost2=	(cost2-cost1)/TempStepSize;
+				ddCost = (dCost2-dCost1)/TempStepSize;
+//				cout << "dCost1=" << dCost1 << "	dCost2=" << dCost2 << "	ddCost=" << ddCost << endl;
+
+				if ((cost2<costOld)&&(cost2<cost1)) 
+					BestStepSize = TempStepSize;
+
+/*				cout << "return to zero " << OldStepSize << endl;
+				for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+				{
+					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
+						mPathLoss.mClutter.mClutterTypes[i].sHeight 
+							//Take both TempStepSize back
+							+= CHeightDiff[i]/SizeOfDiff*OldStepSize
+//							*mNumMeas/mClutterCount[i];
+							*TotNum/mClutterCount[i];
+//					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
+				}
+//				cout << endl;
+				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+				cost2 = 100*(1-CorrC);
+				cout << "S=" << -OldStepSize; 
+				cout << "	dC=" << (cost2-costOld);
+				cout << "	CostO=" << costOld << "	Cost2="<< cost2 << "	Min=" << costMin;
+				cout << "	Mean: " << Mean << "	StDev: " << StDev;
+				cout << "	CorrC: " << CorrC << endl;
+				OldStepSize = 0;
+*/
+			}
+			if (fabs(ddCost)>1e-10)
+			{
+				TempStepSize = (ddCost*StepSize - (dCost1+dCost2)/2.0)/(ddCost);
+			}
+			if (TempStepSize<0) 
+			{
+				if ((cost2<costOld)&&(cost2<cost1))
+				{
+					if (costOld<cost1)
+						TempStepSize = StepSize/2;
+					else
+						TempStepSize = StepSize*2;
+				}
+				else if ((cost1<cost)&&(cost1<=cost2))
+					TempStepSize = StepSize;
+				else TempStepSize = StepSize/2;
+			}
+
+//			cout << "new TempStepSize = " << TempStepSize << endl;;
+			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+			{
+				if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
+					mPathLoss.mClutter.mClutterTypes[i].sHeight 
+							-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize)
+//								*mNumMeas/mClutterCount[i];
+								*TotNum/mClutterCount[i];
+//				cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
+			}
+			OldStepSize=TempStepSize;
+//			cout << endl;
+			NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+			cost = 100*(1-CorrC);
+			cout << "S=" << TempStepSize; 
+			cout << "	dC=" << (cost-costOld);
+			cout << "	CostO=" << costOld << "	Cost="<< cost << "	Min=" << costMin;
+			cout << "	Mean: " << Mean << "	StDev: " << StDev;
+			cout << "	CorrC: " << CorrC << endl;
+			
+			if ((cost<costOld)&&(cost<cost1)&&(cost<cost2))
+				BestStepSize = TempStepSize;
+			if ((cost1<cost)||(cost2<=cost))
+				redo=true;
+
+			cout << "BestStepSize = " << BestStepSize << endl;
+			if (redo)
+			{
+				for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+/*				{
+					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
+						mPathLoss.mClutter.mClutterTypes[i].sHeight 
+//								Restore to orinal stepsize				
+								+= CHeightDiff[i]/SizeOfDiff*OldStepSize
+//									*mNumMeas/mClutterCount[i];
+									*TotNum/mClutterCount[i];
+//					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
+				}
+				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+				cost2 = 100*(1-CorrC);
+				cout << "S=" << -OldStepSize; 
+				cout << "	dC=" << (cost2-costOld);
+				cout << "	CostO=" << costOld << "	Cost2="<< cost2 << "	Min=" << costMin;
+				cout << "	Mean: " << Mean << "	StDev: " << StDev;
+				cout << "	CorrC: " << CorrC << endl;
+				OldStepSize=0;
+*/
+				TempStepSize = BestStepSize;
+				for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+				{
+					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
+						mPathLoss.mClutter.mClutterTypes[i].sHeight 
+								-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize)
+//									*mNumMeas/mClutterCount[i];
+									*TotNum/mClutterCount[i];
+//					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
+				}
+//				cout << endl;
+				OldStepSize = TempStepSize;
+				redo=false;
+			
+				NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+				cost = 100*(1-CorrC);
+				cout << "S=" << TempStepSize; 
+				cout << "	dC=" << (cost-costOld);
+				cout << "	CostO=" << costOld << "	Cost="<< cost << "	Min=" << costMin;
+				cout << "	Mean: " << Mean << "	StDev: " << StDev;
+				cout << "	CorrC: " << CorrC << endl;
+			}
+			TempStepSize = BestStepSize;
+			
+			if (costOld<cost) TempStepSize/=2.0;	
+
+			if (fabs(TempStepSize)<0.01) 
+			{
+				smallStepSize++;
+				TempStepSize=fabs(0.5*CHeightDiff[1]/SizeOfDiff*mClutterCount[1]/TotNum);
+//				TempStepSize=fabs(0.5*CHeightDiff[1]/SizeOfDiff*mClutterCount[1]/mNumMeas);
+//				TempStepSize = fabs(0.5*CHeightDiff[1]);
+				for (i=1; i<mPathLoss.mClutter.mNumber; i++)
+				{
+					OldStepSize=fabs(0.5*CHeightDiff[i]/SizeOfDiff*mClutterCount[i]/TotNum);
+//					OldStepSize=fabs(0.5*CHeightDiff[1]/SizeOfDiff*mClutterCount[1]/mNumMeas);
+//					OldStepSize=fabs(0.5*CHeightDiff[i]);
+					if (OldStepSize<TempStepSize)
+						TempStepSize = OldStepSize;
+				}
+			}
+			else if (cost>costOld)
+				smallStepSize++;
+			else if (cost<costOld)
+				smallStepSize=0;				
+			if (fabs(TempStepSize)<0.01)
+				TempStepSize = 0.01;
+//			StepSize = min(TempStepSize, OldStepSize);
+
+			for (i=0; i<mPathLoss.mClutter.mNumber; i++)
+				if (fabs(StepSize*2)<fabs(DeltaH[i]))
+					DeltaH[i] = DeltaH[i]/fabs(DeltaH[i])*max(StepSize*fabs(DeltaH[i])*2,0.01);
+				
+		} // if TempStepSize groot genoeg.
+
+//		cout << "SizeOfDiff " << SizeOfDiff << endl;
+//		stop = (stop)||(((100*fabs((cost - costMin)/costMin)) < 0.005)&&(giveUP>3)&&(StepSize<0.001));
+		for (i=1;i<mPathLoss.mClutter.mNumber; i++)
+		{
+			if (mPathLoss.mClutter.mClutterTypes[i].sHeight < 0)
+				mPathLoss.mClutter.mClutterTypes[i].sHeight = 0.0;
+			if (((CHeightDiff[i]>0)&&(Up[i]))||((CHeightDiff[i]<0)&&(!Up[i]))
+				||((0==mPathLoss.mClutter.mClutterTypes[i].sHeight)&&(CHeightDiff[i]>0)))
+			{
+					if (DeltaH[i]>0.01)
+					{
+//					cout << "Maal met DeltaH" << endl;
+						DeltaH[i]*=-0.8;
+						changed[i] =true;
+					}
+					else Passed[i]=true;
+			}
+			Up[i] = (CHeightDiff[i]<0);
+//			stop = stop&&Passed[i];
+		}
+
+		NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+		cost = 100*(1-CorrC);
+		cout << endl;
+		cout << NumStop <<"	CostO=" << costOld;
+		cout << "	Cost=" << cost << "	Min=" << costMin;
+		cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
+		cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
+		cout << "	CorrC: " << CorrC << endl;
+		StepResult[NumStop] = cost;
+
+
+		cout << "costMin=" << costMin << "	costMinTemp=" << costMinTemp 
+			<< "	TempMinIndex=" <<TempMinIndex << endl
+		if (cost < costMin)
+		{
+			costMin = cost;
+			for (i=0; i<mPathLoss.mClutter.mNumber; i++)
+				BestHeight[i] = mPathLoss.mClutter.mClutterTypes[i].sHeight;
+			mPathLoss.mClutter.UpdateHeightsWidths();
+			cout << "Saved" << endl;
+			stuck=0;
+			giveUP=0;
+		}
+		else if (TempMinIndex>0)
+		{
+			for (i=0; i<mPathLoss.mClutter.mNumber; i++)
+				mPathLoss.mClutter.mClutterTypes[i].sHeight=BestHeight[i];
+			NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+			cost = 100*(1-CorrC);
+			cout << NumStop <<"	CostO=" << costOld;
+			cout << "	Cost=" << cost << "	Min=" << costMin;
+			cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
+			cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
+			cout << "	CorrC: " << CorrC << endl;
+			if (cost < costMin)
+			{
+				costMin = cost;
+				stuck=0;
+//				giveUP=0;
+				mPathLoss.mClutter.UpdateHeightsWidths();
+				cout << "Saved" << endl;
+			}
+			else stuck++;
+			TempMinIndex=0;
+			StepResult[NumStop] = cost;
+		}
+		else stuck++;
+
+		if ((stuck>1)||((ExhaustiveSearch)&&(stuck>0)))
+		{
+			for (i=0; i<mPathLoss.mClutter.mNumber; i++)
+			{
+				if (!changed[i]) DeltaH[i]=-0.8*DeltaH[i];
+				mPathLoss.mClutter.mClutterTypes[i].sHeight=BestHeight[i];
+				changed[i] = false;
+			}
+			NumUsed = PerformAnalysis(Mean, MeanSq, StDev, CorrC, 0);
+			cost = 100*(1-CorrC);
+			cout << NumStop <<"	CostO=" << costOld;
+			cout << "	Cost=" << cost << "	Min=" << costMin;
+			cout << "	#Used: " << NumUsed << "	Mean: " << Mean; 
+			cout << "	MSE: " << MeanSq << "	StDev: " << StDev;
+			cout << "	CorrC: " << CorrC << endl;
+//			stuck=0;
+			giveUP++;
+			StepResult[NumStop] = cost;
+		}
+		StepSize = TempStepSize;
+	}
+	
+	for (i=0; i<mPathLoss.mClutter.mNumber; i++)
+		mPathLoss.mClutter.mClutterTypes[i].sHeight = BestHeight[i];
+
+	for (i=NumStopStore; i>0; i--)
+		cout << i << "	" << StepResult[i] << endl;
+
+	mPathLoss.mClutter.UpdateHeightsWidths(); 	
+
+	return true;
+}
 

@@ -1061,8 +1061,8 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 //		double R1 = Surface + RoundHill;
 //		Surface = 0.0;
 	}
-
 */
+
 /*	else if (MainEdge)
 	{
 		// Adjustment to Flat earth model

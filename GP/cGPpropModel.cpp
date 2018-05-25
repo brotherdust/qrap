@@ -1208,6 +1208,7 @@ int cGPpropModel:: mainTuning()
 		mCandidate[i].sRank = 2*(mNumCandidates-1);
 		mCandidate[i].sPareto = false;
 		mCandidate[i].sOptimised = false;
+	cout << "i=" << i << endl;
 		mCandidate[i].sDepth=mCandidate[i].sTree->getTreeDepth()+1;
 /*		mCandidate[i].sNumClutter = mMeas.mPathLoss.mClutter.mNumber;
 		mCandidate[i].sClutterType  = new unsigned[mMeas.mPathLoss.mClutter.mNumber];
@@ -1257,7 +1258,7 @@ int cGPpropModel:: mainTuning()
 		}
 	}
 
-	for (j = 0; j < NumSeeds; j+=Skip)
+/*	for (j = 0; j < NumSeeds; j+=Skip)
 	{	
 		for (i=j; (i < (NumThread+j))&&(i<NumSeeds); i++) 
 		{
@@ -1272,7 +1273,7 @@ int cGPpropModel:: mainTuning()
         			calcThread[i].join();	
 		}
 	}
-
+*/
 	for (j = 0; j < NumSeeds; j+=Skip)
 	{	
 		for (i=j; (i < (NumThread+j))&&(i<NumSeeds); i++) 

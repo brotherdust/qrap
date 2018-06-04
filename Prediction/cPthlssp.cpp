@@ -811,12 +811,6 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex, double &alpha)
 	double tempL, tempR;
 	int start, stop;
 
-	if (m_size<2)
-	{
-		alpha=PI;
-	 	return 0.0;		
-	}
-//	cout << "In cPathLossPredictor::SetPeakRadius:m_size = " << m_size;
 	sizeSP = m_size;
 	SmoothProfile = new float[sizeSP];
 	start = max(0,PeakIndex-m_SeekWidth-m_SmoothWidth);
@@ -918,12 +912,14 @@ double cPathLossPredictor::SetPeakRadius(int PeakIndex, double &alpha)
 	if (radius>MAXDOUBLE/1.2) radius = 3*m_reR;
 	else if (radius<-(MAXDOUBLE/1.2)) radius = 3*m_reR;
 
-/*	
+/*	if (mCalcMarker==142423)
+	{
 	cout << endl<< "	r2:"<< radius;
 
 	double  r1 = (2.0*(xL+xR)*xR*xL)/(alpha*(xL*xL+xR*xR)); 
 	cout << "	r1:"<< r1;
         cout << "	xL=" << xL << "  xR=" << xR << "  yL=" << yL << "  yR=" << yR << endl;
+	}
 */
 	delete [] SmoothProfile;
 	if (leftInfl>=rightInfl)
@@ -966,6 +962,8 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 			* sqrt(2.0/lambda)/SQd1d2;
 	MhuRho = mhu*rho;
 
+//	if (mCalcMarker==1358542) 
+//	cout << endl << mCalcMarker;
 #ifndef NO_DEBUG
 //	cout	<< " radius=" << radius << "  rho=" << rho
 //		<< "   mhu=" << mhu << "   MhuRho=" << MhuRho << endl;
@@ -997,6 +995,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 	else if ((radius>0)&&(rho<=1.2)&&(radius<=0.5*m_reR)&&(mhu>-0.6))
 	{
 		//  Old RAP 	// if (rho<=1.0) 
+//		if (mCalcMarker==142423) 
 //		cout << " OldRap		";
 		RoundHill = 6.02 + 5.556*rho + 3.418*rho*rho +
 				0.256*rho*rho*rho;
@@ -1032,6 +1031,8 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 		Surface -=  (HeightGain(Y1,K) + HeightGain(Y2,K));
 		KnifeEdge = 0;
 //		Surface *= mClutter.mClutterTypes[mClutterProfile[PeakIndex]].sRho;
+//		if (mCalcMarker==142423) 
+//		cout << " SEarth	X=" << X;
 	}
 	else if (radius>0)
 	{
@@ -1044,11 +1045,12 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 //		RoundHill = max(R1,R2);
 	}
 */
-/*	else if ((radius>0)&&(radius<3*m_reR)&&(rho<1.3)&&(mhu>-0.6))
+/*
+	else if ((radius>0)&&(radius<3*m_reR)&&(rho<1.3)&&(mhu>-0.6))
 	{
 		//  Rec. ITU-R P.526-12 Feb 2012 $4.2 
 //		if (mCalcMarker==142423) 
-//			cout << " RoundHill	";
+		cout << " RoundHill	";
 		RoundHill = 7.2*rho - 2.0*rho*rho + 3.6*rho*rho*rho
 						- 0.8*rho*rho*rho*rho;
 		double xhi;
@@ -1061,8 +1063,8 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 //		double R1 = Surface + RoundHill;
 //		Surface = 0.0;
 	}
-*/
 
+*/
 /*	else if (MainEdge)
 	{
 		// Adjustment to Flat earth model
@@ -1072,7 +1074,13 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 		Surface = -mClutter.mClutterTypes[mClutterProfile[PeakIndex]].sRho
 				*20.0*log10(Y1*Y2*4.0*M_PI/(lambda*mLinkLength));
 	}
-*/	
+	else
+	{
+//		if (mCalcMarker==142423)
+//	 	cout << " Nothing		";
+	}
+*/
+//	if (mCalcMarker==142423)
 /*	{
 #ifndef NO_DEBUG
 	cout << " mhu=" << mhu;
@@ -1125,6 +1133,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 
 	return DiffLoss;
 } /* end CPathLossPrdictor::CalcDiffLoss */
+
 
 
 //**************************************************************************

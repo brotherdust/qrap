@@ -2300,12 +2300,13 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		{
 			cout << "Starting Exhaustive search " << endl;
 			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
-				DeltaH[i] = -1.0;
+				DeltaH[i] = -0.7;
 			if (0<mClutterCount[i]) Change[i] = true;
-			smallStepSize = 0;
+//			smallStepSize = 0;
 			StepSize = 0.5;
  			ExhaustiveSearch=true;
 			stop = false;
+			smallStepSize=0;
 		}	
 		
 
@@ -2634,8 +2635,8 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			}
 			else if (cost>costOld)
 				smallStepSize++;
-			else if (cost<costOld)
-				smallStepSize=0;				
+//			else if (cost<costOld)
+//				smallStepSize=0;				
 			if (fabs(TempStepSize)<0.01)
 				TempStepSize = 0.01;
 //			StepSize = min(TempStepSize, OldStepSize);
@@ -2644,7 +2645,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				if (fabs(StepSize*2)<fabs(DeltaH[i]))
 					DeltaH[i] = DeltaH[i]/fabs(DeltaH[i])*max(StepSize*fabs(DeltaH[i])*2,0.01);
 				
-		} // if TempStepSize groot genoeg.
+		} // if TempStepSize groot genoeg. & Not Exhaustive Search
 
 //		cout << "SizeOfDiff " << SizeOfDiff << endl;
 //		stop = (stop)||(((100*fabs((cost - costMin)/costMin)) < 0.005)&&(giveUP>3)&&(StepSize<0.001));
@@ -2678,8 +2679,8 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		StepResult[NumStop] = cost;
 
 
-		cout << "costMin=" << costMin << "	costMinTemp=" << costMinTemp 
-			<< "	TempMinIndex=" <<TempMinIndex << endl
+//		cout << "costMin=" << costMin << "	costMinTemp=" << costMinTemp 
+//			<< "	TempMinIndex=" <<TempMinIndex << endl;
 		if (cost < costMin)
 		{
 			costMin = cost;
@@ -2689,6 +2690,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			cout << "Saved" << endl;
 			stuck=0;
 			giveUP=0;
+			
 		}
 		else if (TempMinIndex>0)
 		{

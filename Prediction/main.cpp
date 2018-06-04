@@ -151,9 +151,9 @@ int main (int argc, char **argv)
 	bool Continue;
 	cMeasAnalysisCalc Meas;
 
-
 	cGeoP *Hoek;
 	unsigned NumHoek=4;
+
 
 //Gauteng 20m DEM
 /*	NumHoek=19;
@@ -262,20 +262,20 @@ int main (int argc, char **argv)
 
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-	Meas.OptimiseHeights(0);
+//	Meas.OptimiseHeights(0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 //	Meas.SetSeekWidthBest(1);
 //	Meas.SetSmoothWidthBest(1);
 //	Meas.OptimiseSeekWidth();
-/*	Meas.OptimiseModelCoefAllTotal(0);
+	Meas.OptimiseModelCoefAllTotal(0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-	Meas.OptimiseModelCoefD(0);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+//	Meas.OptimiseModelCoefD(0);
+//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 	Meas.SaveResults();
-*/
+
 //      Meas.OptimiseHeights(3);
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 

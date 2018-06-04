@@ -22,6 +22,12 @@
  *                                                                         *
  ************************************************************************* */
 
+
+//**************************************************************************
+//This class in no longer used. Ported to cPlotTask.
+//
+
+
 #ifndef Qrap_cTrafficDist_h
 #define Qrap_cTrafficDist_h
 
@@ -70,19 +76,19 @@ namespace Qrap
 			bool WriteOutput (GeoType OutputProj);
 			
 			/**
-			 * Perform a primary server plot for all the radioinstallations
+			 * Use MatrixInversionMethod to determine clutter weights
 			 * 
 			 * @return A boolean.
 			 */
-			bool PrimServPlot ();
+			bool DetermineClutterDistMatrix ();
+			
 
 			/**
-			 * Determine a matrix containing the area of each clutter type within a radioinstallations coverage area.
+			 * Do gradient search to determine clutter traffic weights
 			 * 
 			 * @return A boolean.
 			 */
-			bool DetermineClutterDist ();
-			
+			bool DetermineClutterDistGradient ();
 			/*
 			 * 
 			 */
@@ -112,21 +118,12 @@ namespace Qrap
 			 * Description of GetDBinfo
 			 */
 			bool GetDBinfo();
-			
 
 			/**
-			 * Description of OrderAllPred
+			 * Description of GetDBinfo
 			 */
-			int OrderAllPred();
-			
-			/**
-			 * Description of UpdateActiveRasters
-			 * 
-			 * @param Now Description
-			 * @param Advance Description
-			 */
-			unsigned UpdateActiveRasters(int Now, int Advance);
-			
+			double CostFunction(bool PacketData=true);
+		
 			eOutputUnits	mUnits;		///< The units in which the result is requested ... in case of Coverage
 			bool		mDownlink;	///< Is it a downlink(true) or uplink(false) calculation 
 			double		mRqSN;		///< Minimum required signal to Noise ratio in dB
@@ -153,7 +150,7 @@ namespace Qrap
 			double 		mMaxCoverageRange;
 			unsigned	mNumAngles;	///< Number of angles in 360 used individual coverage plots
 			tMobile		mMobile;	///< Information on the mobile units
-			unsigned	mNumFixed;	///< Number of fixed radion installations.
+			unsigned	mNumFixed;	///< Number of fixed radio installations.
 			vector<tFixed>	mFixedInsts;	///< Inforamtion on the fixed installations
 			Float2DArray	mPlot;		///< Result of the plot
 			Float2DArray	mSupportPlot;	///< secodary/supporting information e.g. signal strength incase of Prim Server
@@ -166,6 +163,8 @@ namespace Qrap
 			double		mMaxRange;	///< Maximum range that will be considered
 			string		mDir;		///< Directory of the output file
 			string		mOutputFile;	///< Name of the output file
+			cClutter	mClutterUsed;	///< Clutter data
+			Float2DArray 	mClutterDist;	///< Matrix countaining the number of clutterpixels for each installation
 
 			MatrixXd mTheMatrix;	// matrix representing the set of linear equations to be solved
 			MatrixXd mTraffic;

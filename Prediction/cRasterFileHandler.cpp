@@ -367,6 +367,7 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 			}
 			if ((profile[j] <-440.0)||(profile[j] >8880)||(profile[j]==OUTOFRASTER))
 				profile[j]=0;
+			if (0==profile[j]) cout << "foutjie" << endl;
 	
 		}
 		else mCurrentRasters[Current]->mUsed = true;

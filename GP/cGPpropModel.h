@@ -45,10 +45,10 @@
 #include "../DataBase/Config.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 300
+#define NUM_INIT_CANDIDATES 800
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 10
-#define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50
+#define NUM_GENERATIONS 50 // GP field guide suggest between 10 and 50
 #define NUM_POINT_PER_EVAL 1000
 //how much of the population we loose per generation
 #define UNFIT_LIMIT 100195
@@ -56,6 +56,9 @@
 #define MAX_TREE_DEPTH 10 
 #define PROP_MUTATE 0.5
 #define PROP_CROSSOVER 0.5
+//Affects how elitist the algorithm is ... the smaller the more elitist
+#define GAUSSDIST 4
+
 
 #define MAXOPTLOOPS 500
 #define MAXOPTCALC 2500
@@ -175,13 +178,13 @@ namespace Qrap
 
 			int CostFunction(unsigned CandidateIndex, double &Mean, double &MeanSquareError,
 				double &StDev, double &CorrC, 
-				bool CalcNewObstruction=true, unsigned Clutterfilter=3);
+				bool CalcNewObstruction=true, unsigned Clutterfilter=7);
 
 			int CostFunctionTreeOnly(unsigned CIndex, double &Mean, double &MeanSquareError,
-					double &StDev, double &CorrC, unsigned Clutterfilter=3);
+					double &StDev, double &CorrC, unsigned Clutterfilter=7);
 
 			int AutoFix(unsigned CIndex, double &Mean, double &MeanSquareError,
-					double &StDev, double &CorrC, unsigned Clutterfilter=3);
+					double &StDev, double &CorrC, unsigned Clutterfilter=7);
 
 			void optimiseConstants(unsigned Index);
 

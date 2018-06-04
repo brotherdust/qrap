@@ -1194,6 +1194,37 @@ int cGPpropModel:: mainTuning()
 	mCandidate.push_back(newCandidate);
 	newCandidate.renew();
 
+	//Basic with clutterheight term)
+	// # 26
+	newTree = new Add(5);
+	newTree->mChild[0] = new ConstNode(32.45);
+	newTree->mChild[1] = new Multiply();
+	newTree->mChild[1]->mChild[0] = new ConstNode(20.0);
+	newTree->mChild[1]->mChild[1] = new Log10Node();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[2] = new Multiply();
+	newTree->mChild[2]->mChild[0] = new ConstNode(0.5);
+	newTree->mChild[2]->mChild[1] = new ObstructionNode();
+	newTree->mChild[3] = new Multiply();
+	newTree->mChild[3]->mChild[0] = new ConstNode(0.01);
+	newTree->mChild[3]->mChild[1] = new Power();
+	newTree->mChild[3]->mChild[1]->mChild[0] = new TxHeightNode();
+	newTree->mChild[3]->mChild[1]->mChild[1] = new ConstNode(0.4);
+	newTree->mChild[4] = new Multiply();
+	newTree->mChild[4]->mChild[0] = new ConstNode(0.1);
+	newTree->mChild[4]->mChild[1] = new Power();
+	newTree->mChild[4]->mChild[1]->mChild[0] = new Add();
+	newTree->mChild[4]->mChild[1]->mChild[0]->mChild[0] = new ClutterDepthNode();
+	newTree->mChild[4]->mChild[1]->mChild[0]->mChild[1] = new ClutterHeightNode();
+	newTree->mChild[4]->mChild[1]->mChild[1] = new ConstNode(0.4);
+
+	newCandidate.sTree = newTree;
+	newCandidate.sDepth = 5;
+	newCandidate.sForm = 26;
+	mCandidate.push_back(newCandidate);
+	newCandidate.renew();
+
+
 //*************************************************************************************************
 	NumSeeds = mCandidate.size();
 	mNumCandidates = mCandidate.size();
@@ -1579,7 +1610,7 @@ int cGPpropModel:: mainTuning()
 			{
 				IndexForClone = mNumStars;
 				while (IndexForClone>(mNumStars-1))
-					IndexForClone = (unsigned)(fabs(gGauss(gRandomGen)*2*(mNumStars)));
+					IndexForClone = (unsigned)(fabs(gGauss(gRandomGen)*GAUSSDIST*(mNumStars)));
 				mCandidate[mNumCandidates-1-i] = mStars[IndexForClone];
 			}
 			else if (mNumCandidates-mNumToDie>1)
@@ -1587,7 +1618,7 @@ int cGPpropModel:: mainTuning()
 				IndexForClone = mNumCandidates-mNumToDie;
 				while (IndexForClone>(mNumCandidates-mNumToDie-1))
 					IndexForClone = (unsigned)(fabs(gGauss(gRandomGen)
-							*(mNumCandidates-mNumToDie)));
+							*GAUSSDIST*(mNumCandidates-mNumToDie)));
 				mCandidate[mNumCandidates-1-i] = mCandidate[IndexForClone];
 			}
 		}
@@ -3100,13 +3131,13 @@ void cGPpropModel::optimiseConstantsSTDevMO(unsigned Index)
 //					<< "	Delta[i]=" << Delta[i] << endl;
 			}
 			CostFunctionTreeOnly(Index, newMean, newMSE, newStdDev, newCorrC);
-			cout << Index << "	STDevMO	DeltaA = " << DeltaA 
+/*			cout << Index << "	STDevMO	DeltaA = " << DeltaA 
 					<< "		CorrC=" << newCorrC 
 					<< "	StDev=" << newStdDev 
 					<< "	Mean=" << newMean  
 					<< "	MSE=" << newMSE << "	CalcCount="<< CalcCount << endl;
 		
-			Continue = (OmegaSize>1e-3)&&(((oldStdDev-newStdDev)/newStdDev)>1e-6);
+*/			Continue = (OmegaSize>1e-3)&&(((oldStdDev-newStdDev)/newStdDev)>1e-6);
 			oldCorrC = newCorrC; oldStdDev=newStdDev; oldMean=newMean; oldMSE=newMSE;
 		}
 		Continue = Continue&&(LoopCount<MAXOPTLOOPS)&&(CalcCount<MAXOPTCALC);

@@ -2432,7 +2432,7 @@ www.QRap.org.za
 ;
 	</table> <!-- testpointauxGSM -->
 
-<!-- *********************************************************************************************************************
+<!-- ********************************************************************************************************************* -->
 	<table name="testpointauxLTE" label="LTE Auxiliary Test Point info">
 	       <field name="id"
 		      type="bigserial primary key unique not null"
@@ -2477,7 +2477,7 @@ www.QRap.org.za
 		       description=" " 
 			unittype="power"/>
 
-	</table> <!testpointauxLTE -->
+	</table> <!--testpointauxLTE -->
 
 <!-- ********************************************************************************************************************* -->
 	<table name="testpointauxUTRAN" label="UTRAN Auxiliary Test Point info">

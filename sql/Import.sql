@@ -104,7 +104,7 @@ select count(*) from tempmeas;
 
 truncate table TPtempmeas31;
 
-create table TPtempmeas6GSM(
+create table TPtempmeas31(
 Position	geometry(Point,4326),
 Times		char(50),		
 Longitude	double precision,	Latitude	double precision, Speed	integer,
@@ -158,9 +158,7 @@ NDistance5	real,			NBearing5	real,
 NTech6		char(5),		NCellName6	char(50),
 NCellid6	integer,		NLAC6		integer,
 NCell6		integer,		NARFCN6		integer,
-NRxLev6		integer,
-id		bigserial primary key);
-		NQual6		integer,
+NRxLev6		integer,		NQual6		integer,
 NDistance6	real,			NBearing6	real,
 NTech7		char(5),		NCellName7	char(50),
 NCellid7	integer,		NLAC7		integer,

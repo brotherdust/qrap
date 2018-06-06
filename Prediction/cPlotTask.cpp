@@ -742,13 +742,13 @@ bool cPlotTask::CombineCov()
 	Advance = RangeSum/mFixedInsts.size(); 
 	
 	UpdateActiveRasters(0,Advance+2);
-	for (k=0;k<mActiveRasters.size();k++)
+/*	for (k=0;k<mActiveRasters.size();k++)
 	{
 		cout << "	Top: " << mActiveRasters[k].sTop;
 		cout << "	Left: " << mActiveRasters[k].sLeft;
 		cout << endl;
 	}
-	
+*/	
 	cout << "cPlotTask::CombineCov():  Before main loop;" << endl;	
 	if(mCols<mRows)  //vertical
 	{
@@ -1309,9 +1309,9 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 			||((mCols>=mRows)&&((mFixedInsts[i].sFEdge<=FrontEdge)
 							&&(mFixedInsts[i].sBEdge>=DoneEdge))))
 		{
-			cout << "i: " << i << "  InstKey: " << mFixedInsts[i].sInstKey 	
-							<< " FE: " << mFixedInsts[i].sFEdge 
-							<< "   BE: " <<  mFixedInsts[i].sBEdge << endl;
+//			cout << "i: " << i << "  InstKey: " << mFixedInsts[i].sInstKey 	
+//							<< " FE: " << mFixedInsts[i].sFEdge 
+//							<< "   BE: " <<  mFixedInsts[i].sBEdge << endl;
 			Loaded = false;
 			for (j=0;j<mActiveRasters.size();j++)
 				Loaded = Loaded || 
@@ -1790,6 +1790,12 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 					mFixedInsts.erase(mFixedInsts.begin()+j);
 					j--;
 				}
+				else if (!((mFixedInsts[j].sPStraffic>0.0)||(mFixedInsts[j].sCStraffic>0.0)))
+				{
+					mFixedInsts.erase(mFixedInsts.begin()+j);
+					j--;
+				}
+					
 			}
 		}
 		else
@@ -1844,11 +1850,14 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 						&&(CurrentRadInstID<mNumInstInTraffic-1))
 					CurrentRadInstID++;
 			}
-			cout << "CurrentRadInstID = " << CurrentRadInstID << "	Clutter = " << ClutterRaster[i][j] << endl;
+//			cout << "CurrentRadInstID = " << CurrentRadInstID << "	Clutter = " << ClutterRaster[i][j] << endl;
 			if (mPlot[i][j] == mFixedInsts[CurrentRadInstID].sInstKey)
-				mClutterArea[CurrentRadInstID][(int)ClutterRaster[i][j]] += PlotRes*PlotRes;
+				mClutterArea[CurrentRadInstID][(int)ClutterRaster[i][j]] += PlotRes*PlotRes/1000/1000;
+			if (0==ClutterRaster[i][j])
+				cout << i << "," << j << "	";
 		}
 	}
+	cout << endl;
 	delete_Float2DArray(ClutterRaster);
 
 	//Determine starting values for trafficdensities
@@ -1896,16 +1905,26 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	bool Stop = false, Better=false;
 	int IterLeft=5000;
 	
+	double MinTestCost, MinDelta;
+	unsigned MinIndex=0;
 	cout << "In cPlottask::DetermineTrafficDist(). Starting optimisation loop " << endl; 
 	while ((!Stop)&&(IterLeft>0))
 	{
 		SumOfdCdD = 0.0;
 		OldCost = TrafficDensCost();
+		MinTestCost=OldCost;
+		MinIndex=0;
 		for (j=1; j<=ClutterUsed.mNumber; j++)
 		{
 			Delta = max(0.05*mVerkeerDigt[j],0.001*SumOfTraffic/sumOfArea);
 			mVerkeerDigt[j]+=Delta;
 			TestCost = TrafficDensCost();
+			if (TestCost<MinTestCost)
+			{
+				MinIndex=j;
+				MinTestCost=TestCost;
+				MinDelta = Delta;
+			}
 			dCdD[j] = (TestCost - OldCost)/Delta;
 			if ((mVerkeerDigt[j]<0.0001*SumOfTraffic/sumOfArea)&&(dCdD[j]>0))
 				dCdD[j]=0.0;
@@ -1916,7 +1935,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 //		cout << "In cPlottask::DetermineTrafficDist(). Calculated partial derivatives " << endl; 
 		SizeOfdCdD = sqrt(SumOfdCdD);
 		Better = false;
-		while ((StepSize>0.0001*SumOfTraffic/sumOfArea)&&(!Better))
+		while ((StepSize>0.001*SumOfTraffic/sumOfArea)&&(!Better))
 		{
 			for (j=1; j<=ClutterUsed.mNumber; j++)
 			{
@@ -1931,7 +1950,15 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		}
 		IterLeft--;
 		cout << "#"<< IterLeft<<"	Cost=" << Cost << endl;
-		if (!Better) Stop = true;	
+		if (!Better)
+		{
+			if (MinIndex>0)
+			{
+				mVerkeerDigt[j]+=MinDelta;
+				Cost = MinTestCost;
+			}
+			else Stop = true;	
+		}
 	}
 
 

@@ -1696,11 +1696,38 @@ bool cPlotTask::CellCentriods()
 }
 
 //***************************************************************************
+double cPlotTask::TrafficDensCost()
+{
+	unsigned i, j;
+	double TotalCost = 0.0;
+	double SumPerRow = 0.0;
+
+//	cout << "In cPlotTask::TrafficDensCost(): Before Calculation" << endl;
+	for (i=0; i<mNumInstInTraffic; i++)
+	{
+//		cout << "i=" << i << "	Traffic=" << mCellTraffic[i] << endl;
+		SumPerRow=0.0;
+		for (j=1; j<=mNumClutter; j++)
+		{
+//			cout << "j=" << j << "	Digtheid=" << mVerkeerDigt[j] << endl;
+//			cout << << "i=" << i << "	j=" << j << "	Area=" << mClutterArea[i][j] << endl;
+			SumPerRow += mVerkeerDigt[j]*mClutterArea[i][j];
+		}
+//		cout<< "SumPerRow=" << SumPerRow << "	mCellTraffic[i]="<< mCellTraffic[i] <<endl;
+		TotalCost += (SumPerRow-mCellTraffic[i])*(SumPerRow-mCellTraffic[i]);
+	}
+//	cout << "In cPlotTask::TrafficDensCost(): After Calculation" << endl;
+	return TotalCost;
+}
+
+
+//***************************************************************************
 bool cPlotTask::DetermineTrafficDist(bool Packet)
 {
 	unsigned i, j, k, n, m;
 
 	cClutter ClutterUsed(mClutterClassGroup);
+	mNumClutter = ClutterUsed.mNumber+1;
 	cout << "In cPlottask::DetermineTrafficDist(). ClutterUsed.mNumber = " 
 		<< ClutterUsed.mNumber << endl;	
 	Float2DArray ClutterRaster;
@@ -1731,7 +1758,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	query += " from radioinstallation_view cross join site_view_only cross join customareafilter";
 	query += " WHERE (radioinstallation_view.siteid = site_view_only.id)";
 	query += " and customareafilter.areaname ='TrafficArea' ";
-	query += "and location @ the_geom";
+	query += "and  ST_Within(the_geom,location)";
 
 	pqxx::result QResult;
 	string errormessage="";
@@ -1777,34 +1804,34 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		} 
 	}
 
-	unsigned NumInsts = mFixedInsts.size();
+	mNumInstInTraffic = mFixedInsts.size();
 
-	cout << "In cPlottask::DetermineTrafficDist(). NumInsts = " << NumInsts << endl;	
-	for (n=0; n<NumInsts; n++)
+	cout << "In cPlottask::DetermineTrafficDist(). mNumInstInTraffic = " << mNumInstInTraffic << endl;	
+	for (n=0; n<mNumInstInTraffic; n++)
 		cout << mFixedInsts[n].sInstKey << "	";
 	cout << endl;
 
-	double *CellTraffic;
-	CellTraffic = new double[NumInsts];
+
+	mCellTraffic = new double[mNumInstInTraffic];
 
 	if (Packet)
 	{
-		for (n=0; n<NumInsts; n++)
-			CellTraffic[n] = mFixedInsts[n].sPStraffic; 
+		for (n=0; n<mNumInstInTraffic; n++)
+			mCellTraffic[n] = mFixedInsts[n].sPStraffic; 
 	}
 	else
 	{
-		for (n=0; n<NumInsts; n++)
-			CellTraffic[n] = mFixedInsts[n].sCStraffic; 
+		for (n=0; n<mNumInstInTraffic; n++)
+			mCellTraffic[n] = mFixedInsts[n].sCStraffic; 
 	}
-	Float2DArray ClutterArea;
-	ClutterArea = new_Float2DArray(NumInsts,ClutterUsed.mNumber+1); 
-	for (i=0; i<NumInsts; i++)
+
+	mClutterArea = new_Float2DArray(mNumInstInTraffic,ClutterUsed.mNumber+1); 
+	for (i=0; i<mNumInstInTraffic; i++)
 		for (j=0; j<=ClutterUsed.mNumber; j++)
-			ClutterArea[i][j] = 0.0;
+			mClutterArea[i][j] = 0.0;
 
 	// determine area matrix
-	cout << "In cPlottask::DetermineTrafficDist(). Determining area Matrix " << endl; 
+//	cout << "In cPlottask::DetermineTrafficDist(). Determining area Matrix " << endl; 
 	unsigned CurrentRadInstID = 0;
 	for (i=0; i<mRows; i++)
 	{
@@ -1813,15 +1840,103 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 			if (mPlot[i][j] != mFixedInsts[CurrentRadInstID].sInstKey)
 			{
 				CurrentRadInstID=0;
-				while ((mFixedInsts[CurrentRadInstID].sInstKey!=mPlot[i][j])&&(CurrentRadInstID<NumInsts-1))
+				while ((mFixedInsts[CurrentRadInstID].sInstKey!=mPlot[i][j])
+						&&(CurrentRadInstID<mNumInstInTraffic-1))
 					CurrentRadInstID++;
 			}
+			cout << "CurrentRadInstID = " << CurrentRadInstID << "	Clutter = " << ClutterRaster[i][j] << endl;
 			if (mPlot[i][j] == mFixedInsts[CurrentRadInstID].sInstKey)
-				ClutterArea[CurrentRadInstID][(int)ClutterRaster[i][j]] += PlotRes*PlotRes/1000/1000;
+				mClutterArea[CurrentRadInstID][(int)ClutterRaster[i][j]] += PlotRes*PlotRes;
 		}
 	}
 	delete_Float2DArray(ClutterRaster);
 
+	//Determine starting values for trafficdensities
+	
+	double SumOfTraffic = 0.0;
+	cout << "In cPlottask::DetermineTrafficDist(). Preparing starting Traffic Densities " << endl; 
+	for (n=0; n<mNumInstInTraffic; n++)
+	{
+		cout << "Inst: " << mFixedInsts[n].sInstKey << "	Traffic=" << mCellTraffic[n] << endl;
+		SumOfTraffic += mCellTraffic[n]; 
+	}
+
+	double sumOfArea = 0.0;
+	double * AreaSumPerClutter;
+	AreaSumPerClutter = new double[ClutterUsed.mNumber+1];
+	for (j=0; j<=ClutterUsed.mNumber; j++)
+		AreaSumPerClutter[j]=0.0;
+	for (j=1; j<=ClutterUsed.mNumber; j++)
+	{
+		for (n=0; n<mNumInstInTraffic; n++)
+		{
+			AreaSumPerClutter[j]+=mClutterArea[n][j];
+			sumOfArea+=mClutterArea[n][j];
+		}
+		cout << "Clutter=" << j << "	Area: " << AreaSumPerClutter[j] << endl;
+	}
+
+	mVerkeerDigt = new double[ClutterUsed.mNumber+1];	
+	mVerkeerDigt[0] = 0.0; 	 
+	for (j=1; j<=ClutterUsed.mNumber; j++)
+	{
+		if (AreaSumPerClutter[j]>0.0)
+			mVerkeerDigt[j] = SumOfTraffic/sumOfArea;
+		else mVerkeerDigt[j]=0.0;
+	}
+
+	cout << "In cPlottask::DetermineTrafficDist(). Initialising derivatives" << endl; 
+	double * dCdD; //partial derivative of Costfunction with respect to 
+	dCdD = new double[ClutterUsed.mNumber+1];
+	for (j=0; j<=ClutterUsed.mNumber; j++)
+		dCdD[j] = 0.0;
+
+	double OldCost, TestCost, Delta, SumOfdCdD, SizeOfdCdD, Cost;
+	double StepSize = 0.1*SumOfTraffic/sumOfArea;
+	bool Stop = false, Better=false;
+	int IterLeft=5000;
+	
+	cout << "In cPlottask::DetermineTrafficDist(). Starting optimisation loop " << endl; 
+	while ((!Stop)&&(IterLeft>0))
+	{
+		SumOfdCdD = 0.0;
+		OldCost = TrafficDensCost();
+		for (j=1; j<=ClutterUsed.mNumber; j++)
+		{
+			Delta = max(0.05*mVerkeerDigt[j],0.001*SumOfTraffic/sumOfArea);
+			mVerkeerDigt[j]+=Delta;
+			TestCost = TrafficDensCost();
+			dCdD[j] = (TestCost - OldCost)/Delta;
+			if ((mVerkeerDigt[j]<0.0001*SumOfTraffic/sumOfArea)&&(dCdD[j]>0))
+				dCdD[j]=0.0;
+			SumOfdCdD += dCdD[j]*dCdD[j];
+			//return to original value
+			mVerkeerDigt[j]-=Delta;
+		}
+//		cout << "In cPlottask::DetermineTrafficDist(). Calculated partial derivatives " << endl; 
+		SizeOfdCdD = sqrt(SumOfdCdD);
+		Better = false;
+		while ((StepSize>0.0001*SumOfTraffic/sumOfArea)&&(!Better))
+		{
+			for (j=1; j<=ClutterUsed.mNumber; j++)
+			{
+				mVerkeerDigt[j]-=dCdD[j]*StepSize/SizeOfdCdD;
+				if (mVerkeerDigt[j]<0.0)
+					mVerkeerDigt[j]=0.0;
+			}
+			Cost = TrafficDensCost();
+			if (Cost<OldCost)
+				Better=true;
+			else StepSize*=0.7;
+		}
+		IterLeft--;
+		cout << "#"<< IterLeft<<"	Cost=" << Cost << endl;
+		if (!Better) Stop = true;	
+	}
+
+
+
+/*
 	// Determine size of matrix ... i.e. How many Cluttertypes are represented
 	cout << "In cPlottask::DetermineTrafficDist(). TotalsPerClutter " << endl; 
 	double *TotalsPerClutter;
@@ -1832,7 +1947,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		for (i=0; i<NumInsts; i++)
 		{
 //			cout << ClutterArea[i][j] << "	";
-			TotalsPerClutter[j]+=ClutterArea[i][j];
+			TotalsPerClutter[j]+=mClutterArea[i][j];
 		}
 //		cout << endl;
 //		cout << "ClutterIndex = " <<j <<"	" <<TotalsPerClutter[j] << endl;
@@ -1884,11 +1999,11 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	{	
 		for( m=0; m<ClutterCount; m++)
 		{
-			mRight(m,0)+=ClutterArea[n][ClutterIndex[m]]*CellTraffic[n];			
+			mRight(m,0)+=mClutterArea[n][ClutterIndex[m]]*CellTraffic[n];			
 			for(k=0; k<ClutterCount; k++)
 			{
-				mTheMatrix(m,k) += ClutterArea[n][ClutterIndex[m]]
-							*ClutterArea[n][ClutterIndex[k]];
+				mTheMatrix(m,k) += mClutterArea[n][ClutterIndex[m]]
+							*mClutterArea[n][ClutterIndex[k]];
 			}
 		}
 	}
@@ -2047,7 +2162,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	}
 	else cout << "In cPlottask::DetermineTrafficDist(): Solution NOT found" << endl; 
 */
-
+/*
 	mTheMatrix.resize(ClutterCount+CurrentActiveSetSize,ClutterCount+CurrentActiveSetSize);
 	mRight.resize(ClutterCount+CurrentActiveSetSize,1);
 	for( m=0; m<ClutterCount+CurrentActiveSetSize; m++)
@@ -2225,7 +2340,6 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	delete [] OldActiveSet;
 	
 
-
 	cout << "In cPlottask::DetermineTrafficDist():  Saving estimations" << endl;
 	string queryB;
 	queryB = "INSERT into TrafficDensity ";
@@ -2249,8 +2363,9 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		query += temp;
 		query += ");";
 	}
-	
-
+	delete [] TotalsPerClutter;
+	delete [] ClutterIndex;	
+*/
 
 /*
 	// Implementation of 'straight' matrix inversion
@@ -2313,6 +2428,8 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		}
 	}
 
+	delete [] TotalsPerInst;
+
 //	cout << "In cPlottask::DetermineTrafficDist() before Completing matrixes" << endl;
 
 	for(i=0; i<ClutterCount; i++)
@@ -2338,46 +2455,49 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		}
  	}
 
+	delete [] RadInstOrder;
+
 	cout << "In cPlottask::DetermineTrafficDist() before Solving 'straight' matrix inversion " << endl;
 
 	mTrafficDens = mTheMatrix.fullPivLu().solve(mRight);
-
 	cout << "In cPlottask::DetermineTrafficDist() After 'straight' matrix invertion" << endl;
-	for (i=0;i<ClutterCount;i++)
+*/
+	for (i=1; i<mNumClutter; i++)
 	{
-		cout << "ClutterIndex[i]=" << ClutterIndex[i] 
-			<< "	mTrafficDens(i) = " << mTrafficDens(i) << endl;
+		cout << "ClutterIndex=" << i 
+			<< "	TrafficDensity = " << mVerkeerDigt[i] << endl;
 	}
 
+
 	cout << "In cPlottask::DetermineTrafficDist():  Saving estimations" << endl;
+	string queryB;
 	queryB = "INSERT into TrafficDensity ";
 	queryB += "(lastmodified, traffictype, technology, cluttertype, value) values ";
 	queryB += "(now(), ";
 	if (Packet) queryB += "'Packet Switched', ";
 	else queryB += "'Circuit Switched', ";
+	char* temp;
+	temp = new char[33];
 	gcvt(mFixedInsts[0].sTechKey,8,temp);
 	queryB += temp;
 	queryB += ", ";
 
-	for (m=0; m<ClutterCount; m++)
+	for (m=1; m<mNumClutter+1; m++)
 	{	
 		query = queryB;
-		gcvt(ClutterIndex[m],8,temp);
+		gcvt(m,8,temp);
 		query += temp;
 		query += ", ";
-		gcvt(mTrafficDens(m),8,temp);
+		gcvt(mVerkeerDigt[m],8,temp);
 		query += temp;
 		query += ");";
 	}
 
-	delete [] RadInstOrder;
-	delete [] TotalsPerInst;
-*/
 	cout << "In cPlottask::DetermineTrafficDist() Leaving" << endl;
 	delete [] temp;
-	delete [] TotalsPerClutter;
-	delete [] ClutterIndex;
-	delete_Float2DArray(ClutterArea);
+	delete [] mCellTraffic;
+	delete [] mVerkeerDigt;
+	delete_Float2DArray(mClutterArea);
 	return true;
 }
 

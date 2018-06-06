@@ -187,20 +187,27 @@ enum ePlotType
 			 * @param Advance Description
 			 */
 			unsigned UpdateActiveRasters(int Now, int Advance);
+
+			/**
+			 * Costfunction used to estimate traffic densities 
+			 */
+			double TrafficDensCost();
+
+
 			
-			ePlotType		mPlotType;		///< The type of plot requested
-			eOutputUnits	mUnits;			///< The units in which the result is requested ... in case of Coverage
-			bool			mDownlink;		///< Is it a downlink(true) or uplink(false) calculation 
-			double			mRqSN;			///< Minimum required signal to Noise ratio in dB
-			double			mRxMin;			///< Minimum required Received Signal Strength in dBm
+			ePlotType		mPlotType;	///< The type of plot requested
+			eOutputUnits		mUnits;		///< The units in which the result is requested ... in case of Coverage
+			bool			mDownlink;	///< Is it a downlink(true) or uplink(false) calculation 
+			double			mRqSN;		///< Minimum required signal to Noise ratio in dB
+			double			mRxMin;		///< Minimum required Received Signal Strength in dBm
 			double			mFadeMargin;	///< The fademargin required dB
-			double			mRqCIco;		///< The minimum required co-channel Carrier-to-interference ratio in dB
-			double			mRqCIad;		///< The minimum required adjacent-channel Carrier-to-interference ratio in dB
-			double			mRqEbNo;		///< The minimum required energy per bit to noise ratio 
+			double			mRqCIco;	///< The minimum required co-channel Carrier-to-interference ratio in dB
+			double			mRqCIad;	///< The minimum required adjacent-channel Carrier-to-interference ratio in dB
+			double			mRqEbNo;	///< The minimum required energy per bit to noise ratio 
 			double			mNoiseLevel; 	///< The noise floor ??? dBm
 			double			mkFactorServ;	///< kFactor used in effective earth model for coverage calculations
 			double			mkFactorInt;	///< kFactor used in effective earth model for interference calculations
-			short int		mDEMsource;		///< the primary key to the FILESETSUSED table for selection of the DEM data 
+			short int		mDEMsource;	///< the primary key to the FILESETSUSED table for selection of the DEM data 
 			short int		mClutterSource;	///< the primary key to the FILESETSUSED table for selection of the Clutter data
 			cRasterFileHandler 	mDEM;		///< RasterfileHandler to get the rasters containing the DEM for the upcoming prediction Radials at different angels 
 			bool			mUseClutter;	///< Is clutter data used in the calculations?
@@ -233,6 +240,11 @@ enum ePlotType
 			MatrixXd mTheMatrix;	// matrix representing the set of linear equations to be solved
 			MatrixXd mRight;
 			MatrixXd mTrafficDens;
+			Float2DArray		mClutterArea;	///<Used in determining the traffic densities
+			double *		mCellTraffic;
+			double *		mVerkeerDigt;
+			unsigned		mNumClutter;
+			unsigned		mNumInstInTraffic;
 	};
 }
 #endif /*CPLOTTASK_H_*/

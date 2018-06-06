@@ -174,8 +174,8 @@ bool cConfirmMultiLink::SetPoints(QList<QgsPoint> Points)
 		pqxx::result SitesIn;
 		query = "SELECT id,sitename, ST_AsText(location) AS location,status";
 		query += " FROM site_view_only ";
-		query += " WHERE  location ";
-        	query +="@ ST_GeomFromText('POLYGON((";
+		query += " WHERE  ST_within(location, ";
+        	query +=" ST_GeomFromText('POLYGON((";
 	        for (int i = 0 ; i < Points.size();i++)
  	       	{
  		       	North = max(North,Points[i].y());
@@ -197,7 +197,7 @@ bool cConfirmMultiLink::SetPoints(QList<QgsPoint> Points)
   		query += " ";
 		gcvt(Points[0].y(),10,text);
         	query += text;
-        	query += "))',4326);";	
+        	query += "))',4326));";	
 		if (!gDb.PerformRawSql(query))
 		{
 			cout << "Database Select on sites table failed in cConfirmMultiLink::SetPoints"<< endl;

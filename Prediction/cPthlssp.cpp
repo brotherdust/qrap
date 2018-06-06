@@ -969,7 +969,7 @@ double cPathLossPredictor::CalcDiffLoss(const int BeginIndex,
 //		<< "   mhu=" << mhu << "   MhuRho=" << MhuRho << endl;
 #endif
 
-	if (mhu<-0.8) KnifeEdge = 1.0;	// equivalent to 0
+	if (mhu<-0.8) KnifeEdge = 1.0;	// equivalent to 0dB
 	else if (mhu < 0.0) KnifeEdge = 0.5 - 0.62*mhu;
 	else if (mhu < 1.0)  KnifeEdge = 0.5*exp(-0.95*mhu);
 	else if (mhu < 2.4) { temp = 0.38 - 0.1*mhu;

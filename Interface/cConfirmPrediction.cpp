@@ -866,7 +866,8 @@ void cConfirmPrediction::on_btnDo_clicked()
 		}
 		else if (TrafficDist==mPlotType)
 		{
-			Prediction.DetermineTrafficDist();
+			Prediction.DetermineTrafficDist(true);
+			Prediction.DetermineTrafficDist(false);
 		}
 		FileWritten = Prediction.WriteOutput(DEG);
  	}
@@ -965,7 +966,7 @@ void cConfirmPrediction::on_btnDo_clicked()
       						g = (int)atof(res[i]["g"].c_str());
       						b = (int)atof(res[i]["b"].c_str());
       						a = (int)atof(res[i]["a"].c_str());
-      						cout << res[i]["val"].c_str() << "\t" << r << "\t"<< g << "\t"<< b << endl;
+//      					cout << res[i]["val"].c_str() << "\t" << r << "\t"<< g << "\t"<< b << endl;
       						QColor Col =  QColor(r,g,b,a);
         					myNewColorRampItem.color = Col;
         					myNewColorRampItem.label = res[i]["label"].c_str();
@@ -1014,7 +1015,7 @@ void cConfirmPrediction::on_btnDo_clicked()
    		   					b = (int) (rand()% 5)*255.0/5.0;
    		   				}
    		   				a = (int) 255;
-   		   				cout << "r: " << r << "  g: " << g << "  b: " << b << "  a: " << a << endl;
+ //  		   				cout << "r: " << r << "  g: " << g << "  b: " << b << "  a: " << a << endl;
    		   				myNewColorRampItem.label = myNewColorRampItem.value;
    		   			}
    	   				

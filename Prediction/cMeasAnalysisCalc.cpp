@@ -132,7 +132,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 	mWest = mEast;
 	char *text= new char[33];
 
-	areaQuery = " @ ST_GeomFromText('POLYGON((";
+	areaQuery = " ST_GeomFromText('POLYGON((";
 	for (i = 0 ; i < Points.size();i++)
    	{
 		Points[i].Get(Lat, Lon);
@@ -159,7 +159,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
    	areaQuery += " ";
 	gcvt(Lat,12,text);
    	areaQuery += text;
-   	areaQuery += "))',4326) ";
+   	areaQuery += "))',4326)) ";
 
 	cout << areaQuery << endl;
 	delete [] text;
@@ -209,10 +209,10 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 		query += text;
 	}
 //	Where testpoint is in area
-	query += " and testpoint.location ";
+	query += " and st_within(testpoint.location, ";
 	query += areaQuery;
 //	Where site is in area
-	query += " and site.location";
+	query += " and st_within(site.location, ";
 	query += areaQuery;
 	query+=" order by mobile, ci, id;";
 
@@ -431,8 +431,8 @@ bool cMeasAnalysisCalc::LoadMeasurements(char*  CustomAreaName,
 		query += text;
 	}
 //	Where testpoint is in area
-	query += " and testpoint.location @ the_geom ";
-	query += " and site.location @ the_geom";
+	query += " and ST_within(testpoint.location, the_geom) ";
+	query += " and ST_within(site.location, the_geom)";
 	query+=" order by mobile, ci, id;";
 
 	double longitude, latitude; 

@@ -2429,12 +2429,12 @@ www.QRap.org.za
 						from testpointauxLTE
 						where ta is not null)'>
 				</view>
-;
 	</table> <!-- testpointauxGSM -->
 
 <!-- ********************************************************************************************************************* -->
 	<table name="testpointauxLTE" label="LTE Auxiliary Test Point info">
-	       <field name="id"
+	       
+		<field name="id"
 		      type="bigserial primary key unique not null"
 		      label="ID"
 		      description="Primary key"
@@ -2538,7 +2538,6 @@ www.QRap.org.za
 		       description="Distance between GPS location and estimation in meter" />
 	       
 	</table> <!-- PositionEstimate -->
-
 
 <!-- ********************************************************************************************************************* -->
 	<table name="measurement" label="Measurement">

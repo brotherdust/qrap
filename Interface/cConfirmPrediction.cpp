@@ -74,8 +74,8 @@ bool cConfirmPrediction::SetPoints(QList<QgsPoint> Points)
 		query += " groundheight, status, project, flagx, flagz, technologytype, techkey ";
 		query += "FROM radioinstallation_view LEFT OUTER JOIN technology  ";
 		query += " ON (radioinstallation_view.techkey=technology.id) cross join site_view_only ";
-		query += " WHERE (radioinstallation_view.siteid = site_view_only.id) and location ";
-        	query +="@ ST_GeomFromText('POLYGON((";
+		query += " WHERE (radioinstallation_view.siteid = site_view_only.id) and ST_within(location, ";
+        	query +=" ST_GeomFromText('POLYGON((";
 	        for (int i = 0 ; i < Points.size();i++)
 	        {
 	        	North = max(North,Points[i].y());
@@ -100,7 +100,8 @@ bool cConfirmPrediction::SetPoints(QList<QgsPoint> Points)
 	        query += " ";
 		gcvt(Points[0].y(),12,text);
 	        query += text;
-	        query += "))',4326) order by radioinstallation_view.id;";	
+	        query += "))',4326)) order by radioinstallation_view.id;";	
+		cout << query << endl;
 		if (!gDb.PerformRawSql(query))
 		{
 			QMessageBox::information(this, "QRap", "Problem with database query to get sites in selected area!");

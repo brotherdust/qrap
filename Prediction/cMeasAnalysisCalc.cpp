@@ -69,7 +69,7 @@ cMeasAnalysisCalc::cMeasAnalysisCalc() // default constructor
 	{
 		mPlotResolution = atof(setting.c_str());
 	}
-	else mPlotResolution = 30;
+	else mPlotResolution = 20;
 	cout << " In cMeasAnalysisCalc::cMeasAnalysisCalc() mPlotResolution = " << mPlotResolution << endl;
 
 	setting = gDb.GetSetting("UseClutter");

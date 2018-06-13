@@ -1761,6 +1761,15 @@ where sq%7=0)
 
 drop table trainGSMseperate;
 
+create table test
+(tp bigint,
+servci integer,
+ta smallint,
+imei bigint); 
+
+drop table test
+
+
 create table trainGSMseperate as
 select id as tp, cellid as servci, ta, imei
 from tptempmeas6GSM 

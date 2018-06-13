@@ -188,26 +188,35 @@ int main (int argc, char **argv)
 	Hoek[2].Set(-26.99, 28.99);
 	Hoek[3].Set(-26.99, 27.25);
 */
-/*	
+	
 //	Country
-	NumHoek=4;
-	Hoek = new cGeoP[NumHoek];
-	Hoek[0].Set(-24.01, 30.99);
-	Hoek[1].Set(-30.01, 30.99);
-	Hoek[2].Set(-30.01, 23.00);
-	Hoek[3].Set(-24.01, 23.00);
-*/
-/*
+//	NumHoek=4;
+//	Hoek = new cGeoP[NumHoek];
+//	Hoek[0].Set(-24.01, 30.99);
+//	Hoek[1].Set(-30.01, 30.99);
+//	Hoek[2].Set(-30.01, 23.00);
+//	Hoek[3].Set(-24.01, 23.00);
+
+
 //	Bryanston
-	NumHoek=4;
+/*	NumHoek=4;
 	Hoek = new cGeoP[NumHoek];
 	Hoek[0].Set(-26.036, 27.976);
 	Hoek[1].Set(-26.108, 27.976);
 	Hoek[2].Set(-26.108, 28.074);
 	Hoek[3].Set(-26.036, 28.074);
 */
+/*
+//	Bryanston Positioning
+	NumHoek=4;
+	Hoek = new cGeoP[NumHoek];
+	Hoek[0].Set(-26.050, 28.005);
+	Hoek[1].Set(-26.087, 28.005);
+	Hoek[2].Set(-26.087, 28.055);
+	Hoek[3].Set(-26.050, 28.055);
+*/
 //	Tembisa
-/*	NumHoek=6;
+	NumHoek=6;
 	Hoek = new cGeoP[NumHoek];
 	Hoek[0].Set(-25.965, 28.210);
 	Hoek[1].Set(-25.970, 28.245);
@@ -215,7 +224,7 @@ int main (int argc, char **argv)
 	Hoek[3].Set(-26.062, 28.175);
 	Hoek[4].Set(-25.990, 28.150);
 	Hoek[5].Set(-25.965, 28.180);
-*/
+
 /*	//Tembisa bigger
 	NumHoek=5;	
 	Hoek = new cGeoP[NumHoek];
@@ -227,22 +236,24 @@ int main (int argc, char **argv)
 	Hoek[4].Set(-26.06, 28.26);
 */
 
-/*	vPoints Punte;
+	vPoints Punte;
 	for (unsigned i=0; i<NumHoek; i++)
 		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek;
-	cout << "Loading measurements ... in main()" << endl;
-	Continue = Meas.LoadMeasurements(Punte,0,0,0);
-*/
 
+//	cout << "Loading measurements ... in main()" << endl;
+//	Continue = Meas.LoadMeasurements(Punte,0,0,0);
+
+
+/*
 	cout << "Loading measurements ... in main()" << endl;
 	char * CustomAreaName;
 	CustomAreaName= new char[23];
 	strcpy(CustomAreaName,"GautengClutterOutline");
 	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,0);
-
-	if (!Continue)
+*/
+/*	if (!Continue)
 		return 0;
 
 	if (!gDb.PerformRawSql(queryC))
@@ -255,19 +266,16 @@ int main (int argc, char **argv)
 
 	Meas.SetUseAntANN(false);
 
-//	Meas.mPathLoss.mClutter.Reset(1);
+	Meas.mPathLoss.mClutter.Reset(1);
 
 	Meas.SetPlotResolution(20);
-
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-
-	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
+*/
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+
 //	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-	Meas.OptimiseHeights(0);
-	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+//	Meas.OptimiseHeights(0);
+//	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 //	Meas.SetSeekWidthBest(1);
 //	Meas.SetSmoothWidthBest(1);
@@ -278,7 +286,7 @@ int main (int argc, char **argv)
 //	Meas.OptimiseModelCoefD(0);
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 //	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-	Meas.SaveResults();
+//	Meas.SaveResults();
 
 //      Meas.OptimiseHeights(3);
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
@@ -348,7 +356,7 @@ int main (int argc, char **argv)
 		cout << "Error updating qrap_config" << endl;
 	}
 	Meas.SetUseAntANN(true);
-   Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+   	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
 //   Meas.OptimiseHeights(4);
@@ -503,7 +511,7 @@ for ( i=4; i>=0; i--)
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-/*
+
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
 	cout << "Na constructor" << endl;
@@ -532,7 +540,7 @@ for ( i=4; i>=0; i--)
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-*/
+
 /*
 	if (!gDb.PerformRawSql(query))
 	{

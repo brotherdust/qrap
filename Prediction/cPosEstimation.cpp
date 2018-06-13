@@ -41,7 +41,7 @@
 	unsigned cPosEstimation::mClutterClassGroup = 0;
 	bool cPosEstimation::mUseClutter = true;
 	double cPosEstimation::mkFactor =1.2;
-	double cPosEstimation::mPlotResolution = 5;
+	double cPosEstimation::mPlotResolution = 20;
 
 
 //*********************************************************************
@@ -52,7 +52,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	mPathLoss= new cPathLossPredictor();
 
 	mLTEsim = false;
-	mOriginal = true;
+	mOriginal = false;
 	mUMTSsim = false;
 	mTAUnknown = false;
 	mCurSiteI = 0;
@@ -77,7 +77,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	{
 		mPlotResolution = atof(setting.c_str());
 	}
-	else mPlotResolution = 5;
+	else mPlotResolution = 20;
 
 	setting = gDb.GetSetting("UseClutter");
 	if (setting=="true")
@@ -171,7 +171,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 	unsigned NumInPosSet = 0; 
 	unsigned siteid, tp,type, oldtype;
 	
-	areaQuery += " @ ST_GeomFromText('POLYGON((";
+	areaQuery += "ST_GeomFromText('POLYGON((";
 	for (i = 0 ; i < Points.size();i++)
    	{
 		Points[i].Get(Lat, Lon);
@@ -200,14 +200,14 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
    	areaQuery += " ";
 	gcvt(Lat,12,text);
    	areaQuery += text;
-   	areaQuery += "))',4326) ";
+   	areaQuery += "))',4326)) ";
 
 	query = "select distinct site.id as siteid, ST_AsText(location) as siteLocation, ";
 	query += "type, maxdist, NumInputs, NumOutputs, filename, index, cellid ";
 	query += "from site cross join NeuralNet cross join anninputlist ";
 	query += "where NeuralNet.siteid=site.id ";
 	query += "and anninputlist.annid= NeuralNet.id ";
-	query += "and site.location ";
+	query += "and st_within(site.location, ";
 	query += areaQuery;
 	query += " order by siteid, type, index; ";
 
@@ -420,8 +420,8 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 		pqxx::result MeasSelect;
 
 		query ="SELECT distinct servrad.siteid as ssite, tp2.servci as servci, measurement.tp as tp,  ";
-		query += "tp2.imei as imei, extract(hour from timeofmeas) as uur, ";
-		query += "extract(minute from timeofmeas)*60+extract(sec from timeofmeas) as sek, ";
+//		query += "tp2.imei as imei, extract(hour from timeofmeas) as uur, ";
+//		query += "extract(minute from timeofmeas)*60+extract(sec from timeofmeas) as sek, ";
 		query += "measurement.id as mid, ST_AsText(testpoint.location) as origLocation, ";
 		query += "rad.siteid as nsite, ST_AsText(site.location) as nsiteLocation, rad.id as InstKeyFixed, ";
 		query += "rad.txantennaheight as antheight, rad.EIRP as EIRP, rad.txbearing as bearing, "; 
@@ -444,7 +444,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 		query += "and cell.risector=rad.id and rad.txantpatternkey = antennapattern.id ";
 		query += "and testpoint.positionsource<2 ";
 		query += "and measurement.tp in (select tp from test) ";
-		query += "and servsite.Location @ ST_GeomFromText('POLYGON((";
+		query += "and st_within(servsite.Location, ST_GeomFromText('POLYGON((";
 
 
 		for ( i = 0 ; i < Points.size();i++)
@@ -473,7 +473,7 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 	   	query += " ";
 		gcvt(Lat,12,text);
 	   	query += text;
-	   	query += "))',4326) ";
+	   	query += "))',4326)) ";
 
 		if (MeasType>0)
 		{
@@ -499,8 +499,9 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 			gcvt(Technology,9,text);
 			query += text;
 		}
-*/		query+=" group by timeofmeas, ssite, tp2.servci, nsite, mid, InstKeyFixed, azibeamwidth, origLocation, "; 
-		query+=" tp2.imei, measurement.frequency, measurement.tp, tp1.TA, ci, nsiteLocation, cell.centriod, DistRes ";
+*/		query+=" group by ssite, tp2.servci, nsite, mid, InstKeyFixed, azibeamwidth, origLocation, "; 
+//		query+=" timeofmeas, tp2.imei, ";
+		query+=" measurement.frequency, measurement.tp, tp1.TA, ci, nsiteLocation, cell.centriod, DistRes ";
 		query+=" order by ssite, tp2.servci, measurement.tp, TA, measvalue desc;";
 
 		cout << query << endl;
@@ -597,9 +598,9 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 					else if (NewMeasurement.sAzimuth<-180)
 						NewMeasurement.sAzimuth+=360;
 					NewMeasurement.sTA = atoi(r[i]["TA"].c_str());
-					NewMeasurement.sIMEI = atof(r[i]["imei"].c_str());
-					NewMeasurement.sHour = atof(r[i]["uur"].c_str());
-					NewMeasurement.sSeconds = atof(r[i]["sek"].c_str());
+//					NewMeasurement.sIMEI = atof(r[i]["imei"].c_str());
+//					NewMeasurement.sHour = atof(r[i]["uur"].c_str());
+//					NewMeasurement.sSeconds = atof(r[i]["sek"].c_str());
 //					cout << " IMEI: " << NewMeasurement.sIMEI << "	Uur: " << NewMeasurement.sHour
 //						<< "	Sek: " << NewMeasurement.sSeconds << endl;
 					NewMeasurement.sBeamWidth = atof(r[i]["azibeamwidth"].c_str());
@@ -742,7 +743,7 @@ void cPosEstimation::EstimatePositions()
 
 			if (ANNrun())
 			{
-/*				CI();
+				CI();
 				if (mPosSets[mCurPosI].sMeasurements[0].sDistance<120001)		
 				{
 					CoSinRule();
@@ -755,7 +756,7 @@ void cPosEstimation::EstimatePositions()
 				cout << "Before Exhaustive Search" << endl;
 				ExhaustiveSearch();
 //				DCM_CMA_ES();
-*/			
+			
 				cout << endl << "# " << mCurPosI << endl;
 				for (j=0; j<mPosSets[mCurPosI].sTestPoints.size(); j++)
 				{
@@ -764,7 +765,7 @@ void cPosEstimation::EstimatePositions()
 					cout << distance << "	";
 					switch (mPosSets[mCurPosI].sTestPoints[j].sMethodUsed)
 					{
-						case GPS: 			cout << "GPS				";	break;  
+						case GPS: 			cout << "GPS			";	break;  
 						case CellID: 			cout << "CellID			";	break; 
 						case CellID_TA: 		cout << "CellID_TA		";	break; 
 						case SSiteDir:			cout << "SSiteDir		";	break; 
@@ -773,7 +774,7 @@ void cPosEstimation::EstimatePositions()
 						case CosRuleDistDist:		cout << "CosRuleDistDist	"; 	break; 
 						case CosRuleDistAngle:		cout << "CosRuleDistAngle	"; 	break; 
 						case CosRuleAngleAngle:		cout << "CosRuleAngleAngle	"; 	break; 
-						case DCM_PSO:			cout << "DCM_PSO			";	break; 
+						case DCM_PSO:			cout << "DCM_PSO		";	break; 
 						case DCM_PSObestN:		cout << "DCM_PSObestN		";	break; 
 						case DCM_CMA_ESmean:		cout << "DCM_CMA_ESmean		";	break; 
 						case ExhaustNbest:		cout << "ExhaustNbest		";	break; 
@@ -1972,7 +1973,7 @@ bool cPosEstimation::SetSearchBoundaries()
 	mPhi_min_back = -180;
 	mPhi_max_back = -180;
 
-//	cout << "mPosSets[mCurPosI].sMeasurements[0].sBeamWidth = " << mPosSets[mCurPosI].sMeasurements[0].sBeamWidth << endl;
+	cout << "mPosSets[mCurPosI].sMeasurements[0].sBeamWidth = " << mPosSets[mCurPosI].sMeasurements[0].sBeamWidth << endl;
 
 	mPhi_min = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
  		- (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/2);
@@ -1999,7 +2000,7 @@ bool cPosEstimation::SetSearchBoundaries()
 		mPhi_max_back+=360;
 		mPosSets[mCurPosI].sMeasurements[0].sAzimuth+=360;
 	}
-//	cout << "mPhi_min = " << mPhi_min << "	mPhi_max = " << mPhi_max << endl;
+	cout << "mPhi_min = " << mPhi_min << "	mPhi_max = " << mPhi_max << endl;
 	return true;
 }
 
@@ -2030,7 +2031,7 @@ bool cPosEstimation::ExhaustiveSearch()
 	double phi;
 	double value;
 	double bestValue, bestRho, bestPhi;
-	double sbestValue, sbestRho, sbestPhi;
+	double sbestValue, sbestRho, sbestPhi; //for swopping
 
 	bestValue = MAXDOUBLE;
 	for (i=0; i<NumBest; i++)
@@ -2084,8 +2085,6 @@ bool cPosEstimation::ExhaustiveSearch()
 	newTestPoint.sNewTP = mNewTP;	
 	mPosSets[mCurPosI].sTestPoints.push_back(newTestPoint);
 	mNewTP++;
-
-//	cout << "iterationN=" << iterationN<< "	BestValue= " << gbestValue << "		rho=" <<	gbestRho << "	phi="	<<	gbestPhi << endl;
 
 	double x=0.0;
 	double y=0.0;
@@ -2188,6 +2187,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 		Radius = 0;
 		if ((MAXBTLinMEMORY>iBTL)&&(mBTL.size()>iBTL))
 		{
+			DistRes = mPlotResolution;
 //			cout << "Found iBTL = " << iBTL << endl; 
 			mBTL[iBTL]->GetBTL (NumAngles, NumDist, Radius, DistRes);
 			AngleRes=360.0/NumAngles;
@@ -2214,6 +2214,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 			double Height = mPosSets[mCurPosI].sMeasurements[i].sHeight;
 			double MHeight = MOBILEHEIGHT;
 			double kFactor = mkFactor;
+			cout << "DistRes = " << DistRes << endl;
 			int BTLkey = newBTL->Check_and_SetBTL
 					(mPosSets[mCurPosI].sMeasurements[i].sSiteID, Radius, DistRes, NumAngles,
 					Freq, Height, MHeight, kFactor, mDEMsource, mClutterSource);
@@ -2287,6 +2288,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 
 				Radius = max(max(mRho_max,Radius),Distance+500);
 				DistRes = mPlotResolution;
+				cout << "distres = " << DistRes << endl;
 				NumAngles = round(PI*Radius/DistRes);
 				AngleRes = 360.0/NumAngles;
 				Float2DArray DTM;
@@ -2728,9 +2730,9 @@ bool cPosEstimation::ANNrun()
 		Input[3*q+6] = -1; // scaled
 		Input[3*q+7] = (1822.7+FREQ_OFFSET)*FREQ_SCALE; 	
 	}
-	Input[3*q+5] = (mPosSets[mCurPosI].sMeasurements[0].sIMEI-355441066956633.5)/2947003210268.5;
-	Input[3*q+6] = (mPosSets[mCurPosI].sMeasurements[0].sHour-16)/4;
-	Input[3*q+7] = (mPosSets[mCurPosI].sMeasurements[0].sSeconds-1800)/1800;
+//	Input[3*q+5] = (mPosSets[mCurPosI].sMeasurements[0].sIMEI-355441066956633.5)/2947003210268.5;
+//	Input[3*q+6] = (mPosSets[mCurPosI].sMeasurements[0].sHour-16)/4;
+//	Input[3*q+7] = (mPosSets[mCurPosI].sMeasurements[0].sSeconds-1800)/1800;
 //	cout << " IMEI: " << Input[3*q+5] << "	Uur: " << Input[3*q+6] << "	Sek: " << Input[3*q+7] << endl;
 
 	for (p=0; p<mPosSets[mCurPosI].sNumMeas; p++)

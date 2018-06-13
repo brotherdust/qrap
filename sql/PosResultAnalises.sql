@@ -53,6 +53,7 @@ and pe2.tp = tp2.id;
 
 update results set aziErr= aziErr - 360
 where aziErr > 180;
+
 update results set aziErr= aziErr + 360
 where aziErr <- 180;
 
@@ -126,3 +127,4 @@ group by num;
 
 select * from LTEmeasCountDist
 order by num;
+

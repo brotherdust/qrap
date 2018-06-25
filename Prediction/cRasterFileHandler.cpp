@@ -36,6 +36,8 @@ cRasterFileHandler::cRasterFileHandler()
 	mAvailableSetNW.Set(-90,180);
 	mAvailableSetSE.Set(90,-180);
 	mType = "NULL";
+	mJumped =false;
+	mCurrent = 0;
 }
 
 //*********************************************************************
@@ -43,6 +45,7 @@ void cRasterFileHandler::DirectChangeSetToUse(int OriginalSet)
 {
 	mFileSetOrder.clear();
 	mFileSetOrder.push_back(OriginalSet);
+	mCurrent=0;
 }
 
 //*********************************************************************
@@ -51,6 +54,8 @@ cRasterFileHandler::cRasterFileHandler(short int Source)
 	mSampleMethod=1;
 	mType = "NULL";
 	SetRasterFileRules(Source);
+	mPreferedSetNW.Set(-90,180);
+	mPreferedSetSE.Set(90,-180);
 	mAvailableSetNW.Set(-90,180);
 	mAvailableSetSE.Set(90,-180);
 }
@@ -67,6 +72,7 @@ cRasterFileHandler::~cRasterFileHandler()
 //*********************************************************************
 bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
 {
+	mJumped = false;
 	pqxx::result r;
 	string QueryResult;
 	int temp;
@@ -110,6 +116,7 @@ bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
 				cout << " cRasterFileHandler::SetRasterFileRules. RuleKey = " << 
 					RuleKey << "	FileSet = " << temp << endl;
 				
+				
 			}// end while i<NumBytes
    			mType = r[0]["type"].c_str();
    			if (mType=="DEM") mSampleMethod = 2;
@@ -124,6 +131,7 @@ bool cRasterFileHandler::SetRasterFileRules(short int RuleKey)
 			return false;	
 		}//end else r.size
 	}//end else !gDb->PerformRawSql
+	mCurrent=0;
 	delete [] RuleStr;
 	return true;
 } //end SetRasterFileRules.
@@ -165,6 +173,7 @@ unsigned cRasterFileHandler::GetClutterClassGroup()
 			ClassGroup = -100;	
 		}//end else CC.size
 	}
+	mCurrent=0;
 	delete [] temp;	
 	return ClassGroup;
 };
@@ -175,8 +184,9 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	double Distance, Bearing;
 	unsigned NumPoints;
 	bool IsInSet=false;
-	bool AllFound=false;
-	unsigned i,j,k=0,Current=0;
+	bool IsInThis=false;
+	bool AllFound=true;
+	unsigned i,j,k=0;
 	float *profile;
 //	TxLoc.SetGeoType(DEG);
 //	RxLoc.SetGeoType(DEG);
@@ -194,10 +204,12 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 
 //	cout << "In cRasterFileHandler::GetForLink(...). before loading file for TxLoc" << endl;
 
+
 	for (i=0; i<mCurrentRasters.size(); i++)
 	{
-		IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(TxLoc))
+		IsInThis = ((mCurrentRasters[i]->IsIn(TxLoc))
 				&&(0==mCurrentRasters[i]->mFileSetLevel));
+		IsInSet = IsInSet || IsInThis ;
 		LoadedRastersList+=mCurrentRasters[i]->mFilename;
 		LoadedRastersList+="','";
 	}
@@ -205,6 +217,9 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	{
 		LoadedRastersList+="'";
 		AddRaster(TxLoc,LoadedRastersList);
+		cout << "Adding for TxLoc: " << endl;
+		TxLoc.Display();
+		mCurrent=0;
 	}
 
 //	cout << "In cRasterFileHandler::GetForLink(...). before loading file for RxLoc" << endl;
@@ -213,8 +228,9 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	IsInSet=false;
 	for (i=0; i<mCurrentRasters.size(); i++)
 	{
-		IsInSet = IsInSet || ((mCurrentRasters[i]->IsIn(RxLoc))
-				&&(0==mCurrentRasters[i]->mFileSetLevel));
+		IsInThis = ((mCurrentRasters[i]->IsIn(RxLoc))
+				&&(0==mCurrentRasters[i]->mFileSetLevel));		
+		IsInSet = IsInSet || IsInThis;
 		LoadedRastersList+=mCurrentRasters[i]->mFilename;
 		LoadedRastersList+="','";
 	}
@@ -222,10 +238,10 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 	{
 		LoadedRastersList+="'";
 		AddRaster(RxLoc,LoadedRastersList);
+		cout << "Adding for RxLoc: " << endl;
+		RxLoc.Display();
 	}
 	
-	LoadedRastersList="'";
-	IsInSet=false;
 //	cout << "In cRasterFileHandler::GetForLink(...). After loading file for RxLoc" << endl;
 
 
@@ -237,43 +253,58 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 		return false;
 	}
 	
-	LoadedRastersList="'";
-	k=0; 
-	IsInSet = (mCurrentRasters[k]->IsIn(TxLoc))&&(0==mCurrentRasters[k]->mFileSetLevel);
-	while ((k<mCurrentRasters.size())&&(!IsInSet))
-	{
-		LoadedRastersList+=mCurrentRasters[k]->mFilename;
-		LoadedRastersList+="','";
-		k++;
-		IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(TxLoc))&&(0==mCurrentRasters[k]->mFileSetLevel));
-	}
+	IsInSet = (mCurrentRasters[mCurrent]->IsIn(TxLoc))&&(0==mCurrentRasters[k]->mFileSetLevel);
 	if (!IsInSet)
 	{
-		LoadedRastersList+="'";
-		IsInSet = AddRaster(TxLoc,LoadedRastersList);
-		k=0;
-		IsInSet = mCurrentRasters[k]->IsIn(TxLoc);
-		while ((k<mCurrentRasters.size())&&(!IsInSet))
+		mCurrent=0;
+		LoadedRastersList="'";
+		k=mCurrentRasters.size(); 
+		while ((k>0)&&(!IsInSet))
 		{
-			k++;
-			IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(TxLoc));
+			k--;
+			LoadedRastersList+=mCurrentRasters[k]->mFilename;
+			LoadedRastersList+="','";
+			IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(TxLoc))&&(0==mCurrentRasters[k]->mFileSetLevel));
+
 		}
+		if (!IsInSet)
+		{
+			LoadedRastersList+="'";
+			IsInSet = AddRaster(TxLoc,LoadedRastersList);
+			cout << "Adding for TxLoc2: " << endl;
+			TxLoc.Display();
+			mCurrent=0;
+			k=mCurrentRasters.size();
+			IsInSet = false;
+			while ((k>mCurrentRasters.size())&&(!IsInSet))
+			{
+				k--;
+				IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(TxLoc));
+			}
+		}
+
+		if (IsInSet) mCurrent = k;
 	}
+	
 
 	if (IsInSet)
-	{
-		Current = k;
-		profile[0] = mCurrentRasters[Current]->GetValue(TxLoc,mSampleMethod);
-		mCurrentRasters[Current]->mUsed = true;
+	{		
+		profile[0] = mCurrentRasters[mCurrent]->GetValue(TxLoc,mSampleMethod);
+//		if (mJumped) 
+//		{
+//			cout <<"TxLoc1:" << mCurrentRasters[mCurrent]->mFilename<< endl;
+//			TxLoc.Display();
+//		}
+		mCurrentRasters[mCurrent]->mUsed = true;
 	}
 	else
 	{
-		Current = 0;
-		profile[0]=0;
+		mCurrent = 0;
+		profile[0]=OUTOFRASTER;
 		AllFound = false;
 	}
-	
-	bool Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
+
+	bool Preferred=(0==mCurrentRasters[mCurrent]->mFileSetLevel);
 	bool ToSwitch=false;
 	bool Available = true;
 
@@ -283,16 +314,15 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 		if (!Preferred)
 		{
 			ToSwitch=point.Between(mPreferedSetNW,mPreferedSetSE);
+			Available=point.Between(mAvailableSetNW,mAvailableSetSE);
 		}
-		else 
-		{	
-			ToSwitch=false;
-		}
+		else ToSwitch=false;
 		
-		Available=point.Between(mAvailableSetNW,mAvailableSetSE);
-		if (Available)
-			profile[j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);
-		else profile[j]=0;
+		profile[j] = mCurrentRasters[mCurrent]->GetValue(point,mSampleMethod);
+		if ((profile[j] <-440.0)||(profile[j] >8880)||(profile[j]==OUTOFRASTER)||(0==profile[j]))
+		{
+			Available=point.Between(mAvailableSetNW,mAvailableSetSE);
+		}
 
 //		cout << j << "	" << profile[j] << endl;
 
@@ -300,23 +330,26 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 		// to allow for the Dead Sea shore and Mount Everest
 		{
 			LoadedRastersList="'";
-			k = mCurrentRasters.size()-1;
-			IsInSet= (mCurrentRasters[k]->IsIn(point))&&(0==mCurrentRasters[k]->mFileSetLevel);
+			k = mCurrentRasters.size();
+			IsInSet= false;
 			while ((k>0)&&(!IsInSet))
 			{
+				k--;
 				LoadedRastersList+=mCurrentRasters[k]->mFilename;
 				LoadedRastersList+="','";
-				k--;
 				IsInSet = IsInSet||((mCurrentRasters[k]->IsIn(point))&&
 						(0==mCurrentRasters[k]->mFileSetLevel));
 			}
 			if ((!IsInSet)&&(ToSwitch))
 			{
-				LoadedRastersList+=mCurrentRasters[Current]->mFilename;
+				mCurrent=0;
+				LoadedRastersList+=mCurrentRasters[mCurrent]->mFilename;
 				LoadedRastersList+="'";
 				IsInSet = AddRaster(point,LoadedRastersList);
-				k = mCurrentRasters.size()-1;
-				IsInSet= (mCurrentRasters[k]->IsIn(point))&&(0==mCurrentRasters[k]->mFileSetLevel);
+				cout << "Adding for point: " << endl;
+					point.Display();
+				k = mCurrentRasters.size();
+				IsInSet= false;
 				while ((k>0)&&(!IsInSet))
 				{
 					k--;
@@ -327,23 +360,27 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 
 			if(!IsInSet)
 			{
+				mCurrent=0;
 				LoadedRastersList="'";
-				k = mCurrentRasters.size()-1;
-				IsInSet= (mCurrentRasters[k]->IsIn(point));
+				k = mCurrentRasters.size();
+				IsInSet= false;
 				while ((k>0)&&(!IsInSet))
 				{
+					k--;
 					LoadedRastersList+=mCurrentRasters[k]->mFilename;
 					LoadedRastersList+="','";
-					k--;
 					IsInSet = IsInSet||(mCurrentRasters[k]->IsIn(point));
 				}
 				if (!IsInSet)
 				{
-					LoadedRastersList+=mCurrentRasters[Current]->mFilename;
+					LoadedRastersList+=mCurrentRasters[mCurrent]->mFilename;
 					LoadedRastersList+="'";
 					IsInSet = AddRaster(point,LoadedRastersList);
-					k = mCurrentRasters.size()-1;
-					IsInSet= (mCurrentRasters[k]->IsIn(point));
+					cout << "Adding for point: " << endl;
+					point.Display();
+					mCurrent=0;
+					k = mCurrentRasters.size();
+					IsInSet= false;
 					while ((k>0)&&(!IsInSet))
 					{
 						k--;
@@ -355,28 +392,38 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 				
 			if (IsInSet)
 			{
-				Current =k;
-				profile[j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);
-				mCurrentRasters[Current]->mUsed = true;
-				Preferred=(0==mCurrentRasters[Current]->mFileSetLevel);
+				mCurrent=k;
+				profile[j] = mCurrentRasters[mCurrent]->GetValue(point,mSampleMethod);
+				mCurrentRasters[mCurrent]->mUsed = true;
+				Preferred=(0==mCurrentRasters[mCurrent]->mFileSetLevel);
+//				if (mJumped) 
+//				{
+//					cout << "point:" << mCurrentRasters[mCurrent]->mFilename<< endl;
+//					point.Display();
+//				}
 			}
 			else
 			{
-				profile[j]=0;
+				profile[j]=OUTOFRASTER;
 				AllFound = false;
 			}
 			if ((profile[j] <-440.0)||(profile[j] >8880)||(profile[j]==OUTOFRASTER))
-				profile[j]=0;
-			if (0==profile[j]) cout << "foutjie" << endl;
+				profile[j]=OUTOFRASTER;
+			if (OUTOFRASTER==profile[j])
+			{ 
+				cout << "foutjie" << endl;
+				AllFound=false;
+			}
 	
 		}
-		else mCurrentRasters[Current]->mUsed = true;
+		else mCurrentRasters[mCurrent]->mUsed = true;
 	}
 
 	OutProfile.SetInterPixelDist(DistRes);
 	OutProfile.SetProfile(NumPoints, profile);
 //	cProfile Rprofile(NumPoints, profile, DistRes);
 	delete [] profile;
+	mJumped=false;
 	for (k=0;k<mCurrentRasters.size(); k++)
 		mCurrentRasters[k]->mUsed = false;
 	return AllFound;
@@ -521,15 +568,17 @@ bool cRasterFileHandler::GetForCoverage(bool Fixed, cGeoP SitePos, double &Range
 			if (!Preferred)
 			{
 				ToSwitch=point.Between(mPreferedSetNW,mPreferedSetSE);
+				Available=point.Between(mAvailableSetNW,mAvailableSetSE);
 			}
 			else 
 			{	
 				ToSwitch=false;
 			}
-			Available=point.Between(mAvailableSetNW,mAvailableSetSE);
-			if (Available)
-				Data[i][j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);
-			else Data[i][j]=0;
+
+			Data[i][j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);
+			if ((Data[i][j] <-440.0)||(Data[i][j] >8880)||(Data[i][j]==OUTOFRASTER))
+				Available=point.Between(mAvailableSetNW,mAvailableSetSE);
+
 			if (((Data[i][j] <-440.0)||(Data[i][j] >8880)||(Data[i][j]==OUTOFRASTER)||(ToSwitch))&&(Available))
 			{
 //				cout << "OUT: " << OUTOFRASTER << endl;
@@ -856,15 +905,15 @@ bool cRasterFileHandler::GetForDEM(	cGeoP &NW, cGeoP &SE,
 			if (!Preferred)
 			{
 				ToSwitch=Point.Between(mPreferedSetNW,mPreferedSetSE);
+				Available=Point.Between(mAvailableSetNW,mAvailableSetSE);
 			}
 			else 
 			{	
 				ToSwitch=false;
 			}
-			Available=Point.Between(mAvailableSetNW,mAvailableSetSE);
-			if (Available)
-				Data[i][j]=mCurrentRasters[Current]->GetValue(Point,mSampleMethod);
-			else Data[i][j] = 0;
+			Data[i][j]=mCurrentRasters[Current]->GetValue(Point,mSampleMethod);
+			if ((Data[i][j] == OUTOFRASTER)||(Data[i][j]<-440)||(Data[i][j]>8880))
+				Available=Point.Between(mAvailableSetNW,mAvailableSetSE);
 			tempD = Data[i][j];
 			if (((Data[i][j] == OUTOFRASTER)||(Data[i][j]<-440)||(Data[i][j]>8880)||(ToSwitch))&&(Available))
 			{
@@ -959,6 +1008,7 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 	char *temp2;
 	temp2 = new char[33];
 	double lat,lon;
+	double N, W, S, E, Nm, Wm, Sm, Em;
 	int centmer;
 	GeoType GeoProj;
 	point.SetGeoType(DEG);
@@ -1036,14 +1086,35 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 				if (0==i)
 				{
 					if (!New->mNW.Between(mPreferedSetNW,mPreferedSetSE))
-						mPreferedSetNW=New->mNW;
+					{
+						New->mNW.SetGeoType(DEG);
+						New->mNW.Get(N,W);
+						mPreferedSetNW.Get(Nm,Wm);
+						mPreferedSetNW.Set(max(N,Nm),min(W,Wm));
+					}
 					if (!New->mSE.Between(mPreferedSetNW,mPreferedSetSE))
-						mPreferedSetSE=New->mSE;
+					{
+						New->mSE.SetGeoType(DEG);
+						New->mSE.Get(S,E);
+						mPreferedSetSE.Get(Sm,Em);
+						mPreferedSetSE.Set(min(S,Sm),max(E,Em));
+					}
 				}
 				if (!New->mNW.Between(mAvailableSetNW,mAvailableSetSE))
-					mAvailableSetNW=New->mNW;
+				{
+					New->mNW.SetGeoType(DEG);
+					New->mNW.Get(N,W);
+					mAvailableSetNW.Get(Nm,Wm);
+					mAvailableSetNW.Set(max(N,Nm),min(W,Wm));
+
+				}
 				if (!New->mSE.Between(mAvailableSetNW,mAvailableSetSE))
-					mAvailableSetSE=New->mSE;
+				{
+					New->mSE.SetGeoType(DEG);
+					New->mSE.Get(S,E);
+					mAvailableSetSE.Get(Sm,Em);
+					mAvailableSetSE.Set(min(S,Sm),max(E,Em));
+				}
 
 //				cout << "NumRastersLoaded: " << mCurrentRasters.size()  << endl << endl;
 			} // if r.size()
@@ -1091,6 +1162,10 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 		for (i=0; i<mCurrentRasters.size(); i++)
 			mCurrentRasters[i]->mUsed = false;
 	}
+
+	cout << "Available: " << endl;
+	mAvailableSetNW.Display();
+	mAvailableSetSE.Display();
 	
 	delete [] temp;
 	delete [] temp2;

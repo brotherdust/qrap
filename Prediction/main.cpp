@@ -190,33 +190,24 @@ int main (int argc, char **argv)
 */
 	
 //	Country
-//	NumHoek=4;
-//	Hoek = new cGeoP[NumHoek];
-//	Hoek[0].Set(-24.01, 30.99);
-//	Hoek[1].Set(-30.01, 30.99);
-//	Hoek[2].Set(-30.01, 23.00);
-//	Hoek[3].Set(-24.01, 23.00);
+	NumHoek=4;
+	Hoek = new cGeoP[NumHoek];
+	Hoek[0].Set(-24.01, 30.99);
+	Hoek[1].Set(-30.01, 30.99);
+	Hoek[2].Set(-30.01, 23.00);
+	Hoek[3].Set(-24.01, 23.00);
 
-
+/*
 //	Bryanston
-/*	NumHoek=4;
+	NumHoek=4;
 	Hoek = new cGeoP[NumHoek];
 	Hoek[0].Set(-26.036, 27.976);
 	Hoek[1].Set(-26.108, 27.976);
 	Hoek[2].Set(-26.108, 28.074);
 	Hoek[3].Set(-26.036, 28.074);
 */
-/*
-//	Bryanston Positioning
-	NumHoek=4;
-	Hoek = new cGeoP[NumHoek];
-	Hoek[0].Set(-26.050, 28.005);
-	Hoek[1].Set(-26.087, 28.005);
-	Hoek[2].Set(-26.087, 28.055);
-	Hoek[3].Set(-26.050, 28.055);
-*/
 //	Tembisa
-	NumHoek=6;
+/*	NumHoek=6;
 	Hoek = new cGeoP[NumHoek];
 	Hoek[0].Set(-25.965, 28.210);
 	Hoek[1].Set(-25.970, 28.245);
@@ -224,7 +215,7 @@ int main (int argc, char **argv)
 	Hoek[3].Set(-26.062, 28.175);
 	Hoek[4].Set(-25.990, 28.150);
 	Hoek[5].Set(-25.965, 28.180);
-
+*/
 /*	//Tembisa bigger
 	NumHoek=5;	
 	Hoek = new cGeoP[NumHoek];
@@ -241,19 +232,17 @@ int main (int argc, char **argv)
 		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek;
-
-//	cout << "Loading measurements ... in main()" << endl;
-//	Continue = Meas.LoadMeasurements(Punte,0,0,0);
-
-
-/*
 	cout << "Loading measurements ... in main()" << endl;
+	Continue = Meas.LoadMeasurements(Punte,0,0,0);
+
+
+/*	cout << "Loading measurements ... in main()" << endl;
 	char * CustomAreaName;
 	CustomAreaName= new char[23];
 	strcpy(CustomAreaName,"GautengClutterOutline");
 	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,0);
 */
-/*	if (!Continue)
+	if (!Continue)
 		return 0;
 
 	if (!gDb.PerformRawSql(queryC))
@@ -268,26 +257,127 @@ int main (int argc, char **argv)
 
 	Meas.mPathLoss.mClutter.Reset(1);
 
-	Meas.SetPlotResolution(20);
-*/
+	Meas.SetPlotResolution(30);
+
+
+	if (!gDb.PerformRawSql(queryC))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+	Meas.mPathLoss.mClutter.Reset(1);
+
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+
+	cout<< "GAll" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	Meas.OptimiseHeights(0);
+
+/*	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,0);
+	Meas.OptimiseModelCoefD(0);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "GAll" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+//	Meas.OptimiseOffsets(0);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "GOAll" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
+	cout<< "AGO390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,2);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
+	cout<< "AGO945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
+	cout<< "AGO1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,3);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
+	cout<< "AGO2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	if (!gDb.PerformRawSql(queryC))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+	Meas.mPathLoss.mClutter.Reset(1);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,1);
+	Meas.OptimiseModelCoefAllTotal(1);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
+	cout<< "G390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas.OptimiseOffsets(1);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
+	cout<< "GO390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	if (!gDb.PerformRawSql(queryC))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+	Meas.mPathLoss.mClutter.Reset(1);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,2);
+	Meas.OptimiseModelCoefAllTotal(2);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,2);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
+	cout<< "G945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+//	Meas.OptimiseOffsets(2);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,2);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
+	cout<< "GO945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	if (!gDb.PerformRawSql(queryC))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+	Meas.mPathLoss.mClutter.Reset(1);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,4);
+	Meas.OptimiseModelCoefAllTotal(4);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
+	cout<< "G1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+//	Meas.OptimiseOffsets(4);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
+	cout<< "GO1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	if (!gDb.PerformRawSql(queryC))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+	Meas.mPathLoss.mClutter.Reset(1);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,3);
+	Meas.OptimiseModelCoefD(3);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,3);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
+	cout<< "G2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+//	Meas.OptimiseOffsets(3);
+	Continue = Meas.LoadMeasurements(CustomAreaName,0,0,3);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
+	cout<< "GO2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+
+//	Meas.SaveResults();
+
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-
 //	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-//	Meas.OptimiseHeights(0);
-//	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+//	Meas.OptimiseHeights(3);
+//	cout<< "Nach1" << "Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 //	Meas.SetSeekWidthBest(1);
 //	Meas.SetSmoothWidthBest(1);
 //	Meas.OptimiseSeekWidth();
-//	Meas.OptimiseModelCoefAllTotal(0);
-//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-//	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-//	Meas.OptimiseModelCoefD(0);
-//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
-//	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-//	Meas.SaveResults();
-
+	Meas.OptimiseModelCoefAllTotal(1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas.OptimiseModelCoefD(1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	cout<< "Nach1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas.SaveResults();
+*/
 //      Meas.OptimiseHeights(3);
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
@@ -356,7 +446,7 @@ int main (int argc, char **argv)
 		cout << "Error updating qrap_config" << endl;
 	}
 	Meas.SetUseAntANN(true);
-   	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+   Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
 //   Meas.OptimiseHeights(4);
@@ -511,7 +601,7 @@ for ( i=4; i>=0; i--)
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-
+/*
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
 	cout << "Na constructor" << endl;
@@ -540,7 +630,7 @@ for ( i=4; i>=0; i--)
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-
+*/
 /*
 	if (!gDb.PerformRawSql(query))
 	{

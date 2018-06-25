@@ -31,9 +31,9 @@
 #include "../DataBase/Config.h"
 #include "cProfile.h"
 #include "cMemmngr.h"
-#define MAX_NUM_RASTERS 5
+#define MAX_NUM_RASTERS 10
 
-#define MAX_NUM_RASTERS 5
+#define MAX_NUM_RASTERS 10
 
 
 namespace Qrap
@@ -137,7 +137,9 @@ namespace Qrap
 							Float2DArray &Data, 
 							GeoType ProjIn=DEG,
 							bool Fixed=false);
-						
+
+			bool mJumped;			
+			
 		private:
 			/**
 			 * Description of AddRaster
@@ -156,6 +158,7 @@ namespace Qrap
 			cGeoP		mAvailableSetNW;
 			cGeoP		mAvailableSetSE;
 			string		mType;
+			unsigned 	mCurrent;
 	};
 }
 #endif

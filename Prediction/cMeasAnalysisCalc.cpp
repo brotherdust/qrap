@@ -176,6 +176,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 */
 //	Where site is in area
 	string query ="SELECT mobile, ci, frequency, ST_AsText(testpoint.location) as location, ";
+	query+= "ST_AsText(site.location) as sitepos, ";
 	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth, ";
 	query += "mobileheight, txantennaheight ";
 	query += "from measurement cross join testpoint cross join measdatasource ";
@@ -214,7 +215,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 //	Where site is in area
 	query += " and st_within(site.location, ";
 	query += areaQuery;
-	query+=" order by mobile, ci, id;";
+	query+=" order by mobile, sitepos desc, ci, id;";
 
 	double longitude, latitude; 
 	unsigned spacePos;
@@ -394,6 +395,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(char*  CustomAreaName,
 */
 //	Where site is in area
 	string query ="SELECT mobile, ci, frequency, ST_AsText(testpoint.location) as location, ";
+	query += "ST_AsText(site.location) as sitepos, "; 
 	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth, ";
 	query += "mobileheight, txantennaheight ";
 	query += "from measurement cross join testpoint cross join measdatasource ";
@@ -433,7 +435,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(char*  CustomAreaName,
 //	Where testpoint is in area
 	query += " and ST_within(testpoint.location, the_geom) ";
 	query += " and ST_within(site.location, the_geom)";
-	query+=" order by mobile, ci, id;";
+	query+=" order by mobile, sitepos desc, ci, id;";
 
 	double longitude, latitude; 
 	unsigned spacePos;
@@ -603,13 +605,15 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 
 	pqxx::result r, rMobile, rFixed;
 
-	string query ="SELECT mobile, ci, frequency, ST_AsText(location) as location, ";
+	string query ="SELECT mobile, ci, frequency, ST_AsText(testpoint.location) as location, ";
+	query += "ST_AsText(site.location) as sitepos, "; 
 	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth, ";
 	query += "mobileheight, txantennaheight ";
 	query += "from measurement cross join testpoint cross join measdatasource ";
 	query += "cross join mobile ";
 	query += "cross join cell cross join radioinstallation ";
 	query += "where ci=cell.id and risector= radioinstallation.id "; 
+	query += " and siteid=site.id ";
 	query += "and mobile=mobile.id ";
 	query += "and tp=testpoint.id and measdatasource=measdatasource.id";
 
@@ -637,7 +641,7 @@ bool cMeasAnalysisCalc::LoadMeasurements( unsigned MeasType,
 		gcvt(CI,9,text);
 		query += text;
 	}
-	query+=" order by mobile, ci, id;";
+	query+=" order by mobile, sitepos desc, ci, id;";
 
 	double longitude, latitude; 
 	unsigned spacePos;
@@ -820,6 +824,9 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 	unsigned currentMobile=0;
 	cAntennaPattern FixedAnt, MobileAnt;
 	double *terms;
+	bool Success=true;
+	
+	mDEM.mJumped=true;
 
 	double DiffLoss = 0;
 	terms = new double[NUMTERMS];
@@ -886,6 +893,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					cout << "MobileNum reached limit ... ending measurement analysis" <<endl;
 					return 0;
 				}
+				mDEM.mJumped=true;
+
 //				cout << "Setting Mobile Antenna, mMobiles[MobileNum].sInstKey =" 
 //					<< mMobiles[MobileNum].sInstKey << endl;
 				MobileAnt.SetAntennaPattern(mMobiles[MobileNum].sInstKey, Mobile, 0, 0);
@@ -906,6 +915,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				if (mUseClutter)
 					cout << "	Using Clutter" << endl;
 				else cout << "	NOT using Clutter" << endl;
+				
 */
 			}
 
@@ -924,6 +934,10 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) 
 						/ (CTempMeas*CTempPred);
 
+//					cout <<  "#: " << NumUsed << "	C#: " << CNumUsed 
+//					 	<<  "	err: " << TotalError << "	Cerr: " << CTotalError  
+//						<< endl;
+
 /*					cout << "Inst: " << currentInst << "	#: " << CNumUsed  
 						<< "	Freq =" << mFixedInsts[FixedNum].sFrequency 
 						<< "	M: "<< CMean 					
@@ -934,8 +948,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 							<< " /N: "<< CsumOfAntValue/CNumUsed
 							<< "	PathLoss: " << CsumOfPathLoss 
 							<< " /N: " << CsumOfPathLoss/CNumUsed << endl;
-
-*/				}
+*/
+				}
 
 				CNumUsed = 0;
 				CError=0;
@@ -952,6 +966,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				CCorrC = 0;
 				CsumOfAntValue = 0;
 				CsumOfPathLoss = 0;
+
+				mDEM.mJumped=true;
 				
 				currentInst = mMeasPoints[i].sInstKeyFixed;
 				
@@ -1001,7 +1017,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			}
 			
 //			cout << "cMeasAnalysisCalc::PerformAnalysis:  Before mDEM.GetForLink" << endl;
-			mDEM.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution, DEM);
+			Success=mDEM.GetForLink(mFixedInsts[FixedNum].sSitePos,mMeasPoints[i].sPoint,mPlotResolution, DEM);
+			if (!Success) return 0;
 //			DEM.Display();
 //			cout << "cMeasAnalysisCalc::PerformAnalysis: After mDEM.GetForLink" << endl;
 //			mMeasPoints[i].sDistance = mFixedInsts[FixedNum].sSitePos.Distance(mMeasPoints[i].sPoint);
@@ -1141,6 +1158,9 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 		double CTempMeas = sqrt(CNumUsed*CTotalSMeas-CTotalMeas*CTotalMeas);
 		double CTempPred = sqrt(CNumUsed*CTotalSPred-CTotalPred*CTotalPred);
 		CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) / (CTempMeas*CTempPred);
+//		cout <<  "#: " << NumUsed << "	C#: " << CNumUsed 
+//		 	<<  "	err: " << TotalError << "	Cerr: " << CTotalError  
+//			<< endl;
 /*		cout << "Inst: " << currentInst << "	#: " << CNumUsed  
 			<< "	Freq =" << mFixedInsts[FixedNum].sFrequency 
 			<< "	M: "<< CMean 					
@@ -1149,7 +1169,8 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			<< "	Corr: " << CCorrC << endl;
 		cout	<< "	AntVal: " << CsumOfAntValue << " /N: "<< CsumOfAntValue/CNumUsed
 			<< "	PathLoss: " << CsumOfPathLoss << " /N: " << CsumOfPathLoss/CNumUsed << endl;
-*/	}
+*/
+	}
 
 	if (NumUsed>0)
 	{

@@ -31,9 +31,9 @@
 #include "../DataBase/Config.h"
 #include "cProfile.h"
 #include "cMemmngr.h"
-#define MAX_NUM_RASTERS 10
+#define MAX_NUM_RASTERS 14
 
-#define MAX_NUM_RASTERS 10
+#define MAX_NUM_RASTERS 14
 
 
 namespace Qrap

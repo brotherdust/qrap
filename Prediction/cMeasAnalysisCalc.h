@@ -100,13 +100,14 @@ struct tMeasPoint
 	{
 		cout 
 		<< "measID:" << sID 
+		<< "	Inst:" << sInstKeyFixed
 		<< "	sTxHeight:" << sTxHeight
 		<< "	sRxHeight:" << sRxHeight
 		<< "	sDistance:" << sDistance
 		<< "	sFrequency:" << sFrequency
 		<< "	sReturn:" << sReturn
+		<< "	sClutter:" << sReturn
 		<< endl;
-
 	}
 
 };

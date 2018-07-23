@@ -230,7 +230,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 			mGain = atof(r[0]["gain"].c_str());
 			mBeamW = atof(r[0]["azibeamwidth"].c_str());
 			strcpy(mFile, r[0]["patternFile"].c_str());
-//			cout << mFile << endl;
+//			cout << "	" << mFile << endl;
 		}
 		else
 		{
@@ -1189,6 +1189,7 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 				/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
 		Value = ValueAz1 + (Az-mAziAngles[ref_Azi])*(ValueAz2-ValueAz1)
 						/(mAziAngles[ref_Azi+1]-mAziAngles[ref_Azi]);
+//		cout << "Value = " << Value << "	Az = " << Az << "	El = " << El << endl;
 	}
 	return Value;
 }

@@ -120,7 +120,7 @@ int cGPpropModel:: mainTuning()
 	Continue = mMeas.LoadMeasurements(Punte,0,0,0);
 
 */
-//	mMeas.mPathLoss.mClutter.Reset(1);
+	mMeas.mPathLoss.mClutter.Reset(1);
 
 	cout << "Loading measurements ... in main()" << endl;
 	char * CustomAreaName;
@@ -132,14 +132,21 @@ int cGPpropModel:: mainTuning()
 		return 0;
 
 	mMeas.SetUseAntANN(false);
+
 	mMeas.SetPlotResolution(20);
+
+  	string queryC = "update coefficients set coefficient=0.0;";
+	if (!gDb.PerformRawSql(queryC))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
 
 	double Mean, MSE, StDev, CorrC;
 	mMeas.PerformAnalysis(Mean, MSE, StDev, CorrC);
 
 	cout << endl<< "Initial calculation done" << endl;
 	cout << "Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl << endl << endl;
-	
+
 	GOftn* newTree = nullptr;
 	SCandidate newCandidate;
 
@@ -193,30 +200,30 @@ int cGPpropModel:: mainTuning()
 	// Tuned Q-Rap model ... classic tuning
 	// # 2
 	newTree = new Add(7);
-	newTree->mChild[0] = new ConstNode(91.3948);
+	newTree->mChild[0] = new ConstNode(95.1845);
 	newTree->mChild[1] = new Multiply();
-	newTree->mChild[1]->mChild[0] = new ConstNode(40.3216);
+	newTree->mChild[1]->mChild[0] = new ConstNode(42.3702);
 	newTree->mChild[1]->mChild[1] = new Log10Node();
 	newTree->mChild[1]->mChild[1]->mChild[0] = new DistanceNode();
 	newTree->mChild[2] = new Multiply();
-	newTree->mChild[2]->mChild[0] = new ConstNode(6.753);
+	newTree->mChild[2]->mChild[0] = new ConstNode(3.7594);
 	newTree->mChild[2]->mChild[1] = new Log10Node();
 	newTree->mChild[2]->mChild[1]->mChild[0] = new FrequencyNode();
 	newTree->mChild[3] = new Multiply();
-	newTree->mChild[3]->mChild[0] = new ConstNode(0.534585);
+	newTree->mChild[3]->mChild[0] = new ConstNode(0.460618);
 	newTree->mChild[3]->mChild[1] = new ObstructionNode();
 	newTree->mChild[4] = new Multiply(3);
-	newTree->mChild[4]->mChild[0] = new ConstNode(-12.6864);
+	newTree->mChild[4]->mChild[0] = new ConstNode(-14.1075);
 	newTree->mChild[4]->mChild[1] = new Log10Node();
 	newTree->mChild[4]->mChild[1]->mChild[0] = new DistanceNode();
 	newTree->mChild[4]->mChild[2] = new Log10Node();
 	newTree->mChild[4]->mChild[2]->mChild[0] = new TxHeightNode();
 	newTree->mChild[5] = new Multiply();
-	newTree->mChild[5]->mChild[0] = new ConstNode(-5.9278);
+	newTree->mChild[5]->mChild[0] = new ConstNode(-4.58041);
 	newTree->mChild[5]->mChild[1] = new Log10Node();
 	newTree->mChild[5]->mChild[1]->mChild[0] = new TxHeightNode();
 	newTree->mChild[6] = new Multiply();
-	newTree->mChild[6]->mChild[0] = new ConstNode(0.243318);
+	newTree->mChild[6]->mChild[0] = new ConstNode(0.229531);
 	newTree->mChild[6]->mChild[1] = new Power();
 	newTree->mChild[6]->mChild[1]->mChild[0] = new FrequencyNode();
 	newTree->mChild[6]->mChild[1]->mChild[1] = new ConstNode(0.5);
@@ -1228,18 +1235,28 @@ int cGPpropModel:: mainTuning()
 //*************************************************************************************************
 	NumSeeds = mCandidate.size();
 	mNumCandidates = mCandidate.size();
+	double MeasSErr;
 
+
+//	Continue = mMeas.LoadMeasurements(CustomAreaName,0,0,0);
+	
+//	for (i=2850;i<2950/*mMeas.mNumMeas*/; i++)
+//		mMeas.mMeasPoints[i].show();
 	//Initialise values for all seeds
 	for (i=0; i<NumSeeds; i++)
 	{
-		mCandidate[i].sCorrC = -1.0;
-		mCandidate[i].sStdDev = 99999;
-		mCandidate[i].sMean = 99999;
-		mCandidate[i].sFitness = UNFIT_LIMIT+10;
+		CostFunction(i, mCandidate[i].sMean, MeasSErr,
+					mCandidate[i].sStdDev, mCandidate[i].sCorrC, true);
+		mCandidate[i].sFitness = 100*(1-mCandidate[i].sCorrC) + mCandidate[i].sStdDev;
 		mCandidate[i].sRank = 2*(mNumCandidates-1);
 		mCandidate[i].sPareto = false;
 		mCandidate[i].sOptimised = false;
-	cout << "i=" << i << endl;
+		cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
+			<< "	Fitness=" << mCandidate[i].sFitness				
+			<<"	CorrC=" << mCandidate[i].sCorrC << "	StDev=" << mCandidate[i].sStdDev
+			<< "	Mean=" << mCandidate[i].sMean  
+			<< "	Form=" << mCandidate[i].sForm
+			<< "	Depth=" << mCandidate[i].sDepth << endl;
 		mCandidate[i].sDepth=mCandidate[i].sTree->getTreeDepth()+1;
 /*		mCandidate[i].sNumClutter = mMeas.mPathLoss.mClutter.mNumber;
 		mCandidate[i].sClutterType  = new unsigned[mMeas.mPathLoss.mClutter.mNumber];
@@ -1256,6 +1273,7 @@ int cGPpropModel:: mainTuning()
 		newCandidate = mCandidate[i];
 		mCandidate.push_back(newCandidate);
 	}
+
 
 	//Create another copy of the seeds
 	for (i=0; i<NumSeeds; i++)
@@ -1624,7 +1642,6 @@ int cGPpropModel:: mainTuning()
 		}
 
 		cout << "all good individuals" << endl;
-		sort(mStars.begin(), mStars.end(), SortCriteriaOnStdDev);	
 		for (i=0; i<mStars.size(); i++)
 		{
 			cout << " Star.	i = " << i << "	Rank=" << mStars[i].sRank
@@ -1656,6 +1673,7 @@ int cGPpropModel:: mainTuning()
 				<< "	Depth=" << mStars[i].sDepth <<endl;
 		}
 
+		sort(mStars.begin(), mStars.end(), SortCriteriaOnFitness);
 		//...................................................................................
 		// Mutate all
 
@@ -1675,6 +1693,7 @@ int cGPpropModel:: mainTuning()
              			calcThread[i].join();	
 		}
 
+		
 		cout << "Best candidate:	CorrC = " << mCandidate[0].sCorrC 
 			<< "	StdDev = " << mCandidate[0].sStdDev << endl << endl;
 
@@ -2081,6 +2100,20 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 	}
 
 	NumUsed = 0;
+	Error=0;
+	TotalError=0; 
+	TotalSError=0;
+	TotalMeas=0;
+	TotalPred=0;
+	TotalSMeas=0;
+	TotalSPred=0;
+	TotalMeasPred=0;
+	Mean = 0;
+	MeanSquareError=0; 
+	StDev = 0;
+	CorrC = 0;
+	currentMobile = 0;
+	currentInst = 0;
 	
 	if (0==mMeas.mFixedInsts.size()) return 0;
 
@@ -2091,16 +2124,28 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 	if (SkipNumber<1) SkipNumber = 1;
 	if (mCandidate[CIndex].sPareto) SkipNumber = 1;
 	if (!CalcNewObstruction) SkipNumber = 1;
-
 	unsigned FirstMeas = SkipNumber * gUni(gRandomGen);
+	
+	SkipNumber = 1;
+	FirstMeas = 0;
+
 //	cout << "SkipNumber=" << SkipNumber <<"	FirstMeas = " << FirstMeas << endl;
 	for (i=FirstMeas; i<mMeas.mNumMeas; i=i+SkipNumber)
 	{
+//		if ((i>2850)&&(i<2950))
+//		{
+//			cout << i << "	";
+//			mMeas.mMeasPoints[i].show();
+//		}
 		tempMeas = mMeas.mMeasPoints[i];
 		if ((0==Clutterfilter)||(0==tempMeas.sClutter)
 			||(Clutterfilter==tempMeas.sClutter))
 		{
-
+//			if ((i>2850)&&(i<2950))
+//			{
+//				cout << i << "	";
+//				mMeas.mMeasPoints[i].show();
+//			}	
 			//Change settings if the mobile installation changed
 			if (tempMeas.sInstKeyMobile!=currentMobile)
 			{
@@ -2138,15 +2183,15 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 					if (mMeas.mUseClutter)
 						cout << "	Using Clutter" << endl;
 					else cout << "	NOT using Clutter" << endl;	
-				
-*/				}
+*/				
+				}
 
 			}
 
 			//Change settings if the Fixed Installation changed
 			if (mMeas.mMeasPoints[i].sInstKeyFixed!=currentInst)
 			{
-//				cout << "i=" << i << "	NextInst = " << mMeasPoints[i].sInstKeyFixed << endl;
+//				cout << "i=" << i << "	NextInst = " << mMeas.mMeasPoints[i].sInstKeyFixed << endl;
 				if (CNumUsed>0)
 				{
 					CMean = CTotalError/CNumUsed;
@@ -2158,19 +2203,21 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 					CCorrC = (CNumUsed*CTotalMeasPred - CTotalMeas*CTotalPred) 
 						/ (CTempMeas*CTempPred);
 
-/*					cout << "Inst: " << currentInst << "	#: " << CNumUsed  
+/*					cout << i << "	Inst: " << currentInst << "	#: " << CNumUsed  
 						<< "	Freq =" << mMeas.mFixedInsts[FixedNum].sFrequency 
 						<< "	M: "<< CMean 					
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-//					cout	<< "	AntVal: " << CsumOfAntValue 
-//						<< " /N: "<< CsumOfAntValue/CNumUsed
-//						<< "	PathLoss: " << CsumOfPathLoss 
-//						<< " /N: " << CsumOfPathLoss/CNumUsed << endl;
+					cout	<< "	AntVal: " << CsumOfAntValue 
+						<< " /N: "<< CsumOfAntValue/CNumUsed
+						<< "	PathLoss: " << CsumOfPathLoss 
+						<< " /N: " << CsumOfPathLoss/CNumUsed << endl;
+					mMeas.mMeasPoints[i].show();
 */
 				}
 
+//				cout << i << "	Inst: " << currentInst << "	#: " << CNumUsed  << endl;
 				CNumUsed = 0;
 				CError=0;
 				CTotalError=0; 
@@ -2209,7 +2256,7 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 				EIRP = mMeas.mFixedInsts[FixedNum].sTxPower 
 					- mMeas.mFixedInsts[FixedNum].sTxSysLoss 
 					+ FixedAnt.mGain + MobileAnt.mGain;
-//				cout << "EIRP = " << EIRP << endl;
+//				cout << "EIRP = " << EIRP << "	AntKey: " << mMeas.mFixedInsts[FixedNum].sInstKey << endl;
 
 //				cout << "cGPpropModel::CostFunction: Setting Prediction parameters to match FixedInstallation" << endl;
 				if (CalcNewObstruction)
@@ -2312,6 +2359,7 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 									+ MobileAnt.GetPatternValue(0, 
 									- tempMeas.sTilt);
 
+//				cout << "AntValue=" << AntValue <<"	Azi = " << tempMeas.sAzimuth << "	Tilt = " << tempMeas.sTilt << endl;
 				tempMeas.sEIRPAntValue = EIRP - AntValue;
 				tempMeas.sPredValue = - tempMeas.sPathLoss + EIRP - AntValue;
 //				cout << "tempMeas.sDistance = " << tempMeas.sDistance << endl;
@@ -2321,8 +2369,8 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 						<< "	Tree = " << tempMeas.sPathLoss 
 						<<  "	AntValue = " << AntValue << endl;
 				}
-*/
-				Error = - tempMeas.sMeasValue +tempMeas.sPredValue;
+
+*/				Error = - tempMeas.sMeasValue +tempMeas.sPredValue;
 /*				cout << "i= " << i << "	err= " << Error 
 					<< "	PL= " << tempMeas.sPathLoss
 					<< "	meas= " << tempMeas.sMeasValue << endl;
@@ -2365,9 +2413,10 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 			<< "	MSE: " << CMeanSquareError 
 			<< "	StDev: " << CStDev
 			<< "	Corr: " << CCorrC << endl;
-//		cout	<< "	AntVal: " << CsumOfAntValue << " /N: "<< CsumOfAntValue/CNumUsed
-//			<< "	PathLoss: " << CsumOfPathLoss << " /N: " << CsumOfPathLoss/CNumUsed << endl;
-*/	}
+		cout	<< "	AntVal: " << CsumOfAntValue << " /N: "<< CsumOfAntValue/CNumUsed
+			<< "	PathLoss: " << CsumOfPathLoss << " /N: " << CsumOfPathLoss/CNumUsed << endl;
+*/
+	}
 
 	if (NumUsed>0)
 	{
@@ -2431,6 +2480,7 @@ int cGPpropModel::CostFunctionTreeOnly(unsigned CIndex, double &Mean, double &Me
 
 	unsigned FirstMeas = SkipNumber * gUni(gRandomGen);
 //	cout << "SkipNumber=" << SkipNumber <<"	FirstMeas = " << FirstMeas << endl;
+	SkipNumber =1;
 
 	for (i=FirstMeas; i<mMeas.mNumMeas; i+=SkipNumber)
 	{
@@ -2617,6 +2667,7 @@ int cGPpropModel::AutoFix(unsigned CIndex, double &Mean, double &MeanSquareError
 
 	unsigned FirstMeas = SkipNumber * gUni(gRandomGen);
 //	cout << "SkipNumber=" << SkipNumber <<"	FirstMeas = " << FirstMeas << endl;
+	SkipNumber = 1;
 
 	for (i=FirstMeas; i<mMeas.mNumMeas; i+=SkipNumber)
 	{

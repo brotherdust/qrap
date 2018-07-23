@@ -402,7 +402,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	ClutterDepth = 0.0;
 	for (i=0; i<m_size; i++)
 	{
-		if ((mNLOS[i])&&(mClutterProfile[i]==mClutterIndex))
+		if ((mNLOS[i])&&(mClutterProfile[i]==mClutterIndex)&&(mClutter.mClutterTypes[mClutterIndex].sHeight>0.0))
 			ClutterDepth+=m_interPixelDist;
 	}
 	if ((0==ClutterDepth)&&(mClutterProfile[m_size-1]==mClutterIndex))

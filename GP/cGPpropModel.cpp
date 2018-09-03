@@ -4812,14 +4812,14 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 
 	dice = rand() % 5;
 	if ((dice<2)&&(!grow)
-		&&((mCandidate[Index].sFitness<100195)||(mCandidate[Index].sCorrC>0.0)))
+		&&((mCandidate[Index].sFitness<UNFIT_LIMIT)||(mCandidate[Index].sCorrC>0.0)))
 	{
 		double OldValue;
 		for (i=0; i<mCandidate[Index].sConstants.size(); i++)
 		{
 			OldValue = mCandidate[Index].sConstants[i]->getValue();
 			mCandidate[Index].sConstants[i]->setValue(OldValue
-				*(1.0 + gGauss(gRandomGen)*(1-mMinFitness/mCandidate[Index].sFitness)));
+				*(1.0 + CONSTMUTATE*gGauss(gRandomGen)*(1-mMinFitness/mCandidate[Index].sFitness)));
 		}
 		switch (dice)
 		{	

@@ -37,7 +37,7 @@
   	cProfile cPosEstimation::mClutterProfile;
  	cProfile cPosEstimation::mDEMProfile;
 	cAntennaPattern* cPosEstimation::mFixedAnts = nullptr;
-   	cPathLossPredictor* cPosEstimation::mPathLoss= nullptr;
+  	cPathLossPredictor* cPosEstimation::mPathLoss= nullptr;
 	unsigned cPosEstimation::mClutterClassGroup = 0;
 	bool cPosEstimation::mUseClutter = true;
 	double cPosEstimation::mkFactor =1.2;
@@ -51,7 +51,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	mClutter = new cRasterFileHandler();
 	mPathLoss= new cPathLossPredictor();
 
-	mLTEsim = false;
+	mLTEsim = true;
 	mOriginal = false;
 	mUMTSsim = false;
 	mTAUnknown = false;
@@ -173,22 +173,22 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 	
 	areaQuery += "ST_GeomFromText('POLYGON((";
 	for (i = 0 ; i < Points.size();i++)
-   	{
+   {
 		Points[i].Get(Lat, Lon);
-   		mNorth = max(mNorth,Lat);
-   		mSouth = min(mSouth,Lat);
-   		mEast = max(mEast,Lon);
-   		mWest = min(mWest,Lon);
+   	mNorth = max(mNorth,Lat);
+   	mSouth = min(mSouth,Lat);
+   	mEast = max(mEast,Lon);
+   	mWest = min(mWest,Lon);
 		gcvt(Lon,12,text);
-   		areaQuery += text;
-   		areaQuery += " ";
+   	areaQuery += text;
+   	areaQuery += " ";
 		gcvt(Lat,12,text);
-   		areaQuery += text;
-   		areaQuery += ",";
-   	}
-   	NorthWestCorner.Set(mNorth,mWest,DEG);
+   	areaQuery += text;
+   	areaQuery += ",";
+   }
+   NorthWestCorner.Set(mNorth,mWest,DEG);
 	mNW.Set(mNorth,mWest,DEG);
-   	SouthEastCorner.Set(mSouth,mEast,DEG);
+   SouthEastCorner.Set(mSouth,mEast,DEG);
 	mSE.Set(mSouth,mEast,DEG);
 	cout << "North West corner: " << endl;
 	NorthWestCorner.Display();
@@ -196,11 +196,11 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 	SouthEastCorner.Display();
 	Points[0].Get(Lat,Lon);
 	gcvt(Lon,12,text);
-   	areaQuery += text;
-   	areaQuery += " ";
+   areaQuery += text;
+   areaQuery += " ";
 	gcvt(Lat,12,text);
-   	areaQuery += text;
-   	areaQuery += "))',4326)) ";
+   areaQuery += text;
+   areaQuery += "))',4326)) ";
 
 	query = "select distinct site.id as siteid, ST_AsText(location) as siteLocation, ";
 	query += "type, maxdist, NumInputs, NumOutputs, filename, index, cellid ";
@@ -306,7 +306,6 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 	mNumSites = mSites.size();
 
 	cout << "cPosEstimation::LoadMeasurements: mNumSites = " <<  mNumSites << endl;
-
 
 /*	query = "select cell.id as ci, antneuralnet.id as antannid,filename ";
 	query += "from site cross join cell cross join antneuralnet ";
@@ -617,19 +616,19 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 						Distance = NewMeasurement.sSiteLocation.Distance(NewTestPoint.sOriginalLocation);
 						if (mLTEsim)
 						{
-							NewMeasurement.sResDist = 4.88;
-							addDist =  50.0*distError(LTEdistance);
+							NewMeasurement.sResDist = 19.52;
+							addDist =  49.0*distError(LTEdistance);
 							while ((Distance + addDist)<=0)
-								addDist = 50.0*distError(LTEdistance);
+								addDist = 49.0*distError(LTEdistance);
 							Distance = Distance + addDist;
 						}
 
 						if (mUMTSsim)
 						{
-							NewMeasurement.sResDist = 38;
-							addDist =  50.0*distError(LTEdistance);
+							NewMeasurement.sResDist = 39;
+							addDist =  49.0*distError(LTEdistance);
 							while ((Distance + addDist)<=0)
-								addDist = 50.0*distError(LTEdistance);
+								addDist = 49.0*distError(LTEdistance);
 							Distance = Distance + addDist;
 						}
 
@@ -713,36 +712,47 @@ void cPosEstimation::EstimatePositions()
 
 	time_t beginTime = time(0);
 
+//	for (i=220; i<235; i++)
 	for (i=0; i< mNumPoints; i++)
 	{
 		mCurPosI = i;
+//		cout << "i=" << i << "	Before IF" << endl;
 		if ((mPosSets[mCurPosI].sMeasurements.size()>0)
 			&&(mPosSets[mCurPosI].sTestPoints.size()>0))
 		{
+//			cout << "i=" << i << "	In IF" << endl;
 			mPosSets[mCurPosI].sTestPoints[0].sAzimuth = mPosSets[mCurPosI].sMeasurements[0].sSiteLocation.
 								Bearing(mPosSets[mCurPosI].sTestPoints[0].sOriginalLocation);
 			mPosSets[mCurPosI].sTestPoints[0].sDistance = mPosSets[mCurPosI].sMeasurements[0].sSiteLocation.
 								Distance(mPosSets[mCurPosI].sTestPoints[0].sOriginalLocation);
 
-			delete [] mFixedAnts;
+//			cout << "i=" << i << "	Before delete" << endl;
+			if (mNumInsts>0) delete [] mFixedAnts;
 			mNumInsts = mPosSets[mCurPosI].sMeasurements.size();
+//			cout << "i=" << i << "	NumInsts=" << mNumInsts << endl;
 			mFixedAnts = new cAntennaPattern[mNumInsts];
+//			cout << "i=" << i << "	Before loop" << endl;
 			for (j=0; j < mNumInsts; j++)
 			{
-				mFixedAnts[j].SetUseAntANN (mUseAntANN);
+//				mFixedAnts[j].SetUseAntANN (mUseAntANN);
+				mFixedAnts[j].SetUseAntANN (false);
 				mFixedAnts[j].SetAntennaPattern(mPosSets[mCurPosI].sMeasurements[j].sInstKeyFixed, 
 								Tx, mPosSets[mCurPosI].sMeasurements[j].sAzimuth, 
 								mPosSets[mCurPosI].sMeasurements[j].sTilt);
 			}
+//			cout << "i=" << i << "	Before set Parameters" << endl;
 			mPathLoss->setParameters(mkFactor,mPosSets[mCurPosI].sMeasurements[0].sFrequency,
 						mPosSets[mCurPosI].sMeasurements[0].sHeight, MOBILEHEIGHT,
 						mUseClutter, mClutterClassGroup);
+//			cout << "i=" << i << "	Before set search boundaries" << endl;
 			SetSearchBoundaries();
 			if (mTAUnknown)
 				mRho_max=2800;
 
+//			cout << "i=" << i << "	Before ANN" << endl;
 			if (ANNrun())
 			{
+//				cout << "ANN done" << endl;
 				CI();
 				if (mPosSets[mCurPosI].sMeasurements[0].sDistance<120001)		
 				{
@@ -751,9 +761,10 @@ void cPosEstimation::EstimatePositions()
 						SecondSite();
 				}
 				else SecondSite();
-				cout << "Before PSO" << endl;
+
+//				cout << "Before PSO" << endl;
 //				DCM_ParticleSwarm();
-				cout << "Before Exhaustive Search" << endl;
+//				cout << "Before Exhaustive Search" << endl;
 				ExhaustiveSearch();
 //				DCM_CMA_ES();
 			
@@ -1934,16 +1945,15 @@ bool cPosEstimation::SetSearchBoundaries()
 {
 	mRho_max = 120001.0;
 	mRho_min = mPlotResolution;
-	if (mPosSets[mCurPosI].sMeasurements[0].sDistance > 120000)
+	if ((mPosSets[mCurPosI].sMeasurements[0].sDistance > 120000)||(mTAUnknown))
 	{
 		if (mPosSets[mCurPosI].sMeasurements.size()>1)
 		{
 			mRho_max = 
 			mPosSets[mCurPosI].sMeasurements[0].sSiteLocation.Distance
-			(mPosSets[mCurPosI].sMeasurements[1].sSiteLocation);
+						(mPosSets[mCurPosI].sMeasurements[1].sSiteLocation);
 		}
 		else mRho_max = 17500;
-		mRho_min = mPlotResolution;
 	}
 	else
 	{
@@ -2000,7 +2010,8 @@ bool cPosEstimation::SetSearchBoundaries()
 		mPhi_max_back+=360;
 		mPosSets[mCurPosI].sMeasurements[0].sAzimuth+=360;
 	}
-	cout << "mPhi_min = " << mPhi_min << "	mPhi_max = " << mPhi_max << endl;
+	cout << "Azimuth = " <<  mPosSets[mCurPosI].sMeasurements[0].sAzimuth 
+			<< "	mPhi_min = " << mPhi_min << "	mPhi_max = " << mPhi_max << endl;
 	return true;
 }
 
@@ -2041,7 +2052,7 @@ bool cPosEstimation::ExhaustiveSearch()
 	{
 		for (phi=mPhi_min; phi<=mPhi_max; phi+=(180*asin(mPlotResolution/rho)/PI))
 		{
-//			cout << rho <<"	" << phi << endl;
+
 			value = CostFunction(rho, phi);
 			if (value < NbestValue[NumBest-1])
 			{
@@ -2066,6 +2077,7 @@ bool cPosEstimation::ExhaustiveSearch()
 			}
 			if (value<bestValue)
 			{
+				cout << rho <<"	" << phi << "	Value=" << value << endl;
 				bestValue = value;					
 				bestRho = rho;
 				bestPhi = phi;
@@ -2151,7 +2163,12 @@ double cPosEstimation::CostFunction(double rho, double phi)
 	if ((mCellPathLoss!=NULL)&&(mNumInsts>0)) delete [] mCellPathLoss;
 //	cout << "	After  delete" << endl;
 	if (mNumInsts>0) mCellPathLoss = new double[mNumInsts];
-	else return 0;
+	else
+	{
+		delete [] Prediction;
+		delete [] Delta;
+	 	return 0;
+	}
 	double sumMeas, sumPred, meanMeas, meanPred, teller, varMeas, varPred, CorrC;
 	double DiffLoss=0, Azimuth, AntValue, Distance;
 	float Tilt=0;
@@ -2165,14 +2182,18 @@ double cPosEstimation::CostFunction(double rho, double phi)
 	ParticlePosition.FromHere(mPosSets[mCurPosI].sMeasurements[0].sSiteLocation, rho, phi);
 //	ParticlePosition.Display();
 	if (!ParticlePosition.Between(mNW,mSE))
+	{
+		delete [] Prediction;
+		delete [] Delta;
 		return (999999.0);
+	}
 
 	for (i=0; i<mNumInsts; i++)
 	{
 		Distance = mPosSets[mCurPosI].sMeasurements[i].sSiteLocation.Distance(ParticlePosition);
 		Azimuth = mPosSets[mCurPosI].sMeasurements[i].sSiteLocation.Bearing(ParticlePosition);
 //		cout << "mBTL.size() = " << mBTL.size() << "	i = "<< i << "	mCurposI = " << mCurPosI << endl;
-		iBTL = 0;
+/*		iBTL = 0;
 		found=false;
 		if (mBTL.size()>0)
 		{
@@ -2195,7 +2216,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 		}
 		if ((MAXBTLinMEMORY<=iBTL)||(mBTL.size()<=iBTL)||((Radius+500)<Distance)) 
 		{
-			cout << "Radius = " << Radius << "	Distance = " << Distance <<endl;
+//			cout << "Radius = " << Radius << "	Distance = " << Distance <<endl;
 			if (MAXBTLinMEMORY<=mBTL.size())
 			{
 				cout << "Erasing" << endl;
@@ -2214,7 +2235,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 			double Height = mPosSets[mCurPosI].sMeasurements[i].sHeight;
 			double MHeight = MOBILEHEIGHT;
 			double kFactor = mkFactor;
-			cout << "DistRes = " << DistRes << endl;
+//			cout << "DistRes = " << DistRes << endl;
 			int BTLkey = newBTL->Check_and_SetBTL
 					(mPosSets[mCurPosI].sMeasurements[i].sSiteID, Radius, DistRes, NumAngles,
 					Freq, Height, MHeight, kFactor, mDEMsource, mClutterSource);
@@ -2352,6 +2373,8 @@ double cPosEstimation::CostFunction(double rho, double phi)
 			{
 				cout << "Vloekskoot " << (int)NumDist - round(Distance/DistRes) << "	DistRes = "<< DistRes
 				 <<"	Dist = " << Distance << "	Radius = " << Radius << endl;
+				delete [] Delta;
+				delete [] Prediction;
 				return 999999.0;
 			}
 			Tilt = mBTL[iBTL]->mTilt[ii][jj];
@@ -2359,6 +2382,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 		}
 		else
 		{
+*/
 //			mPosSets[mCurPosI].sMeasurements[i].sSiteLocation.Display();
 //			cout << "i = " << i << "	mCurPosI =" << mCurPosI << endl;
 			mDEM->GetForLink(mPosSets[mCurPosI].sMeasurements[i].sSiteLocation,
@@ -2378,7 +2402,7 @@ double cPosEstimation::CostFunction(double rho, double phi)
 			mCellPathLoss[i] = mPathLoss->TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
 //			cout << "Voor Bearing" << endl;
 //			cout << "Get antvalue" << endl;
-		}
+//		}
 
 		AntValue = mFixedAnts[i].GetPatternValue(Azimuth, Tilt);
 		Prediction[i] =  mPosSets[mCurPosI].sMeasurements[i].sEIRP 
@@ -2720,9 +2744,9 @@ bool cPosEstimation::ANNrun()
 	Input[0] = 1;	
 	Input[1] = cos(mPosSets[mCurPosI].sMeasurements[0].sAzimuth*PI/180);
 	Input[2] = sin(mPosSets[mCurPosI].sMeasurements[0].sAzimuth*PI/180);
-	Input[3] = 1.8*(((double)mPosSets[mCurPosI].sMeasurements[0].sTA+0.5)*mPosSets[mCurPosI].sMeasurements[0].sResDist
+	Input[4] = 1.8*(((double)mPosSets[mCurPosI].sMeasurements[0].sTA+0.5)*mPosSets[mCurPosI].sMeasurements[0].sResDist
 						- 4*mSites[mCurSiteI].sMaxDist/9)/mSites[mCurSiteI].sMaxDist;
-	Input[4] = (mPosSets[mCurPosI].sMeasurements[0].sResDist)/600;
+	Input[3] = (mPosSets[mCurPosI].sMeasurements[0].sResDist)/600;
 
 	for (q=0; q<mSites[mCurSiteI].sCellSet.size(); q++)
 	{
@@ -2908,6 +2932,7 @@ int cPosEstimation::SaveResults()
 		}
 	}
 
+	cout << "Saved Results" << endl;
 	delete [] temp;
 	return true;
 }

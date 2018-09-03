@@ -25,8 +25,9 @@ location @ ST_GeomFromText('POLYGON((28.0218767 -26.04847747,
 
 delete from testpoint where id not in (select tp from testpointauxLTE);
 
+delete from testpoint where positionsource>1;
 
-
+select from test
 
 delete from testpoint where positionsource>1;
 
@@ -44,10 +45,10 @@ select servci, tp1.id as tp, tp2.id as origtp, tp1.positionsource,
 abs(pe1.Distance-pe2.Distance) as distErr, pe1.error as Error
 from testpoint as tp1 cross join positionestimate as pe1
 cross join testpoint as tp2 cross join positionestimate as pe2
-cross join testpointauxLTE
+cross join testpointauxGSM
 where tp1.positionsource>1
 and tp1.originaltp = tp2.id
-and tp2.id = testpointauxLTE.tp
+and tp2.id = testpointauxGSM.tp
 and pe1.tp = tp1.id
 and pe2.tp = tp2.id;
 
@@ -124,7 +125,3 @@ create table LTEmeasCountDist as
 select num, count(*) as aantal
 from LTEnumPerTP
 group by num;
-
-select * from LTEmeasCountDist
-order by num;
-

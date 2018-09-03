@@ -125,6 +125,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	unsigned AntKey;
 	char* Temp;
 	Temp = new char[12];
+	
 
 //	cout << "cAntennaPattern::SetAntennaPattern. Before if (mUseANN) " << endl;
 	if (mUseANN)
@@ -229,7 +230,10 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 			mFreq = atof(r[0]["frequency"].c_str());
 			mGain = atof(r[0]["gain"].c_str());
 			mBeamW = atof(r[0]["azibeamwidth"].c_str());
-			strcpy(mFile, r[0]["patternFile"].c_str());
+//			cout << "patternFile = " << r[0]["patternFile"];
+			delete [] mFile;
+			mFile = new char[DB_FILE_SIZE];
+			snprintf(mFile, DB_FILE_SIZE, "%s", r[0]["patternFile"].c_str());
 //			cout << "	" << mFile << endl;
 		}
 		else

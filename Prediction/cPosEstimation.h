@@ -29,7 +29,7 @@
 #define PI 3.1415926535897932384626433832795
 #define GAMMA 2.4
 #define MOBILEHEIGHT 1
-#define SIGMA2 (8*8)
+#define SIGMA2 (9.5*9.5)
 #define MARGIN 15
 #define SENSITIVITY (-120)
 #define NUMPARTICLES 20
@@ -122,12 +122,12 @@ struct tMeas
 	double		sPathLoss;
 	double		sRFDistEstimate; // "pathloss" corrected for frequency and EIRP 
 	double 		sPredValue;
-	float		sTilt;
+	float			sTilt;
 	double		sHeight;
 	double		sAzimuth;
 	double 		sBeamWidth;
 	double		sDistance;
-	int		sTA; 		// this could be GSM/LTE TA or UMTS timeDiff
+	int			sTA; 		// this could be GSM/LTE TA or UMTS timeDiff
 	double 		sResDist;
 	double		sIMEI;		// the IMEI of the measurement phone
 	double		sHour;		// the hour of the measurement

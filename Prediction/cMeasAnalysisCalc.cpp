@@ -847,7 +847,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 //	unsigned tClutter = 0;
 
 	//These varaibles are local and are such that they can be used with the TERMs defined in cClutter.h
-	double mLinkLength, m_freq, m_htx;
+	double mLinkLength, m_freq, m_htx, mClutterDepth;
 	
 	for (j=0;j<mPathLoss.mClutter.mNumber;j++)
 	{
@@ -1044,7 +1044,6 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 					
 					if (NUMTERMS>0) terms[0] = TERM0;
 					if (NUMTERMS>2) terms[2] = TERM2;
-					if (NUMTERMS>4) terms[4] = TERM4;
 				}
 			}
 			
@@ -1135,6 +1134,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 				if (mUseClutter)
 				{
 					mLinkLength = mMeasPoints[i].sDistance;
+					mClutterDepth = mMeasPoints[i].sClutterDistance;
 					if (NUMTERMS>1) terms[1] = TERM1;
 					if (NUMTERMS>3)
 					{
@@ -1142,6 +1142,7 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 								terms[3] = TERM3;
 //						else terms[3] = 0;
 					}
+					if (NUMTERMS>4) terms[4] = TERM4;
 					if (NUMTERMS>5)
 					{
 //	/					if (fabs(DiffLoss)<0.1) 
@@ -1500,7 +1501,7 @@ bool cMeasAnalysisCalc::OptimiseModelCoefD(unsigned MeasSource)
 			<< "	MeanSquare: " << MeanSquareError << "	StDev: "<< StDev
 			<< "	CorrC: " << CorrC << endl;
 		// Only optimise if enough points are involved
-		if ((NumUsed > 100))
+		if ((NumUsed > 80))
 		{
 			for (i=0; i<NUMTERMS; i++)
 			{
@@ -2375,7 +2376,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		sumSquareDiff = 0.0;
 		TempMinIndex =0;
 
-		if (smallStepSize>3)  // start exhaustive search.
+/*		if (smallStepSize>3)  // start exhaustive search.
 		{
 			cout << "Starting Exhaustive search " << endl;
 			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
@@ -2387,7 +2388,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			stop = false;
 			smallStepSize=0;
 		}	
-		
+*/		
 
 		if (!stop)
 		//Loop to determine partial derivative with respect to each clutter height
@@ -2463,7 +2464,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 //						The below to factors are for the 'altered' gradient search method 
 //						which makes it more sensitive to ill presented cluttertypes. 				
 //							*mNumMeas/mClutterCount[i];
-							*sqrt(TotNum/mClutterCount[i]);
+							*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 			}
 			OldStepSize = TempStepSize;
@@ -2508,11 +2509,11 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				{
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
-							-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize);
+							-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize)
 //									The below to factors are for the 'altered' gradient search method 
 //									which makes it more sensitive to ill presented cluttertypes. 
 //									*mNumMeas/mClutterCount[i];
-//									*TotNum/mClutterCount[i];
+									*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;
@@ -2563,9 +2564,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
 						//Take another TempStepSize forward
-							-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize);
+							-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize)
 //								*mNumMeas/mClutterCount[i];
-//								*TotNum/mClutterCount[i];
+								*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 				OldStepSize=TempStepSize;
@@ -2629,9 +2630,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			{
 				if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 					mPathLoss.mClutter.mClutterTypes[i].sHeight 
-							-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize);
+							-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize)
 //								*mNumMeas/mClutterCount[i];
-//								*TotNum/mClutterCount[i];
+								*TotNum/mClutterCount[i];
 //				cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 			}
 			OldStepSize=TempStepSize;
@@ -2676,9 +2677,9 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 				{
 					if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 						mPathLoss.mClutter.mClutterTypes[i].sHeight 
-								-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize);
+								-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize)
 //									*mNumMeas/mClutterCount[i];
-//									*TotNum/mClutterCount[i];
+									*TotNum/mClutterCount[i];
 //					cout << i << " :  " << mPathLoss.mClutter.mClutterTypes[i].sHeight << "	";
 				}
 //				cout << endl;

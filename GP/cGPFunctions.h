@@ -189,6 +189,16 @@ public:
 };
 
 //*******************************************************************************
+//Log base 10
+class Exponent : public GOftn 
+{
+public:
+	Exponent();
+	tMeasPoint eval(tMeasPoint inPoint);
+	Exponent* clone();
+};
+
+//*******************************************************************************
 // Square x^2
 class Square : public GOftn 
 {

@@ -45,10 +45,10 @@
 #include "../DataBase/Config.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 500
+#define NUM_INIT_CANDIDATES 300
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 10
-#define NUM_GENERATIONS 10 // GP field guide suggest between 10 and 50
+#define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50
 #define NUM_POINT_PER_EVAL 1000
 //how much of the population we loose per generation
 #define UNFIT_LIMIT 100195
@@ -57,11 +57,13 @@
 #define PROP_MUTATE 0.5
 #define PROP_CROSSOVER 0.5
 //Affects how elitist the algorithm is ... the smaller the more elitist
-#define GAUSSDIST 2
+#define GAUSSDIST 0.5
 
 #define MAXOPTLOOPS 500
 #define MAXOPTCALC 2500
 #define MAXMINAGE 30
+
+#define FITNESS 0.5*(100*(1-mCandidate[i].sCorrC)-18) + (mCandidate[i].sStdDev-9)
 
 using namespace std;
 

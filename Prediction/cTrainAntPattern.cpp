@@ -336,6 +336,185 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 	return true;
 }
 
+//*********************************************************************
+bool cTrainAntPattern::LoadMeasurements(char*  CustomAreaName,
+					unsigned MeasType, 
+					unsigned MeasSource,
+					unsigned PosSource,
+					unsigned Technology)
+{
+
+	cAntennaPattern AntPatternFromFile; 
+
+	pqxx::result r;
+	char *text= new char[33];
+	string query, areaQuery;
+	pqxx::result MeasSelect;
+	unsigned i;
+
+	tCellAnt NewCell;
+	NewCell.sCI=0;
+
+	double longitude, latitude;
+	double Total, Delta, DiffLoss, PathLoss, ClutterDepth;
+	float Tilt;
+	string PointString;
+	unsigned spacePos;
+	unsigned cellid;
+	
+	query = "select ci, ST_AsText(site.location) as siteLocation, ";
+	query += "radioinstallation.txantennaheight as height, radioinstallation.txpower as txpwr,  ";
+	query += "radioinstallation.txlosses as txlosses, radioinstallation.id as ri, ";
+	query += "txantpatternkey, txbearing, txmechtilt, tp, ";
+	query += "ST_AsText(testpoint.location) as measLocation, measvalue, frequency ";
+	query += "from measurement cross join testpoint ";
+	query += "cross join cell cross join radioinstallation  cross join site ";
+	query += "cross join technology  ";
+	query += "cross join customareafilter ";
+	query += "where tp=testpoint.id  and ci = cell.id ";
+	query += "and risector = radioinstallation.id and siteid = site.id ";
+	query += "and areaname = '";
+ 	query += CustomAreaName;
+	query += "' ";
+	query += "and techkey = technology.id  ";
+	query += "and testpoint.positionsource < 2 ";
+	query += " and ST_within(testpoint.location, the_geom) ";
+	query += " and ST_within(site.location, the_geom)";
+	
+	if (MeasType>0)
+	{
+		query += " and meastype=";
+		gcvt(MeasType,9,text);
+		query += text;
+	}
+	if (MeasSource>0)
+	{
+		query += " and measdatasource=";
+		gcvt(MeasSource,9,text);
+		query += text;
+	}
+	if (PosSource>0)
+	{
+		query += " and positionsource=";
+		gcvt(PosSource,9,text);
+		query += text;
+	}
+	if (Technology>0)
+	{
+		query += " and Technology.id=";
+		gcvt(Technology,9,text);
+		query += text;
+	}
+
+	query += " order by ci, tp;";
+	cout << query << endl;
+
+	if (!gDb.PerformRawSql(query))
+	{
+		string err = "cTrainAntPattern::LoadMeasurements: ";
+		err +="Problem with database query to get measurements from selected area! Problem with query: ";
+		err += query;
+		cout << err << endl;
+		QRAP_ERROR(err.c_str());
+		delete [] text;
+		return false;
+	}
+
+	gDb.GetLastResult(r);
+	if (r.size() >0)
+	{
+		tMeasNNAnt NewMeasurement; 
+
+		for (i=0; i<r.size(); i++)
+		{
+			cellid = atoi(r[i]["ci"].c_str());
+			if (cellid != NewCell.sCI)
+			{
+				if (NewCell.sCI>0)
+				{
+						if (NewCell.sNumTrain>0)
+						{
+							NewCell.sMean = Total / (NewCell.sNumTrain +NewCell.sNumTest);
+							mCells.push_back(NewCell);
+						}
+						NewCell.sMeasTest.clear();
+						NewCell.sMeasTrain.clear();
+				}
+				NewCell.sCI = cellid;
+				NewCell.sRI = atoi(r[i]["ri"].c_str());
+				NewCell.sTxPwr = atof(r[i]["txpwr"].c_str());
+				NewCell.sTxSysLoss = atof(r[i]["txlosses"].c_str());
+				NewCell.sHeight = atof(r[i]["height"].c_str());
+				NewCell.sAntPatternKey = (unsigned)atoi(r[i]["txantpatternkey"].c_str());
+				NewCell.sBearing = atof(r[i]["txbearing"].c_str());
+				NewCell.sTilt = atof(r[i]["txmechtilt"].c_str());
+				PointString = r[i]["sitelocation"].c_str();
+				spacePos = PointString.find_first_of(' ');
+				longitude = atof((PointString.substr(6,spacePos).c_str())); 
+				latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
+				NewCell.sPosition.Set(latitude,longitude,DEG);
+				mPathLoss.setParameters(mkFactor,NewMeasurement.sFrequency,
+						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
+
+				NewCell.sNumTrain=0;
+				NewCell.sNumTest=0;
+				Total=0;
+				NewCell.sMin = 500;
+			}
+				
+			PointString = r[i]["measlocation"].c_str();
+			spacePos = PointString.find_first_of(' ');
+			longitude = atof((PointString.substr(6,spacePos).c_str())); 
+			latitude = atof((PointString.substr(spacePos,PointString.length()-1)).c_str());
+			NewMeasurement.sLocation.Set(latitude,longitude,DEG);
+			NewMeasurement.sCellID = atoi(r[i]["ci"].c_str());
+			NewMeasurement.sFrequency = atof(r[i]["frequency"].c_str());
+			NewMeasurement.sMeasValue = atof(r[i]["measvalue"].c_str());
+		
+			mDEM.GetForLink(NewCell.sPosition,NewMeasurement.sLocation, mPlotResolution, mDEMProfile);
+			if (mUseClutter)
+			{
+				mClutter.GetForLink(NewCell.sPosition,	NewMeasurement.sLocation, mPlotResolution, mClutterProfile);
+			}
+			mPathLoss.setParameters(mkFactor,NewMeasurement.sFrequency,
+						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
+			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
+
+			if (DiffLoss < 10)
+			{
+					Delta =  - NewMeasurement.sMeasValue - PathLoss;
+					Total +=Delta;
+					if (Delta<NewCell.sMin) NewCell.sMin=Delta;
+					if (((double)i/SUB*SUB == floor((double)i/SUB)*SUB)&&(i>0))
+					{
+							NewCell.sMeasTest.push_back(NewMeasurement);
+							NewCell.sNumTest++;
+					}
+					else
+					{
+							NewCell.sMeasTrain.push_back(NewMeasurement);
+							NewCell.sNumTrain++;
+					}
+			}		
+		}// end for number of entries
+
+	} // end if query is NOT empty
+	else 
+	{
+		string err ="Empty query: ";
+		err += query;
+		cout << err << endl;
+		QRAP_ERROR(err.c_str());
+		delete [] text;
+		return false;
+	} //end query is empty
+
+	delete [] text;
+	cout << "mMAXANNOutput = " << mMAXANNOutput << endl;
+	cout << "cTrainAntPattern::LoadMeasurement: leaving ... happy ... " << endl << endl;
+	return true;
+}
+
 
 //**************************************************************************************************************************
 bool cTrainAntPattern::TrainANDSaveANDTest()

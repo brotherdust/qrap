@@ -112,6 +112,7 @@ tMeasPoint GOftn::evalfix(tMeasPoint inPoint)
 }
 
 //******************************************************************************
+// This function is uded for "fixing" ill conditioned  structures.
 GOftn* GOftn::getNewNode()
 {
 	int randn = rand() % 9;
@@ -162,6 +163,9 @@ GOftn* GOftn::getNewNode()
 			break;
 		case 12:
 			retFtn = new Power();
+			break;
+		case 13:
+			retFtn = new Exponent();
 			break;
 
 		default:
@@ -820,6 +824,50 @@ Log10Node* Log10Node::clone()
 //**********************************************************************
 //**********************************************************************
 //
+//		Exponent exp(x)
+//
+//**********************************************************************
+Exponent::Exponent()
+{
+	mNumChildren = 1;
+	mChild = new GOftn*[mNumChildren];
+	mLabel = "Exp ";
+	mIsConstant = false;
+}
+
+//**********************************************************************
+tMeasPoint Exponent::eval(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	tMeasPoint c1;
+	if (mChild[0])
+	{
+		c1 = mChild[0]->eval(inPoint);
+		outPoint.sReturn = exp(c1.sReturn);
+	}
+	else 
+	{
+		cerr << "input not defined in exponent"<<endl;
+		outPoint.sReturn = 200.0;
+	}
+//	cout <<"	"<< mLabel << outPoint.sReturn <<"  "<< endl;
+	return outPoint;
+}
+
+//**********************************************************************
+Exponent* Exponent::clone()
+{
+	Exponent* retNode = new Exponent;
+	for (unsigned i=0; i<mNumChildren; i++) 
+	{
+		retNode->mChild[i] = mChild[i]->clone();
+	}
+	return retNode;
+}
+
+//**********************************************************************
+//**********************************************************************
+//
 //		Square x^2=x*x
 //
 //**********************************************************************
@@ -860,6 +908,7 @@ Square* Square::clone()
 	}
 	return retNode;
 }
+
 
 //***********************************************************************
 //***********************************************************************

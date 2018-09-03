@@ -409,6 +409,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	{
 		ClutterDepth += max((mClutter.mClutterTypes[mClutterIndex].sHeight - m_hrx)/sqrt(2.0),0.0);
 	}
+	mClutterDepth = ClutterDepth;
 
 	if (DiffLoss<0) DiffLoss = 0;
 	//Incorporate the Obstruction loss
@@ -442,7 +443,14 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 //			}
 //			else mCterms[3] = 0.0;
 		}		
-
+		if (NUMTERMS>4)
+		{
+//			if ((mLinkLength>0.0)&&(fabs(DiffLoss)<0.1)) 
+//			{
+				mCterms[4] = TERM3;
+//			}
+//			else mCterms[3] = 0.0;
+		}
 		if (NUMTERMS>5)
 		{
 //			if (fabs(DiffLoss)<0.1) 

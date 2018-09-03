@@ -165,6 +165,7 @@ class cTrainPosNetDistAngle
 	bool mLTEsim;
 	bool mUMTSsim;
 	bool mOriginal;
+	bool mTAUnknown;
 };
 }
 #endif

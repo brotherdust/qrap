@@ -324,6 +324,15 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 			Available=point.Between(mAvailableSetNW,mAvailableSetSE);
 		}
 
+		//Took the below out and inserted the above 2018-05-20 		
+/*		if (Available)
+		{
+			if (mCurrentRasters[Current]->IsIn(point))
+				profile[j] = mCurrentRasters[Current]->GetValue(point,mSampleMethod);
+			
+		}
+		else profile[j]=OUTOFRASTER;
+*/
 //		cout << j << "	" << profile[j] << endl;
 
 		if (((profile[j] <-440.0)||(profile[j] >8880)||(profile[j]==OUTOFRASTER)||(ToSwitch))&&(Available))
@@ -401,6 +410,7 @@ bool cRasterFileHandler::GetForLink(cGeoP TxLoc, cGeoP RxLoc, double DistRes, cP
 //					cout << "point:" << mCurrentRasters[mCurrent]->mFilename<< endl;
 //					point.Display();
 //				}
+//				if (mJumped) cout << mCurrentRasters[Current]->mFilename<< endl;
 			}
 			else
 			{

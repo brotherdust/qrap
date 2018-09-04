@@ -2460,7 +2460,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			{
 				if ((fabs(CHeightDiff[i])>1e-9)&&(Change[i]))
 					mPathLoss.mClutter.mClutterTypes[i].sHeight 
-						-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize);
+						-= CHeightDiff[i]/SizeOfDiff*(TempStepSize-OldStepSize)
 //						The below to factors are for the 'altered' gradient search method 
 //						which makes it more sensitive to ill presented cluttertypes. 				
 //							*mNumMeas/mClutterCount[i];

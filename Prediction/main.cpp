@@ -254,7 +254,7 @@ int main (int argc, char **argv)
 	if (!Continue)
 		return 0;
 
-/*	if (!gDb.PerformRawSql(queryC))
+	if (!gDb.PerformRawSql(queryC))
 	{
 		cout << "Error clearing coefficients" << endl;
 	}
@@ -306,7 +306,7 @@ int main (int argc, char **argv)
 	Continue = Meas.LoadMeasurements(Punte,0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 	cout<< "AG2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-*/
+
 /*
 	Continue = Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.OptimiseModelCoefD(0);
@@ -483,7 +483,7 @@ int main (int argc, char **argv)
 //	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
 
 
-/*	cTrainAntPattern NeuralNets;
+	cTrainAntPattern NeuralNets;
 	double Azimuth;
 
   	query = "truncate table AntNeuralNet cascade;";
@@ -497,7 +497,7 @@ int main (int argc, char **argv)
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
+
 
   	query = "update qrap_config set value='true' where name = 'UseAntANN';";
 	if (!gDb.PerformRawSql(query))

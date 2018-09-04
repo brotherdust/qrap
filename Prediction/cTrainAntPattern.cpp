@@ -174,6 +174,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
      		areaQuery += text;
      		areaQuery += ",";
    	}
+
    	NorthWestCorner.Set(mNorth,mWest,DEG);
    	SouthEastCorner.Set(mSouth,mEast,DEG);
 	cout << "North West corner: " << endl;
@@ -585,7 +586,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 		cout << " NumTest = " <<  mCells[i].sNumTest << endl;
 		cout << " NumTrain = " <<  mCells[i].sNumTrain << endl;
 
-		if (mCells[i].sNumTrain>50)
+		if (mCells[i].sNumTrain>110)
 		{
 			mCells[i].sInputTrain = new double*[mCells[i].sNumTrain + mNumAzifFile+mNumElevfFile];
 			mCells[i].sOutputTrain = new double*[mCells[i].sNumTrain+ mNumAzifFile+mNumElevfFile];
@@ -597,9 +598,9 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 
 			AntPatternFromFile.SetUseAntANN(false);
 			AntPatternFromFile.SetAntennaPattern(mCells[i].sRI, Tx,
-													mCells[i].sBearing, mCells[i].sTilt);
+									mCells[i].sBearing, mCells[i].sTilt);
 			EIRP = mCells[i].sTxPwr - mCells[i].sTxSysLoss + AntPatternFromFile.mGain;
-				mPathLoss.setParameters(mkFactor,mCells[i].sMeasTrain[0].sFrequency,
+			mPathLoss.setParameters(mkFactor,mCells[i].sMeasTrain[0].sFrequency,
 							mCells[i].sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
 
 			for (j=0; j<mCells[i].sNumTrain; j++)

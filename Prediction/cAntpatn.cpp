@@ -163,8 +163,11 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 				mUseANN = false;
 			}
 		}
-		delete [] Temp;
-		return true;
+		if (mUseANN) 
+		{
+			delete [] Temp;
+			return true;
+		}
 	}
 	
 //	cout << "cAntennaPattern::SetAntennaPattern. Na if (mUseANN) " << endl;
@@ -190,7 +193,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		query += "from mobile cross join antennapattern where " ;
 		query += "mobile.antpatternkey = AntennaPattern.id ";
  		query += "and mobile.id = ";
-//		cout << "Mobile Antenna";
+		cout << "Mobile Antenna";
 	}
 	else
 	{
@@ -206,7 +209,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	query += Temp;
 	query += ";";
 
-//	cout << query << endl;	
+//	cout << endl << query << endl;	
 //	cout << "cAntennaPattern::SetAntennaPattern. Query prepared. Before run query " << endl;
 
 	if(!gDb.PerformRawSql(query))
@@ -1057,11 +1060,14 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 		AntANNInput[2] = sin(Azimuth*PI/180);
 		AntANNInput[3] = cos(Elevation*PI/180);
 		AntANNInput[4] = sin(Elevation*PI/180);
-//		cout << "cAntennaPattern::GetPatternValue: Voor using ANN.";
-//		cout << " Azimuth =  " << Azimuth << "	Elevation = " << Elevation;
 		AntANNValue = mAntennasANN->run(AntANNInput);
 		AntValue = (AntANNValue[0]+0.5)*ANTENNASCALE;
-//		cout << "	AntValue =  " <<  AntValue <<  endl;
+		if ((isnan(AntValue))||(isnan(-AntValue))||(isinf(AntValue))||(fabs(AntValue)>60))
+		{
+			cout << "cAntennaPattern::GetPatternValue: ";
+			cout << " Azimuth =  " << Azimuth << "	Elevation = " << Elevation;
+			cout << "	AntValue =  " <<  AntValue <<  endl;
+		}
 		if (0==AntANNValue) delete [] AntANNValue;
 		delete [] AntANNInput;
 		return AntValue;
@@ -1194,6 +1200,12 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 		Value = ValueAz1 + (Az-mAziAngles[ref_Azi])*(ValueAz2-ValueAz1)
 						/(mAziAngles[ref_Azi+1]-mAziAngles[ref_Azi]);
 //		cout << "Value = " << Value << "	Az = " << Az << "	El = " << El << endl;
+	}
+	if ((isnan(Value))||(isnan(-Value))||(isinf(Value))||(fabs(Value)>60))
+	{
+		cout << "cAntennaPattern::GetPatternValue: before final return";
+		cout << " Azimuth =  " << Azimuth << "	Elevation = " << Elevation;
+		cout << "	Value =  " <<  Value <<  endl;
 	}
 	return Value;
 }

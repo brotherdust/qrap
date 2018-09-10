@@ -189,7 +189,7 @@ class cPosEstimation
 				unsigned PosSource=0,
 				unsigned Technology=0);
 
-	void SetUseAntANN( bool UseAntANN) { mUseAntANN = UseAntANN;};
+	void SetUseAntANN( bool UseAntANN) {mUseAntANN = UseAntANN;};
 
 	void EstimatePositions();
 	int SaveResults();

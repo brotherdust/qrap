@@ -161,33 +161,33 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 	
 	areaQuery += " @ ST_GeomFromText('POLYGON((";
 	for (i = 0 ; i < Points.size();i++)
-   	{
+   {
 		Points[i].Get(Lat, Lon);
-	     	mNorth = max(mNorth,Lat);
-     		mSouth = min(mSouth,Lat);
-     		mEast = max(mEast,Lon);
-     		mWest = min(mWest,Lon);
+	  	mNorth = max(mNorth,Lat);
+   	mSouth = min(mSouth,Lat);
+   	mEast = max(mEast,Lon);
+   	mWest = min(mWest,Lon);
 		gcvt(Lon,12,text);
-     		areaQuery += text;
-     		areaQuery += " ";
+   	areaQuery += text;
+   	areaQuery += " ";
 		gcvt(Lat,12,text);
-     		areaQuery += text;
-     		areaQuery += ",";
-   	}
+   	areaQuery += text;
+   	areaQuery += ",";
+   }
 
-   	NorthWestCorner.Set(mNorth,mWest,DEG);
-   	SouthEastCorner.Set(mSouth,mEast,DEG);
+   NorthWestCorner.Set(mNorth,mWest,DEG);
+   SouthEastCorner.Set(mSouth,mEast,DEG);
 	cout << "North West corner: " << endl;
 	NorthWestCorner.Display();
 	cout << "South East corner: " << endl;
 	SouthEastCorner.Display();
 	Points[0].Get(Lat,Lon);
 	gcvt(Lon,12,text);
-   	areaQuery += text;
-   	areaQuery += " ";
+   areaQuery += text;
+   areaQuery += " ";
 	gcvt(Lat,12,text);
-   	areaQuery += text;
-   	areaQuery += "))',4326) ";
+   areaQuery += text;
+   areaQuery += "))',4326) ";
 
 	query = "select ci, ST_AsText(site.location) as siteLocation, ";
 	query += "radioinstallation.txantennaheight as height, radioinstallation.txpower as txpwr,  ";

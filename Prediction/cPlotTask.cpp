@@ -1664,31 +1664,33 @@ bool cPlotTask::CellCentriods()
 
 	for (i=0; i<NumInsts; i++)
 	{
-		mFixedInsts[i].sCentroidX /=mFixedInsts[i].sPixelCount;
-		mFixedInsts[i].sCentroidY /=mFixedInsts[i].sPixelCount; 
-		mNorthWest.SetGeoType(DEG);
-		mNorthWest.Get(lat,lon);
-		lat-=mFixedInsts[i].sCentroidY*mNSres;
-		lon+=mFixedInsts[i].sCentroidX*mEWres;
-		mFixedInsts[i].sCentroid.Set(lat,lon,DEG);
-
-		query = PreQuery;
-		gcvt(lon,8,temp);
-		query += temp;
-		query += ",";
-		gcvt(lat,8,temp);
-		query += temp;
-		query += MidQuery;
-		gcvt(mFixedInsts[i].sInstKey,8,temp);
-		query += temp;
-		query += ";";	
-		if(!gDb.PerformRawSql(query))
+		if (mFixedInsts[i].sPixelCount>0)
 		{
-			string err = "Error in Updating cell centroids. Query:";
-			err+=query; 
-			QRAP_ERROR(err.c_str());
-			delete [] temp;
-			return false;
+			mFixedInsts[i].sCentroidX /=mFixedInsts[i].sPixelCount;
+			mFixedInsts[i].sCentroidY /=mFixedInsts[i].sPixelCount; 
+			mNorthWest.SetGeoType(DEG);
+			mNorthWest.Get(lat,lon);
+			lat-=mFixedInsts[i].sCentroidY*mNSres;
+			lon+=mFixedInsts[i].sCentroidX*mEWres;
+			mFixedInsts[i].sCentroid.Set(lat,lon,DEG);
+
+			query = PreQuery;
+			gcvt(lon,8,temp);
+			query += temp;
+			query += ",";
+			gcvt(lat,8,temp);
+			query += temp;
+			query += MidQuery;
+			gcvt(mFixedInsts[i].sInstKey,8,temp);
+			query += temp;
+			query += ";";	
+			if(!gDb.PerformRawSql(query))
+			{
+				string err = "Error in Updating cell centroids. Query:";
+				err+=query; 
+				QRAP_ERROR(err.c_str());
+				delete [] temp;
+			}
 		}
 	}
 	delete [] temp;

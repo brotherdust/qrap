@@ -51,7 +51,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	mClutter = new cRasterFileHandler();
 	mPathLoss= new cPathLossPredictor();
 
-	mLTEsim = true;
+	mLTEsim = false;
 	mOriginal = false;
 	mUMTSsim = false;
 	mTAUnknown = false;
@@ -447,32 +447,32 @@ bool cPosEstimation::LoadMeasurements(vPoints Points,
 
 
 		for ( i = 0 ; i < Points.size();i++)
-	   	{
+	  	{
 			Points[i].Get(Lat, Lon);
-	      		mNorth = max(mNorth,Lat);
-	      		mSouth = min(mSouth,Lat);
-	      		mEast = max(mEast,Lon);
-	      		mWest = min(mWest,Lon);
+	  		mNorth = max(mNorth,Lat);
+	  		mSouth = min(mSouth,Lat);
+	  		mEast = max(mEast,Lon);
+	  		mWest = min(mWest,Lon);
 			gcvt(Lon,12,text);
-	      		query += text;
-	      		query += " ";
+	  		query += text;
+	  		query += " ";
 			gcvt(Lat,12,text);
-	      		query += text;
-	      		query += ",";
-	   	}
-	   	NorthWestCorner.Set(mNorth,mWest,DEG);
-	   	SouthEastCorner.Set(mSouth,mEast,DEG);
+	  		query += text;
+	  		query += ",";
+	  	}
+	  	NorthWestCorner.Set(mNorth,mWest,DEG);
+	  	SouthEastCorner.Set(mSouth,mEast,DEG);
 		cout << "North West corner: " << endl;
 		NorthWestCorner.Display();
 		cout << "South East corner: " << endl;
 		SouthEastCorner.Display();
 		Points[0].Get(Lat,Lon);
 		gcvt(Lon,12,text);
-	   	query += text;
-	   	query += " ";
+	  	query += text;
+	  	query += " ";
 		gcvt(Lat,12,text);
-	   	query += text;
-	   	query += "))',4326)) ";
+	  	query += text;
+	  	query += "))',4326)) ";
 
 		if (MeasType>0)
 		{
@@ -734,8 +734,7 @@ void cPosEstimation::EstimatePositions()
 //			cout << "i=" << i << "	Before loop" << endl;
 			for (j=0; j < mNumInsts; j++)
 			{
-//				mFixedAnts[j].SetUseAntANN (mUseAntANN);
-				mFixedAnts[j].SetUseAntANN (false);
+				mFixedAnts[j].SetUseAntANN (mUseAntANN);
 				mFixedAnts[j].SetAntennaPattern(mPosSets[mCurPosI].sMeasurements[j].sInstKeyFixed, 
 								Tx, mPosSets[mCurPosI].sMeasurements[j].sAzimuth, 
 								mPosSets[mCurPosI].sMeasurements[j].sTilt);
@@ -1068,9 +1067,9 @@ bool cPosEstimation::CoSecAzi(double &minAzi)
 	minAzi = FindAzi(BIndex, AIndex);
 //	cout << "In cPosEstimation::CoSecAz:  minAzi = " << minAzi << endl;
 
-	double Distance= mPosSets[mCurPosI].sMeasurements[0].sDistance;
+	double Distance = mPosSets[mCurPosI].sMeasurements[0].sDistance;
 
-	Distance = SearchDistance(minAzi,mRho_min, mRho_max); 
+//	Distance = SearchDistance(minAzi,mRho_min, mRho_max); 
 
 //	cout << "In cPosEstimation::CoSecAz:  Distance = " << Distance << endl;
 //	cout << "In cPosEstimation::CoSecAz:  minAzi = " << minAzi << endl;

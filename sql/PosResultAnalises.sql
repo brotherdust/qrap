@@ -125,3 +125,5 @@ create table LTEmeasCountDist as
 select num, count(*) as aantal
 from LTEnumPerTP
 group by num;
+
+

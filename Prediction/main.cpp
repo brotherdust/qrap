@@ -848,9 +848,11 @@ for ( i=4; i>=0; i--)
 	cout << hoek << "		" << angle << endl;
 */
 
+
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
 	cout << "Na constructor" << endl;
+	Positioning.SetUseAntANN(false);
 
  	queryP = "truncate positionestimate cascade;";
 	if (!gDb.PerformRawSql(queryP))
@@ -864,8 +866,6 @@ for ( i=4; i>=0; i--)
 
 	cout << " Clearing Punte " << endl;
 	Punte.clear();
-
-	Positioning.SetUseAntANN(false);
 
 	cout << " Estimating Positions " << endl;
 	Positioning.EstimatePositions();

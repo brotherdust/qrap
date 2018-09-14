@@ -54,7 +54,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	mLTEsim = false;
 	mOriginal = false;
 	mUMTSsim = false;
-	mTAUnknown = false;
+	mTAUnknown = true;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -701,6 +701,10 @@ void cPosEstimation::EstimatePositions()
 	if (mUseClutter)
 		cout << "cPosEstimation::EstimatePositions(): Using Clutter " <<  endl;
 	else cout << "cPosEstimation::EstimatePositions(): NOT Using Clutter " <<  endl;
+
+	if (mUseAntANN)
+		cout << "cPosEstimation::EstimatePositions(): Using Antenna ANN " <<  endl;
+	else cout << "cPosEstimation::EstimatePositions(): NOT Antenna ANN " <<  endl;
 
 	if (mNumSites>0)
 	{

@@ -126,6 +126,9 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	char* Temp;
 	Temp = new char[12];
 	
+	if (mUseANN)
+		cout << "cAntennaPattern::SetAntennaPattern Using Antenna ANN " <<  endl;
+	else cout << "cAntennaPattern::SetAntennaPattern: NOT Antenna ANN " <<  endl;
 
 //	cout << "cAntennaPattern::SetAntennaPattern. Before if (mUseANN) " << endl;
 	if (mUseANN)

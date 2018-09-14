@@ -127,3 +127,10 @@ from LTEnumPerTP
 group by num;
 
 
+create table MeanStdDevOriginalNOTantANN as
+select positionsource, avg(error) as mean, stddev(error) as sigma, count(*) as num
+from results
+group by positionsource
+order by positionsource
+
+

@@ -115,7 +115,7 @@ tMeasPoint GOftn::evalfix(tMeasPoint inPoint)
 // This function is uded for "fixing" ill conditioned  structures.
 GOftn* GOftn::getNewNode()
 {
-	int randn = rand() % 9;
+	int randn = rand() % 14;
 	double ConstP;
 	GOftn* retFtn;
 	
@@ -649,6 +649,39 @@ tMeasPoint Multiply::eval(tMeasPoint inPoint)
 }
 
 //**********************************************************************
+tMeasPoint Multiply::evalfix(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	tMeasPoint CValue;
+	unsigned i, NumChildren = 0;
+	double Product = 1;
+	for(i=0; i<mNumChildren; i++)
+	{
+		if (mChild[i])
+		{
+			CValue = mChild[i]->eval(inPoint);
+			while((log10(fabs(CValue.sReturn)))>(log(DBL_MAX)/mNumChildren))
+			{
+				mChild[1] = getNewNode();
+				CValue = mChild[1]->evalfix(inPoint);
+			}
+			NumChildren++;
+			Product*=CValue.sReturn;
+		}
+		else 
+		{
+			cerr << "not all inputs define in Multiply"<<"  "<<endl;
+			mNumChildren=NumChildren;
+			outPoint.sReturn = -200.0;
+			return outPoint;
+		}
+	}
+	outPoint.sReturn = Product;
+//	cout << "	" << mLabel << outPoint.sReturn<<endl;
+	return outPoint;
+}
+
+//**********************************************************************
 Multiply* Multiply::clone()
 {
 	Multiply* retNode = new Multiply(mNumChildren);
@@ -710,7 +743,7 @@ tMeasPoint Divide::evalfix(tMeasPoint inPoint)
 	{
 		c1 = mChild[0]->evalfix(outPoint);
 		c2 = mChild[1]->evalfix(outPoint);
-		while (fabs(c2.sReturn)<1e-100)
+		while (fabs(c2.sReturn)<1e-10)
 		{
 			mChild[1] = getNewNode();
 			c2 = mChild[1]->evalfix(inPoint);
@@ -764,7 +797,7 @@ tMeasPoint Log10Node::eval(tMeasPoint inPoint)
 		c1 = mChild[0]->eval(inPoint);
 		argument = c1.sReturn; 
 		
-		if (c1.sReturn>1e-100)
+		if (c1.sReturn>1e-20)
 			outPoint.sReturn = log10(argument);
 		else 
 		{
@@ -793,7 +826,7 @@ tMeasPoint Log10Node::evalfix(tMeasPoint inPoint)
 	{
 		c1 = mChild[0]->evalfix(inPoint);
 		argument = c1.sReturn;
-		while (argument<1e-100)
+		while (argument<1e-10)
 		{
 			mChild[0] = getNewNode();
 			c1 = mChild[0]->evalfix(inPoint);
@@ -855,6 +888,30 @@ tMeasPoint Exponent::eval(tMeasPoint inPoint)
 }
 
 //**********************************************************************
+tMeasPoint Exponent::evalfix(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	tMeasPoint c1;
+	c1 = mChild[0]->evalfix(inPoint);
+	if (mChild[0])
+	{
+		while (c1.sReturn>709)
+		{
+			mChild[0] = getNewNode();
+			c1 = mChild[0]->evalfix(inPoint);
+		}
+		outPoint.sReturn = exp(c1.sReturn);
+	}
+	else 
+	{
+		cerr << "input not defined in exponent"<<endl;
+		outPoint.sReturn = 200.0;
+	}
+//	cout <<"	"<< mLabel << outPoint.sReturn <<"  "<< endl;
+	return outPoint;
+}
+
+//**********************************************************************
 Exponent* Exponent::clone()
 {
 	Exponent* retNode = new Exponent;
@@ -887,6 +944,30 @@ tMeasPoint Square::eval(tMeasPoint inPoint)
 	if (mChild[0])
 	{
 		c1 = mChild[0]->eval(inPoint);
+		outPoint.sReturn = c1.sReturn*c1.sReturn;
+	}
+	else 
+	{
+		cerr << "input not defined in square"<<endl;
+		outPoint.sReturn = 200.0;
+	}
+//	cout <<"	"<< mLabel << outPoint.sReturn <<"  "<< endl;
+	return outPoint;
+}
+
+//**********************************************************************
+tMeasPoint Square::evalfix(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	tMeasPoint c1;
+	if (mChild[0])
+	{
+		c1 = mChild[0]->eval(inPoint);
+		while (fabs(log10(fabs(c1.sReturn)))>151)
+		{
+			mChild[0] = getNewNode();
+			c1 = mChild[0]->evalfix(inPoint);
+		}	
 		outPoint.sReturn = c1.sReturn*c1.sReturn;
 	}
 	else 

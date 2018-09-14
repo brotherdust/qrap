@@ -27,12 +27,15 @@
 #define cTrainAntPattern_h 1
 
 #define MOBILEHEIGHT 1
-#define AntFileInt	2 // the interval in degrees of samples that are included for the training from the supplied antenna file.
+#define AntFileInt 1 // the interval in degrees of samples that are included for the training from the supplied antenna file.
 #define SUB 10 // every SUB sample will be used as a test point
 // ANTSCALE is #defined in DataBase/Config.h
-#define antMAXepoch 200000
-#define antREPORTInt 20000
+#define antMAXepoch 400000
+#define antREPORTInt 10000
 #define antERROR 1e-6
+#define NUMLAYERS 2 //Number of Hidden layers. can only assume 1 or 2 
+#define HIDDEN1 5
+#define HIDDEN2 3 // Not used if NUMLAYERS is 1
 
 // include local headers
 #include "../DataBase/Config.h"
@@ -60,8 +63,8 @@ struct tMeasNNAnt
 	unsigned	sOriginalTP;
 	cGeoP		sLocation;
 	unsigned	sCellID;
-	float			sFrequency;
-	float 			sMeasValue;
+	float		sFrequency;
+	float 		sMeasValue;
 };
 
 typedef	vector<tMeasNNAnt> vMeasNNAnt;
@@ -73,18 +76,18 @@ struct tCellAnt
 	double			sTxPwr;
 	double			sTxSysLoss;
 	cGeoP			sPosition;
-	float				sHeight;
-	int					sAntPatternKey;
+	float			sHeight;
+	int			sAntPatternKey;
 	double			sBearing;
 	double			sTilt;
 	unsigned		sNumInputs;
-	unsigned		sNumOutputs;
-	unsigned   	sNumTrain;
+	unsigned		sNumOutputs; 
+	unsigned   		sNumTrain;
 	unsigned		sNumTest;
 	double			sMean;
 	double			sMin;			// Actually the value at maximum gain
 	double**		sInputTrain;
-	double**		sOutputTrain;
+	double**		sOutputTrain;		// Represents the total effect of the antenna including the gain
 	double**		sInputTest;
 	double**		sOutputTest;
 	vMeasNNAnt		sMeasTrain;

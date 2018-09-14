@@ -193,7 +193,7 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		query += "from mobile cross join antennapattern where " ;
 		query += "mobile.antpatternkey = AntennaPattern.id ";
  		query += "and mobile.id = ";
-		cout << "Mobile Antenna";
+//		cout << "Mobile Antenna";
 	}
 	else
 	{
@@ -1175,15 +1175,15 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 		Value = ValueAz1 + (El-mElevAngles[ref_El])
 				*(mAntPattern[ref_Azi][ref_El+1]-ValueAz1)
 				/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
-/*			ValueAz1 = mAntPattern[ref_Azi][ref_El];
-			ValueAz1 = ValueAz1 + (El-mElevAngles[ref_El])
-									*(mAntPattern[ref_Azi][ref_El+1]-ValueAz1)
-									/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
-			ValueAz2 = mAntPattern[0][ref_El];
-			ValueAz2 = ValueAz2 + (El-mElevAngles[ref_El])
-									*(mAntPattern[0][ref_El+1]-ValueAz2)
-										/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
-			Value = ValueAz1 + (Az-mAziAngles[ref_Azi])*(ValueAz2-ValueAz1)
+/*		ValueAz1 = mAntPattern[ref_Azi][ref_El];
+		ValueAz1 = ValueAz1 + (El-mElevAngles[ref_El])
+						*(mAntPattern[ref_Azi][ref_El+1]-ValueAz1)
+						/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
+		ValueAz2 = mAntPattern[0][ref_El];
+		ValueAz2 = ValueAz2 + (El-mElevAngles[ref_El])
+					*(mAntPattern[0][ref_El+1]-ValueAz2)
+					/(mElevAngles[ref_El+1]-mElevAngles[ref_El]);
+		Value = ValueAz1 + (Az-mAziAngles[ref_Azi])*(ValueAz2-ValueAz1)
 						/(360+mAziAngles[0]-mAziAngles[ref_Azi]);
 */
 	}

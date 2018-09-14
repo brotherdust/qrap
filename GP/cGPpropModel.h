@@ -45,7 +45,7 @@
 #include "../DataBase/Config.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 350
+#define NUM_INIT_CANDIDATES 300
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 10
 #define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50
@@ -57,7 +57,7 @@
 //Affects how elitist the algorithm is ... the smaller the more elitist
 #define GAUSSDIST 2
 
-#define CONSTMUTATE 0.15
+#define CONSTMUTATE 0.1
 
 #define MAXOPTLOOPS 500
 #define MAXOPTCALC 2500
@@ -79,6 +79,7 @@ struct SCandidate
 //	unsigned	sNumClutter=0;
 //	unsigned * 	sClutterType=nullptr;
 //	double * 	sClutterHeight=nullptr;
+	unsigned	sNumber;
 	GOftn * 	sTree=nullptr;
 	double		sCorrC;
 	double		sStdDev;

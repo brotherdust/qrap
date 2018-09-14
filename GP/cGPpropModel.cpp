@@ -1434,7 +1434,7 @@ int cGPpropModel:: mainTuning()
 		mCandidate[i].sRank = 2*(mNumCandidates-1);
 		mCandidate[i].sPareto = false;
 		mCandidate[i].sOptimised = false;
-		cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
+		cout << "Seed i = " << i << "	Rank=" << mCandidate[i].sRank
 			<< "	Fitness=" << mCandidate[i].sFitness				
 			<<"	CorrC=" << mCandidate[i].sCorrC << "	StDev=" << mCandidate[i].sStdDev
 			<< "	Mean=" << mCandidate[i].sMean  
@@ -1581,10 +1581,26 @@ int cGPpropModel:: mainTuning()
 
 	cout << "Done optimising initial clones" << endl;
 	
-	// create the initial tree population 
+	for (i=0; i<mNumCandidates; i++)
+	{
+		CostFunctionTreeOnly(i, mCandidate[i].sMean, MeasSErr,
+					mCandidate[i].sStdDev, mCandidate[i].sCorrC, true);
+		mCandidate[i].sFitness = FITNESS;
+		mCandidate[i].sNumber = i;
+		cout << "# = " << mCandidate[i].sNumber << "	Rank=" << mCandidate[i].sRank
+			<< "	Fitness=" << mCandidate[i].sFitness				
+			<<"	CorrC=" << mCandidate[i].sCorrC << "	StDev=" << mCandidate[i].sStdDev
+			<< "	Mean=" << mCandidate[i].sMean  
+			<< "	Form=" << mCandidate[i].sForm
+			<< "	Depth=" << mCandidate[i].sDepth << endl;
+	}
+
+
+	cout << "Create the initial tree population" << endl; 
 	for (i=mNumCandidates; i<NUM_INIT_CANDIDATES; i++)
 	{
 		newTree = createRandomTree();
+		newCandidate.sNumber = i;
 		newCandidate.sTree = newTree;
 		newCandidate.sForm = i;
 		newCandidate.sCorrC = -1.0;
@@ -1607,11 +1623,25 @@ int cGPpropModel:: mainTuning()
 		} 
 */
 		mCandidate.push_back(newCandidate);
+		CostFunction(i, mCandidate[i].sMean, MeasSErr,
+			mCandidate[i].sStdDev, mCandidate[i].sCorrC, true);
+		mCandidate[i].sFitness = FITNESS;
+		cout << "# = " << mCandidate[i].sNumber << "	Rank=" << mCandidate[i].sRank
+			<< "	Fitness=" << mCandidate[i].sFitness				
+			<<"	CorrC=" << mCandidate[i].sCorrC << "	StDev=" << mCandidate[i].sStdDev
+			<< "	Mean=" << mCandidate[i].sMean  
+			<< "	Form=" << mCandidate[i].sForm
+			<< "	Depth=" << mCandidate[i].sDepth << endl;
 		AutoFix(i, mCandidate[i].sMean, MSE,
 			 mCandidate[i].sStdDev, mCandidate[i].sCorrC);
+		cout << "# = " << mCandidate[i].sNumber << "	Rank=" << mCandidate[i].sRank
+			<< "	Fitness=" << mCandidate[i].sFitness				
+			<<"	CorrC=" << mCandidate[i].sCorrC << "	StDev=" << mCandidate[i].sStdDev
+			<< "	Mean=" << mCandidate[i].sMean  
+			<< "	Form=" << mCandidate[i].sForm
+			<< "	Depth=" << mCandidate[i].sDepth << endl;
 		mCandidate[i].sDepth=mCandidate[i].sTree->getTreeDepth()+1;
 	}
-
 
 	cout << "Done initialising new Candidates" << endl;
 	mNumCandidates = mCandidate.size();
@@ -1678,7 +1708,7 @@ int cGPpropModel:: mainTuning()
 		cout << "GENERATION = " << k << endl;
 		for (i=0; i<mNumCandidates; i++)
 		{
-			cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
+			cout << "# = " << mCandidate[i].sNumber << "	Rank=" << mCandidate[i].sRank
 				<< "	Fitness=" << mCandidate[i].sFitness				
 				<<"	CorrC=" << mCandidate[i].sCorrC << "	StDev=" << mCandidate[i].sStdDev
 				<< "	Mean=" << mCandidate[i].sMean  
@@ -1697,7 +1727,8 @@ int cGPpropModel:: mainTuning()
 		for (i=0; i<mNumCandidates; i++)
 		{
 			mCandidate[i].sPareto = (!((isnan(mCandidate[i].sStdDev))||(isinf(mCandidate[i].sStdDev))
-						||(mCandidate[i].sStdDev<0)))&&(mCandidate[i].sFitness<UNFIT_LIMIT);;
+							||(isinf(-mCandidate[i].sStdDev))||(isnan(-mCandidate[i].sStdDev))
+						||(mCandidate[i].sStdDev<0)))&&(mCandidate[i].sFitness<UNFIT_LIMIT);
 			for (j=0; j<mNumCandidates; j++)
 			{
 				if (j!=i)
@@ -1717,7 +1748,7 @@ int cGPpropModel:: mainTuning()
 				{
 /*					cout << endl << "Inserting new Star" << endl;
 //					optimiseConstants(i);
-					cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
+					cout << "# = " << mCandidate[i].sNumber << "	Rank=" << mCandidate[i].sRank
 						<< "	Fitness=" << mCandidate[i].sFitness 
 						<< "	CorrC=" << mCandidate[i].sCorrC 
 						<< "	StDev=" << mCandidate[i].sStdDev
@@ -1740,7 +1771,8 @@ int cGPpropModel:: mainTuning()
 		{
 //			cout << "Checking Stars " << endl;
 			mStars[i].sPareto = (!((isnan(mStars[i].sStdDev))||(isinf(mStars[i].sStdDev))
-						||(mStars[i].sStdDev<0)))&&(mStars[i].sFitness<UNFIT_LIMIT);;
+						||(isnan(-mStars[i].sStdDev))||(isinf(-mStars[i].sStdDev))
+						||(mStars[i].sStdDev<0)))&&(mStars[i].sFitness<UNFIT_LIMIT);
 			for (j=0; j<mStars.size(); j++)
 			{
 				if (j!=i)
@@ -1827,7 +1859,7 @@ int cGPpropModel:: mainTuning()
 		cout << "all good individuals" << endl;
 		for (i=0; i<mStars.size(); i++)
 		{
-			cout << " Star.	i = " << i << "	Rank=" << mStars[i].sRank
+			cout << " Star.	# = " << mStars[i].sNumber << "	Rank=" << mStars[i].sRank
 				<< "	Fitness=" << mStars[i].sFitness 
 				<< "	CorrC=" << mStars[i].sCorrC 
 				<< "	StDev=" << mStars[i].sStdDev
@@ -1847,7 +1879,7 @@ int cGPpropModel:: mainTuning()
 		sort(mStars.begin(), mStars.end(), SortCriteriaOnStdDev);
 		for (i=0; i<mStars.size(); i++)
 		{
-			cout << " Star.	i = " << i << "	Rank=" << mStars[i].sRank
+			cout << " Star.	# = " << mStars[i].sNumber << "	Rank=" << mStars[i].sRank
 				<< "	Fitness=" << mStars[i].sFitness 
 				<< "	CorrC=" << mStars[i].sCorrC 
 				<< "	StDev=" << mStars[i].sStdDev
@@ -1924,7 +1956,7 @@ int cGPpropModel:: mainTuning()
 	cout << "GENERATION = " << k << endl;
 	for (i=0; i<mNumCandidates; i++)
 	{
-		cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
+		cout << "# = " << mCandidate[i].sNumber << "	Rank=" << mCandidate[i].sRank
 			<< "	Fitness=" << mCandidate[i].sFitness				
 			<<"	CorrC=" << mCandidate[i].sCorrC << "	StDev=" << mCandidate[i].sStdDev
 			<< "	Mean=" << mCandidate[i].sMean  
@@ -1942,6 +1974,7 @@ int cGPpropModel:: mainTuning()
 	for (i=0; i<mNumCandidates; i++)
 	{
 		mCandidate[i].sPareto = (!((isnan(mCandidate[i].sStdDev))||(isinf(mCandidate[i].sStdDev))
+					||(isnan(-mCandidate[i].sStdDev))||(isinf(-mCandidate[i].sStdDev))
 					||(mCandidate[i].sStdDev<0)))
 					&&(mCandidate[i].sFitness<UNFIT_LIMIT);
 		for (j=0; j<mNumCandidates; j++)
@@ -1963,7 +1996,7 @@ int cGPpropModel:: mainTuning()
 			{
 //				cout << endl << "Inserting new Star" << endl;
 				optimiseConstants(i);
-/*				cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
+/*				cout << "# = " << mCandidate[i].sNumber << "	Rank=" << mCandidate[i].sRank
 					<< "	Fitness=" << mCandidate[i].sFitness 
 					<< "	CorrC=" << mCandidate[i].sCorrC 
 					<< "	StDev=" << mCandidate[i].sStdDev
@@ -2037,7 +2070,7 @@ int cGPpropModel:: mainTuning()
 	cout << "GENERATION = " << k << endl;
 	for (i=0; i<mNumCandidates; i++)
 	{
-		cout << "i = " << i << "	Rank=" << mCandidate[i].sRank
+		cout << "# = " << mCandidate[i].sNumber << "	Rank=" << mCandidate[i].sRank
 			<< "	Fitness=" << mCandidate[i].sFitness				
 			<<"	CorrC=" << mCandidate[i].sCorrC << "	StDev=" << mCandidate[i].sStdDev
 			<< "	Mean=" << mCandidate[i].sMean  
@@ -2065,7 +2098,7 @@ int cGPpropModel:: mainTuning()
 	sort(mStars.begin(), mStars.end(), SortCriteriaOnStdDev);	
 	for (i=0; i<mStars.size(); i++)
 	{
-		cout << " Star.	i = " << i << "	Rank=" << mStars[i].sRank
+		cout << " Star.	# = " << mStars[i].sNumber << "	Rank=" << mStars[i].sRank
 			<< "	Fitness=" << mStars[i].sFitness 
 			<< "	CorrC=" << mStars[i].sCorrC 
 			<< "	StDev=" << mStars[i].sStdDev
@@ -2085,7 +2118,7 @@ int cGPpropModel:: mainTuning()
 	sort(mStars.begin(), mStars.end(), SortCriteriaOnStdDev);
 	for (i=0; i<mStars.size(); i++)
 	{
-		cout << " Star.	i = " << i << "	Rank=" << mStars[i].sRank
+		cout << " Star.	# = " << mStars[i].sNumber << "	Rank=" << mStars[i].sRank
 			<< "	Fitness=" << mStars[i].sFitness 
 			<< "	CorrC=" << mStars[i].sCorrC 
 			<< "	StDev=" << mStars[i].sStdDev
@@ -2102,6 +2135,7 @@ int cGPpropModel:: mainTuning()
 	while ((i<mStars.size()))
 	{
 		mStars[i].sPareto = (!((isnan(mStars[i].sStdDev))||(isinf(mStars[i].sStdDev))
+					||(isnan(-mStars[i].sStdDev))||(isinf(-mStars[i].sStdDev))
 					||(mStars[i].sStdDev<0)))
 					&&(mStars[i].sFitness<UNFIT_LIMIT);
 		for (j=0; j<mStars.size(); j++)
@@ -2125,7 +2159,7 @@ int cGPpropModel:: mainTuning()
 	sort(mStars.begin(), mStars.end(), SortCriteriaOnStdDev);	
 	for (i=0; i<mStars.size(); i++)
 	{
-		cout << " Star.	i = " << i << "	Rank=" << mStars[i].sRank
+		cout << " Star.	# = " << mStars[i].sNumber << "	Rank=" << mStars[i].sRank
 			<< "	Fitness=" << mStars[i].sFitness 
 			<< "	CorrC=" << mStars[i].sCorrC 
 			<< "	StDev=" << mStars[i].sStdDev
@@ -2145,7 +2179,7 @@ int cGPpropModel:: mainTuning()
 	sort(mStars.begin(), mStars.end(), SortCriteriaOnStdDev);
 	for (i=0; i<mStars.size(); i++)
 	{
-		cout << " Star.	i = " << i << "	Rank=" << mStars[i].sRank
+		cout << " Star.	# = " << mStars[i].sNumber << "	Rank=" << mStars[i].sRank
 			<< "	Fitness=" << mStars[i].sFitness 
 			<< "	CorrC=" << mStars[i].sCorrC 
 			<< "	StDev=" << mStars[i].sStdDev
@@ -2180,12 +2214,14 @@ void cGPpropModel::ComputeCandidate(unsigned Index)
 
 	mCandidate[Index].sMSE = MSE;
 	if ((isnan(mCandidate[Index].sStdDev))||(isinf(mCandidate[Index].sStdDev))
+		||(isnan(-mCandidate[Index].sStdDev))||(isinf(-mCandidate[Index].sStdDev))
 		||(mCandidate[Index].sStdDev<0)||(isinf(MSE))||(isnan(MSE)))
 	{
 		mCandidate[Index].sStdDev = 99999;
 		mCandidate[Index].sPareto = false;
 	}
 	if ((isnan(mCandidate[Index].sCorrC))||(isinf(mCandidate[Index].sCorrC))
+		||(isnan(-mCandidate[Index].sCorrC))||(isinf(-mCandidate[Index].sCorrC))
 		||(mCandidate[Index].sCorrC<-1.0)||(isinf(MSE))||(isnan(MSE)))
 	{
 		mCandidate[Index].sCorrC = -0.9999;
@@ -2524,7 +2560,7 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 
 				PathLoss = tempMeas.sReturn;
 	
-				if ((isnan(PathLoss))||(isinf(PathLoss)))
+				if ((isnan(PathLoss))||(isinf(PathLoss))||(isnan(-PathLoss))||(isinf(-PathLoss)))
 				{
 //					cout << "Invalid pathloss returned from tree" << endl;
 					tempMeas.sReturn = -200;
@@ -2739,7 +2775,7 @@ int cGPpropModel::CostFunctionTreeOnly(unsigned CIndex, double &Mean, double &Me
 
 				PathLoss = tempMeas.sReturn;
 /*	
-				if ((isnan(PathLoss))||(isinf(PathLoss)))
+				if ((isnan(PathLoss))||(isinf(PathLoss))||(isnan(-PathLoss))||(isinf(-PathLoss)))
 				{
 //					cout << "Invalid pathloss returned from tree" << endl;
 					tempMeas.sReturn = -200;
@@ -2926,7 +2962,7 @@ int cGPpropModel::AutoFix(unsigned CIndex, double &Mean, double &MeanSquareError
 
 				PathLoss = tempMeas.sReturn;
 /*	
-				if ((isnan(PathLoss))||(isinf(PathLoss)))
+				if ((isnan(PathLoss))||(isinf(PathLoss))||(isnan(-PathLoss))||(isinf(-PathLoss)))
 				{
 //					cout << "Invalid pathloss returned from tree" << endl;
 					tempMeas.sReturn = -200;
@@ -3099,7 +3135,9 @@ void cGPpropModel::optimiseConstants(unsigned Index)
 				DiffS[i] = (newStdDev - oldStdDev)*Delta[i]/fabs(Delta[i]);
 				CalcCount ++;
 				Invalid = ((Fitness>UNFIT_LIMIT)&&(newCorrC<0.0))||(isnan(newStdDev))||(isinf(newStdDev))
-					||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC));
+					||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC))
+					||(isnan(-newStdDev))||(isinf(-newStdDev))
+					||(isnan(-newMSE))||(isinf(-newMSE))||(isnan(-newCorrC))||(isinf(-newCorrC));
 			}
 
 			if (((fabs(DiffC[i])>1e-10)||(fabs(DiffS[i])>1e-10))&&(fabs(Delta[i])>1e-6)
@@ -3150,12 +3188,17 @@ void cGPpropModel::optimiseConstants(unsigned Index)
 			NotDecreasing = ((AStdDev>oldStdDev)||(ACorrC<oldCorrC))
 					||(isnan(AStdDev))||(isinf(AStdDev))
 					||(isnan(MSE))||(isinf(MSE))
-					||(isnan(ACorrC))||(isinf(ACorrC));
+					||(isnan(ACorrC))||(isinf(ACorrC))
+					||(isnan(-AStdDev))||(isinf(-AStdDev))
+					||(isnan(-MSE))||(isinf(-MSE))
+					||(isnan(-ACorrC))||(isinf(-ACorrC));
 			NotDecreasing = NotDecreasing && (SizeDelta>1e-3);
 			CalcCount ++ ;
 		}
 		Continue = Continue&&(AStdDev<=oldStdDev)&&(ACorrC>=oldCorrC)&&(!isnan(AStdDev))&&(!isinf(AStdDev))
 				&&(!isnan(MSE))&&(!isinf(MSE))&&(!isnan(ACorrC))&&(!isinf(ACorrC))
+				&&(!isnan(-AStdDev))&&(!isinf(-AStdDev))
+				&&(!isnan(-MSE))&&(!isinf(-MSE))&&(!isnan(-ACorrC))&&(!isinf(-ACorrC))
 				&&(SizeDelta>1e-3);
 		if (Continue)
 		{
@@ -3287,7 +3330,9 @@ void cGPpropModel::optimiseConstantsSTDevMO(unsigned Index)
 				DiffS[i] = (newStdDev - oldStdDev)*Delta[i]/fabs(Delta[i]);
 				CalcCount ++;
 				Invalid = ((Fitness>UNFIT_LIMIT)&&(newCorrC<0.0))||(isnan(newStdDev))||(isinf(newStdDev))
-					||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC));
+					||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC))
+					||(isnan(-newStdDev))||(isinf(-newStdDev))
+					||(isnan(-newMSE))||(isinf(-newMSE))||(isnan(-newCorrC))||(isinf(-newCorrC));
 			}
 
 			if ((fabs(Delta[i])>1e-6)
@@ -3346,7 +3391,10 @@ void cGPpropModel::optimiseConstantsSTDevMO(unsigned Index)
 			NotDecreasing = ((AStdDev>oldStdDev)||(MSE>oldMSE))
 					||(isnan(AStdDev))||(isinf(AStdDev))
 					||(isnan(MSE))||(isinf(MSE))
-					||(isnan(ACorrC))||(isinf(ACorrC));
+					||(isnan(ACorrC))||(isinf(ACorrC))
+					||(isnan(-AStdDev))||(isinf(-AStdDev))
+					||(isnan(-MSE))||(isinf(-MSE))
+					||(isnan(-ACorrC))||(isinf(-ACorrC));
 			NotDecreasing = NotDecreasing && (SizeDelta>1e-3);
 			CalcCount ++ ;
 		}
@@ -3462,7 +3510,9 @@ void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
 			DiffS[i] = (newStdDev - oldStdDev)*Delta[i]/fabs(Delta[i]);
 			CalcCount++;
 			Invalid = ((Fitness>UNFIT_LIMIT)&&(newCorrC<0.0))||(isnan(newStdDev))||(isinf(newStdDev))
-				||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC));
+				||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC))
+				||(isnan(-newStdDev))||(isinf(-newStdDev))
+				||(isnan(-newMSE))||(isinf(-newMSE))||(isnan(-newCorrC))||(isinf(-newCorrC));
 		}
 		
 		if ((!Invalid)&&(fabs(DiffS[i])>1e-10)&&(fabs(Delta[i])>1e-6))
@@ -3608,7 +3658,9 @@ void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
 //					<< "	DiffS[i]=" << DiffS[i] << endl;
 				CalcCount++;
 				Invalid = ((Fitness>UNFIT_LIMIT)&&(newCorrC<0.0))||(isnan(newStdDev))||(isinf(newStdDev))
-					||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC));
+					||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC))
+					||(isnan(-newStdDev))||(isinf(-newStdDev))
+					||(isnan(-newMSE))||(isinf(-newMSE))||(isnan(-newCorrC))||(isinf(-newCorrC));
 			}
 			
 			if ((!Invalid)&&(fabs(DiffS[i])>1e-10)&&(fabs(Delta[i])>1e-6))
@@ -4051,7 +4103,9 @@ void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
 			DiffC[i] = 100*(oldCorrC - newCorrC)*Delta[i]/fabs(Delta[i]);
 			CalcCount++;
 			Invalid = ((Fitness>UNFIT_LIMIT)&&(newCorrC<0.0))||(isnan(newStdDev))||(isinf(newStdDev))
-				||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC));
+				||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC))
+				||(isnan(-newStdDev))||(isinf(-newStdDev))
+				||(isnan(-newMSE))||(isinf(-newMSE))||(isnan(-newCorrC))||(isinf(-newCorrC));
 		}
 		
 		if ((!Invalid)&&(fabs(DiffC[i])>1e-10)&&(fabs(Delta[i])>1e-6))
@@ -4197,7 +4251,9 @@ void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
 //					<< "	DiffC[i]=" << DiffC[i] << endl;
 				CalcCount++;
 				Invalid = ((Fitness>UNFIT_LIMIT)&&(newCorrC<0.0))||(isnan(newStdDev))||(isinf(newStdDev))
-					||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC));
+					||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC))
+					||(isnan(-newStdDev))||(isinf(-newStdDev))
+					||(isnan(-newMSE))||(isinf(-newMSE))||(isnan(-newCorrC))||(isinf(-newCorrC));
 			}
 			
 			if ((!Invalid)&&(fabs(DiffC[i])>1e-10)&&(fabs(Delta[i])>1e-6))
@@ -4664,7 +4720,9 @@ void cGPpropModel::optimiseConstantsCorrCMO(unsigned Index)
 				DiffC[i] = (100.0*(oldCorrC -newCorrC))*Delta[i]/fabs(Delta[i]); 
 				DiffS[i] = (fabs(newMean) - fabs(oldMean))*Delta[i]/fabs(Delta[i]);
 				Invalid = ((Fitness>UNFIT_LIMIT)&&(newCorrC<0.0))||(isnan(newStdDev))||(isinf(newStdDev))
-					||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC));
+					||(isnan(newMSE))||(isinf(newMSE))||(isnan(newCorrC))||(isinf(newCorrC))
+					||(isnan(-newStdDev))||(isinf(-newStdDev))
+					||(isnan(-newMSE))||(isinf(-newMSE))||(isnan(-newCorrC))||(isinf(-newCorrC));
 				CalcCount ++ ;
 			}
 
@@ -4721,11 +4779,16 @@ void cGPpropModel::optimiseConstantsCorrCMO(unsigned Index)
 */			NotDecreasing = (ACorrC<oldCorrC)
 					||(isnan(AStdDev))||(isinf(AStdDev))
 					||(isnan(AMSE))||(isinf(AMSE))
-					||(isnan(ACorrC))||(isinf(ACorrC));
+					||(isnan(ACorrC))||(isinf(ACorrC))
+					||(isnan(-AStdDev))||(isinf(-AStdDev))
+					||(isnan(-AMSE))||(isinf(-AMSE))
+					||(isnan(-ACorrC))||(isinf(-ACorrC));
 			NotDecreasing = NotDecreasing && (SizeDelta>1e-3);
 		}
 		Continue = Continue&&(ACorrC>=oldCorrC)&&(!isnan(AStdDev))&&(!isinf(AStdDev))
 				&&(!isnan(AMSE))&&(!isinf(AMSE))&&(!isnan(ACorrC))&&(!isinf(ACorrC))
+				&&(!isnan(-AStdDev))&&(!isinf(-AStdDev))
+				&&(!isnan(-AMSE))&&(!isinf(-AMSE))&&(!isnan(-ACorrC))&&(!isinf(-ACorrC))
 				&&(SizeDelta>1e-3);
 		if (Continue)
 		{
@@ -4811,15 +4874,23 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 */
 
 	dice = rand() % 5;
+
 	if ((dice<2)&&(!grow)
 		&&((mCandidate[Index].sFitness<UNFIT_LIMIT)||(mCandidate[Index].sCorrC>0.0)))
 	{
 		double OldValue;
+		double Change;
+//		i = rand() % mCandidate[Index].sConstants.size();
 		for (i=0; i<mCandidate[Index].sConstants.size(); i++)
-		{
+		{ 
 			OldValue = mCandidate[Index].sConstants[i]->getValue();
-			mCandidate[Index].sConstants[i]->setValue(OldValue
-				*(1.0 + CONSTMUTATE*gGauss(gRandomGen)*(1-mMinFitness/mCandidate[Index].sFitness)));
+			if (fabs(OldValue)>1e-8)
+			{
+				Change = CONSTMUTATE*gGauss(gRandomGen)*(1-mMinFitness/mCandidate[Index].sFitness);
+				while (fabs(Change)>fabs(OldValue)) // Ensure no change in sign
+					Change = CONSTMUTATE*gGauss(gRandomGen)*(1-mMinFitness/mCandidate[Index].sFitness);
+				mCandidate[Index].sConstants[i]->setValue(OldValue*(1.0 + Change));
+			}
 		}
 		switch (dice)
 		{	
@@ -5155,12 +5226,20 @@ bool cGPpropModel::SortCriteriaOnCorrC(SCandidate c1, SCandidate c2)
 //***************************************************************************
 bool cGPpropModel::SortCriteriaOnStdDev(SCandidate c1, SCandidate c2)
 {
+	if (((isnan(c1.sStdDev))||(isinf(c1.sStdDev))||(isinf(-c1.sStdDev))||(c1.sStdDev<0)))
+		return false;
+	if (((isnan(c2.sStdDev))||(isinf(c2.sStdDev))||(isinf(-c2.sStdDev))||(c2.sStdDev<0)))
+		return true;
 	return (c1.sStdDev < c2.sStdDev);
 }
 
 //***************************************************************************
 bool cGPpropModel::SortCriteriaOnStdDevInverse(SCandidate c1, SCandidate c2)
 {
+	if (((isnan(c1.sStdDev))||(isinf(c1.sStdDev))||(isinf(-c1.sStdDev))||(c1.sStdDev<0)))
+		return true;
+	if (((isnan(c2.sStdDev))||(isinf(c2.sStdDev))||(isinf(-c2.sStdDev))||(c2.sStdDev<0)))
+		return false;
 	return (c1.sStdDev > c2.sStdDev);
 }
 
@@ -5177,6 +5256,10 @@ bool cGPpropModel::SortCriteriaOnRank(SCandidate c1, SCandidate c2)
 //***************************************************************************
 bool cGPpropModel::SortCriteriaOnFitness(SCandidate c1, SCandidate c2)
 {
+	if (((isnan(c1.sFitness))||(isinf(c1.sFitness))||(isinf(-c1.sFitness))||(isnan(-c1.sFitness))))
+		return false;
+	if (((isnan(c2.sFitness))||(isinf(c2.sFitness))||(isinf(-c2.sFitness))||(isnan(-c2.sFitness))))
+		return true;
 	if ((c1.sPareto)&&(c2.sPareto))
 		return (c1.sFitness < c2.sFitness);
 	else if ((!c1.sPareto)&&(!c2.sPareto))
@@ -5187,6 +5270,10 @@ bool cGPpropModel::SortCriteriaOnFitness(SCandidate c1, SCandidate c2)
 //***************************************************************************
 bool cGPpropModel::SortCriteriaOnFitnessInverse(SCandidate c1, SCandidate c2)
 {
+	if (((isnan(c1.sFitness))||(isinf(c1.sFitness))||(isinf(-c1.sFitness))||(isnan(-c1.sFitness))))
+		return true;
+	if (((isnan(c2.sFitness))||(isinf(c2.sFitness))||(isinf(-c2.sFitness))||(isnan(-c2.sFitness))))
+		return false;
 	if ((c1.sPareto)&&(c2.sPareto))
 		return (c1.sFitness > c2.sFitness);
 	else if ((!c1.sPareto)&&(!c2.sPareto))

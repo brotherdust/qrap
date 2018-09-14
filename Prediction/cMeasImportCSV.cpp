@@ -299,6 +299,7 @@ int cMeasImportCSV::LoadMeasurement(char *filename)
 	cout << "cMeasImportCSV::LoadMeasurement: before while " << endl;	
      	while (getline (DataFile, line))
     	{
+		cout << line << endl;
 		if (line.substr(1,1)!="#")
 		{
 	        	istringstream linestream(line);

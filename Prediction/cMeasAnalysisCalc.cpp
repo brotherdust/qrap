@@ -966,14 +966,14 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 						<< "	TPred:" << TotalPred << "	CTPred:" << CTotalPred
 						<< "	TSPred:" << TotalSPred << "	CTSPred:" << CTotalSPred << "	";					  
 //						<< endl;
-
+*/
 					cout << i << "	Inst: " << currentInst << "	#: " << CNumUsed  
 						<< "	Freq =" << mFixedInsts[FixedNum].sFrequency 
 						<< "	M: "<< CMean 					
 						<< "	MSE: " << CMeanSquareError 
 						<< "	StDev: " << CStDev
 						<< "	Corr: " << CCorrC << endl;
-					cout	<< "	AntVal: " << CsumOfAntValue 
+/*					cout	<< "	AntVal: " << CsumOfAntValue 
 						<< " /N: "<< CsumOfAntValue/CNumUsed
 						<< "	PathLoss: " << CsumOfPathLoss 
 						<< " /N: " << CsumOfPathLoss/CNumUsed << endl;
@@ -1200,14 +1200,14 @@ int cMeasAnalysisCalc::PerformAnalysis(double &Mean, double &MeanSquareError,
 			<< "	TPred:" << TotalPred << "	CTPred:" << CTotalPred
 			<< "	TSPred:" << TotalSPred << "	CTSPred:" << CTotalSPred << "	";	
 //			<< endl;
-
+*/
 		cout << i << "	Inst: " << currentInst << "	#: " << CNumUsed  
 			<< "	Freq =" << mFixedInsts[FixedNum].sFrequency 
 			<< "	M: "<< CMean 					
 			<< "	MSE: " << CMeanSquareError 
 			<< "	StDev: " << CStDev
 			<< "	Corr: " << CCorrC << endl;
-		cout	<< "	AntVal: " << CsumOfAntValue << " /N: "<< CsumOfAntValue/CNumUsed
+/*		cout	<< "	AntVal: " << CsumOfAntValue << " /N: "<< CsumOfAntValue/CNumUsed
 			<< "	PathLoss: " << CsumOfPathLoss << " /N: " << CsumOfPathLoss/CNumUsed << endl;
 */
 	}

@@ -162,6 +162,7 @@ class Multiply : public GOftn
 public:
 	Multiply(unsigned NumChildren=2);
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	Multiply* clone();
 };
 
@@ -195,6 +196,7 @@ class Exponent : public GOftn
 public:
 	Exponent();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	Exponent* clone();
 };
 
@@ -205,6 +207,7 @@ class Square : public GOftn
 public:
 	Square();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	Square* clone();
 };
 

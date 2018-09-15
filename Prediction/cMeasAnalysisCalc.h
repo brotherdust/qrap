@@ -43,6 +43,7 @@
 #include <iostream>
 #include <Eigen/Dense>
 
+#define NUMSETS 7
 
 using namespace std;
 using namespace Eigen;
@@ -51,6 +52,7 @@ using namespace Qrap;
 struct tMeasPoint
 {
 	unsigned	sID;
+	unsigned	sSet;
 	unsigned	sCell;
 	unsigned	sInstKeyMobile;
 	unsigned	sInstKeyFixed;
@@ -74,6 +76,7 @@ struct tMeasPoint
 	tMeasPoint operator=(tMeasPoint Right)
 	{
 		sID		= Right.sID;
+		sSet		= Right.sSet;
 		sCell		= Right.sCell;
 		sInstKeyMobile	= Right.sInstKeyMobile;
 		sInstKeyFixed	= Right.sInstKeyFixed;
@@ -150,6 +153,8 @@ class cMeasAnalysisCalc
 	void SetPlotResolution( double InPlotRes) {mPlotResolution = InPlotRes;};
 	void SetSeekWidthBest( double INS) {mSeekWidthBest=INS;};
 	void SetSmoothWidthBest( double INS) {mSmoothWidthBest=INS;};
+
+	void TempAnalysisFunction();
 
 	int SaveResults();
 

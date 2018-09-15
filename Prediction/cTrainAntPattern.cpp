@@ -672,9 +672,9 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 					mMAXANNOutput = fabs(mCells[i].sOutputTrain[j+mCells[i].sNumTrain+mNumAzifFile][0]);
 			}
 
-			mCells[i].sInputTest = new double*[mCells[i].sNumTest];
-			mCells[i].sOutputTest = new double*[mCells[i].sNumTest];
-			for (j=0; j < mCells[i].sNumTest; j++)
+			mCells[i].sInputTest = new double*[mCells[i].sNumTest+ mNumAzifFile+mNumElevfFile];
+			mCells[i].sOutputTest = new double*[mCells[i].sNumTest+ mNumAzifFile+mNumElevfFile];
+			for (j=0; j < mCells[i].sNumTest+mNumAzifFile+mNumElevfFile; j++)
 			{
 				mCells[i].sInputTest[j] = new double[mCells[i].sNumInputs];
 				mCells[i].sOutputTest[j] = new double[mCells[i].sNumOutputs];
@@ -711,13 +711,43 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 					mMAXANNOutput = fabs(mCells[i].sOutputTest[j][0]);
 			}
 
+			for (j=0; j< mNumAzifFile; j++)
+			{
+				Azimuth = j*AngleInterval;
+				mCells[i].sInputTest[j+mCells[i].sNumTest][0] = 1;
+				mCells[i].sInputTest[j+mCells[i].sNumTest][1] = cos(Azimuth*PI/180);
+				mCells[i].sInputTest[j+mCells[i].sNumTest][2] = sin(Azimuth*PI/180);
+				mCells[i].sInputTest[j+mCells[i].sNumTest][3] = cos(mCells[i].sTilt*PI/180);;
+				mCells[i].sInputTest[j+mCells[i].sNumTest][4] = sin(mCells[i].sTilt*PI/180);;
+				
+				AntEffect = AntPatternFromFile.GetPatternValue(Azimuth, mCells[i].sTilt) - AntPatternFromFile.mGain;
+				mCells[i].sOutputTest[j+mCells[i].sNumTest][0] = AntEffect / ANTENNASCALE -0.5;
+				if (fabs(mCells[i].sOutputTest[j+mCells[i].sNumTest][0])>mMAXANNOutput)
+					mMAXANNOutput = fabs(mCells[i].sOutputTest[j+mCells[i].sNumTest][0]);
+			}
+
+			for (j=0; j< mNumElevfFile; j++)
+			{
+				Tilt = -90+ j*AngleInterval;
+				mCells[i].sInputTest[j+mCells[i].sNumTest+mNumAzifFile][0] = 1;
+				mCells[i].sInputTest[j+mCells[i].sNumTest+mNumAzifFile][1] = cos(mCells[i].sBearing*PI/180);
+				mCells[i].sInputTest[j+mCells[i].sNumTest+mNumAzifFile][2] = sin(mCells[i].sBearing*PI/180);
+				mCells[i].sInputTest[j+mCells[i].sNumTest+mNumAzifFile][3] = cos(Tilt*PI/180);
+				mCells[i].sInputTest[j+mCells[i].sNumTest+mNumAzifFile][4] = sin(Tilt*PI/180);
+				
+				AntEffect =  AntPatternFromFile.GetPatternValue(mCells[i].sBearing, Tilt) - AntPatternFromFile.mGain;
+				mCells[i].sOutputTest[j+mCells[i].sNumTest+mNumAzifFile][0] = AntEffect / ANTENNASCALE - 0.5;
+				if (fabs(mCells[i].sOutputTest[j+mCells[i].sNumTest+mNumAzifFile][0])>mMAXANNOutput)
+					mMAXANNOutput = fabs(mCells[i].sOutputTest[j+mCells[i].sNumTest+mNumAzifFile][0]);
+			}
+
 			cout << "mMAXANNOutput = " << mMAXANNOutput << endl;
 			
 			TrainData.set_train_data(mCells[i].sNumTrain+mNumAzifFile +mNumElevfFile, 
 						mCells[i].sNumInputs, mCells[i].sInputTrain,
 						mCells[i].sNumOutputs, mCells[i].sOutputTrain);
 	
-			TestData.set_train_data(mCells[i].sNumTest, 
+			TestData.set_train_data(mCells[i].sNumTest +mNumAzifFile +mNumElevfFile, 
 						mCells[i].sNumInputs, mCells[i].sInputTest,
 						mCells[i].sNumOutputs, mCells[i].sOutputTest);
 
@@ -895,21 +925,21 @@ bool cTrainAntPattern::Output(string Outputfile, unsigned currentCell)
 				ANNInput[3] = cos(tilt*PI/180);
 				ANNInput[4] = sin(tilt*PI/180);
 				ANNOutput = mANN.run(ANNInput);				
-				fprintf(fp,"%d, %f, %f,",i, -FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
+				fprintf(fp,"%d, %f, %f,",i, AntPatternFromFile.mGain-FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
 
 				tilt = mCells[currentCell].sTilt;
  				FileValue = AntPatternFromFile.GetPatternValue(azimuth, tilt);
 				ANNInput[3] = cos(tilt*PI/180);
 				ANNInput[4] = sin(tilt*PI/180);
 				ANNOutput = mANN.run(ANNInput);				
-				fprintf(fp,"%d, %f, %f,",i, - FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
+				fprintf(fp,"%d, %f, %f,",i, AntPatternFromFile.mGain- FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
 
 				tilt = 2.0*mCells[currentCell].sTilt;
  				FileValue = AntPatternFromFile.GetPatternValue(azimuth, tilt);
 				ANNInput[3] = cos(tilt*PI/180);
 				ANNInput[4] = sin(tilt*PI/180);
 				ANNOutput = mANN.run(ANNInput);				
-				fprintf(fp,"%d, %f, %f\n",i, -FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
+				fprintf(fp,"%d, %f, %f\n",i, AntPatternFromFile.mGain-FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
 			}
  			fprintf(fp,"\n");
 			fprintf(fp,"\n");

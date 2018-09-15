@@ -303,8 +303,8 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
 			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
 
-			if (DiffLoss <= 28)
-			{
+//			if (DiffLoss <= 28)
+//			{
 				AntEffect =  NewCell.sTxPwr - NewCell.sTxSysLoss - NewMeasurement.sMeasValue - PathLoss;
 				Total += AntEffect;
 				if (AntEffect<NewCell.sMin) NewCell.sMin=AntEffect;
@@ -318,7 +318,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 					NewCell.sMeasTrain.push_back(NewMeasurement);
 					NewCell.sNumTrain++;
 				}
-			}		
+//			}		
 		}// end for number of entries
 	} // end if query is NOT empty
 	else 

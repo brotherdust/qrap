@@ -175,7 +175,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 	query += "where tp=testpoint.id and measdatasource=measdatasource.id";
 */
 //	Where site is in area
-	string query ="SELECT mobile, ci, frequency, ST_AsText(testpoint.location) as location, ";
+	string query ="SELECT mobile, ci, measdatasource, frequency, ST_AsText(testpoint.location) as location, ";
 	query+= "ST_AsText(site.location) as sitepos, ";
 	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth, ";
 	query += "mobileheight, txantennaheight ";
@@ -248,7 +248,8 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 			unsigned i;
 			for (i=0;i<mNumMeas;i++)
 			{		
-				mMeasPoints[i].sCell = atoi(r[i]["ci"].c_str());	
+				mMeasPoints[i].sCell = atoi(r[i]["ci"].c_str());
+				mMeasPoints[i].sSet = atoi(r[i]["measdatasource"].c_str());	
 				mMeasPoints[i].sID = atoi(r[i]["id"].c_str());
 				mMeasPoints[i].sInstKeyMobile = atoi(r[i]["mobile"].c_str());
 				PointString = r[i]["location"].c_str();
@@ -394,7 +395,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(char*  CustomAreaName,
 	query += "where tp=testpoint.id and measdatasource=measdatasource.id";
 */
 //	Where site is in area
-	string query ="SELECT mobile, ci, frequency, ST_AsText(testpoint.location) as location, ";
+	string query ="SELECT mobile, ci, measdatasource, frequency, ST_AsText(testpoint.location) as location, ";
 	query += "ST_AsText(site.location) as sitepos, "; 
 	query += "measurement.id as id, measvalue, predictvalue, pathloss, distance, tilt, azimuth, ";
 	query += "mobileheight, txantennaheight ";
@@ -470,6 +471,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(char*  CustomAreaName,
 			{		
 				mMeasPoints[i].sCell = atoi(r[i]["ci"].c_str());	
 				mMeasPoints[i].sID = atoi(r[i]["id"].c_str());
+				mMeasPoints[i].sSet = atoi(r[i]["measdatasource"].c_str());	
 				mMeasPoints[i].sInstKeyMobile = atoi(r[i]["mobile"].c_str());
 				PointString = r[i]["location"].c_str();
 				spacePos = PointString.find_first_of(' ');
@@ -1282,6 +1284,9 @@ int cMeasAnalysisCalc::SaveResults()
 		query += ", distance=";
 		gcvt(mMeasPoints[i].sDistance,9,temp);
 		query += temp;
+		query += ", simulatedvalue=";
+		gcvt(mMeasPoints[i].sDiffLoss,9,temp);
+		query += temp;
 		query += " where id=";
 		gcvt(mMeasPoints[i].sID,9,temp);
 		query += temp;
@@ -1320,7 +1325,111 @@ int cMeasAnalysisCalc::SaveResults()
 	return 1;
 }
 
+//*************************************************************************************************
+//*
+void cMeasAnalysisCalc::TempAnalysisFunction()
+{
+	unsigned i,j;
 
+	tMeasPoint SwapPoint;
+	for (i=0; i<mNumMeas ; i++)
+	{
+		for (j=i+1; j<mNumMeas; j++)
+		{
+			if (mMeasPoints[i].sDiffLoss>mMeasPoints[j].sDiffLoss)
+			{
+				SwapPoint=mMeasPoints[i];
+				mMeasPoints[i] = mMeasPoints[j];
+				mMeasPoints[j] = SwapPoint;
+			}
+		}
+	}
+
+
+	double *Mean, *MSE, *StDev, *CorrC;
+	double *Error, *TotalError, *TotalSError, *TotalMeas;
+	double *TotalPred, *TotalSMeas, *TotalSPred, *TotalMeasPred;
+	unsigned *Num;
+
+	Mean = new double[NUMSETS];
+	MSE = new double[NUMSETS];
+	StDev = new double[NUMSETS];
+	CorrC = new double[NUMSETS];
+	Error = new double[NUMSETS];
+	TotalError = new double[NUMSETS];
+	TotalSError = new double[NUMSETS];
+	TotalMeas = new double[NUMSETS];
+	TotalPred = new double[NUMSETS];
+	TotalSMeas = new double[NUMSETS];
+	TotalSPred = new double[NUMSETS];
+	TotalMeasPred = new double[NUMSETS];
+	Num = new unsigned[NUMSETS];
+
+	for (i=0; i<NUMSETS; i++)
+	{
+		Mean[i] = 0;
+		MSE[i] = 0;
+		StDev[i] = 0;
+		CorrC[i] = 0;
+		Error[i] = 0;
+		TotalError[i] = 0;
+		TotalSError[i] = 0;
+		TotalMeas[i] = 0;
+		TotalPred[i] = 0;
+		TotalSMeas[i] = 0;
+		TotalSPred[i] = 0;
+		TotalMeasPred[i] = 0;
+		Num[i] = 0;
+	}
+
+	double DiffLoss = 0.5;
+	double TempMeas, TempPred;
+
+	for (i=0; i<mNumMeas; i++)
+	{ 
+		Num[0]++;
+		Error[0] = - mMeasPoints[i].sMeasValue + mMeasPoints[i].sPredValue;
+		TotalError[0] += Error[0]; 
+		TotalSError[0] += Error[0]*Error[0];
+		TotalMeas[0] += mMeasPoints[i].sMeasValue; 
+		TotalSMeas[0] += mMeasPoints[i].sMeasValue * mMeasPoints[i].sMeasValue; 
+		TotalPred[0] += mMeasPoints[i].sPredValue;
+		TotalSPred[0] += mMeasPoints[i].sPredValue * mMeasPoints[i].sPredValue;				
+		TotalMeasPred[0] += mMeasPoints[i].sPredValue * mMeasPoints[i].sMeasValue;
+			
+		Num[mMeasPoints[i].sSet]++;	
+		Error[mMeasPoints[i].sSet] = - mMeasPoints[i].sMeasValue + mMeasPoints[i].sPredValue;
+		TotalError[mMeasPoints[i].sSet] += Error[mMeasPoints[i].sSet]; 
+		TotalSError[mMeasPoints[i].sSet] += Error[mMeasPoints[i].sSet]*Error[mMeasPoints[i].sSet];
+		TotalMeas[mMeasPoints[i].sSet] += mMeasPoints[i].sMeasValue; 
+		TotalSMeas[mMeasPoints[i].sSet] += mMeasPoints[i].sMeasValue * mMeasPoints[i].sMeasValue; 
+		TotalPred[mMeasPoints[i].sSet] += mMeasPoints[i].sPredValue;
+		TotalSPred[mMeasPoints[i].sSet] += mMeasPoints[i].sPredValue * mMeasPoints[i].sPredValue;				
+		TotalMeasPred[mMeasPoints[i].sSet] += mMeasPoints[i].sPredValue * mMeasPoints[i].sMeasValue;
+		
+		if (mMeasPoints[i].sDiffLoss>DiffLoss)
+		{
+			cout << "ObLoss=" << mMeasPoints[i].sDiffLoss;
+			for (j=0; j<NUMSETS; j++)
+			{
+				if (Num[j]>0)
+				{
+					Mean[j] = TotalError[j]/Num[j];
+					MSE[j] = TotalSError[j]/Num[j];
+					StDev[j] = sqrt(MSE[j]-Mean[j]*Mean[j]);
+	
+					TempMeas = sqrt(Num[j]*TotalSMeas[j] - TotalMeas[j]*TotalMeas[j]);
+					TempPred = sqrt(Num[j]*TotalSPred[j] - TotalPred[j]*TotalPred[j]);
+					CorrC[j] = (Num[j]*TotalMeasPred[j] - TotalMeas[j]*TotalPred[j]) / (TempMeas*TempPred);	
+					cout << "	Set=" << j << "	Mean=" << Mean[j] << "	MSE=" << MSE[j]
+						<< "	StDev=" << StDev[j] << "	CorrC=" << CorrC[j];
+				}
+			}
+			cout << endl;
+			DiffLoss+=0.5;
+		}
+	}
+}
 //*************************************************************************************************
 //*
 bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)

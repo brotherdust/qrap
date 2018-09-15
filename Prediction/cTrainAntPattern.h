@@ -33,9 +33,9 @@
 #define antMAXepoch 400000
 #define antREPORTInt 10000
 #define antERROR 1e-6
-#define NUMLAYERS 2 //Number of Hidden layers. can only assume 1 or 2 
-#define HIDDEN1 5
-#define HIDDEN2 3 // Not used if NUMLAYERS is 1
+#define NUMLAYERS 1 //Number of Hidden layers. can only assume 1 or 2 
+#define HIDDEN1 10
+#define HIDDEN2 2 // Not used if NUMLAYERS is 1
 
 // include local headers
 #include "../DataBase/Config.h"

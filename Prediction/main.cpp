@@ -274,11 +274,9 @@ int main (int argc, char **argv)
 
 	cout<< "All" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-	Meas.TempAnalysisFunction();
-
-	Meas.SaveResults();
-
-	return 0;
+//	Meas.TempAnalysisFunction();
+//	Meas.SaveResults();
+//	return 0;
 
 	Continue = Meas.LoadMeasurements(Punte,0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);

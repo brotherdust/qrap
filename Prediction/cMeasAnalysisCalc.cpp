@@ -2408,7 +2408,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 	bool stop = false, redo=false;
 	bool first = true, ExhaustiveSearch=false;
 
-//	bool StopStepSize=false;
+	bool StopStepSize=false;
 	double cost, costOld, costMin, costMinTemp, cost1, cost2;
 	double dCost1,dCost2,ddCost;
 	double StepSize=1.0, TempStepSize=1.0, OldStepSize, BestStepSize;
@@ -2485,7 +2485,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 		sumSquareDiff = 0.0;
 		TempMinIndex =0;
 
-/*		if (smallStepSize>3)  // start exhaustive search.
+		if (smallStepSize>3)  // start exhaustive search.
 		{
 			cout << "Starting Exhaustive search " << endl;
 			for (i=1; i<mPathLoss.mClutter.mNumber; i++)
@@ -2497,7 +2497,7 @@ bool cMeasAnalysisCalc::OptimiseHeights(unsigned MeasSource)
 			stop = false;
 			smallStepSize=0;
 		}	
-*/		
+		
 
 		if (!stop)
 		//Loop to determine partial derivative with respect to each clutter height

@@ -905,9 +905,11 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 				}
 				stop = stop||((1.1*minTestError<TestError)&&(1.1*minTrainError<TrainError)&&(k>(MAXepoch/3)));
 				if (stop)
+				{
 					cout << "siteid = " << mSites[i].sSiteID << "	k =" << k 
 						<< "	TrainErr = " << TrainError 
 						<< "	TestErr = " << TestError << endl;
+				}
 				k++;
 //				if (k==ceil(MAXepoch/2))
 //				    ANN.set_train_error_function(FANN::ERRORFUNC_TANH);

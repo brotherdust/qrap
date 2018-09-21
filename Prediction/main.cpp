@@ -135,8 +135,8 @@ int main (int argc, char **argv)
 	cout << endl << "Got CI's " << endl;
 	VCMeasurements.WriteToDatabase();
 	cout << endl << "Wrote Measurements to DataBase" << endl;
-*/
-/*
+
+
   	queryC = "update coefficients set coefficient=0.0;";
 	if (!gDb.PerformRawSql(queryC))
 	{
@@ -242,7 +242,7 @@ int main (int argc, char **argv)
 	
 	delete [] Hoek;
 	cout << "Loading measurements ... in main()" << endl;
-	Continue = Meas.LoadMeasurements(Punte,0,0,2);
+	Continue = Meas.LoadMeasurements(Punte,0,0,0);
 */
 
 	cout << "Loading measurements ... in main()" << endl;
@@ -294,18 +294,18 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 	cout<< "AG2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-  	query = "truncate table AntNeuralNet cascade;";
+/*  	query = "truncate table AntNeuralNet cascade;";
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error truncating Antenna Neural Nets" << endl;
 	}
 
 	cout << "In main Loading measurements " << endl;
-	NeuralNets.LoadMeasurements(Punte,0,0);
+	NeuralNets.LoadMeasurements(Punte,0,1);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-
+*/
   	query = "update qrap_config set value='true' where name = 'UseAntANN';";
 	if (!gDb.PerformRawSql(query))
 	{
@@ -332,14 +332,12 @@ int main (int argc, char **argv)
 	Continue = Meas.LoadMeasurements(Punte,0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 	cout<< "Ant2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
 /*
-//	Meas.OptimiseHeights(0);
+	Meas.OptimiseHeights(0);
 	Continue = Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.OptimiseModelCoefAllTotal(0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "GAll" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
 
 	Meas.OptimiseModelCoefD(0);
 	Continue = Meas.LoadMeasurements(Punte,0,0,0);

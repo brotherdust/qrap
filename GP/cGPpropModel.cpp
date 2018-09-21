@@ -2460,7 +2460,16 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 
 				if (FixedNum == mMeas.mFixedInsts.size())
 				{
-					cout << "FixedNum reached limit ... ending measurement analysis"<<endl;			
+					FixedNum=0;
+					while ((mMeas.mFixedInsts[FixedNum].sInstKey!=currentInst)
+						&&(FixedNum < mMeas.mFixedInsts.size()))
+						FixedNum++;
+				}
+
+				if (FixedNum == mMeas.mFixedInsts.size())
+				{
+					cout << "FixedNum reached limit ... ending measurement analysis; Seeking FixedInst: "
+						<< mMeas.mFixedInsts[FixedNum].sInstKey		
 					return 0;
 				}
 

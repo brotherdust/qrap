@@ -38,9 +38,9 @@ cClutter::cClutter()
 	mNumber = 0;
 	mClutterTypes = nullptr;
 	mClassificationGroup = 1;
-//	string setting = gDb.GetSetting("UseClutter");
-//	if (setting=="true")
-//		GetFromDatabase();
+	string setting = gDb.GetSetting("UseClutter");
+	if (setting=="true")
+		GetFromDatabase();
 }/*end cClutter Default Constructor */
 
 //*************************************************************************

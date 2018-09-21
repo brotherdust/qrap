@@ -30,12 +30,13 @@
 #define AntFileInt 1 // the interval in degrees of samples that are included for the training from the supplied antenna file.
 #define SUB 5 // every SUB sample will be used as a test point
 // ANTSCALE is #defined in DataBase/Config.h
-#define antMAXepoch 400000
-#define antREPORTInt 10000
+#define antMAXepoch 500000
+#define antREPORTInt 1000
 #define antERROR 1e-6
+#define antTERROR (0.00015/5000)
 #define NUMLAYERS 1 //Number of Hidden layers. can only assume 1 or 2 
 #define HIDDEN1 10
-#define HIDDEN2 2 // Not used if NUMLAYERS is 1
+#define HIDDEN2 3 // Not used if NUMLAYERS is 1
 
 // include local headers
 #include "../DataBase/Config.h"

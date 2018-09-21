@@ -481,8 +481,8 @@ bool cTrainAntPattern::LoadMeasurements(char*  CustomAreaName,
 						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
 			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
 
-			if (DiffLoss <= 28)
-			{
+//			if (DiffLoss <= 28)
+//			{
 				AntEffect =  NewCell.sTxPwr -NewCell.sTxSysLoss - NewMeasurement.sMeasValue - PathLoss;
 				Total +=AntEffect;
 				if (AntEffect<NewCell.sMin) NewCell.sMin=AntEffect;
@@ -496,7 +496,7 @@ bool cTrainAntPattern::LoadMeasurements(char*  CustomAreaName,
 					NewCell.sMeasTrain.push_back(NewMeasurement);
 					NewCell.sNumTrain++;
 				}
-			}		
+//			}		
 		}// end for number of entries
 
 	} // end if query is NOT empty
@@ -575,9 +575,10 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 	cout << " mNumCells = " << mNumCells << endl;
 
 	mMAXANNOutput = 0;
+	unsigned kmin=0;
 
-	for (i=0; i<mNumCells; i++) // this should be in
-//	for (i=0; i<2; i++) // for debugging purposes
+//	for (i=0; i<mNumCells; i++) // this should be in
+	for (i=21; i<22; i++) // for debugging purposes
 	{
 
 		mCells[i].sNumOutputs = 1;
@@ -769,7 +770,10 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 			mANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
 			mANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
 			mANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
-			mANN.randomize_weights(-0.50,0.50);
+//			double weightsbound = 2.4/max(mCells[i].sNumInputs,max(HiddenN1,HiddenN2));
+			double weightsbound = 0.4;
+//			mANN.randomize_weights(-weightsbound,weightsbound);
+			mANN.init_weights(TrainData);
 
 			cout << "saving mANN: Cell = " << mCells[i].sCI << "	i=" << i << endl;
 			gcvt(mCells[i].sRI,8,radinst);
@@ -786,29 +790,46 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 			minTrainError = MAXDOUBLE;
 			stop = false;	
 			k=0;
+			kmin  =0;
 			while ((k<antMAXepoch+1)&&(!stop))
 			{
 				TrainError = mANN.train_epoch(TrainData);
 				TestError = mANN.test_data(TestData);
 				if (0==k%antREPORTInt)
 				{
-					TestError = mANN.test_data(TestData);
-					TestError = mANN.get_MSE();
+//					TestError = mANN.test_data(TestData);
+//					TestError = mANN.get_MSE();
 					cout << "celld = " << mCells[i].sCI << "	k=" << k 
 						<< "	TrainErr = " << TrainError 
 						<< "	TestErr = " << TestError << endl;
 				}
 				if (((TrainError <= minTrainError)&&(TestError<=minTestError))
-					||((TrainError<= minTrainError*0.6)&&(TestError<=(minTestError*1.1))&&(k>antREPORTInt)))
+					||((TrainError<= minTrainError*0.8)&&(TestError<=(minTestError*1.1))&&(k>antREPORTInt)&&(k>(kmin+2000))))
 				{
 					mANN.save(filename);
-					stop = (TestError < antERROR)&&(TrainError < antERROR);
+					stop = (((minTestError-TestError)/TestError) < antTERROR)
+						&&(((minTrainError-TrainError)/TrainError) < antTERROR)&&(k>(kmin+2000))&&(k>(2*antMAXepoch/3));
 					minTrainError = TrainError;
 					minTestError = TestError;
+					kmin = k;
+				}
+				stop = stop||((1.1*minTestError<TestError)&&(1.1*minTrainError<TrainError)&&(k>(kmin+2000))&&(k>(antMAXepoch/3)));
+				if (stop)
+				{
+					cout << "celld = " << mCells[i].sCI << "	k =" << k 
+						<< "	TrainErr = " << TrainError 
+						<< "	TestErr = " << TestError << endl;
+					cout << "celld = " << mCells[i].sCI << "	kmin =" << kmin
+						<< "	minTrainErr = " << minTrainError 
+						<< "	minTestErr = " << minTestError << endl;
 				}
 				k++;
 				
-			} 	
+			} 
+
+			cout << "celld = " << mCells[i].sCI << "	kmin =" << kmin
+				<< "	minTrainErr = " << minTrainError 
+				<< "	minTestErr = " << minTestError << endl;	
 
 			queryDD = queryD;
 			queryDD += radinst;

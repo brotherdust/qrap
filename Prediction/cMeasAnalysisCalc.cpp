@@ -233,6 +233,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 		string err = "Error in Database Select on Measurement Table. Query:";
 		err+=query; 
 		QRAP_ERROR(err.c_str());
+		delete [] text;
 		return false;
 	} // if
 	else
@@ -285,6 +286,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 						string err = "Error in Database Select on tables mobile and technology. Query:";
 						err+=query; 
 						QRAP_ERROR(err.c_str());
+						delete [] text;
 						return false;
 					}
 					else
@@ -328,6 +330,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 						err += "and technology failed. Query:";
 						err+=query; 
 						QRAP_ERROR(err.c_str());
+						delete [] text;
 						return false;
 					} // if
 					else
@@ -369,6 +372,7 @@ bool cMeasAnalysisCalc::LoadMeasurements(vPoints Points,
 	} // else ... hence the query was successful
 	
 	cout << "cMeasAnalysisCalc::LoadMeasurement: leaving #Meas = " << mNumMeas << endl << endl;
+	delete [] text;
 	return true;
 }
 
@@ -1331,9 +1335,12 @@ void cMeasAnalysisCalc::TempAnalysisFunction()
 {
 	unsigned i,j;
 
+	cout << "cMeasAnalysisCalc::TempAnalysisFunction(): Entering" << endl;
+
 	tMeasPoint SwapPoint;
 	for (i=0; i<mNumMeas ; i++)
 	{
+		cout << i << "	";
 		for (j=i+1; j<mNumMeas; j++)
 		{
 			if (mMeasPoints[i].sDiffLoss>mMeasPoints[j].sDiffLoss)
@@ -1345,6 +1352,7 @@ void cMeasAnalysisCalc::TempAnalysisFunction()
 		}
 	}
 
+	cout << "cMeasAnalysisCalc::TempAnalysisFunction(): Sorted " << endl;
 
 	double *Mean, *MSE, *StDev, *CorrC;
 	double *Error, *TotalError, *TotalSError, *TotalMeas;
@@ -1429,7 +1437,9 @@ void cMeasAnalysisCalc::TempAnalysisFunction()
 			DiffLoss+=0.5;
 		}
 	}
+	cout << "cMeasAnalysisCalc::TempAnalysisFunction(): Tata " << endl;
 }
+
 //*************************************************************************************************
 //*
 bool cMeasAnalysisCalc::OptimiseModelCoefAllTotal(unsigned MeasSource)

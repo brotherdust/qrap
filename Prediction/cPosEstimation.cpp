@@ -119,8 +119,8 @@ cPosEstimation::cPosEstimation() // default constructor
 	mCellPathLoss = new double[2];
 	mFixedAnts = new cAntennaPattern[2];
 
-	mCurANNa = new 	FANN::neural_net();
-	mCurANNd = new 	FANN::neural_net();
+	mCurANNa = new FANN::neural_net();
+	mCurANNd = new FANN::neural_net();
 	mCurSiteI = 0;
 	mNumSites = 0;
 	mCurPosI = 0;
@@ -138,6 +138,9 @@ cPosEstimation::~cPosEstimation() // destructor
 	mCurANNd->destroy();
 	delete [] mFixedAnts;
 	delete [] mCellPathLoss;
+	delete [] mClutterCount;
+	delete [] mCurANNa;
+	delete [] mCurANNd;
 }
 
 //*********************************************************************
@@ -716,8 +719,8 @@ void cPosEstimation::EstimatePositions()
 
 	time_t beginTime = time(0);
 
-//	for (i=220; i<235; i++)
-	for (i=0; i< mNumPoints; i++)
+	for (i=4700; i<mNumPoints; i++)
+//	for (i=0; i< mNumPoints; i++)
 	{
 		mCurPosI = i;
 //		cout << "i=" << i << "	Before IF" << endl;
@@ -2825,8 +2828,8 @@ bool cPosEstimation::ANNrun()
 */
 //	cout << " In cPosEstimation::ANNrun(): before delete" << endl;
 
-//	if (Input!=NULL) delete [] Input;
-//	if (Output!=NULL) delete [] Output;
+	if (Input!=nullptr) delete [] Input;
+//	if (Output!=nullptr) delete [] Output;
 //	cout << " In cPosEstimation::ANNrun(): tata" << endl;
 	return true;
 
@@ -2845,8 +2848,8 @@ int cPosEstimation::SaveResults()
 	string queryM = "INSERT into testpoint (id, originaltp, positionsource, location) Values (";
 	string queryP = "INSERT into PositionEstimate (id, tp, azimuth, distance, error) Values (";
 
-	for (i=0; i<mNumPoints; i++)
-//	for (i=0; i<2390; i++)
+//	for (i=0; i<mNumPoints; i++)
+	for (i=4700; i<mNumPoints; i++)
 	{
 
 		if (mPosSets[i].sTestPoints.size()>0)

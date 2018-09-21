@@ -104,6 +104,7 @@ cAntennaPattern::~cAntennaPattern()
 	delete_Float2DArray(mAntPattern);
 //	if (mUseANN) 
 		mAntennasANN->destroy();
+	delete [] mAntennasANN;
 }/* end CAntennaPattern:: Destructor */
 
 // ********************************************************************
@@ -1071,7 +1072,7 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 			cout << " Azimuth =  " << Azimuth << "	Elevation = " << Elevation;
 			cout << "	AntValue =  " <<  AntValue <<  endl;
 		}
-		if (0==AntANNValue) delete [] AntANNValue;
+//		if (nullptr!=AntANNValue) delete [] AntANNValue;
 		delete [] AntANNInput;
 		return AntValue;
 	}

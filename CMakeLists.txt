@@ -91,6 +91,8 @@ IF (NOT WITH_INTERNAL_SQLITE3)
   ENDIF (NOT SQLITE3_FOUND)
 ENDIF (NOT WITH_INTERNAL_SQLITE3)
 
+FIND_PACKAGE(FANN)
+
 FIND_PACKAGE(GEOS)
 
 FIND_PACKAGE(GDAL)
@@ -783,6 +785,14 @@ TARGET_LINK_LIBRARIES(qrapplugin
 	libqgis_core.so
   	libqgis_gui.so
 	libqwt-qt4.so
+	libdoublefann.so.2
+#	libdoublefann.so.2.2.0
+	libfann.so.2
+#	libfann.so.2.2.0
+	libfixedfann.so.2
+#	libfixedfann.so.2.2.0
+	libfloatfann.so.2
+#	libfloatfann.so.2.2.0
 #	libqwt.so
 )
 

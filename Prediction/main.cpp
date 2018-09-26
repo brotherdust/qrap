@@ -207,7 +207,7 @@ int main (int argc, char **argv)
 	Hoek[2].Set(-29.99, 25.01);
 	Hoek[3].Set(-25.01, 25.01);
 */
-/*
+
 //	Bryanston
 	NumHoek=4;
 	Hoek = new cGeoP[NumHoek];
@@ -215,7 +215,7 @@ int main (int argc, char **argv)
 	Hoek[1].Set(-26.108, 27.976);
 	Hoek[2].Set(-26.108, 28.074);
 	Hoek[3].Set(-26.036, 28.074);
-*/
+
 //	Tembisa
 	NumHoek=6;
 	Hoek = new cGeoP[NumHoek];
@@ -241,9 +241,8 @@ int main (int argc, char **argv)
 		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek;
-	cout << "Loading measurements ... in main()" << endl;
+/*	cout << "Loading measurements ... in main()" << endl;
 	Continue = Meas.LoadMeasurements(Punte,0,0,0);
-*/
 
 /*
 	cout << "Loading measurements ... in main()" << endl;
@@ -271,7 +270,9 @@ int main (int argc, char **argv)
 
 /*	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
 
-	cout<< "All" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+/*	Continue = Meas.LoadMeasurements(Punte,0,0,1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
+	cout<< "AG390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 	Continue = Meas.LoadMeasurements(Punte,0,0,2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
@@ -291,7 +292,7 @@ int main (int argc, char **argv)
 		cout << "Error clearing coefficients" << endl;
 	}
 
-	cout << "In main Loading measurements " << endl;
+	cout << "In main Loading measurements for AntANN" << endl;
 	NeuralNets.LoadMeasurements(Punte,0,1);
 
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
@@ -317,7 +318,7 @@ int main (int argc, char **argv)
 	Continue = Meas.LoadMeasurements(Punte,0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 	cout<< "Ant2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-/*
+
 	Meas.OptimiseHeights(0);
 	Continue = Meas.LoadMeasurements(Punte,0,0,6);
 	Meas.OptimiseModelCoefAllTotal(0);
@@ -520,9 +521,9 @@ int main (int argc, char **argv)
 
 */
 //	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
+/*
 
-
-/*	cTrainAntPattern NeuralNets;
+	cTrainAntPattern NeuralNets;
 	double Azimuth;
 
   	query = "truncate table AntNeuralNet cascade;";
@@ -614,19 +615,20 @@ for ( i=4; i>=0; i--)
    Meas.OptimiseModelCoefD(0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Nach0" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-*/
-/*	
-	cTrainPosNetDistAngle NeuralNets;
+
+	
+	cTrainPosNetDistAngle NeuralNetsP;
 	cout << "In main Loading measurements for Training" << endl;
-	NeuralNets.LoadSites(Punte,2,6,1,1);
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Test",false);
-	NeuralNets.LoadMeasurements(Punte,2,6,1,1,"Train",true);
+	NeuralNetsP.LoadSites(Punte,0,0,0,0);
+
+	NeuralNetsP.LoadMeasurements(Punte,0,0,0,0,"Test",false);
+	NeuralNetsP.LoadMeasurements(Punte,0,0,0,0,"Train",true);
 
 	cout << "In main training nets " << endl;
 	cout << "In main training nets " << endl;
-	NeuralNets.TrainANDSaveANDTest();
-*/
-/*
+	NeuralNetsP.TrainANDSaveANDTest();
+
+
 	query = "update coefficients set coefficient=0.0;";
 
 	if (!gDb.PerformRawSql(query))
@@ -722,12 +724,6 @@ for ( i=4; i>=0; i--)
 	cout << hoek << "		" << angle << endl;
 */
 
-  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
-	if (!gDb.PerformRawSql(query))
-	{
-		cout << "Error updating qrap_config" << endl;
-	}
-
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
 	cout << "Na constructor" << endl;
@@ -739,9 +735,15 @@ for ( i=4; i>=0; i--)
 	{
 		cout << "Error truncating positionestimate" << endl;
 	}
-*/
+  	queryA = "update qrap_config set value='true' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(queryA))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+
 	cout << "Voor LoadMeasurements" << endl;
-	Positioning.LoadMeasurements(Punte,2,6,1,1);
+	Positioning.SetUseAntANN(true);	
+	Positioning.LoadMeasurements(Punte);
 	cout << "Na LoadMeasurements" << endl;
 
 	cout << " Clearing Punte " << endl;

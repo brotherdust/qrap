@@ -28,6 +28,7 @@ else()
         ${_lib}
       PATHS
         ${FANN_DIR}/lib
+	/usr/lib/x86_64-linux-gnu/
         /usr/lib
         /usr/local/lib
         /opt/local/lib

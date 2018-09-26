@@ -1536,7 +1536,7 @@ bool cDatabase::RemoveView (const string& viewName)
 string cDatabase::GetSetting (const string& name)
 {
 	mgDBlock.lock();
-	if (!PerformRawSql("select value from qrap_config where name='"+name+"' and type='local' and username='"+mUsername+"';"))
+	if (!PerformRawSql("select value from qrap_config where name='"+name+"' order by lastmodified desc;"))
 	{
 		mgDBlock.unlock();
 		return string("");

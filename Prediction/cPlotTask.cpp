@@ -1309,9 +1309,9 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 			||((mCols>=mRows)&&((mFixedInsts[i].sFEdge<=FrontEdge)
 							&&(mFixedInsts[i].sBEdge>=DoneEdge))))
 		{
-//			cout << "i: " << i << "  InstKey: " << mFixedInsts[i].sInstKey 	
-//							<< " FE: " << mFixedInsts[i].sFEdge 
-//							<< "   BE: " <<  mFixedInsts[i].sBEdge << endl;
+			cout << "i: " << i << "  InstKey: " << mFixedInsts[i].sInstKey 	
+							<< " FE: " << mFixedInsts[i].sFEdge 
+							<< "   BE: " <<  mFixedInsts[i].sBEdge << endl;
 			Loaded = false;
 			for (j=0;j<mActiveRasters.size();j++)
 				Loaded = Loaded || 
@@ -1353,8 +1353,12 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 										mFixedInsts[i].sFrequency, kFactor,
 										mFixedInsts[i].sRange, mPlotResolution, 
 										mNumAngles, mDEMsource, mUseClutter, mClutterSource);
+
+				cout << " In cPlotTask::UpdateActiveRasters. BTLkey = " << BTLkey << endl;
+
 				if (BTLkey==-1)
 				{
+	
 //					err = "Loading DEM (and Clutter) Data for Site: ";
 					err = "Performing Basic Transmission Loss Calculations for Site: ";
 					gcvt(mFixedInsts[i].sSiteID,8,dummyS);
@@ -1376,7 +1380,7 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 					Float2DArray DTM;
 					DTM = new_Float2DArray(tempNumAngles,tempNumDist);
 					Float2DArray Clutter;
-//					cout << "NA: " << tempNumAngles << "	ND: " << tempNumDist << endl; 
+					cout << "NA: " << tempNumAngles << "	ND: " << tempNumDist << endl; 
 					if (mUseClutter)
 						Clutter = new_Float2DArray(tempNumAngles,tempNumDist);
 					mDEM.GetForCoverage(false, mFixedInsts[i].sSitePos, 
@@ -1439,6 +1443,8 @@ unsigned cPlotTask::UpdateActiveRasters(int Here, int Advance)
 					query += " where id=";
 					query +=dummyS;
 					query +=";";
+					cout << " In cPlotTask::UpdateActiveRasters " << endl; 
+					cout << query << endl;
 					if(!gDb.PerformRawSql(query))
 					{
 						string err = "Error in Database Updating the RadioInst with BTLkeys. Query: ";
@@ -1577,7 +1583,11 @@ int cPlotTask::OrderAllPred()
 								mFixedInsts[i].sRange, 
 								mPlotResolution, mNumAngles, 
 								mDEMsource, mUseClutter, mClutterSource);
+
+		cout << "In cPlotTask::OrderAllPred(). in loop i=" << i << endl;
 	}
+
+	cout << "In cPlotTask::OrderAllPred(). after loop " << endl;
 	
 	// Sort to ensure as little as possible 
 	// swapping of DEM, BTL and Ant rasters
@@ -1725,7 +1735,6 @@ double cPlotTask::TrafficDensCost()
 	return TotalCost;
 }
 
-
 //***************************************************************************
 bool cPlotTask::DetermineTrafficDist(bool Packet)
 {
@@ -1865,7 +1874,6 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		}
 	}
 	cout << endl;
-	delete_Float2DArray(ClutterRaster);
 
 	//Determine starting values for trafficdensities
 	
@@ -1979,6 +1987,17 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 			<< "	TrafficDensity = " << mVerkeerDigt[i] << endl;
 	}
 
+	for (i=0; i<mRows; i++)
+	{
+		for(j=0; j<mCols; j++)
+		{
+			if (ClutterRaster[i][j] < mNumClutter)
+				mPlot[i][j] = mVerkeerDigt[(unsigned)ClutterRaster[i][j]];
+			else mPlot[i][j] = 0.0;
+		}
+	}
+	cout << "In cPlottask::DetermineTrafficDist(). Done with mPlot " << endl;
+	delete_Float2DArray(ClutterRaster);
 /*
 	// Determine size of matrix ... i.e. How many Cluttertypes are represented
 	cout << "In cPlottask::DetermineTrafficDist(). TotalsPerClutter " << endl; 
@@ -2510,7 +2529,6 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 			<< "	mTrafficDens(i) = " << mTrafficDens(i) << endl;
 		
 	}
-
 */
 
 	cout << "In cPlottask::DetermineTrafficDist():  Saving estimations" << endl;

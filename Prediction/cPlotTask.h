@@ -133,7 +133,8 @@ enum ePlotType
 			 * @return A boolean indicating success of calculation.
 			 */
 			bool DetermineTrafficDist(bool Packet=true);
-			
+
+	
 			/*
 			 * 
 			 */

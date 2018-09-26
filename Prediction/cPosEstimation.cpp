@@ -52,9 +52,9 @@ cPosEstimation::cPosEstimation() // default constructor
 	mPathLoss= new cPathLossPredictor();
 
 	mLTEsim = false;
-	mOriginal = false;
+	mOriginal = true;
 	mUMTSsim = false;
-	mTAUnknown = true;
+	mTAUnknown = false;
 	mCurSiteI = 0;
 	mCurPosI = 0;
 	mNumPoints = 0;
@@ -719,14 +719,16 @@ void cPosEstimation::EstimatePositions()
 
 	time_t beginTime = time(0);
 
-	for (i=4700; i<mNumPoints; i++)
-//	for (i=0; i< mNumPoints; i++)
+//	for (i=131; i<133; i++)
+	for (i=0; i< mNumPoints; i++)
 	{
 		mCurPosI = i;
 //		cout << "i=" << i << "	Before IF" << endl;
 		if ((mPosSets[mCurPosI].sMeasurements.size()>0)
 			&&(mPosSets[mCurPosI].sTestPoints.size()>0))
 		{
+			cout << endl << "ServCI = " << mPosSets[mCurPosI].sMeasurements[0].sServingCell << 
+				"	SiteID=" << mPosSets[mCurPosI].sMeasurements[0].sSiteID << endl;
 //			cout << "i=" << i << "	In IF" << endl;
 			mPosSets[mCurPosI].sTestPoints[0].sAzimuth = mPosSets[mCurPosI].sMeasurements[0].sSiteLocation.
 								Bearing(mPosSets[mCurPosI].sTestPoints[0].sOriginalLocation);

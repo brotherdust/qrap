@@ -87,6 +87,9 @@ bool cAntennaPattern:: ResetUseAntANN()
 	if (setting=="true")
 		mUseANN = true;
 	else mUseANN = false;
+	if (mUseANN)
+		cout << "cAntennaPattern::ResetUseAntANN: Using Antenna ANN " <<  endl;
+	else cout << "cAntennaPattern::ResetUseAntANN: NOT Antenna ANN " <<  endl;
 	return mUseANN;
 }/* end CAntennaPattern:: ResetUseAntANN */
 
@@ -113,8 +116,14 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 				double Bearing, double MechTilt)
 {	
 
-	if (Type ==Mobile)
+	if (Mobile==Type)
 		mUseANN = false;
+	else
+	{
+		if (mUseANN)
+			cout << "cAntennaPattern::SetAntennaPattern Using Antenna ANN " <<  endl;
+		else cout << "cAntennaPattern::SetAntennaPattern: NOT Antenna ANN " <<  endl;
+	}
 
 	pqxx::result r;
 
@@ -127,10 +136,6 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 	char* Temp;
 	Temp = new char[12];
 	
-/*	if (mUseANN)
-		cout << "cAntennaPattern::SetAntennaPattern Using Antenna ANN " <<  endl;
-	else cout << "cAntennaPattern::SetAntennaPattern: NOT Antenna ANN " <<  endl;
-*/
 //	cout << "cAntennaPattern::SetAntennaPattern. Before if (mUseANN) " << endl;
 	if (mUseANN)
 	{
@@ -1057,7 +1062,6 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 		double *AntANNInput;
 		AntANNInput = new double[5];
 		double *AntANNValue;
-		AntANNValue = new double[1];
 		double AntValue;
 		AntANNInput[0]  = 1;
 		AntANNInput[1] = cos(Azimuth*PI/180);
@@ -1066,14 +1070,13 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 		AntANNInput[4] = sin(Elevation*PI/180);
 		AntANNValue = mAntennasANN->run(AntANNInput);
 		AntValue = (AntANNValue[0]+0.5)*ANTENNASCALE;
-		if ((isnan(AntValue))||(isnan(-AntValue))||(isinf(AntValue))||(fabs(AntValue)>60))
+/*		if ((isnan(AntValue))||(isnan(-AntValue))||(isinf(AntValue))||(fabs(AntValue)>60))
 		{
 			cout << "cAntennaPattern::GetPatternValue: ";
 			cout << " Azimuth =  " << Azimuth << "	Elevation = " << Elevation;
 			cout << "	AntValue =  " <<  AntValue <<  endl;
 		}
-//		if (nullptr!=AntANNValue) delete [] AntANNValue;
-		delete [] AntANNInput;
+*/		delete [] AntANNInput;
 		return AntValue;
 	}
 
@@ -1205,11 +1208,11 @@ double cAntennaPattern::GetPatternValue(double Azimuth, double Elevation)
 						/(mAziAngles[ref_Azi+1]-mAziAngles[ref_Azi]);
 //		cout << "Value = " << Value << "	Az = " << Az << "	El = " << El << endl;
 	}
-	if ((isnan(Value))||(isnan(-Value))||(isinf(Value))||(fabs(Value)>60))
+/*	if ((isnan(Value))||(isnan(-Value))||(isinf(Value))||(fabs(Value)>60))
 	{
 		cout << "cAntennaPattern::GetPatternValue: before final return";
 		cout << " Azimuth =  " << Azimuth << "	Elevation = " << Elevation;
 		cout << "	Value =  " <<  Value <<  endl;
 	}
-	return Value;
+*/	return Value;
 }

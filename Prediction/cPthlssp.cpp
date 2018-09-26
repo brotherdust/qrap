@@ -313,16 +313,24 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	
 	FreeSpace = CalcFreeSpaceLoss(mLinkLength);
 	PlaneEarth = CalcPlaneEarthLoss(mLinkLength);
-	m_Loss = FreeSpace ;
+	m_Loss = FreeSpace;
 
 	DiffLoss = 0;
+
+//	cout << " In cPathLossPredictor::TotPathLoss: voor GetSize()" << endl;
 	if (InputProfile.GetSize()>3)
 	{
+//		cout << " In cPathLossPredictor::TotPathLoss: voor InitEffectEarth" << endl;
 		InitEffectEarth(InputProfile, ClutterProfile);
+//		cout << " In cPathLossPredictor::TotPathLoss: voor FindElevAngles" << endl;
 		FindElevAngles(ElevAngleTX,ElevAngleRX);
 		
+//		cout << " In cPathLossPredictor::TotPathLoss: voor Horizontalize" << endl;
 		ReffHeight = Horizontalize(0,1);
+//		cout << " In cPathLossPredictor::TotPathLoss: voor FindMainPeak" << endl;
 		PeakIndex = FindMainPeak(0,1,ReffHeight, MinClearance,sqrtD1D2);
+
+//		cout << " In cPathLossPredictor::TotPathLoss: voor mUseClutter " << endl;
 		if (mUseClutter) 
 		{
 			if ((MinClearance<1.0)&&(PeakIndex!=0)) 
@@ -331,6 +339,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 			    mClutterIndex = mClutterProfile[m_size-1];
 		}
 
+//		cout << " In cPathLossPredictor::TotPathLoss: mClutterIndex = " << mClutterIndex << endl;
 		if ((MinClearance<1.0)&&(PeakIndex!=0))
 		{
 			radius = SetPeakRadius(PeakIndex,alpha);
@@ -420,7 +429,7 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 	}
 	else m_Loss+=DiffLoss;
 	
-	
+//	cout << "In cPathLoss::TotPathLoss, before mUseClutter" << endl;
 	if (mUseClutter)
 	{
 //		cout << mClutterProfile[m_size-1] <<"."; 
@@ -580,6 +589,7 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 	m_profile = new float[m_size];
 	InputProfile.GetProfile(m_size,m_profile);
 
+//	cout << "In cPathLossPredictor::InitEffectEarth Voor mUseClutter" << endl;
 	if (mUseClutter)
 	{
 		ClutterProfile.GetProfile(m_size,m_TempProfile);
@@ -603,6 +613,7 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 	if (m_SeekWidth<2) m_SeekWidth = 2;
 //	if (m_SmoothWidth<1) m_SmoothWidth = 1;
 
+//	cout << "In cPathLossPredictor::InitEffectEarth Voor m_kFactor" << endl;
 	if (m_kFactor!=1.0)
 	{
 		centre = ((double)m_size)/2.0;
@@ -623,6 +634,7 @@ void cPathLossPredictor::InitEffectEarth(const cProfile &InputProfile,
 		}
 	}/*endif else*/
 
+//	cout << "In cPathLossPredictor::InitEffectEarth Voor mUseClutter 2" << endl;
 	if (mUseClutter)
 	{
 		for (i=1; i<m_size-1;i++)

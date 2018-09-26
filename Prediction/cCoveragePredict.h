@@ -153,6 +153,7 @@ namespace Qrap
 			double		mFrequency;		///< The prediction frequency
 			double		mkFactor;
 			bool		mUseClutter;
+			bool		mUseAntANN;
 			Float2DArray	mBTL;			///< Description
 			Float2DArray	mTilt;			///< Description
 			Float2DArray	mRxLev;			///< Description

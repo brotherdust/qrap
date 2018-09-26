@@ -294,17 +294,20 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 			NewMeasurement.sFrequency = atof(r[i]["frequency"].c_str());
 			NewMeasurement.sMeasValue = atof(r[i]["measvalue"].c_str());
 		
+
 			mDEM.GetForLink(NewCell.sPosition,NewMeasurement.sLocation, mPlotResolution, mDEMProfile);
 			if (mUseClutter)
 			{
 				mClutter.GetForLink(NewCell.sPosition,	NewMeasurement.sLocation, mPlotResolution, mClutterProfile);
 			}
+
 			mPathLoss.setParameters(mkFactor,NewMeasurement.sFrequency,
 						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
 			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
 
-			if (DiffLoss <= 28)
-			{
+//			cout << i << " Na PathLoss " << endl; 
+//			if (DiffLoss <= 28)
+//			{
 				AntEffect =  NewCell.sTxPwr - NewCell.sTxSysLoss - NewMeasurement.sMeasValue - PathLoss;
 				Total += AntEffect;
 				if (AntEffect<NewCell.sMin) NewCell.sMin=AntEffect;

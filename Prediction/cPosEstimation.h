@@ -122,12 +122,12 @@ struct tMeas
 	double		sPathLoss;
 	double		sRFDistEstimate; // "pathloss" corrected for frequency and EIRP 
 	double 		sPredValue;
-	float			sTilt;
+	float		sTilt;
 	double		sHeight;
 	double		sAzimuth;
 	double 		sBeamWidth;
 	double		sDistance;
-	int			sTA; 		// this could be GSM/LTE TA or UMTS timeDiff
+	int		sTA; 		// this could be GSM/LTE TA or UMTS timeDiff
 	double 		sResDist;
 	double		sIMEI;		// the IMEI of the measurement phone
 	double		sHour;		// the hour of the measurement

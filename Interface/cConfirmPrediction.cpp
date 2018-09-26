@@ -866,8 +866,8 @@ void cConfirmPrediction::on_btnDo_clicked()
 		}
 		else if (TrafficDist==mPlotType)
 		{
-			Prediction.DetermineTrafficDist(true);
-			Prediction.DetermineTrafficDist(false);
+			Prediction.DetermineTrafficDist(true); // only do packet data
+//			Prediction.DetermineTrafficDist(false);
 		}
 		FileWritten = Prediction.WriteOutput(DEG);
  	}

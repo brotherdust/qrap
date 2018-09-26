@@ -53,6 +53,13 @@ cCoveragePredict::cCoveragePredict()
 	mBTL = new_Float2DArray(mNumAngles,mNumRadialPoints);
 	mTilt = new_Float2DArray(mNumAngles,mNumRadialPoints);
 	mRxLev = new_Float2DArray(mNumAngles,mNumRadialPoints);
+	string setting = gDb.GetSetting("UseAntANN");
+	if (setting=="true")
+		mUseAntANN = true;
+	else mUseAntANN = false;
+	if (mUseAntANN)
+		cout << "cCoveragePredict::cCoveragePredict Using Antenna ANN " <<  endl;
+	else cout << "cCoveragePredict::cCoveragePredict NOT Antenna ANN " <<  endl;
 }
 
 
@@ -107,6 +114,10 @@ int cCoveragePredict::SetCommunicationLink(	int		SiteID,
 
 	if (DownLink) Which = Tx;
 	else Which = Rx;
+	mFixedAntenna.SetUseAntANN(mUseAntANN);
+	if (mUseAntANN)
+		cout << "cCoveragePredict::SetCommunicationLink Using Antenna ANN " <<  endl;
+	else cout << "cCoveragePredict::SetCommunicationLink NOT Antenna ANN " <<  endl;
 	mFixedAntenna.SetAntennaPattern(mFixedInst, Which, mFixedAzimuth, mFixedMechTilt);
 	mMobileAntenna.SetAntennaPattern(mMobileInst, Mobile, 0, 0);
 	
@@ -134,6 +145,8 @@ int cCoveragePredict::SetCommunicationLink(	int		SiteID,
 	mFrequency=Frequency;
 	mkFactor=kFactor;
 	mUseClutter=UseClutter;
+
+	cout << "In cCoveragePredict::SetCommunicationLink: leaving";
 
 	return BTLkey;
 }

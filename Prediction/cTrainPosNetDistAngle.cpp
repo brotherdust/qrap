@@ -32,9 +32,9 @@
 cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 {
 	mLTEsim = false;
-	mOriginal = false; 
+	mOriginal = true; 
 	mUMTSsim = false;
-	mTAUnknown = true;
+	mTAUnknown = false;
 	mNumSites = 0;
 }
 
@@ -154,10 +154,10 @@ bool cTrainPosNetDistAngle::LoadSites(vPoints Points,
 	query = "select siteid, sitelocation, ci from ";
 	query += "(select siteid, ST_AsText(site.location) as siteLocation, ";
 	query += "ci, count(measurement.tp) as numPoints ";
-	query += "from measurement cross join testpointauxGSM cross join cell ";
+	query += "from measurement cross join testpointauxLTE cross join cell ";
 	query += "cross join radioinstallation cross join site ";
 	query += "where servci=cell.id and cell.risector = radioinstallation.id ";
-	query += "and measurement.tp=testpointauxGSM.tp and siteid =site.id ";
+	query += "and measurement.tp=testpointauxLTE.tp and siteid =site.id ";
 	query += "and st_within(site.location,";
 	query += areaQuery;
 	query += "group by siteid, ci, site.location ";
@@ -646,7 +646,7 @@ bool cTrainPosNetDistAngle::TrainANDSaveANDTest()
 	TestIndex = 0;
 
 	for (i=0; i<mNumSites; i++)
-//	for (i=8; i<mNumSites; i++)
+//	for (i=1; i<5; i++)
 	{
 		cout << "i=" << i << "	mSites[i].sSiteID = " << mSites[i].sSiteID;
 		cout << "	mSites[i].sNumOutputsA = " << mSites[i].sNumOutputsA;

@@ -434,14 +434,17 @@ int cBTLPredict::PredictBTL(unsigned NumAngles, unsigned NumDistance,
 	cout << "	F_height: " << mFixedHeight;
 	cout << "	M_height: " << mMobileHeight << endl;
 	PathLoss.setParameters(mkFactor,mFrequency,mFixedHeight,mMobileHeight,UseClutter,ClutterClassGroup);
+	cout << "cBTLPredict::PredictBTL; Done setting PathLoss parameters";
 	for (i=0; i<NumAngles; i++)
 	{	
+		cout << "cBTLPredict::PredictBTL, setting DEM";
 		DTMProfile.SetProfile(mNumRadialPoints, DTM[i]);
 		if (UseClutter)
 			ClutterProfile.SetProfile(mNumRadialPoints, Clutter[i]);
+		else cout << "cBTLPredict::PredictBTL, NOT setting clutter";
 		for (j=(NumDistance-1); j>0 ; j--)
 		{
-			mBTL[i][j] = PathLoss.TotPathLoss(DTMProfile, mTilt[i][j], ClutterProfile,DiffLoss, ClutterDepth);
+			mBTL[i][j] = PathLoss.TotPathLoss(DTMProfile, mTilt[i][j], ClutterProfile, DiffLoss, ClutterDepth);
 			if ((mBTL[i][j]<-mMaxPathLoss)&&(j>MaxRadialP))
 			{
 				MaxRadialP = j;

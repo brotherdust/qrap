@@ -321,7 +321,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 					NewCell.sMeasTrain.push_back(NewMeasurement);
 					NewCell.sNumTrain++;
 				}
-			}		
+//			}		
 		}// end for number of entries
 	} // end if query is NOT empty
 	else 

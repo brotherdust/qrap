@@ -248,16 +248,16 @@ int cPathLossPredictor::setParameters(double k, double f,
 	mUseClutter = UseClutter;
 	if ((ClutterClassGroup!=mClutter.mClassificationGroup)&&(mUseClutter))
 	{
+		cout << "In cPathLossPredictor::setParameters, mUseClutter = true";
 		if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
 		UseClutter = mUseClutter;
 		mClutter.mClassificationGroup = ClutterClassGroup;
 	}
 
-	for (unsigned i=0; i<NUMTERMS; i++)
-		mCterms[i]=0;
-
 	if (mUseClutter)
 	{
+		for (unsigned i=0; i<NUMTERMS; i++)
+			mCterms[i]=0;
 		if (NUMTERMS>0) mCterms[0] = TERM0;
 		if (NUMTERMS>2) mCterms[2] = TERM2;
 		if (NUMTERMS>4) mCterms[4] = TERM4;

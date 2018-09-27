@@ -1905,8 +1905,8 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	for (j=1; j<=ClutterUsed.mNumber; j++)
 	{
 		if (AreaSumPerClutter[j]>0.0)
-			mVerkeerDigt[j] = SumOfTraffic/sumOfArea;
-		else mVerkeerDigt[j]=0.0;
+			mVerkeerDigt[j] = 2*(ClutterUsed.mNumber-j)*SumOfTraffic/sumOfArea/ClutterUsed.mNumber;
+		else mVerkeerDigt[j]=0.0; // The cluttertype does not occur in the area.
 	}
 
 	cout << "In cPlottask::DetermineTrafficDist(). Initialising derivatives" << endl; 
@@ -1918,7 +1918,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	double OldCost, TestCost, Delta, SumOfdCdD, SizeOfdCdD, Cost;
 	double StepSize = 0.1*SumOfTraffic/sumOfArea;
 	bool Stop = false, Better=false;
-	int IterLeft=10000;
+	int IterLeft=2000000;
 	
 	double MinTestCost, MinDelta;
 	double MinCost = TrafficDensCost();
@@ -1977,11 +1977,12 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		if (Cost<=MinCost)
 			MinCost = Cost;
 		else Stop = true;
-//		cout << "#"<< IterLeft<<"	Cost=" << Cost << endl;
+		if (IterLeft%10000 ==0)
+			cout << "#"<< IterLeft<<"	Cost=" << Cost << endl;
 	}
 
 	cout << "Results of Gradient Search" << endl;
-	for (i=1; i<mNumClutter; i++)
+	for (i=1; i<=ClutterUsed.mNumber; i++)
 	{
 		cout << "ClutterIndex=" << i 
 			<< "	TrafficDensity = " << mVerkeerDigt[i] << endl;
@@ -1991,7 +1992,8 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	{
 		for(j=0; j<mCols; j++)
 		{
-			if (ClutterRaster[i][j] < mNumClutter)
+//			cout << "i=" << i << "	j=" << j << "	ClutterType=" << (unsigned)ClutterRaster[i][j] << endl;
+			if ((unsigned)ClutterRaster[i][j] <= ClutterUsed.mNumber)
 				mPlot[i][j] = mVerkeerDigt[(unsigned)ClutterRaster[i][j]];
 			else mPlot[i][j] = 0.0;
 		}

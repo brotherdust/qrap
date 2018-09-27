@@ -217,7 +217,7 @@ int main (int argc, char **argv)
 	Hoek[3].Set(-26.036, 28.074);
 
 //	Tembisa
-	NumHoek=6;
+/*	NumHoek=6;
 	Hoek = new cGeoP[NumHoek];
 	Hoek[0].Set(-25.965, 28.210);
 	Hoek[1].Set(-25.970, 28.245);
@@ -226,7 +226,7 @@ int main (int argc, char **argv)
 	Hoek[4].Set(-25.990, 28.150);
 	Hoek[5].Set(-25.965, 28.180);
 
-/*	//Tembisa bigger
+	//Tembisa bigger
 	NumHoek=5;	
 	Hoek = new cGeoP[NumHoek];
 
@@ -241,7 +241,7 @@ int main (int argc, char **argv)
 		Punte.push_back(Hoek[i]);
 	
 	delete [] Hoek;
-/*	cout << "Loading measurements ... in main()" << endl;
+	cout << "Loading measurements ... in main()" << endl;
 	Continue = Meas.LoadMeasurements(Punte,0,0,0);
 
 /*
@@ -270,7 +270,7 @@ int main (int argc, char **argv)
 
 /*	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
 
-/*	Continue = Meas.LoadMeasurements(Punte,0,0,1);
+	Continue = Meas.LoadMeasurements(Punte,0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
 	cout<< "AG390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
@@ -286,7 +286,7 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 	cout<< "AG2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-/*  	query = "truncate table AntNeuralNet cascade;";
+  	query = "truncate table AntNeuralNet cascade;";
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error clearing coefficients" << endl;
@@ -296,7 +296,7 @@ int main (int argc, char **argv)
 	NeuralNets.LoadMeasurements(Punte,0,1);
 
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
-*/
+
 	cout<< "All" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 	Continue = Meas.LoadMeasurements(Punte,0,0,0);
@@ -329,8 +329,8 @@ int main (int argc, char **argv)
 	Continue = Meas.LoadMeasurements(Punte,0,0,6);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
 	cout<< "GAll" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-*/
-/*
+
+
 	Continue = Meas.LoadMeasurements(Punte,0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
 	cout<< "AG390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;

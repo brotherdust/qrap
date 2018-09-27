@@ -459,9 +459,9 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 		{
 //			if ((mLinkLength>0.0)&&(fabs(DiffLoss)<0.1)) 
 //			{
-				mCterms[4] = TERM3;
+				mCterms[4] = TERM4;
 //			}
-//			else mCterms[3] = 0.0;
+//			else mCterms[4] = 0.0;
 		}
 		if (NUMTERMS>5)
 		{

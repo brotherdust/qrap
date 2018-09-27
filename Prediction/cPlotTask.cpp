@@ -1868,8 +1868,8 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 			}
 //			cout << "CurrentRadInstID = " << CurrentRadInstID << "	Clutter = " << ClutterRaster[i][j] << endl;
 			if (mPlot[i][j] == mFixedInsts[CurrentRadInstID].sInstKey)
-				mClutterArea[CurrentRadInstID][(int)ClutterRaster[i][j]] += PlotRes*PlotRes/1000/1000;
-			if (0==ClutterRaster[i][j])
+				mClutterArea[CurrentRadInstID][(unsigned)ClutterRaster[i][j]] += PlotRes*PlotRes/1000/1000;
+			if ((0==(unsigned)ClutterRaster[i][j])||((unsigned)ClutterRaster[i][j]>ClutterUsed.mNumber))
 				cout << i << "," << j << "	";
 		}
 	}
@@ -1904,8 +1904,8 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	mVerkeerDigt[0] = 0.0; 	 
 	for (j=1; j<=ClutterUsed.mNumber; j++)
 	{
-		if ((AreaSumPerClutter[j]>0.0)&&(j<=ClutterUsed.mNumber-10))
-			mVerkeerDigt[j] = 2*(ClutterUsed.mNumber-j)*SumOfTraffic/sumOfArea/ClutterUsed.mNumber;
+		if ((AreaSumPerClutter[j]>0.0)&&(j<=ClutterUsed.mNumber-7))
+			mVerkeerDigt[j] = SumOfTraffic/sumOfArea;
 		else mVerkeerDigt[j]=0.0; // The cluttertype does not occur in the area.
 	}
 
@@ -1930,7 +1930,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		OldCost = TrafficDensCost();
 		MinTestCost=OldCost;
 		MinIndex=0;
-		for (j=1; j<=ClutterUsed.mNumber-10; j++)
+		for (j=1; j<=ClutterUsed.mNumber-7; j++)
 		{
 			Delta = max(0.05*mVerkeerDigt[j],0.001*SumOfTraffic/sumOfArea);
 			mVerkeerDigt[j]+=Delta;
@@ -1949,11 +1949,12 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 			mVerkeerDigt[j]-=Delta;
 		}
 
-		SizeOfdCdD = sqrt(SumOfdCdD);
-		Better = false;
+		if (SumOfdCdD>0) 
+			SizeOfdCdD = sqrt(SumOfdCdD);
+		
 		while ((StepSize>0.001*SumOfTraffic/sumOfArea)&&(!Better))
 		{
-			for (j=1; j<=ClutterUsed.mNumber-10; j++)
+			for (j=1; j<=ClutterUsed.mNumber-7; j++)
 			{
 				mVerkeerDigt[j]-=dCdD[j]*StepSize/SizeOfdCdD;
 				if (mVerkeerDigt[j]<0.0)
@@ -1977,7 +1978,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		if (Cost<=MinCost)
 			MinCost = Cost;
 		else Stop = true;
-		if (IterLeft%10000 ==0)
+		if (IterLeft%100000 ==0)
 			cout << "#"<< IterLeft<<"	Cost=" << Cost << endl;
 	}
 

@@ -248,7 +248,7 @@ int cPathLossPredictor::setParameters(double k, double f,
 	mUseClutter = UseClutter;
 	if ((ClutterClassGroup!=mClutter.mClassificationGroup)&&(mUseClutter))
 	{
-		cout << "In cPathLossPredictor::setParameters, mUseClutter = true";
+//		cout << "In cPathLossPredictor::setParameters, mUseClutter = true";
 		if (mUseClutter) mUseClutter = mClutter.Reset(ClutterClassGroup);
 		UseClutter = mUseClutter;
 		mClutter.mClassificationGroup = ClutterClassGroup;
@@ -408,17 +408,20 @@ float cPathLossPredictor::TotPathLoss(cProfile &InputProfile,
 
 
 	// Estimate the distance the wave travels through the primary clutter type
-	ClutterDepth = 0.0;
-	for (i=0; i<m_size; i++)
+	if (mUseClutter)
 	{
-		if ((mNLOS[i])&&(mClutterProfile[i]==mClutterIndex)&&(mClutter.mClutterTypes[mClutterIndex].sHeight>0.0))
-			ClutterDepth+=m_interPixelDist;
+		ClutterDepth = 0.0;
+		for (i=0; i<m_size; i++)
+		{
+			if ((mNLOS[i])&&(mClutterProfile[i]==mClutterIndex)&&(mClutter.mClutterTypes[mClutterIndex].sHeight>0.0))
+				ClutterDepth+=m_interPixelDist;
+		}
+		if ((0==ClutterDepth)&&(mClutterProfile[m_size-1]==mClutterIndex))
+		{
+			ClutterDepth += max((mClutter.mClutterTypes[mClutterIndex].sHeight - m_hrx)/sqrt(2.0),0.0);
+		}
+		mClutterDepth = ClutterDepth;
 	}
-	if ((0==ClutterDepth)&&(mClutterProfile[m_size-1]==mClutterIndex))
-	{
-		ClutterDepth += max((mClutter.mClutterTypes[mClutterIndex].sHeight - m_hrx)/sqrt(2.0),0.0);
-	}
-	mClutterDepth = ClutterDepth;
 
 	if (DiffLoss<0) DiffLoss = 0;
 	//Incorporate the Obstruction loss

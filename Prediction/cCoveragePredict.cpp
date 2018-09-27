@@ -146,7 +146,7 @@ int cCoveragePredict::SetCommunicationLink(	int		SiteID,
 	mkFactor=kFactor;
 	mUseClutter=UseClutter;
 
-	cout << "In cCoveragePredict::SetCommunicationLink: leaving";
+//	cout << "In cCoveragePredict::SetCommunicationLink: leaving";
 
 	return BTLkey;
 }

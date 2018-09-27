@@ -1904,7 +1904,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	mVerkeerDigt[0] = 0.0; 	 
 	for (j=1; j<=ClutterUsed.mNumber; j++)
 	{
-		if (AreaSumPerClutter[j]>0.0)
+		if ((AreaSumPerClutter[j]>0.0)&&(j<=ClutterUsed.mNumber-10))
 			mVerkeerDigt[j] = 2*(ClutterUsed.mNumber-j)*SumOfTraffic/sumOfArea/ClutterUsed.mNumber;
 		else mVerkeerDigt[j]=0.0; // The cluttertype does not occur in the area.
 	}
@@ -1930,7 +1930,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		OldCost = TrafficDensCost();
 		MinTestCost=OldCost;
 		MinIndex=0;
-		for (j=1; j<=ClutterUsed.mNumber; j++)
+		for (j=1; j<=ClutterUsed.mNumber-10; j++)
 		{
 			Delta = max(0.05*mVerkeerDigt[j],0.001*SumOfTraffic/sumOfArea);
 			mVerkeerDigt[j]+=Delta;
@@ -1953,7 +1953,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		Better = false;
 		while ((StepSize>0.001*SumOfTraffic/sumOfArea)&&(!Better))
 		{
-			for (j=1; j<=ClutterUsed.mNumber; j++)
+			for (j=1; j<=ClutterUsed.mNumber-10; j++)
 			{
 				mVerkeerDigt[j]-=dCdD[j]*StepSize/SizeOfdCdD;
 				if (mVerkeerDigt[j]<0.0)

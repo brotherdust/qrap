@@ -1774,7 +1774,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	query += " from radioinstallation_view cross join site_view_only cross join customareafilter";
 	query += " WHERE (radioinstallation_view.siteid = site_view_only.id)";
 	query += " and customareafilter.areaname ='TrafficArea' ";
-	query += "and  ST_Within(location,the_geom)";
+	query += "and ST_Within(location,the_geom)";
 
 	pqxx::result QResult;
 	string errormessage="";
@@ -1867,7 +1867,8 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 					CurrentRadInstID++;
 			}
 //			cout << "CurrentRadInstID = " << CurrentRadInstID << "	Clutter = " << ClutterRaster[i][j] << endl;
-			if (mPlot[i][j] == mFixedInsts[CurrentRadInstID].sInstKey)
+			if ((mPlot[i][j] == mFixedInsts[CurrentRadInstID].sInstKey)
+				&&((unsigned)ClutterRaster[i][j]>ClutterUsed.mNumber))
 				mClutterArea[CurrentRadInstID][(unsigned)ClutterRaster[i][j]] += PlotRes*PlotRes/1000/1000;
 			if ((0==(unsigned)ClutterRaster[i][j])||((unsigned)ClutterRaster[i][j]>ClutterUsed.mNumber))
 				cout << i << "," << j << "	";

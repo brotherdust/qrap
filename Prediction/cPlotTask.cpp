@@ -1868,7 +1868,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 			}
 //			cout << "CurrentRadInstID = " << CurrentRadInstID << "	Clutter = " << ClutterRaster[i][j] << endl;
 			if ((mPlot[i][j] == mFixedInsts[CurrentRadInstID].sInstKey)
-				&&((unsigned)ClutterRaster[i][j]>ClutterUsed.mNumber))
+				&&((unsigned)ClutterRaster[i][j]<ClutterUsed.mNumber))
 				mClutterArea[CurrentRadInstID][(unsigned)ClutterRaster[i][j]] += PlotRes*PlotRes/1000/1000;
 			if ((0==(unsigned)ClutterRaster[i][j])||((unsigned)ClutterRaster[i][j]>ClutterUsed.mNumber))
 				cout << i << "," << j << "	";

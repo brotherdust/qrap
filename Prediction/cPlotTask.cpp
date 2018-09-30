@@ -1717,21 +1717,19 @@ double cPlotTask::TrafficDensCost()
 //	cout << "In cPlotTask::TrafficDensCost(): Before Calculation" << endl;
 	for (i=0; i<mNumInstInTraffic; i++)
 	{
-//		cout << "i=" << i << "	Traffic=" << mCellTraffic[i] << endl;
 		SumPerRow=0.0;
 		for (j=1; j<=mNumClutter; j++)
 		{
 //			cout << "j=" << j << "	Digtheid=" << mVerkeerDigt[j] << endl;
-//			cout << << "i=" << i << "	j=" << j << "	Area=" << mClutterArea[i][j] << endl;
+//			cout << "i=" << i << "	j=" << j << "	Area=" << mClutterArea[i][j] << endl;
 			SumPerRow += mVerkeerDigt[j]*mClutterArea[i][j];
 		}
-//		cout<< "SumPerRow=" << SumPerRow << "	mCellTraffic[i]="<< mCellTraffic[i] <<endl;
+//		cout<< "i="<< i <<"	SumPerRow=" << SumPerRow 
+//			<< "	mCellTraffic[i]="<< mCellTraffic[i] <<endl;
 		TotalCost += (SumPerRow-mCellTraffic[i])*(SumPerRow-mCellTraffic[i]);
 	}
 //	cout << "In cPlotTask::TrafficDensCost(): After Calculation" << endl;
-	if (TotalCost>0.0)
-		TotalCost = sqrt(TotalCost);
-	else TotalCost=0.0;
+	TotalCost = sqrt(TotalCost);
 	return TotalCost;
 }
 
@@ -1743,7 +1741,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	char* temp;
 	temp = new char[33];
 	cClutter ClutterUsed(mClutterClassGroup);
-	mNumClutter = ClutterUsed.mNumber+1;
+	mNumClutter = ClutterUsed.mNumber;
 	cout << "In cPlottask::DetermineTrafficDist(). ClutterUsed.mNumber = " 
 		<< ClutterUsed.mNumber << endl;	
 	Float2DArray ClutterRaster;
@@ -1868,10 +1866,9 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 			}
 //			cout << "CurrentRadInstID = " << CurrentRadInstID << "	Clutter = " << ClutterRaster[i][j] << endl;
 			if ((mPlot[i][j] == mFixedInsts[CurrentRadInstID].sInstKey)
-				&&((unsigned)ClutterRaster[i][j]<ClutterUsed.mNumber))
+				&&((unsigned)ClutterRaster[i][j]<=ClutterUsed.mNumber))
 				mClutterArea[CurrentRadInstID][(unsigned)ClutterRaster[i][j]] += PlotRes*PlotRes/1000/1000;
-			if ((0==(unsigned)ClutterRaster[i][j])||((unsigned)ClutterRaster[i][j]>ClutterUsed.mNumber))
-				cout << i << "," << j << "	";
+//			else cout << i << "," << j << "," << mPlot[i][j] << "," << ClutterRaster[i][j] << "	";
 		}
 	}
 	cout << endl;
@@ -1908,9 +1905,29 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	VerkeerDigtVorige[0] = 0.0;
 	for (j=1; j<=ClutterUsed.mNumber; j++)
 	{
-		if ((AreaSumPerClutter[j]>0.0)&&(j<=ClutterUsed.mNumber))
+		if ((AreaSumPerClutter[j]>0.0)&&(j<=ClutterUsed.mNumber-2))
 			mVerkeerDigt[j] = SumOfTraffic/sumOfArea;
-		else mVerkeerDigt[j]=0.0; // The cluttertype does not occur in the area.
+		else
+		{
+			mVerkeerDigt[j]=0.0; // The cluttertype does not occur in the area.
+			AreaSumPerClutter[j] = 0;
+		}
+		VerkeerDigtVorige[j] = mVerkeerDigt[j];
+	}
+	
+	double SumPerRow=0, TotalCost=0;
+	for (i=0; i<mNumInstInTraffic; i++)
+	{
+		SumPerRow=0.0;
+		for (j=0; j<=mNumClutter; j++)
+		{
+			cout << "	" << i << "," << j << ",a:" << mClutterArea[i][j];
+			SumPerRow += mVerkeerDigt[j]*mClutterArea[i][j];
+		}
+		cout << endl;
+		cout<< "i="<< i <<"	SumPerRow=" << SumPerRow 
+			<< "	mCellTraffic[i]="<< mCellTraffic[i] <<endl;
+		TotalCost += (SumPerRow-mCellTraffic[i])*(SumPerRow-mCellTraffic[i]);
 	}
 
 	cout << "In cPlottask::DetermineTrafficDist(). Initialising derivatives" << endl; 
@@ -1920,14 +1937,14 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		dCdD[j] = 0.0;
 
 	double OldCost, TestCost, Delta, SumOfdCdD, SizeOfdCdD, Cost;
-	double StepSize = 0.05*SumOfTraffic/sumOfArea;
+	double StepSize = 0.01*SumOfTraffic/sumOfArea;
 	bool Stop = false, Better=false;
-	int IterLeft=100000;
+	int IterLeft=5000;
 	
 	double MinTestCost, MinDelta;
 	double MinCost = TrafficDensCost();
 	unsigned MinIndex=0;
-	cout << "In cPlottask::DetermineTrafficDist(). Starting optimisation loop " << endl; 
+	cout << "In cPlottask::DetermineTrafficDist(). Starting optimisation loop. MinCost="<< MinCost << endl; 
 	while ((!Stop)&&(IterLeft>0))
 	{
 		SumOfdCdD = 0.0;
@@ -1936,42 +1953,54 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		MinIndex=0;
 		for (j=1; j<=ClutterUsed.mNumber; j++)
 		{
-			Delta = max(0.05*mVerkeerDigt[j],0.01*SumOfTraffic/sumOfArea);
-			mVerkeerDigt[j]+=Delta;
-			TestCost = TrafficDensCost();
-			if (TestCost<MinTestCost)
+			if (AreaSumPerClutter[j]>0)
 			{
-				MinIndex=j;
-				MinTestCost=TestCost;
-				MinDelta = Delta;
+				Delta = max(0.01*mVerkeerDigt[j],0.0001*SumOfTraffic/sumOfArea);
+				mVerkeerDigt[j]+=Delta;
+				TestCost = TrafficDensCost();
+				if (TestCost<MinTestCost)
+				{
+					MinIndex=j;
+					MinTestCost=TestCost;
+					MinDelta = Delta;
+				}
+				if (fabs(Delta)>0) dCdD[j] = (TestCost - OldCost)/Delta;
+				else dCdD[j] = 0;
+				cout << j << "	TestCost=" << TestCost << "	OldCost=" << OldCost 
+					<< "	Delta= " << Delta << "	" << dCdD[j] << endl;
+//				if ((mVerkeerDigt[j]<0.0000001*SumOfTraffic/sumOfArea)&&(dCdD[j]>0))
+//					dCdD[j]=0.0;
+				SumOfdCdD += dCdD[j]*dCdD[j];
+				//return to original value
+				mVerkeerDigt[j]-=Delta;
 			}
-			dCdD[j] = (TestCost - OldCost)/Delta;
-			if ((mVerkeerDigt[j]<0.0000001*SumOfTraffic/sumOfArea)&&(dCdD[j]>0))
-				dCdD[j]=0.0;
-			SumOfdCdD += dCdD[j]*dCdD[j];
-			//return to original value
-			mVerkeerDigt[j]-=Delta;
-//			cout << j << "	" << TestCost << "	" << OldCost << "	" << dCdD[j] << endl;
 		}
 
 		SizeOfdCdD = sqrt(SumOfdCdD);
-		
-		StepSize=0.1*SumOfTraffic/sumOfArea;
-		while ((StepSize>0.0001*SumOfTraffic/sumOfArea)&&(!Better)&&(SizeOfdCdD>0))
+		cout << "SumOfdCdD = " << SumOfdCdD << endl;
+		StepSize=0.01*SumOfTraffic/sumOfArea;
+		Better = false;
+		while ((StepSize>0.001*SumOfTraffic/sumOfArea)&&(!Better)&&(SizeOfdCdD>0))
 		{
 			for (j=1; j<=ClutterUsed.mNumber; j++)
 			{
-				VerkeerDigtVorige[j] = mVerkeerDigt[j];
-				mVerkeerDigt[j]-=dCdD[j]*StepSize/SizeOfdCdD;
-				if (mVerkeerDigt[j]<0.0)
-					mVerkeerDigt[j]=0.0;
+				if (AreaSumPerClutter[j]>0)
+				{
+					VerkeerDigtVorige[j] = mVerkeerDigt[j];
+					mVerkeerDigt[j]-=dCdD[j]*StepSize/SizeOfdCdD;
+//					if (mVerkeerDigt[j]<0.0)
+//						mVerkeerDigt[j]=0.0;
+				}
 			}
 			Cost = TrafficDensCost();
 			if (Cost<OldCost)
 				Better=true;
 			else 
 			{
-				mVerkeerDigt[j] = VerkeerDigtVorige[j];
+				for (j=1; j<=ClutterUsed.mNumber; j++)
+				{
+					mVerkeerDigt[j] = VerkeerDigtVorige[j];
+				}
 				StepSize*=0.7;
 			}
 		}
@@ -1982,13 +2011,14 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 			{
 				mVerkeerDigt[MinIndex]+=MinDelta;
 				Cost = MinTestCost;
+				cout << "MinIndex=" << MinIndex << "	" << MinDelta << "	" << Cost << endl;
 			}
-			else Stop = true;	
+//			else Stop = true;	
 		}
 		if (Cost<=MinCost)
 			MinCost = Cost;
 		else Stop = true;
-		if (IterLeft%100 ==0)
+		if (IterLeft%10 ==0)
 			cout << "#"<< IterLeft<<"	Cost=" << Cost << endl;
 	}
 
@@ -2555,7 +2585,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	queryB += temp;
 	queryB += ", ";
 
-	for (m=1; m<mNumClutter+1; m++)
+	for (m=1; m<=mNumClutter; m++)
 	{	
 		query = queryB;
 		gcvt(m,8,temp);

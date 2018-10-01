@@ -1425,11 +1425,14 @@ int cGPpropModel:: mainTuning()
 	
 //	for (i=2850;i<2950/*mMeas.mNumMeas*/; i++)
 //		mMeas.mMeasPoints[i].show();
+	CostFunction(0, mCandidate[0].sMean, MeasSErr,
+				mCandidate[0].sStdDev, mCandidate[0].sCorrC, true);
+
 	//Initialise values for all seeds
 	for (i=0; i<NumSeeds; i++)
 	{
 		CostFunction(i, mCandidate[i].sMean, MeasSErr,
-					mCandidate[i].sStdDev, mCandidate[i].sCorrC, true);
+					mCandidate[i].sStdDev, mCandidate[i].sCorrC, false);
 		mCandidate[i].sFitness = FITNESS;
 		mCandidate[i].sRank = 2*(mNumCandidates-1);
 		mCandidate[i].sPareto = false;
@@ -2457,7 +2460,7 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 				while ((mMeas.mFixedInsts[FixedNum].sInstKey!=currentInst)
 					&&(FixedNum < mMeas.mFixedInsts.size()))
 					FixedNum++;
-
+/*
 				if (FixedNum == mMeas.mFixedInsts.size())
 				{
 					FixedNum=0;
@@ -2465,11 +2468,11 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 						&&(FixedNum < mMeas.mFixedInsts.size()))
 						FixedNum++;
 				}
-
+*/
 				if (FixedNum == mMeas.mFixedInsts.size())
 				{
 					cout << "FixedNum reached limit ... ending measurement analysis; Seeking FixedInst: "
-						<< mMeas.mFixedInsts[FixedNum].sInstKey		
+						<< mMeas.mFixedInsts[FixedNum].sInstKey	<< endl;	
 					return 0;
 				}
 
@@ -2596,8 +2599,8 @@ int cGPpropModel::CostFunction(unsigned CIndex, double &Mean, double &MeanSquare
 						<< "	Tree = " << tempMeas.sPathLoss 
 						<<  "	AntValue = " << AntValue << endl;
 				}
-
-*/				Error = - tempMeas.sMeasValue +tempMeas.sPredValue;
+*/
+				Error = - tempMeas.sMeasValue +tempMeas.sPredValue;
 /*				cout << "i= " << i << "	err= " << Error 
 					<< "	PL= " << tempMeas.sPathLoss
 					<< "	meas= " << tempMeas.sMeasValue << endl;

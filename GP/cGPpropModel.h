@@ -57,13 +57,15 @@
 //Affects how elitist the algorithm is ... the smaller the more elitist
 #define GAUSSDIST 2
 
-#define CONSTMUTATE 0.1
+#define CONSTMUTATE 0.15
 
 #define MAXOPTLOOPS 500
 #define MAXOPTCALC 2500
 #define MAXMINAGE 30
 
-#define FITNESS 0.5*(100*(1-mCandidate[i].sCorrC)-18) + (mCandidate[i].sStdDev-9)
+#define CLUTTER 21
+
+#define FITNESS 0.5*(100*(1-mCandidate[i].sCorrC)-17) + (mCandidate[i].sStdDev-7)
 
 //impacts on how much of the population we loose per generation
 #define UNFIT_LIMIT 200
@@ -183,13 +185,13 @@ namespace Qrap
 
 			int CostFunction(unsigned CandidateIndex, double &Mean, double &MeanSquareError,
 				double &StDev, double &CorrC, 
-				bool CalcNewObstruction=true, unsigned Clutterfilter=0);
+				bool CalcNewObstruction=true, unsigned Clutterfilter=CLUTTER);
 
 			int CostFunctionTreeOnly(unsigned CIndex, double &Mean, double &MeanSquareError,
-					double &StDev, double &CorrC, unsigned Clutterfilter=0);
+					double &StDev, double &CorrC, unsigned Clutterfilter=CLUTTER);
 
 			int AutoFix(unsigned CIndex, double &Mean, double &MeanSquareError,
-					double &StDev, double &CorrC, unsigned Clutterfilter=0);
+					double &StDev, double &CorrC, unsigned Clutterfilter=CLUTTER);
 
 			void optimiseConstants(unsigned Index);
 

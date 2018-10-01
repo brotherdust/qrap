@@ -225,7 +225,7 @@ int main (int argc, char **argv)
 	Hoek[3].Set(-26.062, 28.175);
 	Hoek[4].Set(-25.990, 28.150);
 	Hoek[5].Set(-25.965, 28.180);
-
+*/
 	//Tembisa bigger
 	NumHoek=5;	
 	Hoek = new cGeoP[NumHoek];
@@ -236,7 +236,7 @@ int main (int argc, char **argv)
 	Hoek[3].Set(-26.06, 28.113);
 	Hoek[4].Set(-26.06, 28.26);
 */
-	vPoints Punte;
+/*	vPoints Punte;
 	for (unsigned i=0; i<NumHoek; i++)
 		Punte.push_back(Hoek[i]);
 	
@@ -244,31 +244,38 @@ int main (int argc, char **argv)
 	cout << "Loading measurements ... in main()" << endl;
 	Continue = Meas.LoadMeasurements(Punte,0,0,0);
 
-/*
 	cout << "Loading measurements ... in main()" << endl;
 	char * Punte;
 	Punte= new char[23];
 	strcpy(Punte,"GautengClutterOutline");
-	Continue = Meas.LoadMeasurements(Punte,0,0,6);
-*/
+	Continue = Meas.LoadMeasurements(Punte,0,0,0);
+
 	if (!Continue)
 		return 0;
 
 	int Num;
+
+	Meas.mPathLoss.mClutter.Reset(1);
+
+	Meas.SetPlotResolution(20);
+
+	cTrainAntPattern NeuralNets;
+	double Azimuth;
 
   	query = "update qrap_config set value='false' where name = 'UseAntANN';";
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error updating qrap_config" << endl;
 	}
-
 	Meas.SetUseAntANN(false);
 
-	Meas.mPathLoss.mClutter.Reset(1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
-	Meas.SetPlotResolution(20);
+	cout<< "All" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-/*	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
+//	Meas.TempAnalysisFunction();
+//	Meas.SaveResults();
+//	return 0;
 
 	Continue = Meas.LoadMeasurements(Punte,0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
@@ -289,15 +296,21 @@ int main (int argc, char **argv)
   	query = "truncate table AntNeuralNet cascade;";
 	if (!gDb.PerformRawSql(query))
 	{
-		cout << "Error clearing coefficients" << endl;
+		cout << "Error truncating Antenna Neural Nets" << endl;
 	}
 
 	cout << "In main Loading measurements for AntANN" << endl;
 	NeuralNets.LoadMeasurements(Punte,0,1);
 
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
+	cout << "In main training nets " << endl;
+	NeuralNets.TrainANDSaveANDTest();
 
-	cout<< "All" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+	Meas.SetUseAntANN(true);
 
 	Continue = Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
@@ -320,16 +333,15 @@ int main (int argc, char **argv)
 	cout<< "Ant2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 	Meas.OptimiseHeights(0);
-	Continue = Meas.LoadMeasurements(Punte,0,0,6);
+	Continue = Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.OptimiseModelCoefAllTotal(0);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "GAll" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 	Meas.OptimiseModelCoefD(0);
-	Continue = Meas.LoadMeasurements(Punte,0,0,6);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
+	Continue = Meas.LoadMeasurements(Punte,0,0,0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "GAll" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
 
 	Continue = Meas.LoadMeasurements(Punte,0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
@@ -346,8 +358,8 @@ int main (int argc, char **argv)
 	Continue = Meas.LoadMeasurements(Punte,0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 	cout<< "AG2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-*/
-/*
+
+
 	Continue = Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.OptimiseModelCoefD(0);
 	Meas.OptimiseOffsets(0);
@@ -371,70 +383,12 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 	cout<< "AGO2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
-/*
-	if (!gDb.PerformRawSql(queryC))
+  	query = "update qrap_config set value='false' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
 	{
-		cout << "Error clearing coefficients" << endl;
+		cout << "Error updating qrap_config" << endl;
 	}
-	Meas.mPathLoss.mClutter.Reset(1);
-	Continue = Meas.LoadMeasurements(Punte,0,0,1);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
-	cout<< "Gh390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-	Meas.OptimiseModelCoefAllTotal(1);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
-	cout<< "G390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-	Meas.OptimiseModelCoefD(1);
-	Continue = Meas.LoadMeasurements(Punte,0,0,1);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
-	cout<< "D390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-//	Meas.OptimiseOffsets(1);
-//	Continue = Meas.LoadMeasurements(Punte,0,0,1);
-//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
-//	cout<< "GO390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	if (!gDb.PerformRawSql(queryC))
-	{
-		cout << "Error clearing coefficients" << endl;
-	}
-	Meas.mPathLoss.mClutter.Reset(1);
-	Continue = Meas.LoadMeasurements(Punte,0,0,2);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
-	cout<< "Gh945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-	Continue = Meas.LoadMeasurements(Punte,0,0,2);
-	Meas.OptimiseModelCoefAllTotal(2);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
-	cout<< "G945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
-	Meas.OptimiseModelCoefD(2);
-	Continue = Meas.LoadMeasurements(Punte,0,0,2);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
-	cout<< "D945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-//	Meas.OptimiseOffsets(2);
-//	Continue = Meas.LoadMeasurements(Punte,0,0,2);
-//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
-//	cout<< "GO945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-
-	if (!gDb.PerformRawSql(queryC))
-	{
-		cout << "Error clearing coefficients" << endl;
-	}
-	Meas.mPathLoss.mClutter.Reset(1);
-	Continue = Meas.LoadMeasurements(Punte,0,0,4);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
-	cout<< "Gh1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-	Continue = Meas.LoadMeasurements(Punte,0,0,4);
-	Meas.OptimiseModelCoefAllTotal(4);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
-	cout<< "G1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
-	Meas.OptimiseModelCoefD(4);
-	Continue = Meas.LoadMeasurements(Punte,0,0,4);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
-	cout<< "D1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-//	Meas.OptimiseOffsets(4);
-//	Continue = Meas.LoadMeasurements(Punte,0,0,4);
-//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
-//	cout<< "GO1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas.SetUseAntANN(false);
 
 	if (!gDb.PerformRawSql(queryC))
 	{
@@ -446,10 +400,12 @@ int main (int argc, char **argv)
 	cout<< "Gh2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 	Continue = Meas.LoadMeasurements(Punte,0,0,3);
 	Meas.OptimiseModelCoefAllTotal(3);
+	Continue = Meas.LoadMeasurements(Punte,0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 	cout<< "G2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 	Meas.OptimiseModelCoefD(3);
+
 	Continue = Meas.LoadMeasurements(Punte,0,0,3);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 	cout<< "D2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
@@ -457,6 +413,174 @@ int main (int argc, char **argv)
 //	Continue = Meas.LoadMeasurements(Punte,0,0,3);
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
 //	cout<< "GO2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	cout << "In main Loading measurements " << endl;
+	NeuralNets.LoadMeasurements(Punte,0,3);
+
+	cout << "In main training nets " << endl;
+	NeuralNets.TrainANDSaveANDTest();
+
+  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+	Meas.SetUseAntANN(true);
+
+	Continue = Meas.LoadMeasurements(Punte,0,0,3);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 3);
+	cout<< "Ant2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+
+
+  	query = "update qrap_config set value='false' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+	Meas.SetUseAntANN(false);
+
+	if (!gDb.PerformRawSql(queryC))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+	Meas.mPathLoss.mClutter.Reset(1);
+	Continue = Meas.LoadMeasurements(Punte,0,0,2);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
+	cout<< "Gh945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Continue = Meas.LoadMeasurements(Punte,0,0,2);
+	Meas.OptimiseModelCoefAllTotal(2);
+	Continue = Meas.LoadMeasurements(Punte,0,0,2);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
+	cout<< "G945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
+	Meas.OptimiseModelCoefD(2);
+	Continue = Meas.LoadMeasurements(Punte,0,0,2);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
+	cout<< "D945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+//	Meas.OptimiseOffsets(2);
+//	Continue = Meas.LoadMeasurements(Punte,0,0,2);
+//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
+
+//	cout<< "GO945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	cout << "In main Loading measurements " << endl;
+	NeuralNets.LoadMeasurements(Punte,0,2);
+
+	cout << "In main training nets " << endl;
+	NeuralNets.TrainANDSaveANDTest();
+
+  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+	Meas.SetUseAntANN(true);
+
+	Continue = Meas.LoadMeasurements(Punte,0,0,2);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
+	cout<< "Ant945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+
+
+  	query = "update qrap_config set value='false' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+	Meas.SetUseAntANN(false);
+
+	if (!gDb.PerformRawSql(queryC))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+	Meas.mPathLoss.mClutter.Reset(1);
+	Continue = Meas.LoadMeasurements(Punte,0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
+	cout<< "Gh1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Continue = Meas.LoadMeasurements(Punte,0,0,4);
+	Meas.OptimiseModelCoefAllTotal(4);
+	Continue = Meas.LoadMeasurements(Punte,0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
+	cout<< "G1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
+	Continue = Meas.LoadMeasurements(Punte,0,0,4);
+	Meas.OptimiseModelCoefD(4);
+	Continue = Meas.LoadMeasurements(Punte,0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
+	cout<< "D1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+//	Meas.OptimiseOffsets(4);
+//	Continue = Meas.LoadMeasurements(Punte,0,0,4);
+//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
+//	cout<< "GO1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	cout << "In main Loading measurements " << endl;
+	NeuralNets.LoadMeasurements(Punte,0,4);
+
+	cout << "In main training nets " << endl;
+	NeuralNets.TrainANDSaveANDTest();
+
+  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+	Meas.SetUseAntANN(true);
+
+	Continue = Meas.LoadMeasurements(Punte,0,0,4);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 4);
+	cout<< "Ant1830" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+
+  	query = "update qrap_config set value='false' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+	Meas.SetUseAntANN(false);
+
+	if (!gDb.PerformRawSql(queryC))
+	{
+		cout << "Error clearing coefficients" << endl;
+	}
+
+	Meas.mPathLoss.mClutter.Reset(1);
+//	Continue = Meas.LoadMeasurements(Punte,0,0,1);
+//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
+//	cout<< "Gh390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Continue = Meas.LoadMeasurements(Punte,0,0,1);
+	Meas.OptimiseModelCoefAllTotal(1);
+//	Continue = Meas.LoadMeasurements(Punte,0,0,1);
+//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
+//	cout<< "G390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+	Continue = Meas.LoadMeasurements(Punte,0,0,1);
+	Meas.OptimiseModelCoefD(1);
+	Continue = Meas.LoadMeasurements(Punte,0,0,1);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
+	cout<< "D390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+//	Meas.OptimiseOffsets(1);
+//	Continue = Meas.LoadMeasurements(Punte,0,0,1);
+
+//	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
+//	cout<< "GO390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+*/
+/*	cout << "In main Loading measurements " << endl;
+	NeuralNets.LoadMeasurements(Punte,0,1);
+
+	cout << "In main training nets " << endl;
+	NeuralNets.TrainANDSaveANDTest();
+
+  	query = "update qrap_config set value='true' where name = 'UseAntANN';";
+	if (!gDb.PerformRawSql(query))
+	{
+		cout << "Error updating qrap_config" << endl;
+	}
+	Meas.SetUseAntANN(true);
+	Continue = Meas.LoadMeasurements(Punte,0,0,1);
+
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
+	cout<< "Ant390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 //	Meas.SaveResults();
 
@@ -481,7 +605,7 @@ int main (int argc, char **argv)
 //	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 
 //	cout<< "Nach4" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-/*
+
 /*
 	if (!gDb.PerformRawSql(queryC))
 	{
@@ -523,6 +647,7 @@ int main (int argc, char **argv)
 //	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
 /*
 
+/*
 	cTrainAntPattern NeuralNets;
 	double Azimuth;
 
@@ -533,24 +658,24 @@ int main (int argc, char **argv)
 	}
 	
 	cout << "In main Loading measurements " << endl;
-	NeuralNets.LoadMeasurements(Punte,0,6);
+	NeuralNets.LoadMeasurements(Punte,0,0);
 
 	cout << "In main training nets " << endl;
 	NeuralNets.TrainANDSaveANDTest();
-*/
-/*
+
+
   	query = "update qrap_config set value='true' where name = 'UseAntANN';";
 	if (!gDb.PerformRawSql(query))
 	{
 		cout << "Error updating qrap_config" << endl;
 	}
 	Meas.SetUseAntANN(true);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	Continue = Meas.LoadMeasurements(Punte,0,0,0);
 
-	Continue = Meas.LoadMeasurements(Punte,0,0,6);
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 6);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "GAll" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
-*/
-/*
+
 	Continue = Meas.LoadMeasurements(Punte,0,0,1);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
 	cout<< "AG390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
@@ -568,10 +693,10 @@ int main (int argc, char **argv)
 	cout<< "AG2145" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
 /*
-	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+//	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
 //   Meas.OptimiseHeights(4);
-/*
+
 	Meas.OptimiseModelCoefAllTotal(1);
    Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
@@ -666,10 +791,10 @@ for ( i=4; i>=0; i--)
 		cout << "Error updating qrap_config" << endl;
 	}
 
-	Meas.LoadMeasurements(1,0,1);
 	Meas.SetUseAntANN(true);
+	Continue = Meas.LoadMeasurements(Punte,0,0,1);
 
-	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
+	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
 	cout<< "Result" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev << "	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 */
 /*
@@ -723,27 +848,25 @@ for ( i=4; i>=0; i--)
 	angle = 180*atan2(y,x)/PI;
 	cout << hoek << "		" << angle << endl;
 */
-
+/*
 	cout << "Voor constructor" << endl;
 	cPosEstimation Positioning;
 	cout << "Na constructor" << endl;
 
-	Positioning.SetUseAntANN(true);
-
-/* 	queryP = "truncate positionestimate cascade;";
+ 	queryP = "truncate positionestimate cascade;";
 	if (!gDb.PerformRawSql(queryP))
 	{
 		cout << "Error truncating positionestimate" << endl;
 	}
-  	queryA = "update qrap_config set value='true' where name = 'UseAntANN';";
+  	queryA = "update qrap_config set value='false' where name = 'UseAntANN';";
 	if (!gDb.PerformRawSql(queryA))
 	{
 		cout << "Error updating qrap_config" << endl;
 	}
 
 	cout << "Voor LoadMeasurements" << endl;
-	Positioning.SetUseAntANN(true);	
-	Positioning.LoadMeasurements(Punte);
+	Positioning.SetUseAntANN(false);	
+	Positioning.LoadMeasurements(Punte,2,6,1,1);
 	cout << "Na LoadMeasurements" << endl;
 
 	cout << " Clearing Punte " << endl;
@@ -754,7 +877,7 @@ for ( i=4; i>=0; i--)
 
 	cout << " Saving Results " << endl;
 	Positioning.SaveResults();
-
+*/
 /*
 	if (!gDb.PerformRawSql(query))
 	{

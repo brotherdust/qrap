@@ -45,7 +45,7 @@
 #include "../DataBase/Config.h"
 
 // local defines
-#define NUM_INIT_CANDIDATES 300
+#define NUM_INIT_CANDIDATES 500
 //#define NUM_INIT_CANDIDATES 500 //recommended in GP field guide
 #define MAX_NUM_IN_CACHE 10
 #define NUM_GENERATIONS 15 // GP field guide suggest between 10 and 50
@@ -54,8 +54,9 @@
 #define MAX_TREE_DEPTH 10 
 #define PROP_MUTATE 0.5
 #define PROP_CROSSOVER 0.5
+
 //Affects how elitist the algorithm is ... the smaller the more elitist
-#define GAUSSDIST 2
+#define GAUSSDIST 1
 
 #define CONSTMUTATE 0.15
 
@@ -63,7 +64,7 @@
 #define MAXOPTCALC 2500
 #define MAXMINAGE 30
 
-#define CLUTTER 21
+#define CLUTTER 0
 
 #define FITNESS 0.5*(100*(1-mCandidate[i].sCorrC)-17) + (mCandidate[i].sStdDev-7)
 

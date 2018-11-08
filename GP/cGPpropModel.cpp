@@ -46,8 +46,6 @@ cGPpropModel::cGPpropModel()
 //*************************************************************************
 cGPpropModel::~cGPpropModel()
 {
-	unsigned i;
-
 	mCandidate.clear();
 	mStars.clear();
 }
@@ -2067,7 +2065,7 @@ int cGPpropModel:: mainTuning()
 			{
 				IndexForClone = mNumStars;
 				while (IndexForClone>(mNumStars-1))
-					IndexForClone = (unsigned)(fabs(gGauss(gRandomGen))*GAUSSDIST*(mNumStars)));
+					IndexForClone = (unsigned)(fabs(gGauss(gRandomGen))*GAUSSDIST*mNumStars);
 				mCandidate[mNumCandidates-1-i] = mStars[IndexForClone];
 			}
 			else if (mNumCandidates-mNumToDie>1)

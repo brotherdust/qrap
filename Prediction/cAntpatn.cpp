@@ -87,9 +87,9 @@ bool cAntennaPattern:: ResetUseAntANN()
 	if (setting=="true")
 		mUseANN = true;
 	else mUseANN = false;
-	if (mUseANN)
-		cout << "cAntennaPattern::ResetUseAntANN: Using Antenna ANN " <<  endl;
-	else cout << "cAntennaPattern::ResetUseAntANN: NOT Antenna ANN " <<  endl;
+//	if (mUseANN)
+//		cout << "cAntennaPattern::ResetUseAntANN: Using Antenna ANN " <<  endl;
+//	else cout << "cAntennaPattern::ResetUseAntANN: NOT Antenna ANN " <<  endl;
 	return mUseANN;
 }/* end CAntennaPattern:: ResetUseAntANN */
 
@@ -120,9 +120,9 @@ bool cAntennaPattern::SetAntennaPattern(int Key, eAnt Type,
 		mUseANN = false;
 	else
 	{
-		if (mUseANN)
-			cout << "cAntennaPattern::SetAntennaPattern Using Antenna ANN " <<  endl;
-		else cout << "cAntennaPattern::SetAntennaPattern: NOT Antenna ANN " <<  endl;
+//		if (mUseANN)
+//			cout << "cAntennaPattern::SetAntennaPattern Using Antenna ANN " <<  endl;
+//		else cout << "cAntennaPattern::SetAntennaPattern: NOT Antenna ANN " <<  endl;
 	}
 
 	pqxx::result r;

@@ -5140,7 +5140,7 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 	else 
 	{
 		double random = gUni(gRandomGen);
-		double mutateProp = min(0.5, fabs(random)*(1-mMinFitness/mCandidate[Index].sFitness));
+		double mutateProp = min(0.5, (1-mMinFitness/mCandidate[Index].sFitness));
 		dice = dice%2;
 		switch (dice)
 		{	

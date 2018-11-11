@@ -154,19 +154,20 @@ int cGPpropModel:: mainTuning()
 	// Basic free space plus obstruction loss (Q-Rap basic model)
 	// # 0
 	newTree = new Add(4);
+	newTree = new Add(2);
 	newTree->mChild[0] = new ConstNode(32.45);
 	newTree->mChild[1] = new Multiply();
 	newTree->mChild[1]->mChild[0] = new ConstNode(20.0);
 	newTree->mChild[1]->mChild[1] = new Log10Node();
-	newTree->mChild[1]->mChild[1]->mChild[0] = new FrequencyNode();
-	newTree->mChild[2] = new Multiply();
+	newTree->mChild[1]->mChild[1]->mChild[0] = new DistanceNode();
+/*	newTree->mChild[2] = new Multiply();
 	newTree->mChild[2]->mChild[0] = new ConstNode(20.0);
 	newTree->mChild[2]->mChild[1] = new Log10Node();
-	newTree->mChild[2]->mChild[1]->mChild[0] = new DistanceNode();
+	newTree->mChild[2]->mChild[1]->mChild[0] = new FrequencyNode();
 	newTree->mChild[3] = new Multiply();
 	newTree->mChild[3]->mChild[0] = new ConstNode(1.0);
 	newTree->mChild[3]->mChild[1] = new ObstructionNode();
-
+*/
 	newCandidate.sTree = newTree;
 	newCandidate.sDepth = 3;
 	newCandidate.sForm = 0;
@@ -5074,7 +5075,7 @@ void cGPpropModel::mutateThread(unsigned Begin, unsigned Skip)
 		mutateCandidate(i,false);
 //		growProp = fabs(gUni(gRandomGen))*(1-mMinFitness/mCandidate[i].sFitness);
 //		mutateCandidate(i,(growProp>0.5));
-		CrossOverProp = CROSSOVERSCALE*fabs(gUni(gRandomGen))*(1-mMinFitness/mCandidate[i].sFitness);
+		CrossOverProp = CROSSOVERCONST*fabs(gUni(gRandomGen))*(1-mMinFitness/mCandidate[i].sFitness);
 		if ((mNumStars>1)&&(CrossOverProp>1))
 		{
 			IndexForCrossOver = mNumStars;

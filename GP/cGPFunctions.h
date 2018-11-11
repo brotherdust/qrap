@@ -44,7 +44,7 @@ public:
 	GOftn();
 	~GOftn();
 	virtual tMeasPoint eval(tMeasPoint inPoint) = 0;  //setting the 0 makes it a PURE
-	tMeasPoint evalfix(tMeasPoint inPoint);
+	virtual tMeasPoint evalfix(tMeasPoint inPoint) = 0;
 	virtual GOftn* clone() = 0; //make a deep copy of the current tree
 	void mutate(double Scale); //used in mutating constants
 	void setValue(double newValue); //used in tuning constants

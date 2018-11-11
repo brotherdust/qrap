@@ -53,7 +53,7 @@
 
 #define MAX_TREE_DEPTH 10 
 #define PROP_MUTATE 0.5
-#define PROP_CROSSOVER 0.5
+#define CROSSOVERSCALE 4 // impacts on how often cross over takes place individuals taking part in a cross over
 
 //Affects how elitist the algorithm is ... the smaller the more elitist
 #define GAUSSDIST 1

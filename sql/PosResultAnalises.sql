@@ -133,4 +133,39 @@ from results
 group by positionsource
 order by positionsource
 
+update qrap_config set value=false where name='UseAntANN';
 
+update qrap_config set value=20 where name='PlotResolution';
+
+select distinct ci,ri from (
+select ci, ST_AsText(site.location) as siteLocation, radioinstallation.txantennaheight as height, 
+radioinstallation.txpower as txpwr,  radioinstallation.txlosses as txlosses, radioinstallation.id as ri, 
+txantpatternkey, txbearing, txmechtilt, tp, ST_AsText(testpoint.location) as measLocation, measvalue, frequency 
+from measurement cross join testpoint cross join cell cross join radioinstallation  cross join site cross join technology  
+cross join customareafilter 
+where tp=testpoint.id  and ci = cell.id and risector = radioinstallation.id and siteid = site.id 
+and areaname = 'TrafficArea' and techkey = technology.id  and testpoint.positionsource < 2  
+and ST_within(testpoint.location, the_geom)  and ST_within(site.location, the_geom) order by ci, tp) as binne;
+
+select distinct ci,ri from (
+select ci, ST_AsText(site.location) as siteLocation, radioinstallation.txantennaheight as height, 
+radioinstallation.txpower as txpwr,  radioinstallation.txlosses as txlosses, radioinstallation.id as ri, 
+txantpatternkey, txbearing, txmechtilt, tp, ST_AsText(testpoint.location) as measLocation, measvalue, frequency 
+from measurement cross join testpoint cross join cell cross join radioinstallation  cross join site cross join technology  
+cross join customareafilter where tp=testpoint.id  and ci = cell.id and risector = radioinstallation.id and siteid = site.id  
+and risector in (select radid from antneuralnet) 
+and areaname = 'TrafficArea' and techkey = technology.id  and testpoint.positionsource < 2  
+and ST_within(testpoint.location, the_geom)  and ST_within(site.location, the_geom) order by ci, tp) as binne;
+
+delete from measurement where ci not in
+(select cell.id 
+from cell cross join radioinstallation cross join site 
+where risector=radioinstallation.id
+and siteid=site.id
+and  location @ ST_GeomFromText('POLYGON((27.9750 -26.0350,
+28.0750 -26.0350,
+28.0750 -26.109,
+27.9750 -26.109,
+27.9750 -26.0350))',4326));
+
+update qrap_config set value=20 where name='PlotResolution';

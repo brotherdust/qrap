@@ -62,6 +62,7 @@ class DistanceNode : public GOftn
 public:
 	DistanceNode();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	DistanceNode* clone();
 };
 
@@ -72,6 +73,7 @@ class FrequencyNode : public GOftn
 public:
 	FrequencyNode();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	FrequencyNode* clone();
 };
 
@@ -82,6 +84,7 @@ class TxHeightNode : public GOftn
 public:
 	TxHeightNode();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	TxHeightNode* clone();
 };
 
@@ -92,6 +95,7 @@ class RxHeightNode : public GOftn
 public:
 	RxHeightNode();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	RxHeightNode* clone();
 };
 
@@ -102,6 +106,7 @@ class ObstructionNode : public GOftn
 public:
 	ObstructionNode();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	ObstructionNode* clone();
 };
 
@@ -112,6 +117,7 @@ class  ClutterTypeNode : public GOftn
 public:
 	ClutterTypeNode();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	ClutterTypeNode* clone();
 };
 
@@ -122,6 +128,7 @@ class  ClutterHeightNode : public GOftn
 public:
 	ClutterHeightNode();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	ClutterHeightNode* clone();
 };
 
@@ -132,6 +139,7 @@ class  ClutterDepthNode : public GOftn
 public:
 	ClutterDepthNode();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	ClutterDepthNode* clone();
 };
 
@@ -142,6 +150,7 @@ class Add : public GOftn
 public:
 	Add(unsigned NumChildren=2);
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	Add* clone();
 };
 
@@ -152,6 +161,7 @@ class Subtract : public GOftn
 public:
 	Subtract();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	Subtract* clone();
 };
 
@@ -235,6 +245,7 @@ public:
 	void setValue(double newValue);
 	double getValue();
 	tMeasPoint eval(tMeasPoint inPoint);
+	tMeasPoint evalfix(tMeasPoint inPoint);
 	ConstNode* clone();
 };
 

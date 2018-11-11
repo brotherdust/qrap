@@ -1905,7 +1905,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 	VerkeerDigtVorige[0] = 0.0;
 	for (j=1; j<=ClutterUsed.mNumber; j++)
 	{
-		if ((AreaSumPerClutter[j]>0.0)&&(j<=ClutterUsed.mNumber-2))
+		if ((AreaSumPerClutter[j]>0.0)&&(j<=ClutterUsed.mNumber-3))
 			mVerkeerDigt[j] = SumOfTraffic/sumOfArea;
 		else
 		{
@@ -1966,10 +1966,10 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 				}
 				if (fabs(Delta)>0) dCdD[j] = (TestCost - OldCost)/Delta;
 				else dCdD[j] = 0;
-				cout << j << "	TestCost=" << TestCost << "	OldCost=" << OldCost 
-					<< "	Delta= " << Delta << "	" << dCdD[j] << endl;
-//				if ((mVerkeerDigt[j]<0.0000001*SumOfTraffic/sumOfArea)&&(dCdD[j]>0))
-//					dCdD[j]=0.0;
+//				cout << j << "	TestCost=" << TestCost << "	OldCost=" << OldCost 
+//					<< "	Delta= " << Delta << "	" << dCdD[j] << endl;
+				if ((mVerkeerDigt[j]<0.0000001*SumOfTraffic/sumOfArea)&&(dCdD[j]>0))
+					dCdD[j]=0.0;
 				SumOfdCdD += dCdD[j]*dCdD[j];
 				//return to original value
 				mVerkeerDigt[j]-=Delta;
@@ -1977,7 +1977,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 		}
 
 		SizeOfdCdD = sqrt(SumOfdCdD);
-		cout << "SumOfdCdD = " << SumOfdCdD << endl;
+//		cout << "SumOfdCdD = " << SumOfdCdD << endl;
 		StepSize=0.01*SumOfTraffic/sumOfArea;
 		Better = false;
 		while ((StepSize>0.001*SumOfTraffic/sumOfArea)&&(!Better)&&(SizeOfdCdD>0))
@@ -1988,8 +1988,8 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 				{
 					VerkeerDigtVorige[j] = mVerkeerDigt[j];
 					mVerkeerDigt[j]-=dCdD[j]*StepSize/SizeOfdCdD;
-//					if (mVerkeerDigt[j]<0.0)
-//						mVerkeerDigt[j]=0.0;
+					if (mVerkeerDigt[j]<0.0)
+						mVerkeerDigt[j]=0.0;
 				}
 			}
 			Cost = TrafficDensCost();
@@ -2019,7 +2019,7 @@ bool cPlotTask::DetermineTrafficDist(bool Packet)
 			MinCost = Cost;
 		else Stop = true;
 		if (IterLeft%10 ==0)
-			cout << "#"<< IterLeft<<"	Cost=" << Cost << endl;
+			cout << "#"<< IterLeft<<"	Cost=" << Cost << "	SumOfdCdD = " << SumOfdCdD << endl;
 	}
 
 	cout << "Results of Gradient Search" << endl;
@@ -2660,10 +2660,10 @@ bool cPlotTask::GetDBinfo()
 		query += "rxantpatternkey,rxbearing,rxmechtilt,rxlosses,rxsensitivity,rxantennaheight, ";
 		query += "btlfreq, spacing, bandwidth, downlink, uplink, ";
 		query += "sum(cstraffic) as cstraffic, sum(pstraffic) as pstraffic, techkey ";
-		query += "FROM radioinstallation LEFT OUTER JOIN cell on (radioinstallation.id=risector) ";
-		query += "CROSS JOIN technology CROSS JOIN site ";
-		query += "WHERE techkey=technology.id and siteid=site.id ";
-		query += " and radioinstallation.id ="; 
+		query += "FROM radioinstallation_view LEFT OUTER JOIN cell on (radioinstallation_view.id=risector) ";
+		query += "CROSS JOIN technology CROSS JOIN site_view ";
+		query += "WHERE techkey=technology.id and siteid=site_view.id ";
+		query += " and radioinstallation_view.id ="; 
 		query += temp;
 		query += " group by siteid, location, eirp, txlosses, rxlosses,";
 		query += "txantpatternkey, txbearing, txmechtilt, ";

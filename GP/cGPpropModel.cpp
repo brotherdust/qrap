@@ -5074,7 +5074,7 @@ void cGPpropModel::mutateThread(unsigned Begin, unsigned Skip)
 		mutateCandidate(i,false);
 //		growProp = fabs(gUni(gRandomGen))*(1-mMinFitness/mCandidate[i].sFitness);
 //		mutateCandidate(i,(growProp>0.5));
-		CrossOverProp = fabs(gUni(gRandomGen))*(1-mMinFitness/mCandidate[i].sFitness);
+		CrossOverProp = CROSSOVERSCALE*fabs(gUni(gRandomGen))*(1-mMinFitness/mCandidate[i].sFitness);
 		if ((mNumStars>1)&&(CrossOverProp>1))
 		{
 			IndexForCrossOver = mNumStars;

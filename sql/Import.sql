@@ -1761,7 +1761,7 @@ where sq%7=0)
 
 drop table trainGSMseperate;
 
-create table train
+create table test
 (tp bigint,
 servci integer,
 ta smallint,
@@ -1837,3 +1837,5 @@ select imei, count(*) as num
 from tptempmeas6GSM cross join tpused 
 where tp=id
 group by imei;
+
+INSERT into NeuralNet (id, Lastmodified, machineid, type, siteid, MaxDist, numInputs, numOutputs, filename) Values (0,now(),1,1,370,1447.19,98,2,'/home/maggie/qrap/Data/Output/370_1.ann');

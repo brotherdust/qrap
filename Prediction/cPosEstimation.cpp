@@ -1994,9 +1994,9 @@ bool cPosEstimation::SetSearchBoundaries()
 	cout << "mPosSets[mCurPosI].sMeasurements[0].sBeamWidth = " << mPosSets[mCurPosI].sMeasurements[0].sBeamWidth << endl;
 
 	mPhi_min = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
- 		- (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/2);
+ 		- (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth);
 	mPhi_max = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
-		+ (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth/2);	
+		+ (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth);	
 	mPhi_min_back = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
 			- (ceil)(mPosSets[mCurPosI].sMeasurements[0].sBeamWidth);
 	mPhi_max_back = mPosSets[mCurPosI].sMeasurements[0].sAzimuth
@@ -2850,8 +2850,8 @@ int cPosEstimation::SaveResults()
 	string queryM = "INSERT into testpoint (id, originaltp, positionsource, location) Values (";
 	string queryP = "INSERT into PositionEstimate (id, tp, azimuth, distance, error) Values (";
 
-//	for (i=0; i<mNumPoints; i++)
-	for (i=4700; i<mNumPoints; i++)
+	for (i=0; i<mNumPoints; i++)
+//	for (i=4700; i<mNumPoints; i++)
 	{
 
 		if (mPosSets[i].sTestPoints.size()>0)

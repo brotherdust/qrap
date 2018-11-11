@@ -377,6 +377,9 @@ bool cTrainAntPattern::LoadMeasurements(char*  CustomAreaName,
 	query += "cross join customareafilter ";
 	query += "where tp=testpoint.id  and ci = cell.id ";
 	query += "and risector = radioinstallation.id and siteid = site.id ";
+//	Temp, take out	
+	query += " and risector not in (select radid from antneuralnet) ";
+//	end: Temp take out
 	query += "and areaname = '";
  	query += CustomAreaName;
 	query += "' ";
@@ -580,8 +583,8 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 	mMAXANNOutput = 0;
 	unsigned kmin=0;
 
-//	for (i=0; i<mNumCells; i++) // this should be in
-	for (i=21; i<22; i++) // for debugging purposes
+	for (i=0; i<mNumCells; i++) // this should be in
+//	for (i=21; i<22; i++) // for debugging purposes
 	{
 
 		mCells[i].sNumOutputs = 1;

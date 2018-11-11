@@ -90,7 +90,9 @@ void GOftn::setValue(double newValue)
 //*****************************************************************************
 double GOftn::getValue() 
 {
-	return mConstVal;
+	if (mIsConstant)
+		return mConstVal;
+	else return 0;
 }
 
 //****************************************************************************
@@ -103,12 +105,6 @@ void GOftn::mutate(double Scale)
 	mLabel = str;
 	delete [] str;
 	mIsConstant = true;
-}
-
-//*****************************************************************************
-tMeasPoint GOftn::evalfix(tMeasPoint inPoint)
-{
-	return eval(inPoint);
 }
 
 //******************************************************************************
@@ -204,6 +200,12 @@ tMeasPoint DistanceNode::eval(tMeasPoint inPoint)
 	return outPoint;
 }
 
+//********************************************************************
+tMeasPoint DistanceNode::evalfix(tMeasPoint inPoint)
+{
+	return eval(inPoint);
+}
+
 //*************************************************************************
 DistanceNode* DistanceNode::clone()
 {
@@ -232,6 +234,12 @@ tMeasPoint FrequencyNode::eval(tMeasPoint inPoint)
 	outPoint.sReturn = inPoint.sFrequency;
 //	cout << mLabel << outPoint.sReturn <<"  "<<endl;
 	return outPoint;
+}
+
+//********************************************************************
+tMeasPoint FrequencyNode::evalfix(tMeasPoint inPoint)
+{
+	return eval(inPoint);
 }
 
 //*************************************************************************
@@ -264,6 +272,12 @@ tMeasPoint TxHeightNode::eval(tMeasPoint inPoint)
 	return outPoint;
 }
 
+//********************************************************************
+tMeasPoint TxHeightNode::evalfix(tMeasPoint inPoint)
+{
+	return eval(inPoint);
+}
+
 //*************************************************************************
 TxHeightNode* TxHeightNode::clone()
 {
@@ -292,6 +306,12 @@ tMeasPoint RxHeightNode::eval(tMeasPoint inPoint)
 	outPoint.sReturn = inPoint.sRxHeight;
 //	cout << mLabel << outPoint.sReturn<<"  "<<endl;
 	return outPoint;
+}
+
+//********************************************************************
+tMeasPoint RxHeightNode::evalfix(tMeasPoint inPoint)
+{
+	return eval(inPoint);
 }
 
 //*************************************************************************
@@ -324,6 +344,12 @@ tMeasPoint ObstructionNode::eval(tMeasPoint inPoint)
 	return outPoint;
 }
 
+//********************************************************************
+tMeasPoint ObstructionNode::evalfix(tMeasPoint inPoint)
+{
+	return eval(inPoint);
+}
+
 //*************************************************************************
 ObstructionNode* ObstructionNode::clone()
 {
@@ -352,6 +378,12 @@ tMeasPoint ClutterTypeNode::eval(tMeasPoint inPoint)
 	outPoint.sReturn = inPoint.sClutter;
 //	cout << mLabel << outPoint.sReturn <<"  "<<endl;
 	return outPoint;
+}
+
+//********************************************************************
+tMeasPoint ClutterTypeNode::evalfix(tMeasPoint inPoint)
+{
+	return eval(inPoint);
 }
 
 //*************************************************************************
@@ -384,6 +416,12 @@ tMeasPoint ClutterHeightNode::eval(tMeasPoint inPoint)
 	return outPoint;
 }
 
+//********************************************************************
+tMeasPoint ClutterHeightNode::evalfix(tMeasPoint inPoint)
+{
+	return eval(inPoint);
+}
+
 //*************************************************************************
 ClutterHeightNode* ClutterHeightNode::clone()
 {
@@ -413,6 +451,12 @@ tMeasPoint ClutterDepthNode::eval(tMeasPoint inPoint)
 	outPoint.sReturn = inPoint.sClutterDistance;
 //	cout << mLabel << outPoint.sReturn <<"  "<<endl;
 	return outPoint;
+}
+
+//********************************************************************
+tMeasPoint ClutterDepthNode::evalfix(tMeasPoint inPoint)
+{
+	return eval(inPoint);
 }
 
 //*************************************************************************
@@ -498,6 +542,15 @@ tMeasPoint ConstNode::eval(tMeasPoint inPoint)
 	return outPoint;
 }
 
+//***************************************************************************
+tMeasPoint ConstNode::evalfix(tMeasPoint inPoint)
+{
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = mConstVal;
+//	cout << mLabel << "  " << outPoint.sReturn <<endl;
+	return outPoint;
+}
+
 //**************************************************************************
 ConstNode* ConstNode::clone()
 {
@@ -548,6 +601,12 @@ tMeasPoint Add::eval(tMeasPoint inPoint)
 	return outPoint;
 }
 
+//********************************************************************
+tMeasPoint Add::evalfix(tMeasPoint inPoint)
+{
+	return eval(inPoint);
+}
+
 //***********************************************************************
 Add* Add::clone()
 {
@@ -592,6 +651,12 @@ tMeasPoint Subtract::eval(tMeasPoint inPoint)
 	}
 //	cout << "	" << mLabel << outPoint.sReturn<<"  "<<endl;
 	return outPoint;
+}
+
+//********************************************************************
+tMeasPoint Subtract::evalfix(tMeasPoint inPoint)
+{
+	return eval(inPoint);
 }
 
 //***********************************************************************

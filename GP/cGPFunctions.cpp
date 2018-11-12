@@ -203,7 +203,10 @@ tMeasPoint DistanceNode::eval(tMeasPoint inPoint)
 //********************************************************************
 tMeasPoint DistanceNode::evalfix(tMeasPoint inPoint)
 {
-	return eval(inPoint);
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sDistance/1000;
+//	cout << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
 }
 
 //*************************************************************************
@@ -239,7 +242,10 @@ tMeasPoint FrequencyNode::eval(tMeasPoint inPoint)
 //********************************************************************
 tMeasPoint FrequencyNode::evalfix(tMeasPoint inPoint)
 {
-	return eval(inPoint);
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sFrequency;
+//	cout << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
 }
 
 //*************************************************************************
@@ -275,7 +281,10 @@ tMeasPoint TxHeightNode::eval(tMeasPoint inPoint)
 //********************************************************************
 tMeasPoint TxHeightNode::evalfix(tMeasPoint inPoint)
 {
-	return eval(inPoint);
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sTxHeight;
+//	cout << mLabel << outPoint.sReturn<<"  "<<endl;
+	return outPoint;
 }
 
 //*************************************************************************
@@ -311,7 +320,10 @@ tMeasPoint RxHeightNode::eval(tMeasPoint inPoint)
 //********************************************************************
 tMeasPoint RxHeightNode::evalfix(tMeasPoint inPoint)
 {
-	return eval(inPoint);
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sRxHeight;
+//	cout << mLabel << outPoint.sReturn<<"  "<<endl;
+	return outPoint;
 }
 
 //*************************************************************************
@@ -347,7 +359,10 @@ tMeasPoint ObstructionNode::eval(tMeasPoint inPoint)
 //********************************************************************
 tMeasPoint ObstructionNode::evalfix(tMeasPoint inPoint)
 {
-	return eval(inPoint);
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sDiffLoss;
+//	cout << mLabel << outPoint.sReturn <<"  "<< endl;
+	return outPoint;
 }
 
 //*************************************************************************
@@ -383,7 +398,10 @@ tMeasPoint ClutterTypeNode::eval(tMeasPoint inPoint)
 //********************************************************************
 tMeasPoint ClutterTypeNode::evalfix(tMeasPoint inPoint)
 {
-	return eval(inPoint);
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sClutter;
+//	cout << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
 }
 
 //*************************************************************************
@@ -419,7 +437,10 @@ tMeasPoint ClutterHeightNode::eval(tMeasPoint inPoint)
 //********************************************************************
 tMeasPoint ClutterHeightNode::evalfix(tMeasPoint inPoint)
 {
-	return eval(inPoint);
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sClutterHeight;
+//	cout << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
 }
 
 //*************************************************************************
@@ -456,7 +477,10 @@ tMeasPoint ClutterDepthNode::eval(tMeasPoint inPoint)
 //********************************************************************
 tMeasPoint ClutterDepthNode::evalfix(tMeasPoint inPoint)
 {
-	return eval(inPoint);
+	tMeasPoint outPoint = inPoint;
+	outPoint.sReturn = inPoint.sClutterDistance;
+//	cout << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
 }
 
 //*************************************************************************
@@ -604,7 +628,29 @@ tMeasPoint Add::eval(tMeasPoint inPoint)
 //********************************************************************
 tMeasPoint Add::evalfix(tMeasPoint inPoint)
 {
-	return eval(inPoint);
+	tMeasPoint outPoint = inPoint;
+	tMeasPoint CValue;
+	unsigned i, NumChildren = 0;
+	double Sum = 0;
+	for(i=0; i<mNumChildren; i++)
+	{
+		if (mChild[i])
+		{
+			NumChildren++;
+			CValue = mChild[i]->evalfix(inPoint);
+			Sum+=CValue.sReturn;
+		}
+		else 
+		{
+			cerr << "not all inputs define in Add"<<endl;
+			mNumChildren=NumChildren;
+			outPoint.sReturn = -200.0;
+			return outPoint;
+		}
+	}
+	outPoint.sReturn = Sum;
+//	cout << "	" << mLabel << outPoint.sReturn <<"  "<<endl;
+	return outPoint;
 }
 
 //***********************************************************************
@@ -656,7 +702,22 @@ tMeasPoint Subtract::eval(tMeasPoint inPoint)
 //********************************************************************
 tMeasPoint Subtract::evalfix(tMeasPoint inPoint)
 {
-	return eval(inPoint);
+	tMeasPoint outPoint = inPoint;
+	tMeasPoint c1, c2;
+	if (mChild[0] && mChild[1])
+	{
+		c1 = mChild[0]->evalfix(inPoint);
+		c2 = mChild[1]->evalfix(inPoint);
+		outPoint.sReturn = c1.sReturn - c2.sReturn;
+		if (outPoint.sReturn<0) outPoint.sReturn=1e-10;
+	}
+	else 
+	{
+		cerr << "left and right not defined in Subtract"<<endl;
+		outPoint.sReturn = -200.0;
+	}
+//	cout << "	" << mLabel << outPoint.sReturn<<"  "<<endl;
+	return outPoint;
 }
 
 //***********************************************************************
@@ -718,17 +779,19 @@ tMeasPoint Multiply::evalfix(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	tMeasPoint CValue;
-	unsigned i, NumChildren = 0;
+	unsigned i, NumChildren = 0, count = 0;
 	double Product = 1;
+	
 	for(i=0; i<mNumChildren; i++)
 	{
 		if (mChild[i])
 		{
-			CValue = mChild[i]->eval(inPoint);
-			while((log10(fabs(CValue.sReturn)))>(log(DBL_MAX)/mNumChildren))
+			CValue = mChild[i]->evalfix(inPoint);
+			while((log10(fabs(CValue.sReturn)))>(log(DBL_MAX)/mNumChildren)&&count<10)
 			{
 				mChild[1] = getNewNode();
 				CValue = mChild[1]->evalfix(inPoint);
+				count++;
 			}
 			NumChildren++;
 			Product*=CValue.sReturn;
@@ -804,14 +867,16 @@ tMeasPoint Divide::evalfix(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	tMeasPoint c1, c2;
+	unsigned count = 0;
 	if (mChild[0] && mChild[1])
 	{
 		c1 = mChild[0]->evalfix(outPoint);
 		c2 = mChild[1]->evalfix(outPoint);
-		while (fabs(c2.sReturn)<1e-10)
+		while ((fabs(c2.sReturn)<1e-6)&&(count<10))
 		{
 			mChild[1] = getNewNode();
 			c2 = mChild[1]->evalfix(inPoint);
+			count++;
 		}
 		outPoint.sReturn = c1.sReturn/c2.sReturn;
 	}
@@ -887,15 +952,17 @@ tMeasPoint Log10Node::evalfix(tMeasPoint inPoint)
 	tMeasPoint outPoint = inPoint;
 	tMeasPoint c1;
 	double argument;
+	unsigned count = 0;
 	if (mChild[0])
 	{
 		c1 = mChild[0]->evalfix(inPoint);
 		argument = c1.sReturn;
-		while (argument<1e-10)
+		while ((argument<1e-6)&&(count<10))
 		{
 			mChild[0] = getNewNode();
 			c1 = mChild[0]->evalfix(inPoint);
 			argument = c1.sReturn;
+			count++;
 		}
 		outPoint.sReturn = log10(argument);
 	}
@@ -957,13 +1024,15 @@ tMeasPoint Exponent::evalfix(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	tMeasPoint c1;
+	unsigned count = 0;
 	c1 = mChild[0]->evalfix(inPoint);
 	if (mChild[0])
 	{
-		while (c1.sReturn>709)
+		while ((c1.sReturn>709)&&(count<10))
 		{
 			mChild[0] = getNewNode();
 			c1 = mChild[0]->evalfix(inPoint);
+			count++;
 		}
 		outPoint.sReturn = exp(c1.sReturn);
 	}
@@ -1025,13 +1094,15 @@ tMeasPoint Square::evalfix(tMeasPoint inPoint)
 {
 	tMeasPoint outPoint = inPoint;
 	tMeasPoint c1;
+	unsigned count = 0;
 	if (mChild[0])
 	{
-		c1 = mChild[0]->eval(inPoint);
-		while (fabs(log10(fabs(c1.sReturn)))>151)
+		c1 = mChild[0]->evalfix(inPoint);
+		while ((fabs(log10(fabs(c1.sReturn)))>151)&&(count<10))
 		{
 			mChild[0] = getNewNode();
 			c1 = mChild[0]->evalfix(inPoint);
+			count++;
 		}	
 		outPoint.sReturn = c1.sReturn*c1.sReturn;
 	}
@@ -1132,6 +1203,7 @@ tMeasPoint Power::evalfix(tMeasPoint inPoint)
 	double returnval = 1;
 	tMeasPoint outPoint = inPoint;
 	tMeasPoint c1, c2;
+	unsigned count = 0;
 	if (mChild[0] && mChild[1])
 	{
 		c1 = mChild[0]->evalfix(inPoint);
@@ -1157,21 +1229,24 @@ tMeasPoint Power::evalfix(tMeasPoint inPoint)
 			returnval = 1.0/returnval;
 			outPoint.sReturn = returnval;	
 		}
-		else if ((fabs(c1.sReturn)<1e-10)&&(c2.sReturn>0))
+		else if ((fabs(c1.sReturn)<1e-6)&&(c2.sReturn>0))
 		{
 			outPoint.sReturn = 0.0;
 		}
 		else
 		{
-			while (c1.sReturn<0.0)
+			while ((c1.sReturn<0.0)&&(count<10))
 			{
 				mChild[0] = getNewNode();
 				c1 = mChild[0]->evalfix(inPoint);
+				count++;
 			}
-			while (fabs(c2.sReturn)>100)
+			count=0;
+			while ((fabs(c2.sReturn)>100)&&(count<10))
 			{
 				mChild[1] = getNewNode();
 				c2 = mChild[1]->evalfix(inPoint);
+				count ++;
 			}
 			outPoint.sReturn = pow(c1.sReturn, c2.sReturn);
 		} 

@@ -1853,6 +1853,8 @@ int cGPpropModel:: mainTuning()
 			<< "	Depth=" << mCandidate[i].sDepth << endl;
 		AutoFix(i, mCandidate[i].sMean, MSE,
 			 mCandidate[i].sStdDev, mCandidate[i].sCorrC);
+		mCandidate[i].sConstants.clear();
+		mCandidate[i].sTree->getConstants(mCandidate[i].sConstants);
 		cout << "# = " << mCandidate[i].sNumber << "	Rank=" << mCandidate[i].sRank
 			<< "	Fitness=" << mCandidate[i].sFitness				
 			<<"	CorrC=" << mCandidate[i].sCorrC << "	StDev=" << mCandidate[i].sStdDev
@@ -5085,6 +5087,8 @@ void cGPpropModel::mutateThread(unsigned Begin, unsigned Skip)
 			{
 				AutoFix(i, mCandidate[i].sMean, MSE,
 					 mCandidate[i].sStdDev, mCandidate[i].sCorrC); 
+				mCandidate[i].sConstants.clear();
+				mCandidate[i].sTree->getConstants(mCandidate[i].sConstants);
 			}
 		}
 

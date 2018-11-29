@@ -27,16 +27,12 @@
 #define cTrainAntPattern_h 1
 
 #define MOBILEHEIGHT 1
-#define AntFileInt 1 // the interval in degrees of samples that are included for the training from the supplied antenna file.
-#define SUB 5 // every SUB sample will be used as a test point
+#define AntFileInt	2 // the interval in degrees of samples that are included for the training from the supplied antenna file.
+#define SUB 10 // every SUB sample will be used as a test point
 // ANTSCALE is #defined in DataBase/Config.h
-#define antMAXepoch 500000
-#define antREPORTInt 1000
+#define antMAXepoch 200000
+#define antREPORTInt 20000
 #define antERROR 1e-6
-#define antTERROR (0.00015/5000)
-#define NUMLAYERS 1 //Number of Hidden layers. can only assume 1 or 2 
-#define HIDDEN1 10
-#define HIDDEN2 3 // Not used if NUMLAYERS is 1
 
 // include local headers
 #include "../DataBase/Config.h"
@@ -64,8 +60,8 @@ struct tMeasNNAnt
 	unsigned	sOriginalTP;
 	cGeoP		sLocation;
 	unsigned	sCellID;
-	float		sFrequency;
-	float 		sMeasValue;
+	float			sFrequency;
+	float 			sMeasValue;
 };
 
 typedef	vector<tMeasNNAnt> vMeasNNAnt;
@@ -77,18 +73,18 @@ struct tCellAnt
 	double			sTxPwr;
 	double			sTxSysLoss;
 	cGeoP			sPosition;
-	float			sHeight;
-	int			sAntPatternKey;
+	float				sHeight;
+	int					sAntPatternKey;
 	double			sBearing;
 	double			sTilt;
 	unsigned		sNumInputs;
-	unsigned		sNumOutputs; 
-	unsigned   		sNumTrain;
+	unsigned		sNumOutputs;
+	unsigned   	sNumTrain;
 	unsigned		sNumTest;
 	double			sMean;
 	double			sMin;			// Actually the value at maximum gain
 	double**		sInputTrain;
-	double**		sOutputTrain;		// Represents the total effect of the antenna including the gain
+	double**		sOutputTrain;
 	double**		sInputTest;
 	double**		sOutputTest;
 	vMeasNNAnt		sMeasTrain;
@@ -112,12 +108,6 @@ class cTrainAntPattern
 
 
 	bool LoadMeasurements(vPoints Points,
-				unsigned MeasType=0, 
-				unsigned MeasSource=0,
-				unsigned PosSource=0,
-				unsigned Technology=0);
-
-	bool LoadMeasurements(char*  CustomAreaName,
 				unsigned MeasType=0, 
 				unsigned MeasSource=0,
 				unsigned PosSource=0,

@@ -207,7 +207,7 @@ int main (int argc, char **argv)
 	Hoek[2].Set(-29.99, 25.01);
 	Hoek[3].Set(-25.01, 25.01);
 */
-
+/*
 //	Bryanston
 	NumHoek=4;
 	Hoek = new cGeoP[NumHoek];
@@ -215,7 +215,7 @@ int main (int argc, char **argv)
 	Hoek[1].Set(-26.092, 27.995);
 	Hoek[2].Set(-26.092, 28.055);
 	Hoek[3].Set(-26.050, 28.055);
-
+*/
 //	Tembisa
 /*	NumHoek=6;
 	Hoek = new cGeoP[NumHoek];
@@ -244,6 +244,7 @@ int main (int argc, char **argv)
 	cout << "Loading measurements ... in main()" << endl;
 	Continue = Meas.LoadMeasurements(Punte,0,0,0);
 
+
 /*
 	cout << "Loading measurements ... in main()" << endl;
 	char * Punte;
@@ -262,6 +263,7 @@ int main (int argc, char **argv)
 		return 0;
 
 	int Num;
+	Meas.mPathLoss.mClutter.Reset(1);
 
 	Meas.mPathLoss.mClutter.Reset(1);
 
@@ -292,6 +294,8 @@ int main (int argc, char **argv)
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 1);
 	cout<< "AG390" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
 
+*/
+/*
 	Continue = Meas.LoadMeasurements(Punte,0,0,2);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 2);
 	cout<< "AG945" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
@@ -658,7 +662,6 @@ int main (int argc, char **argv)
 //	cout<< "Na1" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl  << endl << endl;
 
 
-
 /*	cTrainAntPattern NeuralNets;
 	double Azimuth;
 
@@ -678,6 +681,8 @@ int main (int argc, char **argv)
 	Continue = Meas.LoadMeasurements(Punte,0,0,0);
 	Meas.PerformAnalysis(Mean, MSE, StDev, CorrC, 0);
 	cout<< "GAll" << "	Mean=" << Mean << "	MSE=" << MSE << "	StDev=" << StDev <<"	CorrC=" << CorrC << endl<< endl << endl << endl << endl;
+
+	return 0;
 */
 /*
 

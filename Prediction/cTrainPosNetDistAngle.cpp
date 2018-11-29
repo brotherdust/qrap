@@ -31,7 +31,7 @@
 //*********************************************************************
 cTrainPosNetDistAngle::cTrainPosNetDistAngle() // default constructor
 {
-	mLTEsim = false;
+	mLTEsim = true;
 	mOriginal = true; 
 	mUMTSsim = false;
 	mTAUnknown = false;

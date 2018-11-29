@@ -49,7 +49,9 @@ cTrainAntPattern::cTrainAntPattern() // default constructor
 	{
 		mPlotResolution = atof(setting.c_str());
 	}
-	else mPlotResolution = 5;
+	else mPlotResolution = 30;
+
+	mPlotResolution = 30;
 
 	setting = gDb.GetSetting("UseClutter");
 	if (setting=="true")
@@ -153,7 +155,7 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 	NewCell.sCI=0;
 
 	double longitude, latitude;
-	double Total, AntEffect, DiffLoss, PathLoss, ClutterDepth;
+	double Total, Delta, DiffLoss, PathLoss, ClutterDepth;
 	float Tilt;
 	string PointString;
 	unsigned spacePos;
@@ -161,33 +163,32 @@ bool cTrainAntPattern::LoadMeasurements(vPoints Points,
 	
 	areaQuery += " @ ST_GeomFromText('POLYGON((";
 	for (i = 0 ; i < Points.size();i++)
-   	{
+   {
 		Points[i].Get(Lat, Lon);
-	     	mNorth = max(mNorth,Lat);
-     		mSouth = min(mSouth,Lat);
-     		mEast = max(mEast,Lon);
-     		mWest = min(mWest,Lon);
+     	mNorth = max(mNorth,Lat);
+     	mSouth = min(mSouth,Lat);
+     	mEast = max(mEast,Lon);
+     	mWest = min(mWest,Lon);
 		gcvt(Lon,12,text);
-     		areaQuery += text;
-     		areaQuery += " ";
+     	areaQuery += text;
+     	areaQuery += " ";
 		gcvt(Lat,12,text);
-     		areaQuery += text;
-     		areaQuery += ",";
-   	}
-
-   	NorthWestCorner.Set(mNorth,mWest,DEG);
-   	SouthEastCorner.Set(mSouth,mEast,DEG);
+     	areaQuery += text;
+     	areaQuery += ",";
+   }
+   NorthWestCorner.Set(mNorth,mWest,DEG);
+   SouthEastCorner.Set(mSouth,mEast,DEG);
 	cout << "North West corner: " << endl;
 	NorthWestCorner.Display();
 	cout << "South East corner: " << endl;
 	SouthEastCorner.Display();
 	Points[0].Get(Lat,Lon);
 	gcvt(Lon,12,text);
-   	areaQuery += text;
-   	areaQuery += " ";
+   areaQuery += text;
+   areaQuery += " ";
 	gcvt(Lat,12,text);
-   	areaQuery += text;
-   	areaQuery += "))',4326) ";
+   areaQuery += text;
+   areaQuery += "))',4326) ";
 
 	query = "select ci, ST_AsText(site.location) as siteLocation, ";
 	query += "radioinstallation.txantennaheight as height, radioinstallation.txpower as txpwr,  ";
@@ -485,24 +486,24 @@ bool cTrainAntPattern::LoadMeasurements(char*  CustomAreaName,
 			}
 			mPathLoss.setParameters(mkFactor,NewMeasurement.sFrequency,
 						NewCell.sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
-			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
+			PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss,ClutterDepth);
 
-//			if (DiffLoss <= 28)
-//			{
-				AntEffect =  NewCell.sTxPwr -NewCell.sTxSysLoss - NewMeasurement.sMeasValue - PathLoss;
-				Total +=AntEffect;
-				if (AntEffect<NewCell.sMin) NewCell.sMin=AntEffect;
-				if (((double)i/SUB*SUB == floor((double)i/SUB)*SUB)&&(i>0))
-				{
-					NewCell.sMeasTest.push_back(NewMeasurement);
-					NewCell.sNumTest++;
-				}
-				else
-				{
-					NewCell.sMeasTrain.push_back(NewMeasurement);
-					NewCell.sNumTrain++;
-				}
-//			}		
+			if (DiffLoss < 10)
+			{
+					Delta =  - NewMeasurement.sMeasValue - PathLoss;
+					Total +=Delta;
+					if (Delta<NewCell.sMin) NewCell.sMin=Delta;
+					if (((double)i/SUB*SUB == floor((double)i/SUB)*SUB)&&(i>0))
+					{
+							NewCell.sMeasTest.push_back(NewMeasurement);
+							NewCell.sNumTest++;
+					}
+					else
+					{
+							NewCell.sMeasTrain.push_back(NewMeasurement);
+							NewCell.sNumTrain++;
+					}
+			}		
 		}// end for number of entries
 
 	} // end if query is NOT empty
@@ -528,7 +529,6 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 {
 //	mNumAzifFile = 0;
 //	mNumElevfFile = 0;
-	double FileInt = AntFileInt;
 	mNumAzifFile = floor(360/AntFileInt);
 	mNumElevfFile = floor(180/AntFileInt)+1;
 	double AngleInterval = 180/(floor(180/AntFileInt));
@@ -536,9 +536,9 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 
 	FANN::training_data	TrainData;
 	FANN::training_data	TestData;
-	double PathLoss, AntEffect, ClutterDepth;
+	double PathLoss, Delta, ClutterDepth;
 	double TrainError, TestError;
-	double EffectiveTxPwr;
+	double EIRP;
 	double minTrainError = MAXDOUBLE;
 	double minTestError = MAXDOUBLE;
 	unsigned i,j,k;
@@ -581,7 +581,6 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 	cout << " mNumCells = " << mNumCells << endl;
 
 	mMAXANNOutput = 0;
-	unsigned kmin=0;
 
 	for (i=0; i<mNumCells; i++) // this should be in
 //	for (i=21; i<22; i++) // for debugging purposes
@@ -591,19 +590,11 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 		mCells[i].sNumInputs = 5;
 		mCells[i].sNumTrain = mCells[i].sMeasTrain.size();
 		mCells[i].sNumTest = mCells[i].sMeasTest.size();
-		cout << "Inst = " <<  mCells[i].sRI << "	CI = " << mCells[i].sCI;
-		cout << " 	NumTest = " <<  mCells[i].sNumTest;
-		cout << " 	NumTrain = " <<  mCells[i].sNumTrain << endl;
+		cout << " NumTest = " <<  mCells[i].sNumTest << endl;
+		cout << " NumTrain = " <<  mCells[i].sNumTrain << endl;
 
-		if (mCells[i].sNumTrain>=360)
+		if (mCells[i].sNumTrain>50)
 		{
-			cout << "Doing Inst = " <<  mCells[i].sRI << "	CI = " << mCells[i].sCI << endl;
-
-/*			mNumAzifFile = min((double)mCells[i].sNumTrain, floor(360/AntFileInt))+1;
-			FileInt = 360/mNumAzifFile;
-			mNumElevfFile = floor(180/FileInt)+1;
-			AngleInterval = FileInt;
-*/	
 			mCells[i].sInputTrain = new double*[mCells[i].sNumTrain + mNumAzifFile+mNumElevfFile];
 			mCells[i].sOutputTrain = new double*[mCells[i].sNumTrain+ mNumAzifFile+mNumElevfFile];
 			for (j=0; j < (mCells[i].sNumTrain+mNumAzifFile+mNumElevfFile); j++)
@@ -614,9 +605,9 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 
 			AntPatternFromFile.SetUseAntANN(false);
 			AntPatternFromFile.SetAntennaPattern(mCells[i].sRI, Tx,
-									mCells[i].sBearing, mCells[i].sTilt);
-			EffectiveTxPwr = mCells[i].sTxPwr - mCells[i].sTxSysLoss;
-			mPathLoss.setParameters(mkFactor,mCells[i].sMeasTrain[0].sFrequency,
+													mCells[i].sBearing, mCells[i].sTilt);
+			EIRP = mCells[i].sTxPwr - mCells[i].sTxSysLoss + AntPatternFromFile.mGain;
+				mPathLoss.setParameters(mkFactor,mCells[i].sMeasTrain[0].sFrequency,
 							mCells[i].sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
 
 			for (j=0; j<mCells[i].sNumTrain; j++)
@@ -630,7 +621,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 								mPlotResolution,mClutterProfile);
 				}
 
-				PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
+				PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss,ClutterDepth);
 				Azimuth = mCells[i].sPosition.Bearing( mCells[i].sMeasTrain[j].sLocation);
 
 				mCells[i].sInputTrain[j][0] = 1;
@@ -639,12 +630,12 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				mCells[i].sInputTrain[j][3] = cos(Tilt*PI/180);
 				mCells[i].sInputTrain[j][4] = sin(Tilt*PI/180);
 				
-//				RxLevCalc = MIN(-mCells[i].sMin,EffectiveTxPwr) - PathLoss;
+//				RxLevCalc = MIN(-mCells[i].sMin,EIRP) - PathLoss;
 //				if (RxLevCalc >-140) 
-//							AntEffect = RxLevCalc - mCells[i].sMeasTrain[j].sMeasValue;
-//				else AntEffect = -140 -  mCells[i].sMeasTrain[j].sMeasValue;		
-				AntEffect = EffectiveTxPwr - PathLoss - mCells[i].sMeasTrain[j].sMeasValue;
-				mCells[i].sOutputTrain[j][0]  = AntEffect / ANTENNASCALE - 0.5;
+//							Delta = RxLevCalc - mCells[i].sMeasTrain[j].sMeasValue;
+//				else Delta = -140 -  mCells[i].sMeasTrain[j].sMeasValue;		
+				Delta = EIRP - PathLoss - mCells[i].sMeasTrain[j].sMeasValue;
+				mCells[i].sOutputTrain[j][0]  = Delta / ANTENNASCALE - 0.5;
 				if (fabs(mCells[i].sOutputTrain[j][0])>mMAXANNOutput)
 					mMAXANNOutput = fabs(mCells[i].sOutputTrain[j][0]);
 			}
@@ -658,8 +649,8 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				mCells[i].sInputTrain[j+mCells[i].sNumTrain][3] = cos(mCells[i].sTilt*PI/180);;
 				mCells[i].sInputTrain[j+mCells[i].sNumTrain][4] = sin(mCells[i].sTilt*PI/180);;
 				
-				AntEffect = AntPatternFromFile.GetPatternValue(Azimuth, mCells[i].sTilt) - AntPatternFromFile.mGain;
-				mCells[i].sOutputTrain[j+mCells[i].sNumTrain][0] = AntEffect / ANTENNASCALE -0.5;
+				Delta = AntPatternFromFile.GetPatternValue(Azimuth, mCells[i].sTilt);
+				mCells[i].sOutputTrain[j+mCells[i].sNumTrain][0] = Delta / ANTENNASCALE -0.5;
 				if (fabs(mCells[i].sOutputTrain[j+mCells[i].sNumTrain][0])>mMAXANNOutput)
 					mMAXANNOutput = fabs(mCells[i].sOutputTrain[j+mCells[i].sNumTrain][0]);
 			}
@@ -673,15 +664,15 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				mCells[i].sInputTrain[j+mCells[i].sNumTrain+mNumAzifFile][3] = cos(Tilt*PI/180);
 				mCells[i].sInputTrain[j+mCells[i].sNumTrain+mNumAzifFile][4] = sin(Tilt*PI/180);
 				
-				AntEffect =  AntPatternFromFile.GetPatternValue(mCells[i].sBearing, Tilt) - AntPatternFromFile.mGain;
-				mCells[i].sOutputTrain[j+mCells[i].sNumTrain+mNumAzifFile][0] = AntEffect / ANTENNASCALE - 0.5;
+				Delta =  AntPatternFromFile.GetPatternValue(mCells[i].sBearing, Tilt);
+				mCells[i].sOutputTrain[j+mCells[i].sNumTrain+mNumAzifFile][0] = Delta / ANTENNASCALE - 0.5;
 				if (fabs(mCells[i].sOutputTrain[j+mCells[i].sNumTrain+mNumAzifFile][0])>mMAXANNOutput)
 					mMAXANNOutput = fabs(mCells[i].sOutputTrain[j+mCells[i].sNumTrain+mNumAzifFile][0]);
 			}
 
-			mCells[i].sInputTest = new double*[mCells[i].sNumTest+ mNumAzifFile+mNumElevfFile];
-			mCells[i].sOutputTest = new double*[mCells[i].sNumTest+ mNumAzifFile+mNumElevfFile];
-			for (j=0; j < mCells[i].sNumTest+mNumAzifFile+mNumElevfFile; j++)
+			mCells[i].sInputTest = new double*[mCells[i].sNumTest];
+			mCells[i].sOutputTest = new double*[mCells[i].sNumTest];
+			for (j=0; j < mCells[i].sNumTest; j++)
 			{
 				mCells[i].sInputTest[j] = new double[mCells[i].sNumInputs];
 				mCells[i].sOutputTest[j] = new double[mCells[i].sNumOutputs];
@@ -699,7 +690,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				}
 				mPathLoss.setParameters(mkFactor,mCells[i].sMeasTest[j].sFrequency,
 							mCells[i].sHeight, MOBILEHEIGHT, mUseClutter, mClutterClassGroup);
-				PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss, ClutterDepth);
+				PathLoss = mPathLoss.TotPathLoss(mDEMProfile, Tilt, mClutterProfile, DiffLoss,ClutterDepth);
 				Azimuth = mCells[i].sPosition.Bearing(mCells[i].sMeasTest[j].sLocation);
 	
 				mCells[i].sInputTest[j][0] = 1;
@@ -708,44 +699,14 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 				mCells[i].sInputTest[j][3] = cos(Tilt*PI/180);
 				mCells[i].sInputTest[j][4] = sin(Tilt*PI/180);
 	
-//				RxLevCalc = MIN(-mCells[i].sMin,EffectiveTxPwr) - PathLoss;
-//				if (RxLevCalc >-140) 
-//					AntEffect = RxLevCalc - mCells[i].sMeasTrain[j].sMeasValue;
-//				else AntEffect = -140 -  mCells[i].sMeasTrain[j].sMeasValue;		
-				AntEffect = EffectiveTxPwr - PathLoss - mCells[i].sMeasTrain[j].sMeasValue;
-				mCells[i].sOutputTest[j][0]  = AntEffect / ANTENNASCALE - 0.5;
+				RxLevCalc = MIN(-mCells[i].sMin,EIRP) - PathLoss;
+				if (RxLevCalc >-140) 
+							Delta = RxLevCalc - mCells[i].sMeasTrain[j].sMeasValue;
+				else Delta = -140 -  mCells[i].sMeasTrain[j].sMeasValue;	
+				
+				mCells[i].sOutputTest[j][0]  = Delta / ANTENNASCALE - 0.5;
 				if (fabs(mCells[i].sOutputTest[j][0])>mMAXANNOutput)
 					mMAXANNOutput = fabs(mCells[i].sOutputTest[j][0]);
-			}
-
-			for (j=0; j< mNumAzifFile; j++)
-			{
-				Azimuth = j*AngleInterval;
-				mCells[i].sInputTest[j+mCells[i].sNumTest][0] = 1;
-				mCells[i].sInputTest[j+mCells[i].sNumTest][1] = cos(Azimuth*PI/180);
-				mCells[i].sInputTest[j+mCells[i].sNumTest][2] = sin(Azimuth*PI/180);
-				mCells[i].sInputTest[j+mCells[i].sNumTest][3] = cos(mCells[i].sTilt*PI/180);;
-				mCells[i].sInputTest[j+mCells[i].sNumTest][4] = sin(mCells[i].sTilt*PI/180);;
-				
-				AntEffect = AntPatternFromFile.GetPatternValue(Azimuth, mCells[i].sTilt) - AntPatternFromFile.mGain;
-				mCells[i].sOutputTest[j+mCells[i].sNumTest][0] = AntEffect / ANTENNASCALE -0.5;
-				if (fabs(mCells[i].sOutputTest[j+mCells[i].sNumTest][0])>mMAXANNOutput)
-					mMAXANNOutput = fabs(mCells[i].sOutputTest[j+mCells[i].sNumTest][0]);
-			}
-
-			for (j=0; j< mNumElevfFile; j++)
-			{
-				Tilt = -90+ j*AngleInterval;
-				mCells[i].sInputTest[j+mCells[i].sNumTest+mNumAzifFile][0] = 1;
-				mCells[i].sInputTest[j+mCells[i].sNumTest+mNumAzifFile][1] = cos(mCells[i].sBearing*PI/180);
-				mCells[i].sInputTest[j+mCells[i].sNumTest+mNumAzifFile][2] = sin(mCells[i].sBearing*PI/180);
-				mCells[i].sInputTest[j+mCells[i].sNumTest+mNumAzifFile][3] = cos(Tilt*PI/180);
-				mCells[i].sInputTest[j+mCells[i].sNumTest+mNumAzifFile][4] = sin(Tilt*PI/180);
-				
-				AntEffect =  AntPatternFromFile.GetPatternValue(mCells[i].sBearing, Tilt) - AntPatternFromFile.mGain;
-				mCells[i].sOutputTest[j+mCells[i].sNumTest+mNumAzifFile][0] = AntEffect / ANTENNASCALE - 0.5;
-				if (fabs(mCells[i].sOutputTest[j+mCells[i].sNumTest+mNumAzifFile][0])>mMAXANNOutput)
-					mMAXANNOutput = fabs(mCells[i].sOutputTest[j+mCells[i].sNumTest+mNumAzifFile][0]);
 			}
 
 			cout << "mMAXANNOutput = " << mMAXANNOutput << endl;
@@ -754,32 +715,21 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 						mCells[i].sNumInputs, mCells[i].sInputTrain,
 						mCells[i].sNumOutputs, mCells[i].sOutputTrain);
 	
-			TestData.set_train_data(mCells[i].sNumTest +mNumAzifFile +mNumElevfFile, 
+			TestData.set_train_data(mCells[i].sNumTest, 
 						mCells[i].sNumInputs, mCells[i].sInputTest,
 						mCells[i].sNumOutputs, mCells[i].sOutputTest);
 
-			unsigned HiddenN1 = HIDDEN1;
-			unsigned HiddenN2 = HIDDEN2;
+			unsigned HiddenN1 = 10;
+//			unsigned HiddenN2 = 4;
 
-			if (1==NUMLAYERS)
-			{
-				mANN.create_standard(3, mCells[i].sNumInputs, 
+			mANN.create_standard(3, mCells[i].sNumInputs, 
 						HiddenN1, mCells[i].sNumOutputs);
-			}
-			else if (2==NUMLAYERS)
-			{
-				mANN.create_standard(4, mCells[i].sNumInputs, 
-						HiddenN1, HiddenN2, mCells[i].sNumOutputs);
-			}
  			mANN.set_train_error_function(FANN::ERRORFUNC_LINEAR);
 			mANN.set_train_stop_function(FANN::STOPFUNC_MSE);
 			mANN.set_training_algorithm(FANN::TRAIN_QUICKPROP);
 			mANN.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC);
 			mANN.set_activation_function_output(FANN::SIGMOID_SYMMETRIC);
-//			double weightsbound = 2.4/max(mCells[i].sNumInputs,max(HiddenN1,HiddenN2));
-			double weightsbound = 0.4;
-//			mANN.randomize_weights(-weightsbound,weightsbound);
-			mANN.init_weights(TrainData);
+			mANN.randomize_weights(-0.50,0.50);
 
 			cout << "saving mANN: Cell = " << mCells[i].sCI << "	i=" << i << endl;
 			gcvt(mCells[i].sRI,8,radinst);
@@ -796,46 +746,29 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 			minTrainError = MAXDOUBLE;
 			stop = false;	
 			k=0;
-			kmin  =0;
 			while ((k<antMAXepoch+1)&&(!stop))
 			{
 				TrainError = mANN.train_epoch(TrainData);
 				TestError = mANN.test_data(TestData);
 				if (0==k%antREPORTInt)
 				{
-//					TestError = mANN.test_data(TestData);
-//					TestError = mANN.get_MSE();
+					TestError = mANN.test_data(TestData);
+					TestError = mANN.get_MSE();
 					cout << "celld = " << mCells[i].sCI << "	k=" << k 
 						<< "	TrainErr = " << TrainError 
 						<< "	TestErr = " << TestError << endl;
 				}
 				if (((TrainError <= minTrainError)&&(TestError<=minTestError))
-					||((TrainError<= minTrainError*0.8)&&(TestError<=(minTestError*1.1))&&(k>antREPORTInt)&&(k>(kmin+2000))))
+					||((TrainError<= minTrainError*0.6)&&(TestError<=(minTestError*1.1))&&(k>antREPORTInt)))
 				{
 					mANN.save(filename);
-					stop = (((minTestError-TestError)/TestError) < antTERROR)
-						&&(((minTrainError-TrainError)/TrainError) < antTERROR)&&(k>(kmin+2000))&&(k>(2*antMAXepoch/3));
+					stop = (TestError < antERROR)&&(TrainError < antERROR);
 					minTrainError = TrainError;
 					minTestError = TestError;
-					kmin = k;
-				}
-				stop = stop||((1.1*minTestError<TestError)&&(1.1*minTrainError<TrainError)&&(k>(kmin+2000))&&(k>(antMAXepoch/3)));
-				if (stop)
-				{
-					cout << "celld = " << mCells[i].sCI << "	k =" << k 
-						<< "	TrainErr = " << TrainError 
-						<< "	TestErr = " << TestError << endl;
-					cout << "celld = " << mCells[i].sCI << "	kmin =" << kmin
-						<< "	minTrainErr = " << minTrainError 
-						<< "	minTestErr = " << minTestError << endl;
 				}
 				k++;
 				
-			} 
-
-			cout << "celld = " << mCells[i].sCI << "	kmin =" << kmin
-				<< "	minTrainErr = " << minTrainError 
-				<< "	minTestErr = " << minTestError << endl;	
+			} 	
 
 			queryDD = queryD;
 			queryDD += radinst;
@@ -896,7 +829,7 @@ bool cTrainAntPattern::TrainANDSaveANDTest()
 		
 			cout << "sMin =" << mCells[i].sMin 
 					<< "	sMean = " << mCells[i].sMean 
-					<< "	EffectiveTxPwr = " << EffectiveTxPwr << endl;
+					<< "	EIRP = " << EIRP << endl;
 			cout << "saved mANN: cell = " << mCells[i].sCI << "	i=" << i << endl;
 			cout << "mMAXANNOutput = " << mMAXANNOutput << endl;
 		}
@@ -922,7 +855,7 @@ bool cTrainAntPattern::Output(string Outputfile, unsigned currentCell)
 	cAntennaPattern AntPatternFromFile; 
 	AntPatternFromFile.SetUseAntANN(false);
 	AntPatternFromFile.SetAntennaPattern(mCells[currentCell].sRI, Tx,
-						mCells[currentCell].sBearing, mCells[currentCell].sTilt);
+													mCells[currentCell].sBearing, mCells[currentCell].sTilt);
 
 	bool WriteFile = true;
 	if (WriteFile)
@@ -952,21 +885,21 @@ bool cTrainAntPattern::Output(string Outputfile, unsigned currentCell)
 				ANNInput[3] = cos(tilt*PI/180);
 				ANNInput[4] = sin(tilt*PI/180);
 				ANNOutput = mANN.run(ANNInput);				
-				fprintf(fp,"%d, %f, %f,",i, AntPatternFromFile.mGain-FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
+				fprintf(fp,"%d, %f, %f,",i, -FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
 
 				tilt = mCells[currentCell].sTilt;
  				FileValue = AntPatternFromFile.GetPatternValue(azimuth, tilt);
 				ANNInput[3] = cos(tilt*PI/180);
 				ANNInput[4] = sin(tilt*PI/180);
 				ANNOutput = mANN.run(ANNInput);				
-				fprintf(fp,"%d, %f, %f,",i, AntPatternFromFile.mGain- FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
+				fprintf(fp,"%d, %f, %f,",i, - FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
 
 				tilt = 2.0*mCells[currentCell].sTilt;
  				FileValue = AntPatternFromFile.GetPatternValue(azimuth, tilt);
 				ANNInput[3] = cos(tilt*PI/180);
 				ANNInput[4] = sin(tilt*PI/180);
 				ANNOutput = mANN.run(ANNInput);				
-				fprintf(fp,"%d, %f, %f\n",i, AntPatternFromFile.mGain-FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
+				fprintf(fp,"%d, %f, %f\n",i, -FileValue,-(ANNOutput[0]+0.5)*ANTENNASCALE);
 			}
  			fprintf(fp,"\n");
 			fprintf(fp,"\n");

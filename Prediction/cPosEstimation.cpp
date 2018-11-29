@@ -52,7 +52,7 @@ cPosEstimation::cPosEstimation() // default constructor
 	mPathLoss= new cPathLossPredictor();
 
 	mLTEsim = false;
-	mOriginal = true;
+	mOriginal = false;
 	mUMTSsim = false;
 	mTAUnknown = false;
 	mCurSiteI = 0;
@@ -2851,7 +2851,6 @@ int cPosEstimation::SaveResults()
 	string queryP = "INSERT into PositionEstimate (id, tp, azimuth, distance, error) Values (";
 
 	for (i=0; i<mNumPoints; i++)
-//	for (i=4700; i<mNumPoints; i++)
 	{
 
 		if (mPosSets[i].sTestPoints.size()>0)

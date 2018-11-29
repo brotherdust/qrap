@@ -85,8 +85,8 @@ cClutter::cClutter(unsigned ClassGroup)
 //*************************************************************************
 //## Destructor 
 cClutter::~cClutter()
-{
-		Destroy();
+{		
+	Destroy();
 }
 
 
@@ -367,7 +367,7 @@ void cClutter::Destroy()
 		delete [] mClutterTypes[i].sAllowCchange;
 	}
 
-	if (mClutterTypes!=NULL) delete [] mClutterTypes;
+	if (nullptr!=mClutterTypes) delete [] mClutterTypes;
 }
 
 //**************************************************************************************

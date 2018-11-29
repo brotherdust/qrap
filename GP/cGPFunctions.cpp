@@ -34,8 +34,29 @@ GOftn::GOftn()
 //************************************************************************
 GOftn::~GOftn()
 {
-//	if ((mChild!=nullptr)&&(mNumChildren>0))
-//		delete [] mChild;
+//	cout << "destruct " << mLabel << endl;
+	for (unsigned i=0; i<mNumChildren; i++)
+		if ((mChild[i]!=nullptr)) delete mChild[i];
+	if ((mChild!=nullptr)&&(mNumChildren>0))
+	{
+		delete [] mChild;
+	}
+
+}
+
+//***********************************************************************
+void GOftn::printTree(int depth)
+{
+	for (int j=0; j<depth; j++) 
+	{
+		printf(" . ");
+	}
+	cout << mLabel.c_str() <<endl;
+	for (unsigned i=0; i<mNumChildren; i++) 
+	{
+		if (nullptr!=mChild[i]) mChild[i]->printTree(depth+1);
+		else cout << "nullptr" << endl;
+	}
 }
 
 //*************************************************************************
@@ -98,7 +119,10 @@ double GOftn::getValue()
 //****************************************************************************
 void GOftn::mutate(double Scale)
 {
-	mConstVal *=( 1.0 + fGauss(fRandomGen)*Scale);
+	double delta = fGauss(fRandomGen)*Scale;
+	while ((delta<0)||(delta>1))
+		delta = fGauss(fRandomGen)*Scale;
+	mConstVal *=( 1.0 + delta);
 	char* str;
 	str = new char[20];
 	sprintf(str, " C: %f", mConstVal);
@@ -593,6 +617,8 @@ Add::Add(unsigned NumChildren)
 {
 	mNumChildren = NumChildren;
 	mChild = new GOftn*[mNumChildren];
+	for (unsigned i=0; i<mNumChildren; i++)
+		mChild[i] = nullptr;
 	mLabel = " + ";
 	mIsConstant = false;
 }
@@ -664,7 +690,18 @@ Add* Add::clone()
 	return retNode;
 }
 
-
+//************************************************************************
+/*Add::~Add()
+{
+//	cout << "destruct " << mLabel << endl;
+	for (int i=mNumChildren-1; i>=0; i--)
+		if ((mChild[i]!=nullptr)) delete mChild[i];
+	if ((mChild!=nullptr)&&(mNumChildren>0))
+	{
+		delete [] mChild;
+	}
+}
+*/
 //***********************************************************************
 //***********************************************************************
 //		Subtract
@@ -674,6 +711,8 @@ Subtract::Subtract()
 {
 	mNumChildren = 2;
 	mChild = new GOftn*[mNumChildren];
+	for (int i=0; i<mNumChildren; i++)
+		mChild[i] = nullptr;
 	mLabel = " - ";
 	mIsConstant = false;
 }
@@ -688,7 +727,7 @@ tMeasPoint Subtract::eval(tMeasPoint inPoint)
 		c1 = mChild[0]->eval(inPoint);
 		c2 = mChild[1]->eval(inPoint);
 		outPoint.sReturn = c1.sReturn - c2.sReturn;
-		if (outPoint.sReturn<0) outPoint.sReturn=1e-10;
+//		if (outPoint.sReturn<0) outPoint.sReturn=1e-6;
 	}
 	else 
 	{
@@ -709,7 +748,7 @@ tMeasPoint Subtract::evalfix(tMeasPoint inPoint)
 		c1 = mChild[0]->evalfix(inPoint);
 		c2 = mChild[1]->evalfix(inPoint);
 		outPoint.sReturn = c1.sReturn - c2.sReturn;
-		if (outPoint.sReturn<0) outPoint.sReturn=1e-10;
+//		if (outPoint.sReturn<0) outPoint.sReturn=1e-10;
 	}
 	else 
 	{
@@ -731,6 +770,18 @@ Subtract* Subtract::clone()
 	return retNode;
 }
 
+//************************************************************************
+/*Subtract::~Subtract()
+{
+//	cout << "destruct " << mLabel << endl;
+	for (int i=mNumChildren-1; i>=0; i--)
+		if ((mChild[i]!=nullptr)) delete mChild[i];
+	if ((mChild!=nullptr)&&(mNumChildren>0))
+	{
+		delete [] mChild;
+	}
+}
+*/
 
 //***********************************************************************
 //***********************************************************************
@@ -742,6 +793,8 @@ Multiply::Multiply(unsigned NumChildren)
 {
 	mNumChildren = NumChildren;
 	mChild = new GOftn*[mNumChildren];
+	for (int i=0; i<mNumChildren; i++)
+		mChild[i] = nullptr;
 	mLabel = " * ";
 	mIsConstant = false;
 }
@@ -787,8 +840,9 @@ tMeasPoint Multiply::evalfix(tMeasPoint inPoint)
 		if (mChild[i])
 		{
 			CValue = mChild[i]->evalfix(inPoint);
-			while((log10(fabs(CValue.sReturn)))>(log(DBL_MAX)/mNumChildren)&&count<10)
+			while((log10(fabs(CValue.sReturn)))>(log(DBL_MAX)/mNumChildren)&&(count<10))
 			{
+				delete mChild[1];
 				mChild[1] = getNewNode();
 				CValue = mChild[1]->evalfix(inPoint);
 				count++;
@@ -820,6 +874,18 @@ Multiply* Multiply::clone()
 	return retNode;
 }
 
+//************************************************************************
+/*Multiply::~Multiply()
+{
+//	cout << "destruct " << mLabel << endl;
+	for (int i=mNumChildren-1; i>=0; i--)
+		if ((mChild[i]!=nullptr)) delete mChild[i];
+	if ((mChild!=nullptr)&&(mNumChildren>0))
+	{
+		delete [] mChild;
+	}
+}
+*/
 
 //**********************************************************************
 //**********************************************************************
@@ -831,6 +897,8 @@ Divide::Divide()
 {
 	mNumChildren = 2;
 	mChild = new GOftn*[mNumChildren];
+	for (unsigned i=0; i<mNumChildren; i++)
+		mChild[i] = nullptr;
 	mLabel = " / ";
 	mIsConstant = false;
 }
@@ -844,7 +912,7 @@ tMeasPoint Divide::eval(tMeasPoint inPoint)
 	{
 		c1 = mChild[0]->eval(outPoint);
 		c2 = mChild[1]->eval(outPoint);
-		if (fabs(c2.sReturn)>1e-100)
+		if (fabs(c2.sReturn)>1e-12)
 			outPoint.sReturn = c1.sReturn/c2.sReturn;
 		else
 		{
@@ -874,6 +942,7 @@ tMeasPoint Divide::evalfix(tMeasPoint inPoint)
 		c2 = mChild[1]->evalfix(outPoint);
 		while ((fabs(c2.sReturn)<1e-6)&&(count<10))
 		{
+			delete mChild[1];
 			mChild[1] = getNewNode();
 			c2 = mChild[1]->evalfix(inPoint);
 			count++;
@@ -900,7 +969,18 @@ Divide* Divide::clone()
 	}
 	return retNode;
 }
-
+//************************************************************************
+/*Divide::~Divide()
+{
+//	cout << "destruct " << mLabel << endl;
+	for (int i=mNumChildren-1; i>=0; i--)
+		if ((mChild[i]!=nullptr)) delete mChild[i];
+	if ((mChild!=nullptr)&&(mNumChildren>0))
+	{
+		delete [] mChild;
+	}
+}
+*/
 
 //**********************************************************************
 //**********************************************************************
@@ -912,6 +992,8 @@ Log10Node::Log10Node()
 {
 	mNumChildren = 1;
 	mChild = new GOftn*[mNumChildren];
+	for (unsigned i=0; i<mNumChildren; i++)
+		mChild[i] = nullptr;
 	mLabel = "log10()";
 	mIsConstant = false;
 }
@@ -927,20 +1009,20 @@ tMeasPoint Log10Node::eval(tMeasPoint inPoint)
 		c1 = mChild[0]->eval(inPoint);
 		argument = c1.sReturn; 
 		
-		if (c1.sReturn>1e-20)
+		if (c1.sReturn>1e-12)
 			outPoint.sReturn = log10(argument);
 		else 
 		{
 //			cerr << "Log10: input value too small	";
 //			cout << mChild[0]->mLabel  << " " << argument << endl;
-			outPoint.sReturn = -200.0;
+			outPoint.sReturn = -12.0;
 		}
 
 	}
 	else 
 	{
 		cerr << "input not defined in log10"<<endl;
-		outPoint.sReturn = -200.0;
+		outPoint.sReturn = -12.0;
 	}
 //	cout <<"	"<< mLabel << outPoint.sReturn << endl;
 	return outPoint;
@@ -957,8 +1039,9 @@ tMeasPoint Log10Node::evalfix(tMeasPoint inPoint)
 	{
 		c1 = mChild[0]->evalfix(inPoint);
 		argument = c1.sReturn;
-		while ((argument<1e-6)&&(count<10))
+		while ((argument<1e-12)&&(count<10))
 		{
+			delete mChild[0];
 			mChild[0] = getNewNode();
 			c1 = mChild[0]->evalfix(inPoint);
 			argument = c1.sReturn;
@@ -969,7 +1052,7 @@ tMeasPoint Log10Node::evalfix(tMeasPoint inPoint)
 	else 
 	{
 		cerr << "input not defined in log10"<<endl;
-		outPoint.sReturn = -200.0;
+		outPoint.sReturn = -12.0;
 	}
 //	cout <<"	"<< mLabel << outPoint.sReturn <<"  "<< endl;
 	return outPoint;
@@ -986,6 +1069,19 @@ Log10Node* Log10Node::clone()
 	return retNode;
 }
 
+//************************************************************************
+/*Log10Node::~Log10Node()
+{
+//	cout << "destruct " << mLabel << endl;
+	for (int i=mNumChildren-1; i>=0; i--)
+		if ((mChild[i]!=nullptr)) delete mChild[i];
+	if ((mChild!=nullptr)&&(mNumChildren>0))
+	{
+		delete [] mChild;
+	}
+}
+*/
+
 //**********************************************************************
 //**********************************************************************
 //
@@ -996,6 +1092,8 @@ Exponent::Exponent()
 {
 	mNumChildren = 1;
 	mChild = new GOftn*[mNumChildren];
+	for (unsigned i=0; i<mNumChildren; i++)
+		mChild[i] = nullptr;
 	mLabel = "Exp ";
 	mIsConstant = false;
 }
@@ -1030,6 +1128,7 @@ tMeasPoint Exponent::evalfix(tMeasPoint inPoint)
 	{
 		while ((c1.sReturn>709)&&(count<10))
 		{
+			delete mChild[0];
 			mChild[0] = getNewNode();
 			c1 = mChild[0]->evalfix(inPoint);
 			count++;
@@ -1056,6 +1155,19 @@ Exponent* Exponent::clone()
 	return retNode;
 }
 
+//************************************************************************
+/*Exponent::~Exponent()
+{
+//	cout << "destruct " << mLabel << endl;
+	for (int i=mNumChildren-1; i>=0; i--)
+		if ((mChild[i]!=nullptr)) delete mChild[i];
+	if ((mChild!=nullptr)&&(mNumChildren>0))
+	{
+		delete [] mChild;
+	}
+}
+*/
+
 //**********************************************************************
 //**********************************************************************
 //
@@ -1066,6 +1178,8 @@ Square::Square()
 {
 	mNumChildren = 1;
 	mChild = new GOftn*[mNumChildren];
+	for (unsigned i=0; i<mNumChildren; i++)
+		mChild[i] = nullptr;
 	mLabel = "Square ";
 	mIsConstant = false;
 }
@@ -1100,6 +1214,7 @@ tMeasPoint Square::evalfix(tMeasPoint inPoint)
 		c1 = mChild[0]->evalfix(inPoint);
 		while ((fabs(log10(fabs(c1.sReturn)))>151)&&(count<10))
 		{
+			delete mChild[0];
 			mChild[0] = getNewNode();
 			c1 = mChild[0]->evalfix(inPoint);
 			count++;
@@ -1126,6 +1241,18 @@ Square* Square::clone()
 	return retNode;
 }
 
+//************************************************************************
+/*Square::~Square()
+{
+//	cout << "destruct " << mLabel << endl;
+	for (int i=mNumChildren-1; i>=0; i--)
+		if ((mChild[i]!=nullptr)) delete mChild[i];
+	if ((mChild!=nullptr)&&(mNumChildren>0))
+	{
+		delete [] mChild;
+	}
+}
+*/
 
 //***********************************************************************
 //***********************************************************************
@@ -1137,6 +1264,8 @@ Power::Power()
 {
 	mNumChildren = 2;
 	mChild = new GOftn*[mNumChildren];
+	for (unsigned i=0; i<mNumChildren; i++)
+		mChild[i] = nullptr;
 	mLabel = " ^ ";
 	mIsConstant = false;
 }
@@ -1237,6 +1366,7 @@ tMeasPoint Power::evalfix(tMeasPoint inPoint)
 		{
 			while ((c1.sReturn<0.0)&&(count<10))
 			{
+				delete mChild[0];
 				mChild[0] = getNewNode();
 				c1 = mChild[0]->evalfix(inPoint);
 				count++;
@@ -1244,6 +1374,7 @@ tMeasPoint Power::evalfix(tMeasPoint inPoint)
 			count=0;
 			while ((fabs(c2.sReturn)>100)&&(count<10))
 			{
+				delete mChild[1];
 				mChild[1] = getNewNode();
 				c2 = mChild[1]->evalfix(inPoint);
 				count ++;
@@ -1271,3 +1402,15 @@ Power* Power::clone()
 	return retNode;
 }
 
+//************************************************************************
+/*Power::~Power()
+{
+//	cout << "destruct " << mLabel << endl;
+	for (int i=mNumChildren-1; i>=0; i--)
+		if ((mChild[i]!=nullptr)) delete mChild[i];
+	if ((mChild!=nullptr)&&(mNumChildren>0))
+	{
+		delete [] mChild;
+	}
+}
+*/

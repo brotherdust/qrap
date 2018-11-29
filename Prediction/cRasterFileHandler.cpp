@@ -1040,9 +1040,9 @@ bool cRasterFileHandler::AddRaster(cGeoP point, string LoadedRastersNames)
 		query += "WHERE filesetkey=filesets.id AND filesets.id=";
 		gcvt(mFileSetOrder[i],8,temp);
 		query += temp; 
-		query += " AND sourcefiles.machineid=";
-		gcvt(gDb.globalMachineID,8,temp);
-		query += temp; 
+//		query += " AND sourcefiles.machineid=";
+//		gcvt(gDb.globalMachineID,8,temp);
+//		query += temp; 
 		query += " AND filename NOT IN ("+LoadedRastersNames;
 		query += ") AND "+ PointString + " <@"+"areasquare;";
 		

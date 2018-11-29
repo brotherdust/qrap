@@ -42,7 +42,7 @@ public:
 	GOftn* getNewNode();
 	GOftn** mChild;
 	GOftn();
-	~GOftn();
+	virtual ~GOftn();
 	virtual tMeasPoint eval(tMeasPoint inPoint) = 0;  //setting the 0 makes it a PURE
 	virtual tMeasPoint evalfix(tMeasPoint inPoint) = 0;
 	virtual GOftn* clone() = 0; //make a deep copy of the current tree
@@ -52,6 +52,7 @@ public:
 	string getLabel();
 	unsigned getTreeDepth();
 	unsigned getConstants(vConstants &Constants);
+	void printTree(int depth=0);
 };
 
 
@@ -149,6 +150,7 @@ class Add : public GOftn
 {
 public:
 	Add(unsigned NumChildren=2);
+//	~Add();
 	tMeasPoint eval(tMeasPoint inPoint);
 	tMeasPoint evalfix(tMeasPoint inPoint);
 	Add* clone();
@@ -160,6 +162,7 @@ class Subtract : public GOftn
 {
 public:
 	Subtract();
+//	~Subtract();
 	tMeasPoint eval(tMeasPoint inPoint);
 	tMeasPoint evalfix(tMeasPoint inPoint);
 	Subtract* clone();
@@ -171,6 +174,7 @@ class Multiply : public GOftn
 {
 public:
 	Multiply(unsigned NumChildren=2);
+//	~Multiply();
 	tMeasPoint eval(tMeasPoint inPoint);
 	tMeasPoint evalfix(tMeasPoint inPoint);
 	Multiply* clone();
@@ -182,6 +186,7 @@ class Divide : public GOftn
 {
 public:
 	Divide();
+//	~Divide();
 	tMeasPoint eval(tMeasPoint inPoint);
 	tMeasPoint evalfix(tMeasPoint inPoint);
 	Divide* clone();
@@ -194,6 +199,7 @@ class Log10Node : public GOftn
 {
 public:
 	Log10Node();
+//	~Log10Node();
 	tMeasPoint eval(tMeasPoint inPoint);
 	tMeasPoint evalfix(tMeasPoint inPoint);
 	Log10Node* clone();
@@ -205,6 +211,7 @@ class Exponent : public GOftn
 {
 public:
 	Exponent();
+//	~Exponent();
 	tMeasPoint eval(tMeasPoint inPoint);
 	tMeasPoint evalfix(tMeasPoint inPoint);
 	Exponent* clone();
@@ -216,6 +223,7 @@ class Square : public GOftn
 {
 public:
 	Square();
+//	~Square();
 	tMeasPoint eval(tMeasPoint inPoint);
 	tMeasPoint evalfix(tMeasPoint inPoint);
 	Square* clone();
@@ -227,6 +235,7 @@ class Power : public GOftn
 {
 public:
 	Power();
+//	~Power();
 	tMeasPoint eval(tMeasPoint inPoint);
 	tMeasPoint evalfix(tMeasPoint inPoint);
 	Power* clone();

@@ -52,7 +52,7 @@
 #define NUM_POINT_PER_EVAL 1000
 
 #define MAX_TREE_DEPTH 10 
-#define PROP_MUTATE 0.5
+#define PROP_MUTATE 0.6
 #define CROSSOVERCONST 4
 
 //Affects how elitist the algorithm is ... the smaller the more elitist
@@ -109,17 +109,6 @@ struct SCandidate
 */		sTree = new ConstNode(0.0);
 	}
 
-	void deleteTree(GOftn* inTree)	
-	{
-	 //free any children first
-		for (unsigned i=0; i<inTree->mNumChildren; i++) 
-		{ 
-			if (inTree->mChild[i]!=nullptr) deleteTree(inTree->mChild[i]);
-		}
-//		if ((inTree!=nullptr)) delete inTree;
-		inTree = nullptr;
-	}
-
  	~SCandidate() 
 	{
 /*		if (sClutterType!=nullptr) delete [] sClutterType;
@@ -127,7 +116,7 @@ struct SCandidate
 		if (sClutterHeight!=nullptr) delete [] sClutterHeight;	
 		sClutterHeight = nullptr;
 		sConstants.clear();
-		if (sTree!=nullptr) deleteTree(sTree);
+		if (sTree!=nullptr) delete sTree;
 */	}
 
 	SCandidate & operator=(SCandidate Right)
@@ -143,10 +132,13 @@ struct SCandidate
 			sClutterType[i] = Right.sClutterType[i];
 			sClutterHeight[i] = Right.sClutterHeight[i];
 		}
-*/		sConstants.clear();
-		if (sTree!=nullptr) deleteTree(sTree);
+*/		
+		if ((sTree!=nullptr)&&(sTree!=Right.sTree)) delete sTree;
+		
 		sTree = Right.sTree->clone();
+		sConstants.clear();
 		sTree->getConstants(sConstants);
+		sNumber		= Right.sNumber;
 		sCorrC		= Right.sCorrC;
 		sStdDev		= Right.sStdDev;
 		sMean		= Right.sMean;
@@ -204,20 +196,6 @@ namespace Qrap
 
 			void optimiseConstantsCorrCMO(unsigned Index);
 
-			void printTree(GOftn* inTree, int depth=0);
-
-			bool mutateTreeManyNode(GOftn* &inTree, int depth=0, 
-							bool grow = false, 
-							double PropMutate=0.3);
-
-			bool mutateTreeSingleBranch(GOftn* &inTree, int depth=0, 
-							bool grow = false, 
-							double PropMutate=0.3);
-
-			bool crossOverTree(GOftn* treeToAlter, GOftn* donatingTree);
-	
-			void deleteTree(GOftn* inTree);
-
 			void mutateCandidate(unsigned CandidateIndex, bool grow=false);
 
 			void mutateThread(unsigned Begin, unsigned Skip);
@@ -249,6 +227,19 @@ namespace Qrap
 			vCandidates 	mCandidate;
 			vCandidates 	mStars;
 			cMeasAnalysisCalc mMeas;
+	
+			void sorter(vCandidates &Series, bool (*criteria)(SCandidate, SCandidate));
+
+			bool mutateTreeManyNode(GOftn* &parentTree, int depth=0, 
+							bool grow = false, 
+							double PropMutate=0.3, int Index=-1);
+
+			bool mutateTreeSingleBranch(GOftn* &inTree, int depth=0, 
+							bool grow = false, 
+							double PropMutate=0.3);
+
+			bool crossOverTree(GOftn* &treeToAlter, GOftn* donatingTree);
+	
 
 	};
 }

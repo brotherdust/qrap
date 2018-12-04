@@ -186,15 +186,15 @@ namespace Qrap
 			int AutoFix(unsigned CIndex, double &Mean, double &MeanSquareError,
 					double &StDev, double &CorrC, unsigned Clutterfilter=CLUTTER);
 
-			void optimiseConstants(unsigned Index);
+			bool optimiseConstants(unsigned Index);
 
-			void optimiseConstantsSTDev(unsigned Index);
+			bool optimiseConstantsSTDev(unsigned Index);
 
-			void optimiseConstantsSTDevMO(unsigned Index);
+			bool optimiseConstantsSTDevMO(unsigned Index);
 
-			void optimiseConstantsCorrC(unsigned Index);
+			bool optimiseConstantsCorrC(unsigned Index);
 
-			void optimiseConstantsCorrCMO(unsigned Index);
+			bool optimiseConstantsCorrCMO(unsigned Index);
 
 			void mutateCandidate(unsigned CandidateIndex, bool grow=false);
 

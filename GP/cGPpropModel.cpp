@@ -1953,7 +1953,7 @@ int cGPpropModel:: mainTuning()
 		for (i=0; i<mNumCandidates; i++)
 		{
 			mCandidate[i].sRank = i;
-			cout << i << "	CorrC = " << mCandidate[i].sCorrC << endl;
+//			cout << i << "	CorrC = " << mCandidate[i].sCorrC << endl;
 		}
 //		stable_sort(mCandidate.begin(), mCandidate.end(), SortCriteriaOnStdDev);
 		sorter(mCandidate, SortCriteriaOnStdDev);
@@ -1973,9 +1973,11 @@ int cGPpropModel:: mainTuning()
 		cout << "GENERATION = " << k << endl;
 		for (i=0; i<mNumCandidates; i++)
 		{
-			cout << "# = " << mCandidate[i].sNumber << "	Rank=" << mCandidate[i].sRank
+			cout << "# = " << mCandidate[i].sNumber 
+				 << "	Rank=" << mCandidate[i].sRank
 				<< "	Fitness=" << mCandidate[i].sFitness				
-				<<"	CorrC=" << mCandidate[i].sCorrC << "	StDev=" << mCandidate[i].sStdDev
+				<< "	CorrC=" << mCandidate[i].sCorrC 
+				<< "	StDev=" << mCandidate[i].sStdDev
 				<< "	Mean=" << mCandidate[i].sMean  
 				<< "	Form=" << mCandidate[i].sForm
 				<< "	Depth=" << mCandidate[i].sDepth << endl;
@@ -3360,7 +3362,7 @@ int cGPpropModel::AutoFix(unsigned CIndex, double &Mean, double &MeanSquareError
 
 
 //**************************************************************************
-void cGPpropModel::optimiseConstants(unsigned Index)
+bool cGPpropModel::optimiseConstants(unsigned Index)
 {
 	double oldCorrC, oldStdDev, oldMean, oldMSE;
 	double newCorrC, newStdDev, newMean, newMSE;
@@ -3371,6 +3373,7 @@ void cGPpropModel::optimiseConstants(unsigned Index)
 	unsigned CalcCount = 0;
 	double Fitness = UNFIT_LIMIT+200;
 	bool Invalid = true;
+	bool Changed = false;
 
 	double TempDelta=0, DeltaA = 5.0/0.75;
 	double OmegaSize =0.0, OmegaI;
@@ -3541,6 +3544,7 @@ void cGPpropModel::optimiseConstants(unsigned Index)
 			Continue = (OmegaSize>1e-3)&&((((oldStdDev-newStdDev)/newStdDev)>1e-6)
 					||(((newCorrC-oldCorrC)/newCorrC)>1e-6));
 			oldCorrC = newCorrC; oldStdDev=newStdDev; oldMean=newMean; oldMSE=newMSE;
+			Changed = true;
 		}
 		Continue = Continue&&(LoopCount<3*MAXOPTLOOPS)&&(CalcCount<3*MAXOPTCALC);
 	}
@@ -3554,10 +3558,11 @@ void cGPpropModel::optimiseConstants(unsigned Index)
   	timeinfo = localtime ( &rawtime );
 	cout << " Done optimising Constants for Candidate Tree MO. INDEX = " << Index 
 		<< "	Time: " << asctime(timeinfo) << endl;
+	return Changed;
 }
 
 //**************************************************************************
-void cGPpropModel::optimiseConstantsSTDevMO(unsigned Index)
+bool cGPpropModel::optimiseConstantsSTDevMO(unsigned Index)
 {
 	double oldCorrC, oldStdDev, oldMean, oldMSE;
 	double newCorrC, newStdDev, newMean, newMSE;
@@ -3568,6 +3573,7 @@ void cGPpropModel::optimiseConstantsSTDevMO(unsigned Index)
 	unsigned CalcCount = 0;
 	double Fitness = UNFIT_LIMIT+200;
 	bool Invalid = true;
+	bool Changed = false;
 
 	double TempDelta=0, DeltaA = 5.0/0.75;
 	double OmegaSize =0.0, OmegaI;
@@ -3740,6 +3746,7 @@ void cGPpropModel::optimiseConstantsSTDevMO(unsigned Index)
 		
 */			Continue = (OmegaSize>1e-3)&&(((oldStdDev-newStdDev)/newStdDev)>1e-6);
 			oldCorrC = newCorrC; oldStdDev=newStdDev; oldMean=newMean; oldMSE=newMSE;
+			Changed = true;
 		}
 		Continue = Continue&&(LoopCount<MAXOPTLOOPS)&&(CalcCount<MAXOPTCALC);
 	}
@@ -3752,10 +3759,11 @@ void cGPpropModel::optimiseConstantsSTDevMO(unsigned Index)
   	timeinfo = localtime ( &rawtime );
 	cout << "Done optimising Constants for Candidate Tree STDevMO. INDEX = " << Index 
 		<< "	Time: " << asctime(timeinfo) << endl;
+	return Changed;
 }
 
 //**************************************************************************
-void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
+bool cGPpropModel::optimiseConstantsSTDev(unsigned Index)
 {
 	double oldCorrC, oldStdDev, oldMean, oldMSE;
 	double newCorrC, newStdDev, newMean, newMSE;
@@ -3766,6 +3774,7 @@ void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
 	unsigned CalcCount = 0;
 	unsigned k = 0;
 	bool Invalid = true;
+	bool Changed = false;
 	SCandidate thisCandidate, oldCandidate, newCandidate, yCandidate, minCandidate;
 	unsigned minAge = 0;
 	double minStdDev = UNFIT_LIMIT-199;
@@ -4108,6 +4117,7 @@ void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
 
 		CalcCount ++ ;
 		LoopCount ++;
+		Changed = true;
 	}
 	mCandidate[Index] = minCandidate;
 	CostFunctionTreeOnly(Index, oldMean, oldMSE, oldStdDev, oldCorrC);
@@ -4120,12 +4130,13 @@ void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
   	timeinfo = localtime ( &rawtime );
 	cout << "Done optimising Constants for Candidate Tree StDev. INDEX = " << Index 
 		<< "	Time: " << asctime(timeinfo) << endl;
+	return Changed;
 }
 
 
 //**************************************************************************
 /*
-void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
+bool cGPpropModel::optimiseConstantsSTDev(unsigned Index)
 {
 	double oldCorrC, oldStdDev, oldMean, oldMSE;
 	double newCorrC, newStdDev, newMean, newMSE;
@@ -4135,7 +4146,7 @@ void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
 	unsigned LoopCount = 0;
 	unsigned CalcCount = 0;
 	bool Invalid = true;
-
+	bool Changed = false;
 	double TempDelta=0, DeltaA = 5/0.8, DeltaB, DeltaC;
 	double OmegaSize =0.0, OmegaI;
 	unsigned i=0, numConsts=0;
@@ -4328,6 +4339,7 @@ void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
 					<< "	StDev=" << oldStdDev 
 					<< "	Mean=" << oldMean  
 					<< "	MSE=" << oldMSE << "	CalcCount="<< CalcCount <<endl;
+			Changed = true;
 				
 		}
 		LoopCount ++;
@@ -4342,10 +4354,11 @@ void cGPpropModel::optimiseConstantsSTDev(unsigned Index)
   	timeinfo = localtime ( &rawtime );
 	cout << "Done optimising Constants for Candidate Tree StDev. INDEX = " << Index 
 		<< "	Time: " << asctime(timeinfo) << endl;
+	return Changed;
 }
 */
 //**************************************************************************
-void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
+bool cGPpropModel::optimiseConstantsCorrC(unsigned Index)
 {
 	double origCorrC, origStdDev, origMean, origMSE;
 	double minStdDev;
@@ -4358,6 +4371,7 @@ void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
 	unsigned CalcCount = 0;
 	unsigned k = 0;
 	bool Invalid = true;
+	bool Changed = false;
 	SCandidate thisCandidate, oldCandidate, newCandidate, yCandidate, minCandidate;
 	unsigned minAge = 0;
 	double maxCorrC = -1.0;;
@@ -4701,6 +4715,7 @@ void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
 		thisCandidate = newCandidate; 
 		oldCorrC = newCorrC; oldStdDev=newStdDev; oldMean=newMean; oldMSE=newMSE;
 		LoopCount ++;
+		Changed = true;
 	}
 	mCandidate[Index] = minCandidate;
 	CostFunctionTreeOnly(Index, oldMean, oldMSE, oldStdDev, oldCorrC);
@@ -4712,12 +4727,13 @@ void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
   	timeinfo = localtime ( &rawtime );
 	cout << "Done optimising Constants for Candidate Tree CorrC. INDEX = " << Index 
 		<< "	Time: " << asctime(timeinfo) << endl;
+	return Changed;
 }
 
 
 //**************************************************************************
 /*
-void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
+bool cGPpropModel::optimiseConstantsCorrC(unsigned Index)
 {
 	double origCorrC, origStdDev, origMean, origMSE;
 	double minStdDev;
@@ -4730,6 +4746,7 @@ void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
 	unsigned CalcCount = 0;
 	double Fitness = UNFIT_LIMIT+200;
 	bool Invalid = true;
+	bool Changed = false;
 
 	double TempDelta=0, DeltaA = 3.0/0.7, DeltaB, DeltaC;
 	double OmegaSize =0.0, OmegaI;
@@ -4931,7 +4948,7 @@ void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
 					<< "	MSE=" << oldMSE << "	CalcCount="<< CalcCount << endl;
 
 			Continue = Continue&&((oldStdDev<1.5*minStdDev)||(oldCorrC<(origCorrC+0.03)));
-			
+			Changed = true;
 		}
 		LoopCount ++;
 		Continue = Continue&&(LoopCount<MAXOPTLOOPS)&&(CalcCount<MAXOPTCALC);
@@ -4945,12 +4962,13 @@ void cGPpropModel::optimiseConstantsCorrC(unsigned Index)
   	timeinfo = localtime ( &rawtime );
 	cout << "Done optimising Constants for Candidate Tree CorrC. INDEX = " << Index 
 		<< "	Time: " << asctime(timeinfo) << endl;
+	return Changed;
 }
 */
 
 
 //**************************************************************************
-void cGPpropModel::optimiseConstantsCorrCMO(unsigned Index)
+bool cGPpropModel::optimiseConstantsCorrCMO(unsigned Index)
 {
 	double oldCorrC, oldStdDev, oldMean, oldMSE;
 	double newCorrC, newStdDev, newMean, newMSE;
@@ -4960,6 +4978,7 @@ void cGPpropModel::optimiseConstantsCorrCMO(unsigned Index)
 	unsigned CalcCount = 0;
 	double Fitness = UNFIT_LIMIT+200;
 	bool Invalid =true;
+	bool Changed = false;
 
 	double TempDelta=0, DeltaA = 5.0/0.75;
 	double OmegaSize =0.0, OmegaI;
@@ -5129,6 +5148,7 @@ void cGPpropModel::optimiseConstantsCorrCMO(unsigned Index)
 		
 			Continue = (OmegaSize>1e-3)&&(((newCorrC-oldCorrC)/newCorrC)>1e-6);
 			oldCorrC = newCorrC; oldStdDev=newStdDev; oldMean=newMean; oldMSE=newMSE;
+			Changed = true;
 		}
 		LoopCount ++;
 		Continue = Continue&&(LoopCount<MAXOPTLOOPS)&&(CalcCount<MAXOPTCALC);
@@ -5143,6 +5163,7 @@ void cGPpropModel::optimiseConstantsCorrCMO(unsigned Index)
 
 	cout << "Done optimising Constants for Candidate Tree CorrC MO. INDEX = " << Index 
 		<< "	Time: " << asctime(timeinfo) << endl;
+	return Changed;
 }
 
 //********************************************************************************
@@ -5164,11 +5185,11 @@ void cGPpropModel::mutateThread(unsigned Begin, unsigned Skip)
 			IndexForCrossOver = mNumStars;
 			while (IndexForCrossOver>(mNumStars-1))
 				IndexForCrossOver = (unsigned)(fabs(gUni(gRandomGen))*GAUSSDIST*mNumStars);
-			cout << "IndexForCrossOver = " << IndexForCrossOver << endl;
-			mCandidate[i].sTree->printTree();
-			cout << endl;
-			mStars[IndexForCrossOver].sTree->printTree();
-			cout << endl;
+//			cout << "IndexForCrossOver = " << IndexForCrossOver << endl;
+//			mCandidate[i].sTree->printTree();
+//			cout << endl;
+//			mStars[IndexForCrossOver].sTree->printTree();
+//			cout << endl;
 			if (crossOverTree(mCandidate[i].sTree, mStars[IndexForCrossOver].sTree)) 
 			{
 				mCandidate[i].sConstants.clear();
@@ -5181,9 +5202,9 @@ void cGPpropModel::mutateThread(unsigned Begin, unsigned Skip)
 					 mCandidate[i].sStdDev, mCandidate[i].sCorrC);
 				mCandidate[i].sFitness =  FITNESS;
 			}
-			cout << "After CrossOver" << endl; 
-			mCandidate[i].sTree->printTree();
-			cout << endl;
+//			cout << "After CrossOver" << endl; 
+//			mCandidate[i].sTree->printTree();
+//			cout << endl;
 		}
 
 	}
@@ -5194,6 +5215,7 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 {
 	unsigned dice, ConstIndex;
 	bool Mutated = false;
+	bool Optimised = false; 
 	mCandidate[Index].sPareto = false;
 	mCandidate[Index].sOptimised = false;
 
@@ -5227,15 +5249,15 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 		}
 		switch (dice)
 		{	
-			case 0:	optimiseConstantsCorrC(Index);
+			case 0:	Optimised = optimiseConstantsCorrC(Index);
 				break;
-			case 1:	optimiseConstantsSTDev(Index);
+			case 1:	Optimised = optimiseConstantsSTDev(Index);
 				break;
-			case 2:	optimiseConstants(Index);
+			case 2:	Optimised = optimiseConstants(Index);
 				break;
 		}
 	}
-	else 
+	if ((dice>=3)||(grow)||(!Optimised))
 	{
 		double random = gUni(gRandomGen);
 		double mutateProp = min(0.5, (1-mMinFitness/mCandidate[Index].sFitness));
@@ -5250,22 +5272,22 @@ void cGPpropModel::mutateCandidate(unsigned Index, bool grow)
 				random = gUni(gRandomGen);
 				unsigned mutateDepth = min(depth, (unsigned)max(0,
 						(int)(depth*fabs(random)*mCandidate[Index].sFitness/mMinFitness)));
-				mCandidate[Index].sTree->printTree();
-				cout << "mutateTreeSingleBranch" << endl;
+//				mCandidate[Index].sTree->printTree();
+//				cout << "mutateTreeSingleBranch" << endl;
 				Mutated = mutateTreeSingleBranch(mCandidate[Index].sTree, 
 								mutateDepth, grow, mutateProp);
-				if (Mutated) mCandidate[Index].sTree->printTree();
-				cout << endl;
+//				if (Mutated) mCandidate[Index].sTree->printTree();
+//				cout << endl;
 
 				}
 				break;
 			case 1:	
-				cout << endl;
-				mCandidate[Index].sTree->printTree();
-				cout << "mutateTreeManyNode" << endl;
+//				cout << endl;
+//				mCandidate[Index].sTree->printTree();
+//				cout << "mutateTreeManyNode" << endl;
 				Mutated = mutateTreeManyNode(mCandidate[Index].sTree, 0, grow, mutateProp,-1);
-				if (Mutated) mCandidate[Index].sTree->printTree();
-				cout << endl;
+//				if (Mutated) mCandidate[Index].sTree->printTree();
+//				cout << endl;
 				break;
 		}
 
@@ -5335,7 +5357,7 @@ bool cGPpropModel::crossOverTree(GOftn* &treeToAlter, GOftn* donatingTree)
 		//clone side of donatingTree
 		treeToAlter->mChild[childToAlter] = (donatingTree->mChild[childToAlter])->clone();
 		//delete side of treeToAlter
-		cout << "Deleting in crossOverTree" << endl;
+//		cout << "Deleting in crossOverTree" << endl;
 		if (tempTree!=nullptr) delete tempTree;
 		return true;
 	}
@@ -5440,9 +5462,9 @@ bool cGPpropModel::mutateTreeManyNode(GOftn* &parentTree, int depth, bool grow, 
 //			newNode->printTree();
 			if ((inTree!=nullptr))
 			{
-				cout << "Deleting in mutateTreeManyNode " << Index << "	" << inTree;
-				if (-1==Index) cout << "	" << parentTree << endl;
-				else cout << "	" << parentTree->mChild[Index] << endl;
+//				cout << "Deleting in mutateTreeManyNode " << Index << "	" << inTree;
+//				if (-1==Index) cout << "	" << parentTree << endl;
+//				else cout << "	" << parentTree->mChild[Index] << endl;
 				delete inTree;
 			}
 			if (-1==Index)

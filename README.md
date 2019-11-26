@@ -1,7 +1,7 @@
 # Q-Rap
 
 **Note from repo owner:**
-This code was imported from QRAP's SourceForge site, without modification. I added the README.md for informational purposes. The code is here for my own purposes (but maybe someday I'll have the skills to make it so it works with QGIS5/QT5.
+This code was imported from QRAP's SourceForge site, without modification. I added the README.md for informational purposes. The code is here for archival purposes only, at the moment. Maybe, one day, or if I had help, this could be ported to QGIS 3 (or 4, whenver that happens).
 
 Q-Rap is Radio Planning plug-in for QGIS. It was developed for the Radio Technical Services of the South African Police Service by the University of Pretoria (through BE@UP). The SAPS specified that the source code be released to ensure continuous development and maintenance. The core propagation prediction algorithm was made available by CSIR Meraka Institute.
 

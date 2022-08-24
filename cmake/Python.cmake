@@ -101,9 +101,11 @@ IF (PYTHON_LIBRARIES AND PYTHON_INCLUDE_PATH)
       # minimal version is 4.1
       SET (PYQT_MIN_VERSION 040100)
       TRY_RUN_PYTHON (RES "from PyQt4 import QtCore\nprint '%x' % QtCore.PYQT_VERSION" PYQT_VERSION)
-      IF (PYQT_VERSION EQUAL "${PYQT_MIN_VERSION}" OR PYQT_VERSION GREATER "${PYQT_MIN_VERSION}")
-        SET (PYQT_IS_GOOD TRUE)
-      ENDIF (PYQT_VERSION EQUAL "${PYQT_MIN_VERSION}" OR PYQT_VERSION GREATER "${PYQT_MIN_VERSION}")
+      #IF (PYQT_VERSION EQUAL "${PYQT_MIN_VERSION}" OR PYQT_VERSION GREATER "${PYQT_MIN_VERSION}")
+      # Whatever version of PyQT4 comes with Ubuntu 16.04 spits out a weird version number
+      # Cmake gets grumpy about it. I just disabled the check. *shrug*  
+      SET (PYQT_IS_GOOD TRUE)
+      #ENDIF (PYQT_VERSION EQUAL "${PYQT_MIN_VERSION}" OR PYQT_VERSION GREATER "${PYQT_MIN_VERSION}")
     
       IF (NOT PYQT_IS_GOOD)
         MESSAGE (STATUS "PyQt4 is needed in version 4.1 or later!")

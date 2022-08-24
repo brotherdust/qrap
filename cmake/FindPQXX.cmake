@@ -20,6 +20,7 @@ if ( NOT PQXX_INCLUDE_DIRECTORIES OR NOT PQXX_LIBRARIES )
         /usr/local/pgsql/lib
         /usr/local/lib
         /usr/lib
+        /usr/lib/x86_64-linux-gnu
       DOC "Location of libpqxx library"
       NO_DEFAULT_PATH
     )

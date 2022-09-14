@@ -27,7 +27,7 @@
 #include "qrap.h"
 //
 #include <qgisinterface.h>
-#include <qgisgui.h>
+#include <qgis_gui.h>
 
 // Qt4 Related Includes
 #include <QAction>

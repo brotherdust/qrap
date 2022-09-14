@@ -60,7 +60,7 @@ using namespace std;
 //QGIS includes
 #include <qgisplugin.h>
 #include <qgisinterface.h>
-#include <qgisgui.h>
+#include <qgis_gui.h>
 #include <qgspoint.h>
 #include <qgsmapcanvas.h>
 #include <qgsmaptool.h>

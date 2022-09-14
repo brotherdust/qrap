@@ -4,5 +4,8 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"cmake.buildDirectory": "${workspaceFolder}/build/${buildType}",
+		"cmake.generator": "Ninja"
+	}
 }

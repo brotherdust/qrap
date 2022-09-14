@@ -25,16 +25,37 @@
 #    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# FindLibPython.py
+# FindPyQt.py
 # Copyright (c) 2007, Simon Edwards <simon@simonzone.com>
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
+import os.path
+import PyQt5.QtCore
+import sipconfig
 import sys
-import distutils.sysconfig
 
-print("exec_prefix:%s" % sys.exec_prefix)
-print("short_version:%s" % sys.version[:3])
-print("long_version:%s" % sys.version.split()[0])
-print("py_inc_dir:%s" % distutils.sysconfig.get_python_inc())
-print("site_packages_dir:%s" % distutils.sysconfig.get_python_lib(plat_specific=1))
+cfg = sipconfig.Configuration()
+sip_dir = cfg.default_sip_dir
+for p in (
+    os.path.join(sip_dir, "PyQt5"),
+    os.path.join(sip_dir, "PyQt5-3"),
+    sip_dir,
+    os.path.join(cfg.default_mod_dir, "PyQt5", "bindings"),
+):
+    if os.path.exists(os.path.join(p, "QtCore", "QtCoremod.sip")):
+        sip_dir = p
+        break
+
+print("pyqt_version_str:%s" % PyQt5.QtCore.PYQT_VERSION_STR)
+print("pyqt_mod_dir:%s" % os.path.join(cfg.default_mod_dir, "PyQt5"))
+print("pyqt_sip_dir:%s" % sip_dir)
+print("pyqt_sip_flags:%s" % PyQt5.QtCore.PYQT_CONFIGURATION["sip_flags"])
+print("pyqt_bin_dir:%s" % cfg.default_bin_dir)
+
+try:
+    import PyQt5.sip
+
+    print("pyqt_sip_module:PyQt5.sip")
+except:
+    print("pyqt_sip_module:sip")

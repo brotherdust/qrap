@@ -31,7 +31,7 @@
 // include Qt headers
 #include <QMainWindow>
 #include <QClipboard>
-#include <QtGui/QVBoxLayout>
+#include <QtWidgets/QVBoxLayout>
 
 // include local headers
 #include "Config.h"

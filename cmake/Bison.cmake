@@ -1,58 +1,60 @@
 # use bison for .yy files
 
 # search for bison
-MACRO(FIND_BISON)
-  IF(NOT BISON_EXECUTABLE)
-    IF (MSVC)
-      FIND_PROGRAM(BISON_EXECUTABLE "$ENV{LIB_DIR}/bin/bison.exe")
-    ELSE (MSVC)
-      FIND_PROGRAM(BISON_EXECUTABLE bison)
-    ENDIF (MSVC)
-    IF (NOT BISON_EXECUTABLE)
+macro(FIND_BISON)
+  if(NOT BISON_EXECUTABLE)
+    if(MSVC)
+      find_program(BISON_EXECUTABLE "$ENV{LIB_DIR}/bin/bison.exe")
+    else(MSVC)
+      find_program(BISON_EXECUTABLE bison)
+    endif(MSVC)
+    if(NOT BISON_EXECUTABLE)
 
-      MESSAGE(FATAL_ERROR "Bison not found - aborting")
+      message(FATAL_ERROR "Bison not found - aborting")
 
-    ELSE (NOT BISON_EXECUTABLE)
+    else(NOT BISON_EXECUTABLE)
 
-      EXEC_PROGRAM(${BISON_EXECUTABLE} ARGS --version OUTPUT_VARIABLE BISON_VERSION_STR)
+      exec_program(
+        ${BISON_EXECUTABLE} ARGS
+        --version
+        OUTPUT_VARIABLE BISON_VERSION_STR)
       # get first line in case it's multiline
-      STRING(REGEX REPLACE "([^\n]+).*" "\\1" FIRST_LINE "${BISON_VERSION_STR}")
+      string(REGEX REPLACE "([^\n]+).*" "\\1" FIRST_LINE "${BISON_VERSION_STR}")
       # get version information
-      STRING(REGEX REPLACE ".* ([0-9]+)\\.([0-9]+)" "\\1" BISON_VERSION_MAJOR "${FIRST_LINE}")
-      STRING(REGEX REPLACE ".* ([0-9]+)\\.([0-9]+)" "\\2" BISON_VERSION_MINOR "${FIRST_LINE}")
-      IF (BISON_VERSION_MAJOR LESS 2)
-        MESSAGE (FATAL_ERROR "Bison version is too old (${BISON_VERSION_MAJOR}.${BISON_VERSION_MINOR}). Use 2.0 or higher.")
-      ENDIF (BISON_VERSION_MAJOR LESS 2)
+      string(REGEX REPLACE ".* ([0-9]+)\\.([0-9]+)" "\\1" BISON_VERSION_MAJOR
+                           "${FIRST_LINE}")
+      string(REGEX REPLACE ".* ([0-9]+)\\.([0-9]+)" "\\2" BISON_VERSION_MINOR
+                           "${FIRST_LINE}")
+      if(BISON_VERSION_MAJOR LESS 2)
+        message(
+          FATAL_ERROR
+            "Bison version is too old (${BISON_VERSION_MAJOR}.${BISON_VERSION_MINOR}). Use 2.0 or higher."
+        )
+      endif(BISON_VERSION_MAJOR LESS 2)
 
-    ENDIF (NOT BISON_EXECUTABLE)
-  ENDIF(NOT BISON_EXECUTABLE)
+    endif(NOT BISON_EXECUTABLE)
+  endif(NOT BISON_EXECUTABLE)
 
-ENDMACRO(FIND_BISON)
+endmacro(FIND_BISON)
 
-MACRO(ADD_BISON_FILES _sources )
-  FIND_BISON()
+macro(ADD_BISON_FILES _sources)
+  find_bison()
 
-  FOREACH (_current_FILE ${ARGN})
-    GET_FILENAME_COMPONENT(_in ${_current_FILE} ABSOLUTE)
-    GET_FILENAME_COMPONENT(_basename ${_current_FILE} NAME_WE)
+  foreach(_current_FILE ${ARGN})
+    get_filename_component(_in ${_current_FILE} ABSOLUTE)
+    get_filename_component(_basename ${_current_FILE} NAME_WE)
 
-    SET(_out ${CMAKE_CURRENT_BINARY_DIR}/${_basename}.cpp)
+    set(_out ${CMAKE_CURRENT_BINARY_DIR}/${_basename}.cpp)
 
+    # bison options: -t add debugging facilities -d produce additional header
+    # file (used in parser.l) -v produce additional *.output file with parser
+    # states
 
-    # bison options:
-    # -t add debugging facilities
-    # -d produce additional header file (used in parser.l)
-    # -v produce additional *.output file with parser states
-
-    ADD_CUSTOM_COMMAND(
+    add_custom_command(
       OUTPUT ${_out}
-      COMMAND ${BISON_EXECUTABLE}
-      ARGS
-      -o${_out} -d -v -t
-      ${_in}
-      DEPENDS ${_in}
-      )
+      COMMAND ${BISON_EXECUTABLE} ARGS -o${_out} -d -v -t ${_in}
+      DEPENDS ${_in})
 
-    SET(${_sources} ${${_sources}} ${_out} )
-  ENDFOREACH (_current_FILE)
-ENDMACRO(ADD_BISON_FILES)
+    set(${_sources} ${${_sources}} ${_out})
+  endforeach(_current_FILE)
+endmacro(ADD_BISON_FILES)

@@ -27,7 +27,7 @@
 
 // Include global headers
 
-#include <QtGui>
+#include <QtWidgets>
 #include <iostream>
 
 // Include local headers

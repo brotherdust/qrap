@@ -1,4 +1,4 @@
-# Find QScintilla2 PyQt4 module
+# Find QScintilla2 PyQt5 module
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # QScintilla2 website: http://www.riverbankcomputing.co.uk/software/qscintilla/
@@ -19,25 +19,46 @@
 # NOTE: include after check for Qt
 
 
-IF(EXISTS QSCINTILLA_VERSION_STR)
+IF(QSCINTILLA_VERSION_STR)
   # Already in cache, be silent
   SET(QSCINTILLA_FOUND TRUE)
-ELSE(EXISTS QSCINTILLA_VERSION_STR)
+ELSE(QSCINTILLA_VERSION_STR)
+
+  set(QSCINTILLA_LIBRARY_NAMES
+    qscintilla2-qt5
+    qscintilla2_qt5
+    libqt5scintilla2
+    libqscintilla2-qt5
+    qt5scintilla2
+    libqscintilla2-qt5.dylib
+    qscintilla2
+  )
+
+  find_library(QSCINTILLA_LIBRARY
+    NAMES ${QSCINTILLA_LIBRARY_NAMES}
+    PATHS
+      "${QT_LIBRARY_DIR}"
+      $ENV{LIB_DIR}/lib
+      /usr/local/lib
+      /usr/local/lib/qt5
+      /usr/lib
+  )
+
+  set(_qsci_fw)
+  if(QSCINTILLA_LIBRARY MATCHES "/qscintilla.*\\.framework")
+    string(REGEX REPLACE "^(.*/qscintilla.*\\.framework).*$" "\\1" _qsci_fw "${QSCINTILLA_LIBRARY}")
+  endif()
 
   FIND_PATH(QSCINTILLA_INCLUDE_DIR
     NAMES Qsci/qsciglobal.h
     PATHS
+      "${_qsci_fw}/Headers"
+      ${Qt5Core_INCLUDE_DIRS}
       "${QT_INCLUDE_DIR}"
+      $ENV{LIB_DIR}/include
       /usr/local/include
       /usr/include
-    )
-
-  FIND_LIBRARY(QSCINTILLA_LIBRARY
-    NAMES qscintilla2 libqscintilla2 libqscintilla2.dylib
-    PATHS
-      "${QT_LIBRARY_DIR}"
-      /usr/local/lib
-      /usr/lib
+    PATH_SUFFIXES qt
     )
 
   IF(QSCINTILLA_LIBRARY AND QSCINTILLA_INCLUDE_DIR)
@@ -53,7 +74,7 @@ ELSE(EXISTS QSCINTILLA_VERSION_STR)
   ENDIF(QSCINTILLA_LIBRARY AND QSCINTILLA_INCLUDE_DIR)
 
   IF(QSCINTILLA_INCLUDE_DIR AND NOT EXISTS QSCINTILLA_VERSION_STR)
-    # get QScintilla2 version from header, is optinally retrieved via bindings
+    # get QScintilla2 version from header, is optionally retrieved via bindings
     # with Qsci PyQt4 module
     FILE(READ ${QSCINTILLA_INCLUDE_DIR}/Qsci/qsciglobal.h qsci_header)
     STRING(REGEX REPLACE "^.*QSCINTILLA_VERSION_STR +\"([^\"]+)\".*$" "\\1" QSCINTILLA_VERSION_STR "${qsci_header}")
@@ -69,7 +90,6 @@ ELSE(EXISTS QSCINTILLA_VERSION_STR)
     ENDIF(QSCINTILLA_FIND_REQUIRED)
   ENDIF(QSCINTILLA_FOUND)
 
-ENDIF(EXISTS QSCINTILLA_VERSION_STR)
+ENDIF(QSCINTILLA_VERSION_STR)
 
 #MARK_AS_ADVANCED(QSCINTILLA_INCLUDE_DIR QSCINTILLA_LIBRARY)
-

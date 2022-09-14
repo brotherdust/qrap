@@ -1,46 +1,34 @@
-
-# CMake module to search for Expat library
-# (library for parsing XML files)
+# CMake module to search for Expat library (library for parsing XML files)
 #
-# If it's found it sets EXPAT_FOUND to TRUE
-# and following variables are set:
-#    EXPAT_INCLUDE_DIR
-#    EXPAT_LIBRARY
+# If it's found it sets EXPAT_FOUND to TRUE and following variables are set:
+# EXPAT_INCLUDE_DIR EXPAT_LIBRARY
 
+find_path(EXPAT_INCLUDE_DIR expat.h /usr/local/include /usr/include
+          "$ENV{LIB_DIR}/include/expat" c:/msys/local/include)
+# libexpat needed for msvc version
+find_library(
+  EXPAT_LIBRARY
+  NAMES expat libexpat
+  PATHS /usr/local/lib /usr/lib "$ENV{LIB_DIR}/lib" c:/msys/local/lib)
 
-FIND_PATH(EXPAT_INCLUDE_DIR expat.h 
-  /usr/local/include 
-  /usr/include 
-  "$ENV{LIB_DIR}/include/expat"
-  c:/msys/local/include
-  )
-#libexpat needed for msvc version
-FIND_LIBRARY(EXPAT_LIBRARY NAMES expat libexpat PATHS 
-  /usr/local/lib 
-  /usr/lib 
-  "$ENV{LIB_DIR}/lib"
-  c:/msys/local/lib
-  )
+if(EXPAT_INCLUDE_DIR AND EXPAT_LIBRARY)
+  set(EXPAT_FOUND TRUE)
+endif(EXPAT_INCLUDE_DIR AND EXPAT_LIBRARY)
 
-IF (EXPAT_INCLUDE_DIR AND EXPAT_LIBRARY)
-   SET(EXPAT_FOUND TRUE)
-ENDIF (EXPAT_INCLUDE_DIR AND EXPAT_LIBRARY)
+if(EXPAT_FOUND)
 
+  if(NOT EXPAT_FIND_QUIETLY)
+    message(STATUS "Found Expat: ${EXPAT_LIBRARY}")
+  endif(NOT EXPAT_FIND_QUIETLY)
 
-IF (EXPAT_FOUND)
+else(EXPAT_FOUND)
 
-   IF (NOT EXPAT_FIND_QUIETLY)
-      MESSAGE(STATUS "Found Expat: ${EXPAT_LIBRARY}")
-   ENDIF (NOT EXPAT_FIND_QUIETLY)
+  if(EXPAT_FIND_REQUIRED)
+    message(FATAL_ERROR "Could not find Expat")
+  else(EXPAT_FIND_REQUIRED)
+    if(NOT EXPAT_FIND_QUIETLY)
+      message(STATUS "Could not find Expat")
+    endif(NOT EXPAT_FIND_QUIETLY)
+  endif(EXPAT_FIND_REQUIRED)
 
-ELSE (EXPAT_FOUND)
-
-   IF (EXPAT_FIND_REQUIRED)
-     MESSAGE(FATAL_ERROR "Could not find Expat")
-   ELSE (EXPAT_FIND_REQUIRED)
-     IF (NOT EXPAT_FIND_QUIETLY)
-        MESSAGE(STATUS "Could not find Expat")
-     ENDIF (NOT EXPAT_FIND_QUIETLY)
-   ENDIF (EXPAT_FIND_REQUIRED)
-
-ENDIF (EXPAT_FOUND)
+endif(EXPAT_FOUND)

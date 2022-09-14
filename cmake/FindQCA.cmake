@@ -1,6 +1,5 @@
-
 # Find QCA (Qt Cryptography Architecture 2+)
-# ~~~~~~~~~~~~~~~~
+# ~~~
 # When run this will define
 #
 #  QCA_FOUND - system has QCA
@@ -14,38 +13,34 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
-
 if(QCA_INCLUDE_DIR AND QCA_LIBRARY)
 
   set(QCA_FOUND TRUE)
 
 else(QCA_INCLUDE_DIR AND QCA_LIBRARY)
 
-  find_library(QCA_LIBRARY
+  find_library(
+    QCA_LIBRARY
     NAMES qca qca2
-    PATHS
-      ${LIB_DIR}
-      $ENV{LIB}
-      "$ENV{LIB_DIR}"
-      /usr/local/lib
-  )
+    PATHS ${LIB_DIR} $ENV{LIB} "$ENV{LIB_DIR}" /usr/local/lib)
 
   if(APPLE)
     if(QCA_LIBRARY AND QCA_LIBRARY MATCHES "qca(2)?\\.framework")
-      set(QCA_LIBRARY "${QCA_LIBRARY}" CACHE FILEPATH "QCA framework" FORCE)
-      set(QCA_INCLUDE_DIR "${QCA_LIBRARY}/Headers" CACHE FILEPATH "QCA framework headers" FORCE)
+      set(QCA_LIBRARY
+          "${QCA_LIBRARY}"
+          CACHE FILEPATH "QCA framework" FORCE)
+      set(QCA_INCLUDE_DIR
+          "${QCA_LIBRARY}/Headers"
+          CACHE FILEPATH "QCA framework headers" FORCE)
     endif()
   endif(APPLE)
 
-  find_path(QCA_INCLUDE_DIR
+  find_path(
+    QCA_INCLUDE_DIR
     NAMES QtCrypto
-    PATHS
-      ${LIB_DIR}/include
-      "$ENV{LIB_DIR}/include"
-      $ENV{INCLUDE}
-      /usr/local/include
-    PATH_SUFFIXES QtCrypto qt4/QtCrypto
-  )
+    PATHS ${LIB_DIR}/include "$ENV{LIB_DIR}/include" $ENV{INCLUDE}
+          /usr/local/include
+    PATH_SUFFIXES QtCrypto qt4/QtCrypto)
 
   if(QCA_LIBRARY AND QCA_INCLUDE_DIR)
     set(QCA_FOUND TRUE)
@@ -63,20 +58,24 @@ if(NOT QCA_FOUND)
 
 else(NOT QCA_FOUND)
 
-  # Check version is valid (>= 2.0.3)
-  # find_package(QCA 2.0.3) works with 2.1.0+, which has a QcaConfigVersion.cmake, but 2.0.3 does not
+  # Check version is valid (>= 2.0.3) find_package(QCA 2.0.3) works with 2.1.0+,
+  # which has a QcaConfigVersion.cmake, but 2.0.3 does not
 
   # qca_version.h header only available with 2.1.0+
   set(_qca_version_h "${QCA_INCLUDE_DIR}/qca_version.h")
   if(EXISTS "${_qca_version_h}")
-    file(STRINGS "${_qca_version_h}" _qca_version_str REGEX "^.*QCA_VERSION_STR +\"[^\"]+\".*$")
-    string(REGEX REPLACE "^.*QCA_VERSION_STR +\"([^\"]+)\".*$" "\\1" QCA_VERSION_STR "${_qca_version_str}")
+    file(STRINGS "${_qca_version_h}" _qca_version_str
+         REGEX "^.*QCA_VERSION_STR +\"[^\"]+\".*$")
+    string(REGEX REPLACE "^.*QCA_VERSION_STR +\"([^\"]+)\".*$" "\\1"
+                         QCA_VERSION_STR "${_qca_version_str}")
   else()
     # qca_core.h contains hexidecimal version in <= 2.0.3
     set(_qca_core_h "${QCA_INCLUDE_DIR}/qca_core.h")
     if(EXISTS "${_qca_core_h}")
-      file(STRINGS "${_qca_core_h}" _qca_version_str REGEX "^#define +QCA_VERSION +0x[0-9a-fA-F]+.*")
-      string(REGEX REPLACE "^#define +QCA_VERSION +0x([0-9a-fA-F]+)$" "\\1" _qca_version_int "${_qca_version_str}")
+      file(STRINGS "${_qca_core_h}" _qca_version_str
+           REGEX "^#define +QCA_VERSION +0x[0-9a-fA-F]+.*")
+      string(REGEX REPLACE "^#define +QCA_VERSION +0x([0-9a-fA-F]+)$" "\\1"
+                           _qca_version_int "${_qca_version_str}")
       if("${_qca_version_int}" STREQUAL "020003")
         set(QCA_VERSION_STR "2.0.3")
       endif()

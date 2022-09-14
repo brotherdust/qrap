@@ -1,42 +1,36 @@
 # flex a .ll file
 
 # search flex
-MACRO(FIND_FLEX)
-    IF(NOT FLEX_EXECUTABLE)
-      IF (MSVC)
-        FIND_PROGRAM(FLEX_EXECUTABLE 
-            "$ENV{LIB_DIR}/bin/flex.exe"
-	    )
-      ELSE(MSVC)
-        FIND_PROGRAM(FLEX_EXECUTABLE flex)
-      ENDIF (MSVC)
-        IF (NOT FLEX_EXECUTABLE)
-          MESSAGE(FATAL_ERROR "flex not found - aborting")
-        ENDIF (NOT FLEX_EXECUTABLE)
-    ENDIF(NOT FLEX_EXECUTABLE)
-ENDMACRO(FIND_FLEX)
+macro(FIND_FLEX)
+  if(NOT FLEX_EXECUTABLE)
+    if(MSVC)
+      find_program(FLEX_EXECUTABLE "$ENV{LIB_DIR}/bin/flex.exe")
+    else(MSVC)
+      find_program(FLEX_EXECUTABLE flex)
+    endif(MSVC)
+    if(NOT FLEX_EXECUTABLE)
+      message(FATAL_ERROR "flex not found - aborting")
+    endif(NOT FLEX_EXECUTABLE)
+  endif(NOT FLEX_EXECUTABLE)
+endmacro(FIND_FLEX)
 
-MACRO(ADD_FLEX_FILES _sources )
-    FIND_FLEX()
+macro(ADD_FLEX_FILES _sources)
+  find_flex()
 
-    FOREACH (_current_FILE ${ARGN})
-      GET_FILENAME_COMPONENT(_in ${_current_FILE} ABSOLUTE)
-      GET_FILENAME_COMPONENT(_basename ${_current_FILE} NAME_WE)
+  foreach(_current_FILE ${ARGN})
+    get_filename_component(_in ${_current_FILE} ABSOLUTE)
+    get_filename_component(_basename ${_current_FILE} NAME_WE)
 
-      SET(_out ${CMAKE_CURRENT_BINARY_DIR}/flex_${_basename}.cpp)
+    set(_out ${CMAKE_CURRENT_BINARY_DIR}/flex_${_basename}.cpp)
 
+    # -d option for flex means that it will produce output to stderr while
+    # analyzing
 
-      # -d option for flex means that it will produce output to stderr while analyzing 
+    add_custom_command(
+      OUTPUT ${_out}
+      COMMAND ${FLEX_EXECUTABLE} ARGS -o${_out} -d ${_in}
+      DEPENDS ${_in})
 
-      ADD_CUSTOM_COMMAND(
-         OUTPUT ${_out}
-         COMMAND ${FLEX_EXECUTABLE}
-         ARGS
-         -o${_out} -d
-         ${_in}
-         DEPENDS ${_in}
-      )
-
-      SET(${_sources} ${${_sources}} ${_out} )
-   ENDFOREACH (_current_FILE)
-ENDMACRO(ADD_FLEX_FILES)
+    set(${_sources} ${${_sources}} ${_out})
+  endforeach(_current_FILE)
+endmacro(ADD_FLEX_FILES)

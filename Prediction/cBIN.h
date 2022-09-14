@@ -27,7 +27,7 @@
 #ifndef Qrap_cBIN_h
 #define Qrap_cBIN_h
 #include "cMemmngr.h"
-#include "proj_api.h"
+#include "proj.h"
 #include "cGeoP.h"
 #include <string.h>
 #include <stdio.h>

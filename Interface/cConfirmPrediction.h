@@ -36,12 +36,12 @@
 #include "../Prediction/cPlotTask.h"
 #include "ui_ConfirmPrediction.h"
 
-//QT4 includes
+//QT5 includes
 #include <QTreeWidgetItem>
 #include <QFile>
 #include <QDir>
-#include <QPrinter>
-#include <QPrintDialog>
+#include <QtPrintSupport/QPrinter>
+#include <QtPrintSupport/QPrintDialog>
 #include <QPainter>
 #include <QPen>
 #include <QFont>
@@ -58,7 +58,7 @@
 #include <qgsmaplayerregistry.h>
 #include <qgsvectorlayer.h>
 #include <qgisinterface.h>
-#include <qgisgui.h>
+#include <qgis_gui.h>
 #include <qgsapplication.h>
 #include <qgslogger.h>
 #include <qgslabelattributes.h>

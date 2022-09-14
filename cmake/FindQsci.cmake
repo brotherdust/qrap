@@ -1,5 +1,5 @@
-# Find QScintilla2 PyQt4 module
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Find QScintilla2 PyQt module
+# ~~~
 #
 # QScintilla2 website: http://www.riverbankcomputing.co.uk/software/qscintilla/
 #
@@ -8,7 +8,7 @@
 #
 # This file defines the following variables:
 #
-# QSCI_FOUND - system has QScintilla2 PyQt4 module
+# QSCI_FOUND - system has QScintilla2 PyQt module
 #
 # QSCI_MOD_VERSION_STR - The version of Qsci module as a human readable string.
 #
@@ -16,33 +16,66 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
-IF(EXISTS QSCI_MOD_VERSION_STR)
+if(QSCI_MOD_VERSION_STR)
   # Already in cache, be silent
-  SET(QSCI_FOUND TRUE)
-ELSE(EXISTS QSCI_MOD_VERSION_STR)
+  set(QSCI_FOUND TRUE)
+else(QSCI_MOD_VERSION_STR)
 
-  FIND_FILE(_find_qsci_py FindQsci.py PATHS ${CMAKE_MODULE_PATH})
+  if(SIP_BUILD_EXECUTABLE)
+    # SIP >= 5.0 path
 
-  EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} ${_find_qsci_py} OUTPUT_VARIABLE qsci_ver)
+    file(GLOB _qsci_metadata
+         "${Python_SITEARCH}/QScintilla*.dist-info/METADATA")
+    if(_qsci_metadata)
+      file(READ ${_qsci_metadata} _qsci_metadata_contents)
+      string(REGEX REPLACE ".*\nVersion: ([^\n]+).*$" "\\1"
+                           QSCI_MOD_VERSION_STR ${_qsci_metadata_contents})
+    else(_qsci_metadata)
+      execute_process(
+        COMMAND
+          ${Python_EXECUTABLE} -c
+          "from PyQt5.Qsci import QSCINTILLA_VERSION_STR; print(QSCINTILLA_VERSION_STR)"
+        OUTPUT_VARIABLE QSCI_MOD_VERSION_STR)
+    endif(_qsci_metadata)
 
-  IF(qsci_ver)
-    STRING(REGEX REPLACE "^qsci_version_str:([^\n]+).*$" "\\1" QSCI_MOD_VERSION_STR ${qsci_ver})
-    SET(QSCI_FOUND TRUE)
-  ENDIF(qsci_ver)
+    if(QSCI_MOD_VERSION_STR)
+      set(QSCI_SIP_DIR "${PYQT5_SIP_DIR}")
+      set(QSCI_FOUND TRUE)
+    endif(QSCI_MOD_VERSION_STR)
 
-  IF(QSCI_FOUND)
-    FIND_PATH(QSCI_SIP_DIR
-      NAMES Qsci/qscimod4.sip
-      PATHS ${PYQT4_SIP_DIR}
-    )
+  else(SIP_BUILD_EXECUTABLE)
+    # SIP 4.x path
 
-    IF(NOT QSCI_FIND_QUIETLY)
-      MESSAGE(STATUS "Found QScintilla2 PyQt4 module: ${QSCI_MOD_VERSION_STR}")
-    ENDIF(NOT QSCI_FIND_QUIETLY)
-  ELSE(QSCI_FOUND)
-    IF(QSCI_FIND_REQUIRED)
-      MESSAGE(FATAL_ERROR "Could not find QScintilla2 PyQt4 module")
-    ENDIF(QSCI_FIND_REQUIRED)
-  ENDIF(QSCI_FOUND)
+    find_file(
+      _find_qsci_py FindQsci.py
+      PATHS ${CMAKE_MODULE_PATH}
+      NO_CMAKE_FIND_ROOT_PATH)
 
-ENDIF(EXISTS QSCI_MOD_VERSION_STR)
+    set(QSCI_VER 5)
+
+    execute_process(COMMAND ${Python_EXECUTABLE} ${_find_qsci_py} ${QSCI_VER}
+                    OUTPUT_VARIABLE qsci_ver)
+
+    if(qsci_ver)
+      string(REGEX REPLACE "^qsci_version_str:([^\n]+).*$" "\\1"
+                           QSCI_MOD_VERSION_STR ${qsci_ver})
+      find_path(
+        QSCI_SIP_DIR
+        NAMES Qsci/qscimod5.sip
+        PATHS ${PYQT5_SIP_DIR} ${SIP_DEFAULT_SIP_DIR})
+      set(QSCI_FOUND TRUE)
+    endif(qsci_ver)
+
+  endif(SIP_BUILD_EXECUTABLE)
+
+  if(QSCI_FOUND)
+    if(NOT QSCI_FIND_QUIETLY)
+      message(STATUS "Found QScintilla2 PyQt module: ${QSCI_MOD_VERSION_STR}")
+    endif(NOT QSCI_FIND_QUIETLY)
+  else(QSCI_FOUND)
+    if(QSCI_FIND_REQUIRED)
+      message(FATAL_ERROR "Could not find QScintilla2 PyQt module")
+    endif(QSCI_FIND_REQUIRED)
+  endif(QSCI_FOUND)
+
+endif(QSCI_MOD_VERSION_STR)

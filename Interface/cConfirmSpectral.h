@@ -32,7 +32,7 @@
 #include <qgspoint.h>
 #include "../Prediction/cGeoP.h"
 #include <string>
-#include <QtGui/QCheckBox>
+#include <QtWidgets/QCheckBox>
 #include <QtCore/QList>
 
 using namespace std;

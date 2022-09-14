@@ -4,7 +4,8 @@
 #   PQXX_INCLUDE_DIRECTORIES  to the directory containing mysql.h
 #   PQXX_LIBRARIES            to the MySQL client library (and any dependents required)
 # If PQXX_REQUIRED is defined, then a fatal error message will be generated if libpqxx is not found
-if ( NOT PQXX_INCLUDE_DIRECTORIES OR NOT PQXX_LIBRARIES )
+
+#if ( NOT PQXX_INCLUDE_DIRECTORIES OR NOT PQXX_LIBRARIES )
 
 #  FIND_PACKAGE( POSTGRES REQUIRED )
 #  if ( POSTGRES_FOUND )
@@ -47,9 +48,10 @@ if ( NOT PQXX_INCLUDE_DIRECTORIES OR NOT PQXX_LIBRARIES )
 
     mark_as_advanced( FORCE PQXX_INCLUDE_DIRECTORIES )
     mark_as_advanced( FORCE PQXX_LIBRARIES )
+    MESSAGE(STATUS "PQXX Library: ${PQXX_LIBRARY}")
 
   else ( PQXX_HEADER_PATH AND PQXX_LIBRARY )
     message( "PQXX NOT FOUND" )
   endif ( PQXX_HEADER_PATH AND PQXX_LIBRARY )
 
-endif ( NOT PQXX_INCLUDE_DIRECTORIES OR NOT PQXX_LIBRARIES )
+#endif ( NOT PQXX_INCLUDE_DIRECTORIES OR NOT PQXX_LIBRARIES )

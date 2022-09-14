@@ -28,7 +28,7 @@
 #ifndef CLOADTHREAD_H_
 #define CLOADTHREAD_H_
 
-#include <QtGui>
+#include <QtWidgets>
  #include <QMutex>
  #include <QSize>
  #include <QThread>

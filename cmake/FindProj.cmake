@@ -7,7 +7,7 @@
 #    PROJ_LIBRARY
 
 
-FIND_PATH(PROJ_INCLUDE_DIR proj_api.h 
+FIND_PATH(PROJ_INCLUDE_DIR proj.h
   /usr/local/include 
   /usr/include 
   #msvc

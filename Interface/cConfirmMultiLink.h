@@ -35,7 +35,7 @@
 #include "../Prediction/PredStructs.h"
 #include "cLinkAnalysis.h"
 #include <string>
-#include <QtGui/QCheckBox>
+#include <QtWidgets/QCheckBox>
 #include <QtCore/QList>
 
 using namespace std;

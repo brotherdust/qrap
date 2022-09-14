@@ -29,7 +29,7 @@
 #define CPLACESITE_H_
 
 #include <qgisinterface.h>
-#include <qgisgui.h>
+#include <qgis_gui.h>
 //#include <qgsapplication.h>
 #include "../DataBase/Config.h"
 #include "../DataBase/MainWindow.h"

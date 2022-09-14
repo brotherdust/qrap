@@ -1,100 +1,112 @@
-
 # macro that checks for grass installation in specified directory
 
-MACRO (CHECK_GRASS G_PREFIX)
+macro(CHECK_GRASS G_PREFIX)
 
-  FIND_PATH (GRASS_INCLUDE_DIR grass/version.h ${G_PREFIX}/include)
+  find_path(GRASS_INCLUDE_DIR grass/version.h ${G_PREFIX}/include)
 
-  SET (GRASS_LIB_NAMES gis vect dig2 dbmiclient dbmibase shape dgl rtree datetime linkm form gproj)
+  set(GRASS_LIB_NAMES
+      gis
+      vect
+      dig2
+      dbmiclient
+      dbmibase
+      shape
+      dgl
+      rtree
+      datetime
+      linkm
+      form
+      gproj)
 
-  SET (GRASS_LIBRARIES "")
+  set(GRASS_LIBRARIES "")
 
-  FOREACH (LIB ${GRASS_LIB_NAMES})
-    SET(LIB_PATH NOTFOUND)
-    FIND_LIBRARY(LIB_PATH grass_${LIB} PATHS ${G_PREFIX}/lib)
+  foreach(LIB ${GRASS_LIB_NAMES})
+    set(LIB_PATH NOTFOUND)
+    find_library(LIB_PATH grass_${LIB} PATHS ${G_PREFIX}/lib)
 
-    IF (LIB_PATH)
-      IF (NOT GRASS_LIBRARIES STREQUAL NOTFOUND)
-        SET (GRASS_LIBRARIES ${GRASS_LIBRARIES} ${LIB_PATH})
-      ENDIF (NOT GRASS_LIBRARIES STREQUAL NOTFOUND)
-    ELSE (LIB_PATH)
-      SET (GRASS_LIBRARIES NOTFOUND)
-    ENDIF (LIB_PATH)
+    if(LIB_PATH)
+      if(NOT GRASS_LIBRARIES STREQUAL NOTFOUND)
+        set(GRASS_LIBRARIES ${GRASS_LIBRARIES} ${LIB_PATH})
+      endif(NOT GRASS_LIBRARIES STREQUAL NOTFOUND)
+    else(LIB_PATH)
+      set(GRASS_LIBRARIES NOTFOUND)
+    endif(LIB_PATH)
 
-  ENDFOREACH (LIB)
+  endforeach(LIB)
 
-  # LIB_PATH is only temporary variable, so hide it (is it possible to delete a variable?)
-  MARK_AS_ADVANCED(LIB_PATH)
+  # LIB_PATH is only temporary variable, so hide it (is it possible to delete a
+  # variable?)
+  mark_as_advanced(LIB_PATH)
 
-  IF (GRASS_INCLUDE_DIR AND GRASS_LIBRARIES)
-    SET (GRASS_FOUND TRUE)
-    SET (GRASS_PREFIX ${G_PREFIX})
-  ENDIF (GRASS_INCLUDE_DIR AND GRASS_LIBRARIES)
-    
-  MARK_AS_ADVANCED (
-    GRASS_INCLUDE_DIR
-    GRASS_LIBRARIES
-  )
+  if(GRASS_INCLUDE_DIR AND GRASS_LIBRARIES)
+    set(GRASS_FOUND TRUE)
+    set(GRASS_PREFIX ${G_PREFIX})
+  endif(GRASS_INCLUDE_DIR AND GRASS_LIBRARIES)
 
-ENDMACRO (CHECK_GRASS)
+  mark_as_advanced(GRASS_INCLUDE_DIR GRASS_LIBRARIES)
 
-###################################
+endmacro(CHECK_GRASS)
+
+# ##############################################################################
 # search for grass installations
 
 # list of paths which to search - user's choice as first
-SET (GRASS_PATHS ${GRASS_PREFIX} /usr/lib/grass c:/msys/local)
+set(GRASS_PATHS ${GRASS_PREFIX} /usr/lib/grass c:/msys/local)
 
 # mac-specific path
-IF (APPLE)
-  SET (GRASS_PATHS ${GRASS_PATHS} /Applications/GRASS.app/Contents/Resources)
-ENDIF (APPLE)
+if(APPLE)
+  set(GRASS_PATHS ${GRASS_PATHS} /Applications/GRASS.app/Contents/Resources)
+endif(APPLE)
 
-IF (WITH_GRASS)
+if(WITH_GRASS)
 
-  FOREACH (G_PREFIX ${GRASS_PATHS})
-    IF (NOT GRASS_FOUND)
-      CHECK_GRASS(${G_PREFIX})
-    ENDIF (NOT GRASS_FOUND)
-  ENDFOREACH (G_PREFIX)
+  foreach(G_PREFIX ${GRASS_PATHS})
+    if(NOT GRASS_FOUND)
+      check_grass(${G_PREFIX})
+    endif(NOT GRASS_FOUND)
+  endforeach(G_PREFIX)
 
-ENDIF (WITH_GRASS)
+endif(WITH_GRASS)
 
-###################################
+# ##############################################################################
 
-IF (GRASS_FOUND)
-   FILE(READ ${GRASS_INCLUDE_DIR}/grass/version.h VERSIONFILE)
-   STRING(REGEX MATCH "[0-9]+\\.[0-9]+\\.[^ ]+" GRASS_VERSION ${VERSIONFILE})
+if(GRASS_FOUND)
+  file(READ ${GRASS_INCLUDE_DIR}/grass/version.h VERSIONFILE)
+  string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[^ ]+" GRASS_VERSION ${VERSIONFILE})
 
-   IF (NOT GRASS_FIND_QUIETLY)
-      MESSAGE(STATUS "Found GRASS: ${GRASS_PREFIX} (${GRASS_VERSION})")
-   ENDIF (NOT GRASS_FIND_QUIETLY)
+  if(NOT GRASS_FIND_QUIETLY)
+    message(STATUS "Found GRASS: ${GRASS_PREFIX} (${GRASS_VERSION})")
+  endif(NOT GRASS_FIND_QUIETLY)
 
   # openpty is currently needed for GRASS shell
-  INCLUDE(CheckFunctionExists)
-  IF (APPLE)
-  SET (CMAKE_REQUIRED_INCLUDES util.h)
-  ELSE (APPLE)
-  SET (CMAKE_REQUIRED_INCLUDES pty.h)
-  SET (CMAKE_REQUIRED_LIBRARIES util)
-  ENDIF (APPLE)
-  CHECK_FUNCTION_EXISTS(openpty HAVE_OPENPTY)
+  include(CheckFunctionExists)
+  if(APPLE)
+    set(CMAKE_REQUIRED_INCLUDES util.h)
+  else(APPLE)
+    set(CMAKE_REQUIRED_INCLUDES pty.h)
+    set(CMAKE_REQUIRED_LIBRARIES util)
+  endif(APPLE)
+  check_function_exists(openpty HAVE_OPENPTY)
 
   # add 'util' library to the dependencies
-  IF (HAVE_OPENPTY AND NOT APPLE)
-    FIND_LIBRARY(OPENPTY_LIBRARY NAMES util PATHS /usr/local/lib /usr/lib c:/msys/local/lib)
-    SET (GRASS_LIBRARIES ${GRASS_LIBRARIES} ${OPENPTY_LIBRARY})
-  ENDIF (HAVE_OPENPTY AND NOT APPLE)
+  if(HAVE_OPENPTY AND NOT APPLE)
+    find_library(
+      OPENPTY_LIBRARY
+      NAMES util
+      PATHS /usr/local/lib /usr/lib c:/msys/local/lib)
+    set(GRASS_LIBRARIES ${GRASS_LIBRARIES} ${OPENPTY_LIBRARY})
+  endif(HAVE_OPENPTY AND NOT APPLE)
 
-ELSE (GRASS_FOUND)
+else(GRASS_FOUND)
 
-   IF (WITH_GRASS)
+  if(WITH_GRASS)
 
-     IF (GRASS_FIND_REQUIRED)
-        MESSAGE(FATAL_ERROR "Could not find GRASS")
-     ELSE (GRASS_FIND_REQUIRED)
-        MESSAGE(STATUS "Could not find GRASS")
-     ENDIF (GRASS_FIND_REQUIRED)
+    if(GRASS_FIND_REQUIRED)
+      message(FATAL_ERROR "Could not find GRASS")
+    else(GRASS_FIND_REQUIRED)
+      message(STATUS "Could not find GRASS")
+    endif(GRASS_FIND_REQUIRED)
 
-   ENDIF (WITH_GRASS)
+  endif(WITH_GRASS)
 
-ENDIF (GRASS_FOUND)
+endif(GRASS_FOUND)

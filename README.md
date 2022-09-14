@@ -5,7 +5,7 @@ I am attempting to port this to QGIS 3.x:
 
 - [x] Update cmake files and ancillary code for updated dependencies
 - [x] Migrate from Qt4 to Qt5 using the [wiki guide](https://wiki.qt.io/Transition_from_Qt_4.x_to_Qt5) **Completed but there's still a ton of errors**.
-- [] [Migrate proj4 to proj6](https://proj.org/development/migration.html)
+- [ ] [Migrate proj4 to proj6](https://proj.org/development/migration.html)
 
 **THIS DOES NOT YET COMPILE**
 
@@ -20,6 +20,7 @@ While the software is free for use by any-one, we particularly hope that it will
 
 Code Contributors:
 
+* Jarad Olson
 * Magdaleen Ballot from University of Pretoria
 * Gabriel de Sousa (now an UP graduate)
 * Roeland van Nieuwkerk (now an UP graduate)
@@ -27,14 +28,6 @@ Code Contributors:
 * Thane Thomson (now an UP graduate)
 * Shaun Barlow (now an UP graduate)
 * Christo du Plessis (now an UP graduate)
-
-General Support:
-
-* Hennie de Lange from Radio Technical SAPS
-* Kobus Roux from Meraka Institute, CSIR
-* Madelein van der Berg from Meraka Institute, CSIR
-* Anita van Deventer from Meraka Institute, CSIR
-* Adrian Tiplady from the SKA-project and the DST who initiated and sponsored the Spectral Interference Tool.
 
 Testing:
 

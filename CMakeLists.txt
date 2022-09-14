@@ -222,7 +222,7 @@ find_package(GDAL)
 find_package(Expat REQUIRED)
 find_package(Spatialindex REQUIRED)
 find_package(Qwt REQUIRED)
-message("  Found QWt Include: " ${QWT_INCLUDE_DIR})
+message("-- Found QWt Include: " ${QWT_INCLUDE_DIR})
 
 find_package(Eigen REQUIRED)
 # INCLUDE( ${EIGEN_INCLUDE_DIR} ) MESSAGE ( "  Found Eigen Include:"

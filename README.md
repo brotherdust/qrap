@@ -7,6 +7,8 @@ I am attempting to port this to QGIS 3.x:
 - [x] Migrate from Qt4 to Qt5 using the [wiki guide](https://wiki.qt.io/Transition_from_Qt_4.x_to_Qt5) **Completed but there's still a ton of errors**.
 - [] [Migrate proj4 to proj6](https://proj.org/development/migration.html)
 
+**THIS DOES NOT YET COMPILE**
+
 Q-Rap is Radio Planning plug-in for QGIS. It was developed for the Radio Technical Services of the South African Police Service by the University of Pretoria (through BE@UP). The SAPS specified that the source code be released to ensure continuous development and maintenance. The core propagation prediction algorithm was made available by CSIR Meraka Institute.
 
 Why the name Q-Rap? It is to give recognition to its predecessor and enablers: RAP and GISRAP was RAdio Planning/Propagation software developed at Mikomtek, CSIR (now the Meraka Institute), and the enabling QGIS. Without the Open Sourced QGIS, this tool would not have been as user friendly, in fact it simply might not have been at all. We also use Qt extensively.
